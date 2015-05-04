@@ -453,6 +453,19 @@ their analysis.
 
 \subsection{Example: Kitaev honeycomb model}
 
+
+\begin{figure*}[th!]
+\begin{center}
+        \includegraphics[width=0.6\columnwidth]{fig_00.pdf}
+\caption{
+Gauge generators have support on the edges of the honeycomb lattice.
+Qubits here are depicted as circles.
+}
+\label{honeycomb}
+\end{center}
+\end{figure*}
+
+
 The Kitaev honeycomb model is build from spins on
 the sites of a hexagonal lattice. 
 The lattice of linear size $l$ has $n=2l^2$ sites
@@ -460,10 +473,11 @@ which we coordinatize using integer triples $i, j, k$
 with $1\le j, k\le l$ and $k=1, 2.$
 We use periodic boundary conditions so $i, j$ are
 to be taken modulo $l$.
+See figure \ref{honeycomb}.
 The edges of the lattice are in one-to-one
 correspondence with the generators $S$:
 $$
-S = \big\{X_{ij1}X_{ij2},\ Z_{ij2}Z_{i+1,j1},\ Y_{ij1}Y_{i-1,j+1,2}
+S := \big\{X_{ij1}X_{ij2},\ Z_{ij2}Z_{i+1,j1},\ Y_{ij1}Y_{i-1,j+1,2}
 \ \mbox{for}\ 1\le i,j\le l\big\}.
 $$
 
@@ -476,10 +490,38 @@ so we find $|H_0|=\half n+1.$
 There are no logical operators, so we
 must have $|R_0|=n-2.$
 
-In \cite{Kells2009} they introduce a set of
-mutually anti-commuting string operators $K_0.$
+\begin{figure*}[th!]
+\begin{center}
+        \includegraphics[width=0.5\columnwidth]{fig_01.pdf}
+%\caption{Two elements $g_{341}$ and $g_{342}$ of the set $K_0$}
+\caption{Two elements of the set $K_0$ corresponding
+to $i=3$, $j=4$ and $k=1,2.$}
+\label{jaws}
+\end{center}
+\end{figure*}
+
+Now we construct a set of string operators $K_0$,
+one for each site on the lattice, except for
+the two sites $(1,1,1)$ and $(1,1,2).$
+Each string $g_{ijk}\in K_0$
+is constructed as the product of
+gauge operators along a path starting at
+$(1,1,1)$ and terminating at $(i,j,k).$
+Each such path is built from two ``straight''
+path segments, first in the $i$ direction
+and then in the $j$ direction. 
+The paths for operators $g_{ij1}$ and
+$g_{ij2}$ coincide along the $i$ direction
+but become disjoint in the $j$ direction:
+the $g_{ij1}$ path goes around the bottom
+of the hexagons and the $g_{ij2}$ path
+goes around the top.
+See figure \ref{jaws}.
+%In \cite{Kells2009} they introduce a set of
+%mutually anti-commuting string operators $K_0.$
 With periodic boundary conditions $K_0$ forms an
 independant generating set of $R$ of size $n-2.$
+
 To construct an isomorphism $\phi: R\to \Pauli_r$
 we map elements of $K_0$ to the following independant generating
 set of $\Pauli_r$:
