@@ -466,7 +466,7 @@ Qubits here are depicted as circles.
 \end{figure*}
 
 
-The Kitaev honeycomb model is build from spins on
+The Kitaev honeycomb model \cite{Kitaev2006} is built from spins on
 the sites of a hexagonal lattice. 
 The lattice of linear size $l$ has $n=2l^2$ sites
 which we coordinatize using integer triples $i, j, k$
@@ -482,7 +482,22 @@ S := \big\{X_{ij1}X_{ij2},\ Z_{ij2}Z_{i+1,j1},\ Y_{ij1}Y_{i-1,j+1,2}
 $$
 
 Stabilizers are generated from closed strings of
-gauge operators. This gives independant stabilizer generators
+gauge operators. 
+For example, each hexagon gives a stabilizer
+\begin{align*}
+h_{ij}:&= 
+X_{ij1}X_{ij2}
+Z_{ij2}Z_{i+1,j1}
+Y_{i+1,j1}Y_{i,j+1,2}
+X_{i,j+1,2}X_{i,j+1,1}
+Z_{i,j+1,1}Z_{i-1,j+1,2}
+Y_{i-1,j+1,2}Y_{ij1}
+\\
+&= 
+Z_{ij1} Y_{ij2} X_{i+1,j1}
+Z_{i,j+1,2} Y_{i,j+1,1} X_{i-1,j+1,2}.
+\end{align*}
+This gives independant stabilizer generators
 from each hexagon, less one, as well as two
 homologically non-trivial loops.
 The number of hexagons is $\frac{1}{2}n$ and
@@ -522,17 +537,36 @@ See figure \ref{jaws}.
 With periodic boundary conditions $K_0$ forms an
 independant generating set of $R$ of size $n-2.$
 
-To construct an isomorphism $\phi: R\to \Pauli_r$
-we map elements of $K_0$ to the following independant generating
+We construct an isomorphism $\phi: R\to \Pauli_r$
+by setting $\phi(g_{ij1}):=c_{2j'}$
+and $\phi(g_{ij2}):=c_{2j'+1}$
+%we map 
+%elements of $K_0$ to the following independant generating
+where the $c_j$ form the following independant generating
 set of $\Pauli_r$:
 $$
 %\big\{\prod_{i=1}^{j-1} Z_i X_j,\ \prod_{i=1}^{j-1} Z_i Y_j\ \mbox{for}\ 1\le j\le r\big\}.
 \big\{c_{2j}:=Z_1...Z_{j-1} X_j,\ c_{2j+1}:=Z_1...Z_{j-1} Y_j\ \mbox{for}\ 1\le j\le r\big\}.
 $$
 
-{\it XXX Prove this is an isomorphism }
+We check this is a group homomorphism by showing that relations
+satisfied by elements of $K_0$ are satisfied by
+their images under $\phi.$
+All such relations are either of the form
+$g^2=~\pm~I$, $gg'=\pm~g'g$, or
+products thereof.
+So it is sufficient to check squares of
+elements and commutation relations.
+Every element of $K_0$ anticommutes with
+every other element of $K_0$, and this is true also
+of the $c_j.$
+Also, $g_{ijk}^2=I$ and $g_{ijk}^2=-I$ 
+is preserved by $\phi$ because $c_{2j}^2=I$ and $c_{2j}^2=-I$.
+Finally, $\phi$ is an isomorphism
+because it is a bijection of two independant
+generating sets.
 
-The $c_j$ are now paired Majorana fermion operators, 
+The $c_j$ are now paired Majorana fermion operators \cite{Kitaev2006}, 
 and each block in the Hamiltonian
 is seen to be quadratic in these operators:
 $$
@@ -540,6 +574,20 @@ $$
 $$
 where the coefficients $\Gamma_{ij}$
 are dependant on the irrep $\rho.$
+To find these coefficients we see that
+the $X_{ij1}X_{ij2}$
+gauge operators can be generated
+by the product of 
+$g_{ij1}g_{ij2}$ and the enclosed stabilizers (hexagons):
+$$X_{ij1}X_{ij2}=g_{ij1}g_{ij2}\prod_{j'=1}^{j-1} h_{ij'}.$$
+And similarly, we take the product
+of two operators from $K_0$ that differ
+by one path segment (gauge operator) to
+find the other gauge operators:
+\begin{align*}
+Z_{ij2}Z_{i+1,j1} &= g_{ij2} g_{i+1,j1} \\
+Y_{i+1,j1}Y_{i,j+1,2} &= g_{i+1,j1}g_{i,j+1,2}.
+\end{align*}
 
 %A similar analysis applies to the ising model, Jordan-Wigner... 
 %http://arxiv.org/pdf/1504.01444 page 86.
