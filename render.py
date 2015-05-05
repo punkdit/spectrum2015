@@ -220,6 +220,9 @@ for idx in range(len(op1)):
 for i in range(l):
   for j in range(l):
 
+    if (i,j)==(l-1,l-1):
+        continue
+
     k = 0
     x, y = coords[i, j, k]
     c.stroke(path.circle(x, y, radius))
@@ -230,6 +233,11 @@ for i in range(l):
     k = 1
     x, y = coords[i, j, k]
     c.stroke(path.circle(x, y, radius))
+
+x, y = coords[l-2,l-1,0]
+c.text(x+1.2*radius, y-2.*radius, "$g_{341}$", ta)
+x, y = coords[l-2,l-1,1]
+c.text(x+1.0*radius, y+2.*radius, "$g_{342}$", ta)
 
 c.writePDFfile("fig_01")
 
