@@ -68,13 +68,51 @@
 %In both these cases the existence of large weight stabilizer generators
 %causes the gapless behaviour.
 
+Stabilizer codes, and more generally, subsystem codes
+\cite{Poulin2005}, \cite{Bacon2006}
+attempt to store quantum information using
+an error correction proceedure...
+group structure of the measurement operators
+that allows to prove some nice properties of the
+error correction proceedure.
+
+A dynamical picture emerges when we consider a
+Hamiltonian built from the sum of these exact same
+operators (up to a sign).
+Now the encoded information is stored in the
+groundspace of a degenerate Hamiltonian.
+Now we ask if the energetics of the system
+has any robustness to excitations..
+in particular the low energy spectrum,
+can maintain ..
+
+from the coding point of view, distance matters
+as well as number of encoded qubits. subsystem codes
+also would need bounded gauge operators per stabilizer
+in order to be fault tolerant (or have error threshold)
+
+from the dynamical point of view, the first (of many)
+questions to ask is: does the spectrum have a gap?
+Also, this is perhaps a wider class of systems, as we
+may be interested in Hamiltonians with non-degenerate 
+groundstate
+(thought of as a code these systems do not store any information.)
+
+The usual way of attacking these Hamiltonians is
+by doing some kind of ad-hoc spin transformation.
+Here we show a method that is one level
+above such transformations of the hilbert space:
+we transform the (group of) operators themselves.
+% drawback of complicating the analysis of Hamiltonians
+% with J's.
+
 We are interested in diagonalizing (solving) Hamiltonians
 built from Pauli operators, whose terms are not necessarily commuting.
 An example of this is the 
 transverse-field Ising model:
 $\Ham = \sum_i X_i X_{i+1} + Z_i.$
 The usual way of attacking these Hamiltonians is
-by doing some kind of ad-hoc, unmotivated, spin transformation.
+by doing some kind of ad-hoc spin transformation.
 Here we show that the group structure of the 
 Hamiltonian terms reveals similar transforms,
 in a simpler and more general way.
@@ -171,7 +209,8 @@ See \cite{Diaconis1981} and \cite{Kaski2002} for more details.
 The Pauli group $\Pauli_1$ is normally 
 defined as a set of matrices closed under
 matrix multiplication, but we can define
-it abstractly as the group generated
+it abstractly
+as the group generated
 by the (abstract) elements $\{\omega, X, Z\}$ with
 relations as follows:
 $$
@@ -193,6 +232,11 @@ X_i^2=I,\ Z_i^2=I,\ \omega X_i\omega X_i=I,\ \omega Z_i\omega Z_i=I,\ \omega Z_i
 Z_iX_jZ_iX_j=I, \mbox{\ for\ } i, j = 1,..,n,\ i\ne j.
 \end{array}
 \end{equation}
+
+This abstract approach to the definition of a group is known as
+a group {\it presentation}. In general, this is a set of
+generators together with a set of relations satisfied
+by these generators.
 
 Note that $\omega$ commutes with all elements of $\Pauli_n$
 and squares to the idenity, so we will denote this
@@ -272,8 +316,8 @@ Pauli group itself, and we are indeed free to think
 that way because $\rho_{\mathrm{pauli}}$ is a group
 isomorphism.
 It turns out that $\rho_{\mathrm{pauli}}$ is an
-irreducible representation ({\it irrep}) of $\Pauli_n$ and the
-only other irreps of $\Pauli_n$ are 
+irreducible representation ({\it irrep}) of $\Pauli_n$. 
+The only other irreps of $\Pauli_n$ are 
 the $1$-dimensional irreps $\rho:\Pauli_n\to\Complex$
 defined on the independant generators as:
     $$ \rho(X_i) = \pm 1,\quad \rho(Z_i) = \pm 1.$$
@@ -282,6 +326,13 @@ So we have $2^{2n}$ many $1$-dimensional irreps,
 and a single $2^n$-dimensional irrep.
 Summing the squares of the dimensions
 shows that we have a complete set of irreps of $\Pauli_n.$
+
+Our next job will be to find the irreps of {\it subgroups} of $\Pauli_n.$
+Although $\rho_{\mathrm{pauli}}$
+restricted to subgroups $G$ of $\Pauli_n$ serves as a representation
+of $G$ it is no longer irreducible.
+Our aim will be to decompose $\rho_{\mathrm{pauli}}$ into irreps
+of $G.$
 
 We now define a {\it gauge} subgroup $G$ of $\Pauli_n$
 by choosing a set of generators $S\subset \Pauli_n,$
@@ -312,7 +363,9 @@ is a set of independant generators of $R.$
 We also let $H_0$ be a set of $m$ independant generators of $H.$
 
 Next, to find the cosets of $G$ in $\Pauli_n$ we take
-the group closure of $G-\Pauli_n$. This is another
+the group closure of $G-\Pauli_n$; when this is non-empty
+we only need to add $I$ and $-I.$
+This is another
 gauge group, whose reduced gauge group is known as
 the {\it logical} operators $L$, and whose 
 stabilizer subgroup is known as the {\it error} operators $T.$
@@ -333,7 +386,7 @@ $$
     \quad \rho(\phi^{-1}(X_i)) = \pm 1,\quad \rho(\phi^{-1}(Z_i)) = \pm 1.
 $$
 This gives all $2^{m+2r}$ of the $1$-dimensional irreps.
-These will turn out not to be used below.
+%These will turn out not to be used below.
 
 The $2^r$-dimensional irreps are given by:
 $$
@@ -458,6 +511,8 @@ to be the corresponding Pauli linear operators.
 Here we work out a simple example with $n=4$
 that illustrates the above concepts and can
 be readily calculated by hand.
+In this example we supress the tensor product
+symbol when we write operators.
 We take as gauge operators:
 $$
     S = \{XXII, IIXX, ZIZI, IZIZ\}.
@@ -469,17 +524,39 @@ and then the errors $T_0$ corresponding to $H_0$ will
 be $\{ZZZI, IIIX\}.$
 All of this can be summarized in a table of anti-commuting pairs:
 $$
-\begin{array}{cc}
-XIXI & ZZII \\
-XXXX & ZZZI \\
-ZZZZ & IIIX \\
-XXII & ZIZI \\
+\begin{array}{rll}
+L_0 = &XIXI & ZZII \\
+H_0, T_0 = &XXXX & ZZZI \\
+           &ZZZZ & IIIX \\
+R_0 = &XXII & ZIZI \\
 \end{array}
 $$
 where the number of rows equals $n$ and each entry
 commutes with the entries on other rows, and anticommutes
 with the entry on the same row. Indeed, we have a presentation
 of the group $\Pauli_4,$ as it was defined in Eq (\ref{presentation}).
+In particular, we have presented $R$ as $\Pauli_1$ and this
+makes it obvious an isomorphism $\phi:R\to \Pauli_1$
+to use: %, defined by its values on $R_0,$ 
+$$
+    \phi(XXII) := X, \ \ \phi(ZIZI) := Z.
+$$
+
+We now evaluate $\rho(g)$ for each $g\in S$ 
+to work out the form of each block $\Ham_\rho$.
+Note that $g=g'h$ where $g'\in R$ and $h\in H$
+so 
+$$\rho(g)=\rho(g')\rho(h)=\pm\phi(g').$$
+
+We find the four blocks in the Hamiltonian:
+$$
+\Ham_\rho = \sum_{g\in S} \rho(g) = \rho(XXII) + \rho(IIXX) + \rho(ZIZI) + \rho(IZIZ) = X \pm X + Z \pm Z.
+$$
+
+In the next two sections we repeat this calculation for
+more complicated gauge groups.
+The key is to find an isomorphism $\phi$ (as well as $R$ and $H$),
+then the calculation proceeds straightforwardly.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -544,7 +621,7 @@ $$
 \Ham_\rho = \sum_{g\in S} \rho(g) = \sum_{1\le i,j<l} \rho(X_{ij}X_{i,j+1}) + \rho(Z_{ij}Z_{i+1,j}).
 $$
 We note that in \cite{Brzezicki2013}, they perform a
-(ad-hoc?) transformation of the compass model
+transformation of the compass model
 which results in a similar $(l-1)\times(l-1)$ lattice
 of spins, but they have more terms in their Hamiltonian.
 It is not clear if these modifications are essential to
@@ -584,6 +661,7 @@ $$
 S := \big\{X_{ij1}X_{ij2},\ Z_{ij2}Z_{i+1,j1},\ Y_{ij1}Y_{i-1,j+1,2}
 \ \mbox{for}\ 1\le i,j\le l\big\}.
 $$
+Note that we make the definition $Y:=XZ$ for each site.
 
 Stabilizers are generated from closed strings of
 gauge operators. 
@@ -601,9 +679,17 @@ Y_{i-1,j+1,2}Y_{ij1}
 Z_{ij1} Y_{ij2} X_{i+1,j1}
 Z_{i,j+1,2} Y_{i,j+1,1} X_{i-1,j+1,2}.
 \end{align*}
-This gives independant stabilizer generators
-from each hexagon, less one, as well as two
-homologically non-trivial loops.
+
+And the two homologically non-trivial loops
+give stabilizers:
+$$
+h_v := \prod_{i=1}^l Y_{i11} Y_{i12},\ \ 
+h_h := \prod_{j=1}^l X_{1j2} X_{2j1}.
+$$
+
+This gives independant stabilizer generators $H_0$
+from each hexagon, less one, as well as $h_v$ and $h_h.$
+%two homologically non-trivial loops.
 The number of hexagons is $\frac{1}{2}n$ and
 so we find $|H_0|=\half n+1.$
 There are no logical operators, so we
@@ -612,20 +698,21 @@ must have $|R_0|=n-2.$
 \begin{figure*}[th!]
 \begin{center}
         \includegraphics[width=0.5\columnwidth]{fig_01.pdf}
-%\caption{Two elements $g_{341}$ and $g_{342}$ of the set $K_0$}
-\caption{Two elements of the set $K_0$ corresponding
+%\caption{Two elements $g_{341}$ and $g_{342}$ of the set $R_0$}
+\caption{Two elements of the set $R_0$ corresponding
 to $i=3$, $j=4$ and $k=1,2.$}
 \label{jaws}
 \end{center}
 \end{figure*}
 
-Now we construct a set of string operators $K_0$,
+Now we construct a set of string operators $R_0$,
 one for each site on the lattice, except for
 the two sites $(1,1,1)$ and $(1,1,2).$
-Each string $g_{ijk}\in K_0$
+Each string $g_{ijk}\in R_0$
 is constructed as the product of
 gauge operators along a path starting at
 $(1,1,1)$ and terminating at $(i,j,k).$
+See figure \ref{jaws}.
 Each such path is built from two ``straight''
 path segments, first in the $i$ direction
 and then in the $j$ direction. 
@@ -635,63 +722,85 @@ but become disjoint in the $j$ direction:
 the $g_{ij1}$ path goes around the bottom
 of the hexagons and the $g_{ij2}$ path
 goes around the top.
-See figure \ref{jaws}.
 %In \cite{Kells2009} they introduce a set of
-%mutually anti-commuting string operators $K_0.$
-With periodic boundary conditions $K_0$ forms an
+%mutually anti-commuting string operators $R_0.$
+With periodic boundary conditions $R_0$ forms an
 independant generating set of $R$ of size $n-2.$
 
 We construct an isomorphism $\phi: R\to \Pauli_r$
-by setting $\phi(g_{ij1}):=c_{2j'}$
-and $\phi(g_{ij2}):=c_{2j'+1}$
-%we map 
-%elements of $K_0$ to the following independant generating
-where the $c_j$ form the following independant generating
+by sending elements of $R_0$ bijectively
+to the following independant generating
 set of $\Pauli_r$:
 $$
-%\big\{\prod_{i=1}^{j-1} Z_i X_j,\ \prod_{i=1}^{j-1} Z_i Y_j\ \mbox{for}\ 1\le j\le r\big\}.
-\big\{c_{2j}:=Z_1...Z_{j-1} X_j,\ c_{2j+1}:=Z_1...Z_{j-1} Y_j\ \mbox{for}\ 1\le j\le r\big\}.
+\big\{c_{2j}:=Z_1...Z_{j-1} X_j,\ c_{2j+1}:=Z_1...Z_{j-1} Y_j\ \ \mbox{for}\ 1\le j\le r\big\}.
 $$
+The bijection is constrained 
+by setting $\phi(g_{ij1}):=c_{2j'+1}$
+and $\phi(g_{ij2}):=c_{2j'}$
+where $j'$ is chosen uniquely for each $i, j.$
+The $c_j$ are paired Majorana fermion operators \cite{Kitaev2006}.
+
+%We construct an isomorphism $\phi: R\to \Pauli_r$
+%by setting $\phi(g_{ij1}):=c_{2j'}$
+%and $\phi(g_{ij2}):=c_{2j'+1}$
+%%we map 
+%%elements of $R_0$ to the following independant generating
+%where the $c_j$ form the following independant generating
+%set of $\Pauli_r$:
+%$$
+%%\big\{\prod_{i=1}^{j-1} Z_i X_j,\ \prod_{i=1}^{j-1} Z_i Y_j\ \mbox{for}\ 1\le j\le r\big\}.
+%\big\{c_{2j}:=Z_1...Z_{j-1} X_j,\ c_{2j+1}:=Z_1...Z_{j-1} Y_j\ \ \mbox{for}\ 1\le j\le r\big\}.
+%$$
 
 We check this is a group homomorphism by showing that relations
-satisfied by elements of $K_0$ are satisfied by
+satisfied by elements of $R_0$ are satisfied by
 their images under $\phi.$
 All such relations are either of the form
 $g^2=~\pm~I$, $gg'=\pm~g'g$, or
 products thereof.
 So it is sufficient to check squares of
 elements and commutation relations.
-Every element of $K_0$ anticommutes with
-every other element of $K_0$, and this is true also
+Every element of $R_0$ anticommutes with
+every other element of $R_0$, and this is true also
 of the $c_j.$
-Also, $g_{ij1}^2=I$ and $g_{ij2}^2=-I$ 
-is preserved by $\phi$ because $c_{2j}^2=I$ and $c_{2j}^2=-I$.
+Also, $g_{ij1}^2=-I$ and $g_{ij2}^2=I$ 
+is preserved by $\phi$ because $c_{2j}^2=I$ and $c_{2j+1}^2=-I$.
 Finally, $\phi$ is an isomorphism
 because it is a bijection of two independant
 generating sets.
 
-The $c_j$ are now paired Majorana fermion operators \cite{Kitaev2006}, 
-and each block in the Hamiltonian
-is seen to be quadratic in these operators:
-$$
-    \Ham_\rho = \sum_{ij} \Gamma_{ij}(\rho) c_i c_j
-$$
-where the coefficients $\Gamma_{ij}$
-are dependant on the irrep $\rho.$
-To find these coefficients we see that
-the $X_{ij1}X_{ij2}$
+The final step is to write each element of $S$
+as a product of reduced gauge operators and stabilizers.
+Taking the product
+of two operators from $R_0$ that differ
+by one path segment gives the following:
+\begin{align*}
+Z_{ij2}Z_{i+1,j,1} &= g_{ij2} g_{i+1,j,1} \\
+%&\mbox{for}\ \  1\le i<l,\ 1\le j\le l, \ \ \mbox{except}\ \  (i,j)=(1,1) \ \ \mbox{or}\ \ (l,1)\\
+Y_{i+1,j,1}Y_{i,j+1,2} &= g_{i+1,j,1}g_{i,j+1,2}
+%&\mbox{for}\ \  1\le i,j\le l, \ \ \mbox{except}\ \  (i,j)=(1,1) \ \ \mbox{or}\ \ (l,1).
+\end{align*}
+We need the homologically non-trivial stabilizers to get these:
+\begin{align*}
+Z_{lj2}Z_{1j1} &= h_v g_{lj2} g_{1j1} &\mbox{for}\ \  2\le j\le l
+\end{align*}
+And the $X_{ij1}X_{ij2}$
 gauge operators can be generated
 by the product of 
 $g_{ij1}g_{ij2}$ and the enclosed hexagon stabilizers:
 $$X_{ij1}X_{ij2}=g_{ij1}g_{ij2}\prod_{j'=1}^{j-1} h_{ij'}.$$
-And similarly, we take the product
-of two operators from $K_0$ that differ
-by one path segment to
-find the other gauge operators:
-\begin{align*}
-Z_{ij2}Z_{i+1,j1} &= g_{ij2} g_{i+1,j1} \\
-Y_{i+1,j1}Y_{i,j+1,2} &= g_{i+1,j1}g_{i,j+1,2}.
-\end{align*}
+
+The only $S$ operators that are not 
+quadratic in $R_0$ operators are the five
+operators that touch either of the sites
+(1,1,1) or (1,1,2).
+So each block in the Hamiltonian
+is seen to be quadratic in the $c_j$ plus
+five other Pauli operator terms which we denote as $\Lambda_\rho$:
+$$
+    \Ham_\rho = \sum_{ij} \Gamma_{ij}(\rho) c_i c_j + \Lambda_\rho
+$$
+The coefficients $\Gamma_{ij}$ are dependant on the irrep $\rho.$
 
 %A similar analysis applies to the ising model, Jordan-Wigner... 
 %http://arxiv.org/pdf/1504.01444 page 86.
