@@ -29,17 +29,36 @@
 \RequirePackage{graphicx}
 %\RequirePackage[dvips]{geometry}
 
-\def\Xcite#1{}
 
 \begin{document}
 
 \title{Representations of Pauli Operator Hamiltonians}
-%\title{On the Spectrum of Gauge Code Hamiltonians}
 
 \author{Simon Burton}
 \affiliation{Centre for Engineered Quantum Systems, School of Physics, The University of Sydney}
 
+\begin{abstract}
+We analyse the (multiplicative) group structure of terms arrising
+in Hamiltonians constructed from Pauli operators.
+We decompose these operators into irreducible 
+representations, which corresponds to block diagonalizing
+the Hamiltonian where the blocks are labelled by
+eigenvalues of integrals of motion.
+We apply this technique to the 2d-compass model
+and the Kitaev honeycomb model.
+%and find results
+%similar to those previously known,
+%however, we use only the structure of the gauge group,
+%and not any transformations at the level
+%of spins. 
+The results are similar to those previously 
+calculated via spin transformations,
+however, we perform transformations at
+the level of the structure of the gauge group.
+\end{abstract}
+
 \maketitle
+
 
 \def\Complex{\mathbb{C}}
 \def\Z{\mathbb{Z}}
@@ -163,7 +182,7 @@ model.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-\subsection{Cayley graphs}
+\subsection{Motivation: Cayley graphs}
 
 \def\rhoreg{\rho_\mathrm{reg}}
 
@@ -204,7 +223,7 @@ See \cite{Diaconis1981} and \cite{Kaski2002} for more details.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-\subsection{Gauge codes}
+\subsection{Representations of Gauge codes}
 
 The Pauli group $\Pauli_1$ is normally 
 defined as a set of matrices closed under
@@ -268,9 +287,9 @@ We now define the
 Pauli {\it representation} 
 of the Pauli group as a group homomorphism:
 $$
-    \rho_{\mathrm{pauli}} : \Pauli_n \to \GL(V)
+    \rho_{\mathrm{pauli}} : \Pauli_n \to \GL(\Complex[2^n])
 $$
-where $V$ is the $2^n$ dimensional state space of $n$ qubits.
+where $\Complex[2^n]$ is the $2^n$ dimensional state space of $n$ qubits.
 On the independant generators 
 $\{X_1, .., X_n, Z_1, .., Z_n\},\ \rho_{\mathrm{pauli}}$
 is defined as the following tensor product of $2\times 2$ matrices:
@@ -315,7 +334,8 @@ $\rho_{\mathrm{pauli}}$ is thought of as the
 Pauli group itself, and we are indeed free to think
 that way because $\rho_{\mathrm{pauli}}$ is a group
 isomorphism.
-It turns out that $\rho_{\mathrm{pauli}}$ is an
+It turns out (see Appendix for details)
+that $\rho_{\mathrm{pauli}}$ is an
 irreducible representation ({\it irrep}) of $\Pauli_n$. 
 The only other irreps of $\Pauli_n$ are 
 the $1$-dimensional irreps $\rho:\Pauli_n\to\Complex$
@@ -362,7 +382,7 @@ then $R_0 := \{\phi^{-1}(X_i), \phi^{-1}(Z_i)\}_{i=1,..,r}$
 is a set of independant generators of $R.$
 We also let $H_0$ be a set of $m$ independant generators of $H.$
 
-Next, to find the cosets of $G$ in $\Pauli_n$ we take
+To find the cosets of $G$ in $\Pauli_n$ we take
 the group closure of $G-\Pauli_n$; when this is non-empty
 we only need to add $I$ and $-I.$
 This is another
@@ -414,19 +434,31 @@ $$
 %    \quad \rho_t(\phi^{-1}(X_i)) = X_i,\quad \rho_t(\phi^{-1}(Z_i)) = Z_i.
 %$$
 
+%\noindent{\bf Theorem.}
+Using characters one can show that
+on a subgroup $G$ of $\Pauli_n$ the
+Pauli representation decomposes into irreps as:
+$$
+    \rho_{\mathrm{pauli}} = \bigoplus_{l\in L, t\in T} \rho_t.
+$$
+where we label the $2^r$ dimensional irreps by $t\in T.$
+See appendix for details.
 
 The Hamiltonian of interest is 
-an operator $\Ham:\Complex[n]\to\Complex[n]$ and
-normally defined
-as the negative sum of terms from $S,$ but here
-we will reverse the sign:
+an operator $\Ham:\Complex[2^n]\to\Complex[2^n]$:
+%and normally defined
+%as the negative sum of terms from $S,$ but here
+%we will reverse the sign:
 $$ \Ham := \sum_{g\in S} \rho_{\mathrm{pauli}}(g).$$
-
-The goal is to decompose $\Ham$ into blocks as
+Using the above decomposition we find:
 $$
-    \Ham = \bigoplus_{\mathrm{irrep}\rho} \sum_{g\in S}\ \rho(g),
+    \Ham = \bigoplus_{l\in L, t\in T} \sum_{g\in S}\ \rho_t(g).
 $$
-and we will notate each block as
+%The goal is to decompose $\Ham$ into blocks as
+%$$
+%    \Ham = \bigoplus_{\mathrm{irrep}\rho} \sum_{g\in S}\ \rho(g),
+%$$
+We will notate each block as
 $\Ham_\rho := \sum_{g\in S}\rho(g)$
 for each irrep $\rho$ appearing (possibly more than once)
 in $\Ham.$
@@ -435,34 +467,35 @@ The form of $\Ham$ is seen to be very similar
 to the adjacency matrix of Cayley$(G, S)$ but
 instead of the regular representation we are
 using the Pauli representation.
-We use the following map to
-relate these two representations:
-%transfer information about $A$ over to $\Ham$.
-%The Hamiltonian is related to the adjacency matrix
-%$A$ of Cayley$(G, S)$ by the following commutation relation.
 
-\noindent{\bf Theorem.}
-Define a linear map $f:\Complex[G]\to\Complex[G^X]$ as follows.
-Any element $g\in \Pauli_n$ can be written as $g = \pm g_x g_z$
-and we set $f(g) = f(\pm g_x g_z) := \pm g_x.$
-Then,
-$$
-    f A = \Ham f.
-$$
-
-\noindent{\bf Proof.} \Proveit ...
-\qed
-
-{\it XXX $\Complex[G^X]$ is not big enough! 
-Don't we need logical operators \& conjugate
-error operators??? XXX sort this out}
-
-It is easy to see that any eigenvector $v$ of $A$
-with eigenvalue $\lambda$
-is either in the kernel of $f$, or otherwise $fv$
-is an eigenvector of $\Ham$ with eigenvalue $\lambda.$
-Furthermore, $f$ is full-rank \Proveit, and so {\it all} the eigenvectors
-of $\Ham$ are of the form $fv$ for some eigenvector $v$ of $A.$
+%We use the following map to
+%relate these two representations:
+%%transfer information about $A$ over to $\Ham$.
+%%The Hamiltonian is related to the adjacency matrix
+%%$A$ of Cayley$(G, S)$ by the following commutation relation.
+%
+%\noindent{\bf Theorem.}
+%Define a linear map $f:\Complex[G]\to\Complex[G^X]$ as follows.
+%Any element $g\in \Pauli_n$ can be written as $g = \pm g_x g_z$
+%and we set $f(g) = f(\pm g_x g_z) := \pm g_x.$
+%Then,
+%$$
+%    f A = \Ham f.
+%$$
+%
+%\noindent{\bf Proof.} \Proveit ...
+%\qed
+%
+%{\it XXX $\Complex[G^X]$ is not big enough! 
+%Don't we need logical operators \& conjugate
+%error operators??? XXX sort this out}
+%
+%It is easy to see that any eigenvector $v$ of $A$
+%with eigenvalue $\lambda$
+%is either in the kernel of $f$, or otherwise $fv$
+%is an eigenvector of $\Ham$ with eigenvalue $\lambda.$
+%Furthermore, $f$ is full-rank \Proveit, and so {\it all} the eigenvectors
+%of $\Ham$ are of the form $fv$ for some eigenvector $v$ of $A.$
 
 %We write the (distinct) eigenvalues of $\Ham$ in decreasing
 %order:
@@ -479,22 +512,22 @@ of $\Ham$ are of the form $fv$ for some eigenvector $v$ of $A.$
 %in the kernel of $f$ and so these results
 %do not help us show gapped behaviour of $\Ham.$
 
-The above commutation relation
-for $f$ is the definition of an {\it intertwining} map,
-and it is a general result that such maps either 
-preserve an irreducible representation or send them to zero.
-
-\noindent{\bf Theorem.}
-The (images of) all the one-dimensional irreps are contained in
-the kernel of $f$. All the other irreps are preserved.
-
-\noindent{\bf Proof.} \Proveit ...
-\qed
-
-All of the above shows that
-$$
-    \Ham = \bigoplus_{l\in L, t\in T} \sum_{g\in S}\ \rho_t(g).
-$$
+%The above commutation relation
+%for $f$ is the definition of an {\it intertwining} map,
+%and it is a general result that such maps either 
+%preserve an irreducible representation or send them to zero.
+%
+%\noindent{\bf Theorem.}
+%The (images of) all the one-dimensional irreps are contained in
+%the kernel of $f$. All the other irreps are preserved.
+%
+%\noindent{\bf Proof.} \Proveit ...
+%\qed
+%
+%All of the above shows that
+%$$
+%    \Ham = \bigoplus_{l\in L, t\in T} \sum_{g\in S}\ \rho_t(g).
+%$$
 
 In the sequal we will make the identification
 between $g$ and $\rho_{pauli}(g)$.
@@ -769,9 +802,15 @@ Finally, $\phi$ is an isomorphism
 because it is a bijection of two independant
 generating sets.
 
-The final step is to write each element of $S$
+The next step is to write each element of $S$
 as a product of reduced gauge operators and stabilizers.
-Taking the product
+The key thing to note is that the product of two
+operators $g_{ijk}, g_{i'j'k'}\in R_0$ gives a string
+operator between the sites $(i,j,k)$ and $(i',j',k')$.
+And {\it any} string operator between these
+two sites can then be generated by using stabilizers to
+``deform'' the string $g_{ijk}g_{i'j'k'}.$
+For example, taking the product
 of two operators from $R_0$ that differ
 by one path segment gives the following:
 \begin{align*}
@@ -793,7 +832,8 @@ $$X_{ij1}X_{ij2}=g_{ij1}g_{ij2}\prod_{j'=1}^{j-1} h_{ij'}.$$
 The only $S$ operators that are not 
 quadratic in $R_0$ operators are the five
 operators that touch either of the sites
-(1,1,1) or (1,1,2).
+$(1,1,1)$ or $(1,1,2)$.
+
 So each block in the Hamiltonian
 is seen to be quadratic in the $c_j$ plus
 five other Pauli operator terms which we denote as $\Lambda_\rho$:
@@ -825,8 +865,8 @@ The coefficients $\Gamma_{ij}$ are dependant on the irrep $\rho.$
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-%\appendix
-%\section{Technical stuff...}
+\appendix
+\section{Character theory...}
 
 
 
