@@ -866,9 +866,62 @@ The coefficients $\Gamma_{ij}$ are dependant on the irrep $\rho.$
 %
 
 \appendix
-\section{Character theory...}
+\section{Character theory}
+\label{appendix}
 
+Given a group representation $\rho:G\to GL(V)$
+the {\it character} of $\rho$ is a function
+$\chi_\rho:G\to \Complex$ given by
+$$
+    \chi_\rho(g) = \mbox{Tr}\ \rho(g).
+$$
 
+Given two functions $u,v : G \to \Complex$ 
+we define the following inner product:
+$$
+    \langle u, v \rangle := \frac{1}{|G|} \sum_{g\in G} u(g) \overline{v(g)}.
+$$
+
+The character of the Pauli representation, $\chi_{{pauli}}:\Pauli_n\to\Complex$
+is given by:
+$$
+\chi_{{pauli}}(g) = \sum_{v \in basis} \langle v | \rho_{{pauli}}(g) | v \rangle
+    = \left\{ \begin{array}{ll}
+ \pm 2^n &\mbox{if}\ g=\pm I\\
+ 0 &\mbox{otherwise}\end{array}\right.
+$$
+
+Since $|P_n|=2^{2n+1}$ it follows that
+$\langle\chi_{pauli},\chi_{pauli}\rangle = 1$ and
+so $\rho_{pauli}$ is an irreducible representation of $\Pauli_n.$
+
+For $G$ a subgroup of $\Pauli_n$, and decomposition
+into a direct product $G=H\times \Pauli_r$ we have the
+following representations:
+$$
+    \rho(g) = \rho_1(h) \rho_{pauli}(g'),
+$$
+where $g=hg'$, $h\in H$, $g'\in \Pauli_r$ and $\rho_1(h)$ is
+a $1$-dimensional representation of $H$.
+And $\rho_{pauli}$ here is the $2^r$ dimensional Pauli representation.
+The character for this representation is:
+$$
+\chi_{{\rho}}(hg') = \rho_1(h) \sum_{v \in basis} \langle v | \rho_{{pauli}}(g') | v \rangle
+    = \left\{ \begin{array}{ll}
+ \pm 2^r\rho_1(h) &\mbox{if}\ g'=\pm I\\
+ 0 &\mbox{otherwise}\end{array}\right.
+$$
+
+Once again, $|G|=2^{2r+m+1}$ and so
+$\langle\chi_{\rho},\chi_{\rho}\rangle = 1$ and
+$\rho_{\rho}$ is an irreducible representation of $G.$
+We now count the occurances of 
+this representation in $\rho_{pauli}$:
+\begin{align*}
+\langle\chi_{pauli},\chi_{\rho}\rangle &= \frac{1}{|G|}\sum_{g\in G} \chi_{pauli}(g)\overline{\chi_{\rho}(g)} \\
+&= \frac{1}{2^{2r+m+1}} \sum_{g=\pm I} 2^n 2^r = \frac{2^{n+1+r}}{2^{2r+m+1}} = 2^k
+\end{align*}
+where $k$ is the number of logical qubits so that $n=r+m+k.$
 
 \bibliography{refs}{}
 \bibliographystyle{abbrv}
