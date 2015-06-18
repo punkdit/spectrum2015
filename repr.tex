@@ -37,6 +37,8 @@
 \author{Simon Burton}
 \affiliation{Centre for Engineered Quantum Systems, School of Physics, The University of Sydney}
 
+\date{\today}
+
 %\begin{abstract}
 %The Pauli algebra terms used in a Hamiltonian
 %carry a multiplicative group structure echoing
@@ -152,17 +154,6 @@ where the gauge operators generate a large
 number of stabilizers, and we examine two
 such cases: the 2d-compass model \cite{Bacon2006} and
 the Kitaev honeycomb model \cite{Kitaev2006}.
-
-%refs to cite:
-%http://arxiv.org/pdf/0908.4246.pdf
-%http://arxiv.org/pdf/1207.1443.pdf
-%http://arxiv.org/abs/0907.0948
-%http://arxiv.org/pdf/1008.1029v1.pdf
-%http://arxiv.org/abs/1107.2707
-%http://arxiv.org/pdf/1012.0425v2.pdf
-
-
-
 
 
 %    %The quantum error correcting codes,
@@ -299,13 +290,92 @@ the Kitaev honeycomb model \cite{Kitaev2006}.
 
 \subsection{Motivation: graph theory}
 
+\begin{figure*}[th!]
+\begin{center}
+        \includegraphics[width=0.9\columnwidth]{fig_compass.pdf}
+\caption{
+The gauge group action on a basis is depicted as a graph.
+}
+\label{fig_compass}
+\end{center}
+\end{figure*}
+
 \def\rhoreg{\rho_\mathrm{reg}}
+
+Given a group $G$ and a set $V$,
+a {\it group action} 
+is a function $\eta$ that associates
+each $g\in G$ with a bijection $\eta(g):V\to V.$
+%Given a group action $\eta$ of $G$ on a set $V$ and a
+Given such a group action and a
+set $S\subset G$ we can form a graph as
+follows.
+The vertices correspond to the set $V$ and
+(directed) edges are  $\{(v, gv) : v \in V, g \in S\}.$
+If the set $S$ is closed under group inverse then
+we can consider the graph to be undirected.
+The complex vector space with basis $V$ is written $\Complex[V].$
+We can now extend $\eta$ linearly to get a {\it representation} of
+the group $G$:
+$$
+    \Complex[\eta] : G \to GL(\Complex[V]).
+$$
+
+We show in Fig \ref{fig_compass} the action
+of the 
+the following subset of $\Pauli_6$
+on the computational basis:
+$$
+\arraycolsep=-1pt\def\arraystretch{0.2}
+S = \Bigl\{
+\begin{array}{ccc}
+X&X&I\\
+I&I&I
+\end{array},
+\begin{array}{ccc}
+I&I&I\\
+X&X&I
+\end{array},
+\begin{array}{ccc}
+I&X&X\\
+I&I&I
+\end{array},
+\begin{array}{ccc}
+I&I&I\\
+I&X&X
+\end{array},
+\begin{array}{ccc}
+X&I&X\\
+I&I&I
+\end{array},
+\begin{array}{ccc}
+I&I&I\\
+X&I&X
+\end{array},
+\begin{array}{ccc}
+Z&I&I\\
+Z&I&I
+\end{array},
+\begin{array}{ccc}
+I&Z&I\\
+I&Z&I
+\end{array},
+\begin{array}{ccc}
+I&I&Z\\
+I&I&Z
+\end{array}
+\Bigr\}
+$$
 
 The {\it Cayley graph} of a group $G$ and
 generating set $S$ is denoted Cayley($G$, $S$).
 It has nodes $G$ and edges $\{(g, sg) : g \in G, s \in S\}$.
-We will always assume $S$ is closed under group inverse,
-and so we can consider the Cayley graph as undirected.
+%We will always assume $S$ is closed under group inverse,
+%and so we can consider the Cayley graph as undirected.
+This is the graph associated with the group action on itself.
+The group action on itself is in some sense the ``mother'' of all other ways that
+$G$ can act on a set, and likewise the Cayley graph is a ``relaxed'' version
+of all other graphs obtained in this way from $G$.
 
 The adjacency matrix of a graph with $N$ nodes is the 
 $N$ by $N$ matrix $A$ with non-zero entries $A_{ij}=1$ corresponding
@@ -769,11 +839,9 @@ $$
 \Ham_\rho = \sum_{g\in S} \rho(g) = \sum_{1\le i,j<l} \rho(X_{ij}X_{i,j+1}) + \rho(Z_{ij}Z_{i+1,j}).
 $$
 We note that in \cite{Brzezicki2013}, they perform a
-transformation of the compass model
-which results in a similar $(l-1)\times(l-1)$ lattice
-of spins, but they have more terms in their Hamiltonian.
-It is not clear if these modifications are essential to
-their analysis.
+spin transformation of the compass model
+which also results in a $(l-1)\times(l-1)$ lattice
+of spins and identical Hamiltonian except for some signs.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
