@@ -80,6 +80,8 @@ the level of the structure of the gauge group.
 \def\Proveit{{\it (Proof??)}}
 \def\GL{\mathrm{GL}}
 \def\half{\frac{1}{2}}
+\def\Stab{S}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -154,6 +156,14 @@ where the gauge operators generate a large
 number of stabilizers, and we examine two
 such cases: the 2d-compass model \cite{Bacon2006} and
 the Kitaev honeycomb model \cite{Kitaev2006}.
+
+%refs to cite:
+%http://arxiv.org/pdf/0908.4246.pdf
+%http://arxiv.org/pdf/1207.1443.pdf
+%http://arxiv.org/abs/0907.0948
+%http://arxiv.org/pdf/1008.1029v1.pdf
+%http://arxiv.org/abs/1107.2707
+%http://arxiv.org/pdf/1012.0425v2.pdf
 
 
 %    %The quantum error correcting codes,
@@ -247,7 +257,7 @@ the Kitaev honeycomb model \cite{Kitaev2006}.
 
 %\section{Representations of gauge codes}
 
-%It follows that the adjacency matrix $A$ of Cayley($G$, $S$)
+%It follows that the adjacency matrix $A$ of Cayley($G$, $G_0$)
 %is the linear operator $A:\Complex[G]\to\Complex[G]$
 %given by
 %$$
@@ -258,7 +268,7 @@ the Kitaev honeycomb model \cite{Kitaev2006}.
 %and the indicator function $\alpha:G\to\Complex$ is
 %$$
 %    \alpha(g) := \left\{ \begin{array}{ll}
-%1 &\mbox{if $g\in S$; and}\\
+%1 &\mbox{if $g\in G_0$; and}\\
 %0 &\mbox{otherwise.}\end{array} \right.
 %$$
 %
@@ -270,15 +280,15 @@ the Kitaev honeycomb model \cite{Kitaev2006}.
 %
 %Then we have
 %$$
-%    \hat\rho(\alpha) = \sum_{g\in S} \rho(g).
+%    \hat\rho(\alpha) = \sum_{g\in G_0} \rho(g).
 %$$
 %
 %\noindent{\bf Theorem.} 
 %(See \cite{Kaski2002} and \cite{Diaconis1981})
 %The spectrum of the adjacency matrix $A$ of a
-%cayley graph Cayley($G$, $S$) equals the union
+%cayley graph Cayley($G$, $G_0$) equals the union
 %of the spectra of fourier transforms of the indicator
-%function $\alpha$ of the generating set $S$:
+%function $\alpha$ of the generating set $G_0$:
 %$$
 %    \Spec(A) = \bigcup_{\mathrm{irrep}\ \rho} \Spec(\hat\rho(\alpha))
 %$$
@@ -308,11 +318,11 @@ is a function $\eta$ that associates
 each $g\in G$ with a bijection $\eta(g):V\to V.$
 %Given a group action $\eta$ of $G$ on a set $V$ and a
 Given such a group action and a
-set $S\subset G$ we can form a graph as
+set $G_0\subset G$ we can form a graph as
 follows.
 The vertices correspond to the set $V$ and
-(directed) edges are  $\{(v, gv) : v \in V, g \in S\}.$
-If the set $S$ is closed under group inverse then
+(directed) edges are  $\{(v, gv) : v \in V, g \in G_0\}.$
+If the set $G_0$ is closed under group inverse then
 we can consider the graph to be undirected.
 The complex vector space with basis $V$ is written $\Complex[V].$
 We can now extend $\eta$ linearly to get a {\it representation} of
@@ -323,11 +333,11 @@ $$
 
 We show in Fig \ref{fig_compass} the action
 of the 
-the following subset of $\Pauli_6$
+the following subset of the 6-qubit Pauli group %$\Pauli_6$
 on the computational basis:
 $$
 \arraycolsep=-1pt\def\arraystretch{0.2}
-S = \Bigl\{
+G_0 = \Bigl\{
 \begin{array}{ccc}
 X&X&I\\
 I&I&I
@@ -368,23 +378,23 @@ I&I&Z
 $$
 
 The {\it Cayley graph} of a group $G$ and
-generating set $S$ is denoted Cayley($G$, $S$).
-It has nodes $G$ and edges $\{(g, sg) : g \in G, s \in S\}$.
-%We will always assume $S$ is closed under group inverse,
+generating set $G_0$ is denoted Cayley($G$, $G_0$).
+It has nodes $G$ and edges $\{(g, hg) : g \in G, h \in G_0\}$.
+%We will always assume $G_0$ is closed under group inverse,
 %and so we can consider the Cayley graph as undirected.
 This is the graph associated with the group action on itself.
 The group action on itself is in some sense the ``mother'' of all other ways that
-$G$ can act on a set, and likewise the Cayley graph is a ``relaxed'' version
-of all other graphs obtained in this way from $G$.
+$G$ can act on a set, and likewise the Cayley graph is the ``most relaxed'' version
+of all graphs obtained in this way from $G$ acting on a set.
 
 The adjacency matrix of a graph with $N$ nodes is the 
 $N$ by $N$ matrix $A$ with non-zero entries $A_{ij}=1$ corresponding
 to edges $(i, j)$ of the graph.
-It follows that the adjacency matrix $A$ of Cayley($G$, $S$)
+It follows that the adjacency matrix $A$ of Cayley($G$, $G_0$)
 is the linear operator $A:\Complex[G]\to\Complex[G]$
 given by
 $$
-    A = \sum_{g\in S}\rho_{\mathrm{reg}}(g)
+    A = \sum_{g\in G_0}\rho_{\mathrm{reg}}(g)
 $$
 where $\rho_{\mathrm{reg}}$ is the left regular representation of
 $G$ on $\Complex[G].$
@@ -395,7 +405,7 @@ decomposes as the dirrect sum of irreducible
 representations $\rho_k:G\to \GL(V_k)$
 and so
 $$
-    A = \sum_{g\in S}\bigoplus_k \rho_k(g)
+    A = \sum_{g\in G_0}\bigoplus_k \rho_k(g)
 $$
 
 block diagonalizes $A$,
@@ -540,32 +550,32 @@ Our aim will be to decompose $\rho_{\mathrm{pauli}}$ into irreps
 of $G.$
 
 We now define a {\it gauge} subgroup $G$ of $\Pauli_n$
-by choosing a set of generators $S\subset \Pauli_n,$
+by choosing a set of generators $G_0\subset \Pauli_n,$
 %for some subgroup $G$ of $\Pauli_n:$
-$$ G := \langle S\rangle.$$
+$$ G := \langle G_0\rangle.$$
 We will assume $G$ is not abelian, which is
 equivalent to the condition that $-I\in G.$
-We also restrict $S$ to only contain Hermitian operators,
-which is equivalent to requiring that $g^2=I$ for all $g\in S.$
-Now let $H$ be the largest subgroup of $G$ not containing
+We also restrict $G_0$ to only contain Hermitian operators,
+which is equivalent to requiring that $g^2=I$ for all $g\in G_0.$
+Now let $\Stab$ be the largest subgroup of $G$ not containing
 $-I.$
-$H$ is then an abelian subgroup,
+$\Stab$ is then an abelian subgroup,
 also known as the {\it stabilizer} subgroup.
 %(Note that each of the stabilizers commutes with the Hamiltonian.)
 $G$ decomposes as a direct product:
-$$G = H\times R,$$
+$$G = \Stab\times R,$$
 where $R\cong P_r$ for some $1\le r\le n,$
-and $H\cong \Z_2^{m}$ for $0\le m<n.$
-Therefore, $|G| = |H| |R| = 2^{m+2r+1}.$
+and $\Stab\cong \Z_2^{m}$ for $0\le m<n.$
+Therefore, $|G| = |\Stab| |R| = 2^{m+2r+1}.$
 We call $R$ the {\it reduced} gauge group.
-We consider both $H$ and $R$ to be subgroups of $G.$
+We consider both $\Stab$ and $R$ to be subgroups of $G.$
 %Let $\phi:P_r\to R$ be a group isomorphism,
 Let $\phi:R\to P_r$ be a group isomorphism,
 %then $R_0 := \{\phi(X_i), \phi(Z_i)\}_{1\le i\le r}$
 %then $R_0 := \{\phi(X_i), \phi(Z_i)\}_{i=1,..,r}$
 then $R_0 := \{\phi^{-1}(X_i), \phi^{-1}(Z_i)\}_{i=1,..,r}$
 is a set of independant generators of $R.$
-We also let $H_0$ be a set of $m$ independant generators of $H.$
+We also let $\Stab_0$ be a set of $m$ independant generators of $\Stab.$
 
 To find the cosets of $G$ in $\Pauli_n$ we take
 the group closure of $G-\Pauli_n$; when this is non-empty
@@ -576,18 +586,18 @@ the {\it logical} operators $L$, and whose
 stabilizer subgroup is known as the {\it error} operators $T.$
 Now any coset of $G$ can be written as $ltG$ with
 $l\in L$ and $t\in T.$
-The size of $T$ equals the size of $H$: $|T|=|H|=2^m.$
+The size of $T$ equals the size of $\Stab$: $|T|=|\Stab|=2^m.$
 If we let $L_0$ be an independant generating set for $L$
 then we have the important formula:
 \begin{equation}\label{formula}
-\frac{1}{2}|L_0| + |H_0| + \frac{1}{2}|R_0| = n.
+\frac{1}{2}|L_0| + |\Stab_0| + \frac{1}{2}|R_0| = n.
 \end{equation}
 
 The $1$-dimensional irreps $\rho:G\to \Complex,$
 are now defined by
 specifying the action of $\rho$ on the independant generators:
 $$
-    \rho(h)=\pm 1\ \mbox{for}\ h\in H_0,
+    \rho(h)=\pm 1\ \mbox{for}\ h\in \Stab_0,
     \quad \rho(\phi^{-1}(X_i)) = \pm 1,\quad \rho(\phi^{-1}(Z_i)) = \pm 1.
 $$
 This gives all $2^{m+2r}$ of the $1$-dimensional irreps.
@@ -595,27 +605,27 @@ This gives all $2^{m+2r}$ of the $1$-dimensional irreps.
 
 The $2^r$-dimensional irreps are given by:
 $$
-    \rho(h) = \pm I^{\otimes 2^r}\ \mbox{for}\ h\in H_0,
+    \rho(h) = \pm I^{\otimes 2^r}\ \mbox{for}\ h\in \Stab_0,
     \quad \rho(\phi^{-1}(X_i)) = X_i,\quad \rho(\phi^{-1}(Z_i)) = Z_i.
 $$
-We are free to choose the signs of the $\rho(h)$ for each $h\in H_0.$
+We are free to choose the signs of the $\rho(h)$ for each $h\in \Stab_0.$
 Hence there are $2^m$ many of these irreps.
-Each such choice corresponds to the choice of a {\it syndrome} vector $s(h)=\pm 1$, for $h \in H_0,$
+Each such choice corresponds to the choice of a {\it syndrome} vector $s(h)=\pm 1$, for $h \in \Stab_0,$
 or alternatively, choice of an element $t\in T:$
 $$
     \rho(h) = \left\{ \begin{array}{ll}
  I^{\otimes 2^r}\ &\mbox{if $th=ht$}\\
- -I^{\otimes 2^r}\ &\mbox{if $th=-ht$}\end{array} \right\}\mbox{for}\ h\in H_0.
+ -I^{\otimes 2^r}\ &\mbox{if $th=-ht$}\end{array} \right\}\mbox{for}\ h\in \Stab_0.
 $$
 
 %Finally, there are $2^m$ many $2^r$-dimensional irreps $\rho_t$
 %which are labelled by $t\in T$ and defined as
 %$$
-%    %\rho_t(h)=\pm I^{\otimes 2^r}\ \mbox{for}\ h\in H_0,
-%    %\rho_t(h)= [t,h] = th^{-1}th^{-1} = \pm I^{\otimes 2^r}\ \mbox{for}\ h\in H_0,
+%    %\rho_t(h)=\pm I^{\otimes 2^r}\ \mbox{for}\ h\in \Stab_0,
+%    %\rho_t(h)= [t,h] = th^{-1}th^{-1} = \pm I^{\otimes 2^r}\ \mbox{for}\ h\in \Stab_0,
 %    \rho_t(h) = \left\{ \begin{array}{ll}
 % I^{\otimes 2^r}\ &\mbox{if $th=ht$}\\
-% -I^{\otimes 2^r}\ &\mbox{if $th=-ht$}\end{array} \right\}\mbox{for}\ h\in H_0,
+% -I^{\otimes 2^r}\ &\mbox{if $th=-ht$}\end{array} \right\}\mbox{for}\ h\in \Stab_0,
 %    \quad \rho_t(\phi^{-1}(X_i)) = X_i,\quad \rho_t(\phi^{-1}(Z_i)) = Z_i.
 %$$
 
@@ -624,7 +634,7 @@ Using characters one can show that
 on a subgroup $G$ of $\Pauli_n$ the
 Pauli representation decomposes into irreps as:
 $$
-    \rho_{\mathrm{pauli}} = \bigoplus_{l\in L, t\in T} \rho_t.
+    \rho_{\mathrm{pauli}} = \bigoplus_{l\in L, t\in T} \rho_t
 $$
 where we label the $2^r$ dimensional irreps by $t\in T.$
 See appendix for details.
@@ -632,24 +642,24 @@ See appendix for details.
 The Hamiltonian of interest is 
 an operator $\Ham:\Complex[2^n]\to\Complex[2^n]$:
 %and normally defined
-%as the negative sum of terms from $S,$ but here
+%as the negative sum of terms from $G_0,$ but here
 %we will reverse the sign:
-$$ \Ham := \sum_{g\in S} \rho_{\mathrm{pauli}}(g).$$
+$$ \Ham := \sum_{g\in G_0} \rho_{\mathrm{pauli}}(g).$$
 Using the above decomposition we find:
 $$
-    \Ham = \bigoplus_{l\in L, t\in T} \sum_{g\in S}\ \rho_t(g).
+    \Ham = \bigoplus_{l\in L, t\in T} \sum_{g\in G_0}\ \rho_t(g).
 $$
 %The goal is to decompose $\Ham$ into blocks as
 %$$
-%    \Ham = \bigoplus_{\mathrm{irrep}\rho} \sum_{g\in S}\ \rho(g),
+%    \Ham = \bigoplus_{\mathrm{irrep}\rho} \sum_{g\in G_0}\ \rho(g),
 %$$
 We will notate each block as
-$\Ham_\rho := \sum_{g\in S}\rho(g)$
+$\Ham_\rho := \sum_{g\in G_0}\rho(g)$
 for each irrep $\rho$ appearing (possibly more than once)
 in $\Ham.$
 
 The form of $\Ham$ is seen to be very similar
-to the adjacency matrix of Cayley$(G, S)$ but
+to the adjacency matrix of Cayley$(G, G_0)$ but
 instead of the regular representation we are
 using the Pauli representation.
 
@@ -657,7 +667,7 @@ using the Pauli representation.
 %relate these two representations:
 %%transfer information about $A$ over to $\Ham$.
 %%The Hamiltonian is related to the adjacency matrix
-%%$A$ of Cayley$(G, S)$ by the following commutation relation.
+%%$A$ of Cayley$(G, G_0)$ by the following commutation relation.
 %
 %\noindent{\bf Theorem.}
 %Define a linear map $f:\Complex[G]\to\Complex[G^X]$ as follows.
@@ -711,7 +721,7 @@ using the Pauli representation.
 %
 %All of the above shows that
 %$$
-%    \Ham = \bigoplus_{l\in L, t\in T} \sum_{g\in S}\ \rho_t(g).
+%    \Ham = \bigoplus_{l\in L, t\in T} \sum_{g\in G_0}\ \rho_t(g).
 %$$
 
 In the sequal we will make the identification
@@ -733,18 +743,18 @@ In this example we supress the tensor product
 symbol when we write operators.
 We take as gauge operators:
 $$
-    S = \{XXII, IIXX, ZIZI, IZIZ\}.
+    G_0 = \{XXII, IIXX, ZIZI, IZIZ\}.
 $$
-Evidently, the stabilizers are generated by $H_0=\{XXXX, ZZZZ\},$
+Evidently, the stabilizers are generated by $\Stab_0=\{XXXX, ZZZZ\},$
 and we can choose the reduced gauge generators to be $R_0=\{XXII, ZIZI\}.$
 The logical operators are generated by $L_0 = \{XIXI, ZZII\},$
-and then the errors $T_0$ corresponding to $H_0$ will
+and then the errors $T_0$ corresponding to $\Stab_0$ will
 be $\{ZZZI, IIIX\}.$
 All of this can be summarized in a table of anti-commuting pairs:
 $$
 \begin{array}{rll}
 L_0 = &XIXI & ZZII \\
-H_0, T_0 = &XXXX & ZZZI \\
+\Stab_0, T_0 = &XXXX & ZZZI \\
            &ZZZZ & IIIX \\
 R_0 = &XXII & ZIZI \\
 \end{array}
@@ -760,20 +770,20 @@ $$
     \phi(XXII) := X, \ \ \phi(ZIZI) := Z.
 $$
 
-We now evaluate $\rho(g)$ for each $g\in S$ 
+We now evaluate $\rho(g)$ for each $g\in G_0$ 
 to work out the form of each block $\Ham_\rho$.
-Note that $g=g'h$ where $g'\in R$ and $h\in H$
+Note that $g=g'h$ where $g'\in R$ and $h\in \Stab$
 so 
 $$\rho(g)=\rho(g')\rho(h)=\pm\phi(g').$$
 
 We find the four blocks in the Hamiltonian:
 $$
-\Ham_\rho = \sum_{g\in S} \rho(g) = \rho(XXII) + \rho(IIXX) + \rho(ZIZI) + \rho(IZIZ) = X \pm X + Z \pm Z.
+\Ham_\rho = \sum_{g\in G_0} \rho(g) = \rho(XXII) + \rho(IIXX) + \rho(ZIZI) + \rho(IZIZ) = X \pm X + Z \pm Z.
 $$
 
 In the next two sections we repeat this calculation for
 more complicated gauge groups.
-The key is to find an isomorphism $\phi$ (as well as $R$ and $H$),
+The key is to find an isomorphism $\phi$ (as well as $R$ and $\Stab$),
 then the calculation proceeds straightforwardly.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -793,7 +803,7 @@ $(i, j)$ we coordinatize with subscripts $ij$,
 with $i$ and $j$ understood modulo $l$.
 The generators of the gauge group are
 $$
-    S = \big\{ X_{ij}X_{i,j+1},\ Z_{ij}Z_{i+1,j}\ \mbox{for}\ 1\le i, j\le l\big\}.
+    G_0 = \big\{ X_{ij}X_{i,j+1},\ Z_{ij}Z_{i+1,j}\ \mbox{for}\ 1\le i, j\le l\big\}.
 $$
 We write generators of the reduced
 gauge group in anti-commuting pairs:
@@ -807,12 +817,12 @@ $$
 $$
 The generators for the stabilizers are
 $$
-    H_0 = \big\{ \prod_{i=1}^l X_{ij}X_{i,j+1},\ \prod_{i=1}^l Z_{ji}Z_{j+1,i}\ \mbox{for}\ 1\le j\le l-1\big\}.
+    \Stab_0 = \big\{ \prod_{i=1}^l X_{ij}X_{i,j+1},\ \prod_{i=1}^l Z_{ji}Z_{j+1,i}\ \mbox{for}\ 1\le j\le l-1\big\}.
 $$
 The logical operators are generatred by $L_0 = \big\{ \prod_i X_{i1}, \prod_j Z_{1j} \}.$
 These sets have cardinalities:
-$$|S|=2l^2,\ |R_0| = 2(l-1)^2,\ |H_0| = 2(l-1).$$
-%And we note that $\frac{1}{2}|L_0| + |H_0| + \frac{1}{2}|R_0| = n.$
+$$|G_0|=2l^2,\ |R_0| = 2(l-1)^2,\ |\Stab_0| = 2(l-1).$$
+%And we note that $\frac{1}{2}|L_0| + |\Stab_0| + \frac{1}{2}|R_0| = n.$
 And we note that \ref{formula} is satisfied.
 %Now we can define the irreps of $G$.
 Now we write down the values of the
@@ -836,7 +846,7 @@ Note the transposition symmetry between the $X$ and $Z$-type operators.
 We sum all these terms to find 
 the form of the hamiltonian in each block:
 $$
-\Ham_\rho = \sum_{g\in S} \rho(g) = \sum_{1\le i,j<l} \rho(X_{ij}X_{i,j+1}) + \rho(Z_{ij}Z_{i+1,j}).
+\Ham_\rho = \sum_{g\in G_0} \rho(g) = \sum_{1\le i,j<l} \rho(X_{ij}X_{i,j+1}) + \rho(Z_{ij}Z_{i+1,j}).
 $$
 We note that in \cite{Brzezicki2013}, they perform a
 spin transformation of the compass model
@@ -872,9 +882,9 @@ We use periodic boundary conditions so $i, j$ are
 to be taken modulo $l$.
 See figure \ref{honeycomb}.
 The edges of the lattice are in one-to-one
-correspondence with the generators $S$:
+correspondence with the generators $G_0$:
 $$
-S := \big\{X_{ij1}X_{ij2},\ Z_{ij2}Z_{i+1,j1},\ Y_{ij1}Y_{i-1,j+1,2}
+G_0 := \big\{X_{ij1}X_{ij2},\ Z_{ij2}Z_{i+1,j1},\ Y_{ij1}Y_{i-1,j+1,2}
 \ \mbox{for}\ 1\le i,j\le l\big\}.
 $$
 Note that we make the definition $Y:=XZ$ for each site.
@@ -903,11 +913,11 @@ h_v := \prod_{i=1}^l Y_{i11} Y_{i12},\ \
 h_h := \prod_{j=1}^l X_{1j2} X_{2j1}.
 $$
 
-This gives independant stabilizer generators $H_0$
+This gives independant stabilizer generators $\Stab_0$
 from each hexagon, less one, as well as $h_v$ and $h_h.$
 %two homologically non-trivial loops.
 The number of hexagons is $\frac{1}{2}n$ and
-so we find $|H_0|=\half n+1.$
+so we find $|\Stab_0|=\half n+1.$
 There are no logical operators, so we
 must have $|R_0|=n-2.$
 
@@ -985,7 +995,7 @@ Finally, $\phi$ is an isomorphism
 because it is a bijection of two independant
 generating sets.
 
-The next step is to write each element of $S$
+The next step is to write each element of $G_0$
 as a product of reduced gauge operators and stabilizers.
 The key thing to note is that the product of two
 operators $g_{ijk}, g_{i'j'k'}\in R_0$ gives a string
@@ -1012,7 +1022,7 @@ by the product of
 $g_{ij1}g_{ij2}$ and the enclosed hexagon stabilizers:
 $$X_{ij1}X_{ij2}=g_{ij1}g_{ij2}\prod_{j'=1}^{j-1} h_{ij'}.$$
 
-The only $S$ operators that are not 
+The only $G_0$ operators that are not 
 quadratic in $R_0$ operators are the five
 operators that touch either of the sites
 $(1,1,1)$ or $(1,1,2)$.
@@ -1035,7 +1045,7 @@ The coefficients $\Gamma_{ij}$ are dependant on the irrep $\rho.$
 
 %\subsection{Self-representations}
 %
-%In general we can represent $G=H\times R$ in $R$ itself..
+%In general we can represent $G=\Stab\times R$ in $R$ itself..
 %and if we construct generators $R_0$ of $R$ by discarding
 %elements of $G$ (ie. $R_0\subset G$), then the resulting
 %Hamiltonian blocks look like a smaller version
@@ -1079,13 +1089,13 @@ $\langle\chi_{pauli},\chi_{pauli}\rangle = 1$ and
 so $\rho_{pauli}$ is an irreducible representation of $\Pauli_n.$
 
 For $G$ a subgroup of $\Pauli_n$, and decomposition
-into a direct product $G=H\times \Pauli_r$ we have the
+into a direct product $G=\Stab\times \Pauli_r$ we have the
 following representations:
 $$
     \rho(g) = \rho_1(h) \rho_{pauli}(g'),
 $$
-where $g=hg'$, $h\in H$, $g'\in \Pauli_r$ and $\rho_1(h)$ is
-a $1$-dimensional representation of $H$.
+where $g=hg'$, $h\in \Stab$, $g'\in \Pauli_r$ and $\rho_1(h)$ is
+a $1$-dimensional representation of $\Stab$.
 And $\rho_{pauli}$ here is the $2^r$ dimensional Pauli representation.
 The character for this representation is:
 $$
