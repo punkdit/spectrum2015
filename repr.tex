@@ -75,6 +75,7 @@ the level of the structure of the gauge group.
 % CUT HERE
 
 \def\Complex{\mathbb{C}}
+\def\R{\mathbb{R}}
 \def\Z{\mathbb{Z}}
 \def\Ham{\mathcal{H}}
 \def\Pauli{\mathcal{P}}
@@ -165,7 +166,7 @@ gauge group does not generate many
 stabilizers (in fact, only one in this case).
 We are more interested in the situation
 where the gauge operators generate a large 
-number of stabilizers, and we examine two
+(extensive) number of stabilizers, and we examine two
 such cases: the 2d-compass model \cite{Bacon2006} and
 the Kitaev honeycomb model \cite{Kitaev2006}.
 
@@ -427,14 +428,14 @@ block diagonalizes $A$,
 with each $\rho_k$ possibly appearing multiple
 times in the direct sum over $k$.
 
-Given a function $f:G\to\Complex$
-and a representation $\rho:G\to \GL(V)$
-the \emph{Fourier transform}
-of $f$ relative to $\rho$ is defined as
-$$
-\hat{\rho}(f) := \sum_{g\in G}f(g)\rho(g).
-$$
-This will be a linear operator on $V.$
+%Given a function $f:G\to\Complex$
+%and a representation $\rho:G\to \GL(V)$
+%the \emph{Fourier transform}
+%of $f$ relative to $\rho$ is defined as
+%$$
+%\hat{\rho}(f) := \sum_{g\in G}f(g)\rho(g).
+%$$
+%This will be a linear operator on $V.$
 
 See \cite{Diaconis1981} and \cite{Kaski2002} for more details.
 
@@ -630,7 +631,7 @@ This gives all $2^{m+2r}$ of the $1$-dimensional irreps.
 
 The $2^r$-dimensional irreps are given by:
 $$
-    \rho(h) = \pm I^{\otimes 2^r}\ \mbox{for}\ h\in \Stab_0,
+    \rho(h) = \pm I^{\otimes r}\ \mbox{for}\ h\in \Stab_0,
     \quad \rho(\phi^{-1}(X_i)) = X_i,\quad \rho(\phi^{-1}(Z_i)) = Z_i.
 $$
 We are free to choose the signs of the $\rho(h)$ for each $h\in \Stab_0.$
@@ -639,8 +640,8 @@ Each such choice corresponds to the choice of a {\it syndrome} vector $s(h)=\pm 
 or alternatively, choice of an element $t\in T:$
 $$
     \rho(h) = \left\{ \begin{array}{ll}
- I^{\otimes 2^r}\ &\mbox{if $th=ht$}\\
- -I^{\otimes 2^r}\ &\mbox{if $th=-ht$}\end{array} \right\}\mbox{for}\ h\in \Stab_0.
+ I^{\otimes r}\ &\mbox{if $th=ht$}\\
+ -I^{\otimes r}\ &\mbox{if $th=-ht$}\end{array} \right\}\mbox{for}\ h\in \Stab_0.
 $$
 
 %Finally, there are $2^m$ many $2^r$-dimensional irreps $\rho_t$
@@ -688,18 +689,21 @@ to the adjacency matrix of Cayley$(G, G_0)$ but
 instead of the regular representation we are
 using the Pauli representation.
 
-More generally, we would assign weights
+More generally, we can assign weights
 to each operator in $G_0,$ that is
-$w:G_0\to\Complex,$
+$w:G_0\to\R,$
 and 
-$ \Ham = \sum_{g\in G_0} w(g) \rho_{\mathrm{pauli}}(g).$
-We can extend $w$ to all of $G$ 
-by setting $w(g)=0$ when $g\notin G_0$
-then we see the Hamiltonian is the Fourier
-transform of $w$ relative to $\rho_{\mathrm{pauli}}:$
-$$
-\Ham = \hat{\rho}_\mathrm{pauli}(w) = \sum_{g\in G} w(g) \rho_{\mathrm{pauli}}(g).
-$$
+\begin{align*}
+    \Ham = \sum_{g\in G_0} w(g) \rho_{\mathrm{pauli}}(g)
+            = \bigoplus_{l\in L, t\in T} \sum_{g\in G_0}\ w(g) \rho_t(g).
+\end{align*}
+%We can extend $w$ to all of $G$ 
+%by setting $w(g)=0$ when $g\notin G_0$
+%then we see the Hamiltonian is the Fourier
+%transform of $w$ relative to $\rho_{\mathrm{pauli}}:$
+%$$
+%\Ham = \hat{\rho}_\mathrm{pauli}(w) = \sum_{g\in G} w(g) \rho_{\mathrm{pauli}}(g).
+%$$
 
 
 %We use the following map to
@@ -1156,7 +1160,7 @@ $$
 
 Once again, $|G|=2^{2r+m+1}$ and so
 $\langle\chi_{\rho},\chi_{\rho}\rangle = 1$ and
-$\rho_{\rho}$ is an irreducible representation of $G.$
+$\rho$ is an irreducible representation of $G.$
 We now count the occurances of 
 this representation in $\rho_{pauli}$:
 \begin{align*}
