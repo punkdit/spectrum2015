@@ -185,7 +185,7 @@ w = 2.0
 h = 1.0
 
 hk = 1.0 * h
-hm = 2.0 * h
+hm = 1.7 * h
 hr = 1.0 * h
 
 dm = 0.2
@@ -193,8 +193,8 @@ dm = 0.2
 
 def mkop(row, col, op):
 
-    y = row * 1.13*h + 0.5*h
     x = col * w + 0.25*w
+    y = row * 1.13*h + 0.5*h
 
     for i, opp in enumerate(op):
         dx = i * 0.16*w
@@ -209,15 +209,15 @@ c.stroke(path.line(x+w, y, x+w, y+hr), st_dotted)
 #c.text(x+0.5*w, y+0.5*hr, "$R$", center)
 
 ops = """
-XXII ZIZI 
+ZIZI XXII
 ZZZZ IIIX
 XXXX ZZZI
-XIXI ZZII
+ZZII XIXI
 """.strip().split()
 
 for col in [0,1]:
- for row in range(4):
-    mkop(row, col, ops[col+2*row])
+ for irow, row in enumerate([0., 1., 1.7, 2.75]):
+    mkop(row, col, ops[col+2*irow])
 
 #axis(x-0.5, y, y+hr, "$r$")
 
@@ -258,6 +258,59 @@ c.text(-0.5, hr+dm+hm+dm+0.5*hk, "$L$", center)
 c.text(1.6*w, -0.38, "$G$", center)
 
 c.writePDFfile("pic-gauge4.pdf")
+
+
+###############################################################################
+
+
+c = canvas.canvas()
+
+
+
+def state(x, pos=True):
+    x0, x1 = x.split()
+    return r"$|%s\rangle %s |%s\rangle$" % (x0, "+" if pos else "-", x1)
+
+def arc(*args):
+    return path.path(path.arc(*args))
+
+def orbit(x, y, s1, s2, pos=True, Z=True, X=True):
+
+    rh = 1.0
+    r = 0.5
+
+    c.text(x, y+rh, state(s1, pos), center)
+    c.text(x, y, state(s2, pos), center)
+
+    delta = 50
+
+    if Z:
+        c.stroke(arc(x, y+rh+1.5*r, r, -delta, 180+delta), [deco.earrow()])
+        c.stroke(arc(x, y-1.5*r, r, 180-delta, delta), [deco.earrow()])
+        c.text(x+1.8*r, y+rh+2.2*r, "$+2$", center)
+        c.text(x+1.8*r, y-2.2*r, "$-2$", center)
+
+    delta = 40
+    if X:
+        c.stroke(arc(x+1.9*r, y+0.5*rh, 1.3*r, -delta, delta), [deco.earrow()])
+        c.stroke(arc(x-1.9*r, y+0.5*rh, 1.3*r, 180-delta, 180+delta), [deco.earrow()])
+        c.text(x+3.9*r, y+0.5*rh, "$+2$", center)
+        c.text(x-3.9*r, y+0.5*rh, "$+2$", center)
+
+
+x, y = 0., 0.
+w, h = 5., 2.
+
+orbit(x, y, "0000 1111", "1100 0011")
+orbit(x+w, y+h, "0000 1111", "1100 0011", pos=False, X=False)
+orbit(x+w, y-h, "0001 1110", "1101 0010", Z=False)
+orbit(x+2*w, y, "0001 1110", "1101 0010", pos=False, Z=False, X=False)
+
+
+
+
+
+c.writePDFfile("pic-orbit.pdf")
 
 
 

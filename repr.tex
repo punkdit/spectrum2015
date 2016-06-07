@@ -89,6 +89,12 @@ the level of the structure of the gauge group.
 \def\half{\frac{1}{2}}
 \def\Stab{S}
 
+\newcommand{\ket}[1]{|{#1}\rangle}
+\newcommand{\expect}[1]{\langle{#1}\rangle}
+\newcommand{\bra}[1]{\langle{#1}|}
+\newcommand{\ketbra}[2]{\ket{#1}\!\bra{#2}}
+\newcommand{\braket}[2]{\langle{#1}|{#2}\rangle}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -979,15 +985,53 @@ All of this can be summarized in a table of anti-commuting pairs:
 \end{center}
 where the number of rows equals $n$ and each entry
 commutes with the entries on other rows, and anticommutes
-with the entry on the same row. Indeed, we have a presentation
-of the group $\Pauli_4,$ as it was defined in Eq (\ref{presentation}).
-In particular, we have presented $R$ as $\Pauli_1$ and this
-makes it obvious an isomorphism $\phi:R\to \Pauli_1$
+with the entry on the same row. 
+%Indeed, we have a presentation
+%of the group $\Pauli_4,$ as it was defined in Eq (\ref{presentation}).
+%In particular, we have presented $R$ as $\Pauli_1$ and this
+%makes it obvious an isomorphism $\phi:R\to \Pauli_1$
+%to use: %, defined by its values on $R_0,$ 
+If we take all the operators in the left column
+we get generators for a stabilizer group 
+$\{ ZZII, XXXX, ZZZZ, ZIZI \}.$ 
+These stabilize the
+state $\phi = \ket{0000}+\ket{1111}$
+which is unique up to scalar multiple.
+Let $r$ be the gauge operator $XXII$ adjacent to the 
+stabilizer $ZIZI$,
+and similarly let $t_1=ZZZI, t_2=IIIX$.
+The state $\phi$ then lies in the $G-$orbit 
+$$
+\{\phi, r\phi\} = \{\ket{0000}+\ket{1111}, \ket{1100}+\ket{0011}\}.
+$$
+We can enumerate three other $G-$orbits
+using $t_1$ and $t_2$:
+$$
+\{t_1 \phi, t_1 r\phi\}, 
+\{t_2 \phi, t_2 r\phi\}, 
+\{t_1 t_2 \phi, t_1 t_2 r\phi\}.
+$$
+The Hamiltonian acts on states by left multiplication.
+Because this action
+is a sum of gauge group elements,
+the action decomposes into blocks,
+one for each $G-$orbit.
+We depict this action as a weighted graph, where we omit edges
+with zero weight:
+
+\begin{center}
+\includegraphics[]{pic-orbit.pdf}
+\end{center}
+There is also an action on another four orbits which we can get to by
+operating using the adjacent logical operator $l=XIXI.$
+This action looks the same except the labels on each element
+of the orbit has been acted on by the logical operator $l.$
+
+From the table above we can pick out an isomorphism $\phi:R\to \Pauli_1$
 to use: %, defined by its values on $R_0,$ 
 $$
     \phi(XXII) := X, \ \ \phi(ZIZI) := Z.
 $$
-
 We now evaluate $\rho(g)$ for each $g\in G_0$ 
 to work out the form of each block $\Ham_\rho$.
 Note that $g=g'h$ where $g'\in R$ and $h\in \Stab$
