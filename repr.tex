@@ -994,20 +994,19 @@ with the entry on the same row.
 %makes it obvious an isomorphism $\phi:R\to \Pauli_1$
 %to use: %, defined by its values on $R_0,$ 
 If we take all the operators in the left column
-we get generators for a stabilizer group 
-$\{ ZZII, XXXX, ZZZZ, ZIZI \}.$ 
-These stabilize the
-state $\phi = \ket{0000}+\ket{1111}$
-which is unique up to scalar multiple.
+we get generators for an abelian group 
+$\{ ZZII, XXXX, ZZZZ, ZIZI \}$ 
+that stabilizes the
+state $\phi = \ket{0000}+\ket{1111}.$
+This state will be unique up to scalar multiple.
 Let $r$ be the gauge operator $XXII$ adjacent to the 
 stabilizer $ZIZI$,
-and similarly let $t_1=ZZZI, t_2=IIIX$.
 The state $\phi$ then lies in the $G-$orbit 
 $$
 \{\phi, r\phi\} = \{\ket{0000}+\ket{1111}, \ket{1100}+\ket{0011}\}.
 $$
-We can enumerate three other $G-$orbits
-using $t_1$ and $t_2$:
+We use the $T_0$ operators $t_1=ZZZI$ and $t_2=IIIX$
+to list three other $G-$orbits:
 $$
 \{t_1 \phi, t_1 r\phi\}, 
 \{t_2 \phi, t_2 r\phi\}, 
@@ -1016,7 +1015,7 @@ $$
 The Hamiltonian acts on states by left multiplication.
 Because this action
 is a sum of gauge group elements,
-the action decomposes into blocks,
+it will decompose into blocks,
 one for each $G-$orbit.
 We depict this action as a weighted graph, where we omit edges
 with zero weight:
