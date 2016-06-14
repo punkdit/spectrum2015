@@ -144,6 +144,7 @@ class TupleItem(Item):
 
 
 class SetItem(Item):
+    "a hashable unordered set"
     def __init__(self, items):
         items = list(items)
         #for i in range(len(items)):
@@ -193,7 +194,7 @@ assert len(list(all_functions('abc', 'a'))) == 1
 assert len(list(all_functions('a', 'abc'))) == 3
 
 
-def _choose(items, k):
+def __choose(items, k):
     "choose k elements"
     n = len(items)
     assert 0<=k<=n
@@ -205,16 +206,35 @@ def _choose(items, k):
         for i in range(n):
             yield items[:i], items[i+1:], [items[i]]
     else:
-        for left, right, chosen in _choose(items, k-1):
+        for left, right, chosen in __choose(items, k-1):
             n = len(right)
             for i in range(n):
                 yield left + right[:i], right[i+1:], chosen+[right[i]]
 
-def choose(items, k):
+def _choose(items, *ks):
+    "yield a tuple "
+    if len(ks)==0:
+        yield items,
+    elif len(ks)==1:
+        k = ks[0]
+        for left, right, chosen in __choose(items, k):
+            yield items, chosen
+    else:
+        k = ks[0]
+        for flag in _choose(items, *ks[:-1]):
+            chosen = flag[-1]
+            for chosen, _chosen in _choose(chosen, ks[-1]):
+                yield flag + (_chosen,)
+
+
+def choose(items, *ks):
     "choose k elements"
     _items = []
-    for left, right, chosen in _choose(items, k):
-        _items.append((SetItem(left+right), SetItem(chosen)))
+    #for left, right, chosen in _choose(items, k):
+    #    _items.append((SetItem(left+right), SetItem(chosen)))
+    for flag in _choose(items, *ks):
+        flag = tuple(SetItem(item) for item in flag)
+        _items.append(flag)
     return _items
 
 items4 = list('abcd')
@@ -326,22 +346,38 @@ class Group(object):
         # Cauchy-Frobenius lemma
         assert n == sum(len(g.fixed()) for g in group)
 
-    def choice(group, k):
+#    def choice(group, k):
+#        "choose k elements"
+#    
+#        items = group.items
+#        _items = choose(items, k)
+#        #_group = set()
+#        _group = []
+#        for g in group:
+#            perm = g.perm
+#            _perm = {}
+#            for left, right in _items:
+#                _left = SetItem(tuple(perm[item] for item in left))
+#                _right = SetItem(tuple(perm[item] for item in right))
+#                _perm[left, right] = _left, _right
+#            _g = Perm(_perm, _items)
+#            #_group.add(_g)
+#            _group.append(_g)
+#        return Group(_group, _items)
+
+    def choice(group, *ks):
         "choose k elements"
     
         items = group.items
-        _items = choose(items, k)
-        #_group = set()
+        _items = choose(items, *ks)
         _group = []
         for g in group:
             perm = g.perm
             _perm = {}
-            for left, right in _items:
-                _left = SetItem(tuple(perm[item] for item in left))
-                _right = SetItem(tuple(perm[item] for item in right))
-                _perm[left, right] = _left, _right
+            for flag in _items:
+                _flag = tuple(SetItem(tuple(perm[item] for item in __items)) for __items in flag)
+                _perm[flag] = _flag
             _g = Perm(_perm, _items)
-            #_group.add(_g)
             _group.append(_g)
         return Group(_group, _items)
 
@@ -448,6 +484,10 @@ def test():
     S4_22 = S4.choice(2)
     S4_22.check()
 
+    S4_211 = S4.choice(2, 1)
+    assert len(S4_211.items)==12
+    S4_211.check()
+
     assert S4.isomorphic(S4_22)
 
     assert len(list(S4_22.all_homs_iso(S4_22))) == 2
@@ -484,14 +524,19 @@ def test():
     #for group, func in Z22.all_homs(list('ab')):
     #    print func
 
-    for group in [Z4, Z22]:
-        group.check()
-
     group = Z22.choice(2)
-    group.check()
+    print "Z22.choice(2): orbits", [len(orbit) for orbit in group.orbits()]
+    group = Z22.choice(2, 1)
+    print "Z22.choice(2, 1): orbits", [len(orbit) for orbit in group.orbits()]
+    group = Z22.choice(3, 2, 1)
+    print "Z22.choice(3, 2, 1): orbits", [len(orbit) for orbit in group.orbits()]
 
     group = Z4.choice(2)
-    group.check()
+    print "Z4.choice(2): orbits", [len(orbit) for orbit in group.orbits()]
+    group = Z4.choice(2, 1)
+    print "Z4.choice(2, 1): orbits", [len(orbit) for orbit in group.orbits()]
+    group = Z4.choice(3, 2, 1)
+    print "Z4.choice(3, 2, 1): orbits", [len(orbit) for orbit in group.orbits()]
 
 #    print "fixed:",
 #    for g in group:
