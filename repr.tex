@@ -1025,20 +1025,20 @@ If we take all the operators in the left column
 we get generators for an abelian group 
 $\{ ZZII, XXXX, ZZZZ, ZIZI \}$ 
 that stabilizes the
-state $\phi = \ket{0000}+\ket{1111}.$
+state $\ket{\psi} = \ket{0000}+\ket{1111}.$
 This state will be unique up to scalar multiple.
 Let $r$ be the gauge operator $XXII$ adjacent to the 
 stabilizer $ZIZI$,
-The state $\phi$ then lies in the $G-$orbit 
+The state $\ket{\psi}$ then lies in the $G-$orbit 
 $$
-\{\phi, r\phi\} = \{\ket{0000}+\ket{1111}, \ket{1100}+\ket{0011}\}.
+\{\ket{\psi}, r\ket{\psi}\} = \{\ket{0000}+\ket{1111}, \ket{1100}+\ket{0011}\}.
 $$
 We use the $T_0$ operators $t_1=ZZZI$ and $t_2=IIIX$
 to list three other $G-$orbits:
 $$
-\{t_1 \phi, t_1 r\phi\}, 
-\{t_2 \phi, t_2 r\phi\}, 
-\{t_1 t_2 \phi, t_1 t_2 r\phi\}.
+\{t_1 \ket{\psi}, t_1 r\ket{\psi}\}, 
+\{t_2 \ket{\psi}, t_2 r\ket{\psi}\}, 
+\{t_1 t_2 \ket{\psi}, t_1 t_2 r\ket{\psi}\}.
 $$
 The Hamiltonian acts on states by left multiplication.
 Because this action
@@ -1049,12 +1049,19 @@ We depict this action as a weighted graph, where we omit edges
 with zero weight:
 
 \begin{center}
-\includegraphics[]{pic-orbit.pdf}
+\includegraphics[width=0.9\columnwidth]{pic-orbit.pdf}
 \end{center}
-There is also an action on another four orbits which we can get to by
-operating using the adjacent logical operator $l=XIXI.$
-This action looks the same except the labels on each element
-of the orbit has been acted on by the logical operator $l.$
+Here we have sixteen vectors forming an orthogonal basis for the state space.
+They are arranged on the vertices of a cube. This cube is actually a four
+dimensional hypercube, but we suppress the last dimension in
+this diagram.
+Such an arrangement of basis vectors has a cartesian product
+structure which induces a tensor product decomposition of
+the original state space.
+
+\begin{center}
+\includegraphics[width=0.9\columnwidth]{pic-operators.pdf}
+\end{center}
 
 From the table above we can pick out an isomorphism $\phi:R\to \Pauli_1$
 to use: %, defined by its values on $R_0,$ 
