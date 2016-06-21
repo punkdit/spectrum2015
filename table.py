@@ -224,6 +224,7 @@ for side in [-1, 0, 1]:
             \tilde{Z}_3 \tilde{X}_3
             \tilde{Z}_4 \tilde{X}_4
             """.strip().split()
+        ops = list(reversed(ops))
     
     if side>=0:
         for col in [0,1]:
@@ -313,8 +314,8 @@ def orbit((x, y), desc, pos=True, Z=True, X=True, logop=False):
     if Z:
         c.stroke(arc(x, y+rh+1.5*r, r, -delta, 180+delta), [deco.earrow()])
         c.stroke(arc(x, y-1.5*r, r, 180-delta, delta), [deco.earrow()])
-        c.text(x+1.8*r, y+rh+2.2*r, "$+2$", center)
-        c.text(x+1.8*r, y-2.2*r, "$-2$", center)
+        c.text(x+1.8*r, y+rh+2.2*r, "$-2$", center)
+        c.text(x+1.8*r, y-2.2*r, "$+2$", center)
 
     delta = 40
     if X:
@@ -433,8 +434,8 @@ for frame in [0, 1]:
 
     x0, y0 = pts[0, 1, 0]
     x1, y1 = pts[0, 1, 0]
-    y0 -= 0.8
-    y1 += 0.8
+    y0 -= 0.6
+    y1 += 0.6
     operator(x0, y0, x1, y1, r"\tilde{X}_4 = XXII", dx=3.0, arrow=False)
     darrow(x0+1.5, y0, x1+1.5, y1)
 
