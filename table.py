@@ -12,6 +12,7 @@ text.set(mode="latex")
 text.set(docopt="12pt")
 text.preamble(r"\usepackage{amsmath,amsfonts,amssymb}")
 
+text.preamble(r"\def\ket #1{|#1\rangle}")
 
 
 def dopath(points, extra=[], fill=[], closepath=False, smooth=0.0):
@@ -104,8 +105,61 @@ st_thick = [style.linewidth.thick]
 st_Thick = [style.linewidth.Thick]
 st_THICK = [style.linewidth.THICK]
 
+def arc(*args):
+    return path.path(path.arc(*args))
+
+def arcn(*args):
+    return path.path(path.arcn(*args))
+
+###############################################################################
 
 
+c = canvas.canvas()
+
+
+w = 1.8
+h = 1.5
+
+x, y = 0., 0.
+
+c.text(x, y, r"$\ket{0}$", center)
+c.text(x+w, y, r"$\ket{1}$", center)
+
+
+r = 0.4
+theta = 45.0
+
+c.text(x-1.5, y, "$Z:$", center)
+c.stroke(arc(x-1.2*r, y, r, theta, 360-theta), [deco.earrow()])
+c.text(x-1.2*r, y+1.2*r, "$+1$", south)
+
+c.stroke(arcn(x+w+1.2*r, y, r, 180-theta, 180+theta), [deco.earrow()])
+c.text(x+w+1.2*r, y+1.2*r, "$-1$", south)
+
+y -= h
+
+r = 1.8
+theta = 20.0
+
+c.text(x, y, r"$\ket{0}$", center)
+c.text(x+w, y, r"$\ket{1}$", center)
+
+c.text(x-1.5, y, "$X:$", center)
+
+c.text(x+0.5*w, y+0.5, "$+1$", south)
+c.stroke(arc(x+0.5*w, y-0.8*r, r, 90-theta, 90+theta), [deco.earrow()])
+
+c.text(x+0.5*w, y-0.5, "$+1$", north)
+c.stroke(arc(x+0.5*w, y+0.8*r, r, 270-theta, 270+theta), [deco.earrow()])
+
+
+
+c.writePDFfile("pic-zx.pdf")
+
+sys.exit(0)
+
+
+###############################################################################
 
 
 c = canvas.canvas()
@@ -282,9 +336,6 @@ def state(x, pos=True):
     #x0, x1 = x.split()
     x0, x1 = x
     return r"$|%s\rangle %s |%s\rangle$" % (x0, "+" if pos else "-", x1)
-
-def arc(*args):
-    return path.path(path.arc(*args))
 
 def orbit((x, y), desc, pos=True, Z=True, X=True, logop=False):
 

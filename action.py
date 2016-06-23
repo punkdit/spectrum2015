@@ -2,6 +2,8 @@
 
 import sys
 
+import numpy
+
 
 def mulclose(els, verbose=False, maxsize=None):
     els = set(els)
@@ -501,15 +503,37 @@ def test():
     S4_22 = S4.choice(2)
     S4_22.check()
 
-    #G1 = S4.choice(2)
-    G1 = S4.choice(3, 2, 1)
-    G2 = S4.choice(2)
-    group = G1.square(G2)
-    print "SxS:", len(group.items)
-    print "orbits:", len(group.orbits())
-    print
+    if 0:
+        # Pauli group
+        X = Perm((3, 1, 2, 0), items4)
+        Z = Perm((2, 3, 0, 1), items4)
+        I = Perm((0, 1, 2, 3), items4)
+        w = Perm((3, 2, 1, 0), items4)
+        assert X*X==I
+        assert Z*Z==I
+        assert Z*X != X*Z
+        assert Z*X*Z*X == w
+        P = Group.generate([X, Z])
+        assert len(P)==8
+        group = P.square(P)
+        print "orbits:", len(group.orbits())
+        for orbit in group.orbits():
+            print orbit
+            A = numpy.zeros((4, 4))
+            for (i, j) in orbit:
+                i, j = items4.index(i), items4.index(j)
+                A[i, j] = 1
+            print A
 
     if 0:
+        #G1 = S4.choice(2)
+        G1 = S4.choice(3, 2, 1)
+        G2 = S4.choice(2)
+        group = G1.square(G2)
+        print "SxS:", len(group.items)
+        print "orbits:", len(group.orbits())
+        print
+
         group = S4.choice(2).square()
         print "##\n##"
         print "SxS:", len(group.items)

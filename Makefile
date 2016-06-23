@@ -10,6 +10,13 @@ repr: repr.tex refs.bib
 	pdflatex repr.tex
 
 
+notes: notes.tex refs.bib
+	pdflatex notes.tex
+	bibtex notes
+	pdflatex notes.tex
+	pdflatex notes.tex
+
+
 
 
 
