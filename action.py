@@ -305,6 +305,23 @@ class Group(object):
         group = Group(perms, items)
         return group
 
+    def square(self, other=None):
+        if other is None:
+            other = self
+        assert self.isomorphic(other)
+        items = [(i, j) for i in self.items for j in other.items]
+        perms = []
+        for i in range(len(self)):
+            g = self[i]
+            h = other[i]
+            perm = {}
+            for i, j in items:
+                perm[i, j] = g[i], h[j]
+            perm = Perm(perm, items)
+            perms.append(perm)
+        group = Group(perms, items)
+        return group
+
     def fixed(self):
         fixed = {}
         for el in self.els:
@@ -484,6 +501,32 @@ def test():
     S4_22 = S4.choice(2)
     S4_22.check()
 
+    #G1 = S4.choice(2)
+    G1 = S4.choice(3, 2, 1)
+    G2 = S4.choice(2)
+    group = G1.square(G2)
+    print "SxS:", len(group.items)
+    print "orbits:", len(group.orbits())
+    print
+
+    if 0:
+        group = S4.choice(2).square()
+        print "##\n##"
+        print "SxS:", len(group.items)
+        print "orbits:", len(group.orbits())
+    
+        group = S4.choice(2, 1).square()
+        print "##\n#\n#"
+        print len(group)
+        print "SxS:", len(group.items)
+        print "orbits:", len(group.orbits())
+    
+        group = S4.choice(3, 2, 1).square()
+        print "#\n#\n#\n#"
+        print len(group)
+        print "SxS:", len(group.items)
+        print "orbits:", len(group.orbits())
+
     S4_211 = S4.choice(2, 1)
     assert len(S4_211.items)==12
     S4_211.check()
@@ -524,19 +567,20 @@ def test():
     #for group, func in Z22.all_homs(list('ab')):
     #    print func
 
-    group = Z22.choice(2)
-    print "Z22.choice(2): orbits", [len(orbit) for orbit in group.orbits()]
-    group = Z22.choice(2, 1)
-    print "Z22.choice(2, 1): orbits", [len(orbit) for orbit in group.orbits()]
-    group = Z22.choice(3, 2, 1)
-    print "Z22.choice(3, 2, 1): orbits", [len(orbit) for orbit in group.orbits()]
-
-    group = Z4.choice(2)
-    print "Z4.choice(2): orbits", [len(orbit) for orbit in group.orbits()]
-    group = Z4.choice(2, 1)
-    print "Z4.choice(2, 1): orbits", [len(orbit) for orbit in group.orbits()]
-    group = Z4.choice(3, 2, 1)
-    print "Z4.choice(3, 2, 1): orbits", [len(orbit) for orbit in group.orbits()]
+    if 0:
+        group = Z22.choice(2)
+        print "Z22.choice(2): orbits", [len(orbit) for orbit in group.orbits()]
+        group = Z22.choice(2, 1)
+        print "Z22.choice(2, 1): orbits", [len(orbit) for orbit in group.orbits()]
+        group = Z22.choice(3, 2, 1)
+        print "Z22.choice(3, 2, 1): orbits", [len(orbit) for orbit in group.orbits()]
+    
+        group = Z4.choice(2)
+        print "Z4.choice(2): orbits", [len(orbit) for orbit in group.orbits()]
+        group = Z4.choice(2, 1)
+        print "Z4.choice(2, 1): orbits", [len(orbit) for orbit in group.orbits()]
+        group = Z4.choice(3, 2, 1)
+        print "Z4.choice(3, 2, 1): orbits", [len(orbit) for orbit in group.orbits()]
 
 #    print "fixed:",
 #    for g in group:
