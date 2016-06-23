@@ -80,6 +80,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
+\section{Motivating examples}
+
 There's at least one version of mathematical dogma that would
 have us perform our linear algebra without choosing a basis.
 Any basis, or preferred subspace, should only come from the
@@ -170,8 +172,9 @@ where the number of rows equals $n$ and each entry
 commutes with the entries on other rows, and anticommutes
 with the entry on the same row. 
 If we take all the operators in the left column
-we get generators for an abelian group 
-$\{ ZZII, XXXX, ZZZZ, ZIZI \}$ 
+we get the operators 
+$\{ ZZII, XXXX, ZZZZ, ZIZI \}.$ 
+These generate an abelian group 
 that stabilizes the
 state $\ket{\psi} = \ket{0000}+\ket{1111}.$
 Let $r$ be the gauge operator $XXII$ adjacent to the 
@@ -208,8 +211,16 @@ with zero weight:
 \includegraphics[width=0.9\columnwidth]{pic-orbit.pdf}
 \end{center}
 
+\def\Xt{\tilde{X}}
+\def\Zt{\tilde{Z}}
 
-Using the basis computed from the orbits we
+\begin{align*}
+H &= XXII + IIXX + ZIZI + IZIZ \\
+  &= \Xt_4 + \Zt_2\Xt_4 + \Zt_4 + \Zt_3\Zt_4 \\
+  &= (I+\Zt_2)\Xt_4 + (I+\Zt_3) \Zt_4.
+\end{align*}
+
+Using the symmetry invariant basis computed from the orbits we
 can write the matrix for the Hamiltonian in
 block diagonal form:
 $$
@@ -224,7 +235,7 @@ $$
 
 
 
-\section{Representations of gauge codes}
+\section{Representation theory}
 
 \subsection{The Pauli group}
 
@@ -662,9 +673,9 @@ and
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-\section{Examples}
+\section{Applications}
 
-In the following examples we will make the identification
+In the following applications we will make the identification
 between $g$ and $\rho_{pauli}(g)$.
 So terms such as $Z$ and $X$ are understood
 to be the corresponding Pauli linear operators.
@@ -941,6 +952,87 @@ The coefficients $\Gamma_{ij}$ are dependant on the irrep $\rho.$
 % apart from 2d compass model this seems like it will rarely work...
 % Actually it doesn't even work on the 2d compass model.
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+\section{Bounding the gap}
+
+We restrict our attention to Hamiltonians whose off-diagonal entries
+are non-negative.
+This can be achieved by considering Hamiltonians where each term
+involves either $X$-type operators or $Z$-type operators but not both.
+That is, $G_0$ consists only of $X$-type operators and $Z$-type operators.
+We also shift the Hamiltonian by a constant energy, so that
+the diagonal entries are non-negative:
+$$
+%\Ham := \sum_{g\in G_0} \rho_{\mathrm{pauli}}(g).
+\Ham := \sum_{g\in G_0} \rho_{\mathrm{pauli}}(g) + kI.
+$$
+This does not change the spectral gap or eigenvectors.
+
+A simple variational argument
+shows that the top eigenvector (the groundstate)
+can be chosen to have all positive entries
+(this is the Perron-Frobenius theorem)
+and therefore is stabilized:
+
+\noindent{\bf Theorem.}
+Every groundstate is stabilized.
+
+\noindent{\bf Proof.}
+\qed
+
+
+In \cite{Friedland2002}, they derive the following cheeger inequality
+by considering bi-partitions of the graph. We will do the
+same, but using matrix block notation.
+
+Let $v_2$ be a second eigenvector, $ \Ham v_2 = \lambda_2 v_2 $ 
+and $||v_2||=1$.
+We bi-partition the space 
+so that $v_2$ has (vector) blocks:
+$$
+v_2 = \left( \begin{array}{l}
+x\\
+y\end{array} \right)\quad
+$$
+with $x\ge 0$ and $y\le 0,$ component-wise.
+Let the blocks of $\Ham$ under the same partition be:
+$$
+\Ham = \left( \begin{array}{ll}
+A&C\\
+C^\top&B\end{array} \right).\quad
+$$
+If we denote $\lambda_1(A)$ as the top eigenvalue of $A$ and
+$\lambda_1(B)$ as the top eigenvalue of $B$,
+then
+\begin{align*}
+\lambda_2 = v_2^\top \Ham v_2 &= x^\top A x + 2 x^\top C y + y^\top B y \\
+        &\le x^\top A x + y^\top B y\ \le\ ||x||^2 \lambda_1(A) + ||y||^2 \lambda_1(B) \\
+        &\le \mbox{min}(\lambda_1(A), \lambda_1(B))\ \le\ \lambda_1.
+\end{align*}
+
+Defining the following constant as a maximisation over
+all bi-partitions of $\Ham:$
+$$
+    \nu(\Ham) := \max_{A, B}\ \mbox{min}((\lambda_1(A), \lambda_1(B))
+$$
+the above calculation shows that
+$$
+    \lambda_2 \le \nu(\Ham) \le \lambda_1.
+$$
+
+To bound $\lambda_2$ from below, we use a variational argument.
+For any unit vector $v$ orthogonal to the top eigenspace of $\Ham$ we
+have $v^\top \Ham v \le \lambda_2.$
+
+
+See also,
+\cite{AlShimary2010}.
+And \cite{Jarret2015}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %

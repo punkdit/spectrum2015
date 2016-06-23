@@ -156,8 +156,6 @@ c.stroke(arc(x+0.5*w, y+0.8*r, r, 270-theta, 270+theta), [deco.earrow()])
 
 c.writePDFfile("pic-zx.pdf")
 
-sys.exit(0)
-
 
 ###############################################################################
 
@@ -273,10 +271,10 @@ for side in [-1, 0, 1]:
         ops = """ZIZI XXII ZZZZ IIIX XXXX ZZZI ZZII XIXI""".strip().split()
     else:
         ops = r"""
-            \tilde{Z}_1 \tilde{X}_1 
-            \tilde{Z}_2 \tilde{X}_2 
-            \tilde{Z}_3 \tilde{X}_3
-            \tilde{Z}_4 \tilde{X}_4
+            \tilde{X}_1 \tilde{Z}_1 
+            \tilde{X}_2 \tilde{Z}_2 
+            \tilde{X}_3 \tilde{Z}_3
+            \tilde{X}_4 \tilde{Z}_4
             """.strip().split()
         ops = list(reversed(ops))
     
