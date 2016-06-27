@@ -101,4 +101,7 @@ u, v = la.eig(A)
 print u
 print v#[:, 0]
 
+# eigvals: [ 11.21110255   6.          -3.21110255]
+
+
 
