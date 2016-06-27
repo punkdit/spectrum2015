@@ -60,7 +60,8 @@
 \def\C{\mathbb{C}}
 \def\R{\mathbb{R}}
 \def\Z{\mathbb{Z}}
-\def\Ham{\mathcal{H}}
+%\def\Ham{\mathcal{H}} % meh..
+\def\Ham{H} 
 \def\Pauli{\mathcal{P}}
 \def\Spec{\mbox{Spec}}
 \def\Proveit{{\it (Proof??)}}
@@ -132,7 +133,7 @@ To further elucidate this idea we turn to another example.
 Now we have a hamiltonian built from three commuting and
 independent operators 
 $$
-    H = XXI + IXX + ZZZ.
+    \Ham = XXI + IXX + ZZZ.
 $$
 Starting with $\ket{000}$ we compute the orbit state
 as $\ket{000}+\ket{011}+\ket{110}+\ket{101}.$
@@ -151,7 +152,7 @@ invariant basis.}
 
 Now we consider a four qubit example:
 $$
-    H = XXII + IIXX + ZIZI + IZIZ.
+    \Ham = XXII + IIXX + ZIZI + IZIZ.
 $$
 This time the terms of the Hamiltonian do not form
 an abelian group.
@@ -215,7 +216,7 @@ with zero weight:
 \def\Zt{\tilde{Z}}
 
 \begin{align*}
-H &= XXII + IIXX + ZIZI + IZIZ \\
+\Ham &= XXII + IIXX + ZIZI + IZIZ \\
   &= \Xt_4 + \Zt_2\Xt_4 + \Zt_4 + \Zt_3\Zt_4 \\
   &= (I+\Zt_2)\Xt_4 + (I+\Zt_3) \Zt_4.
 \end{align*}
@@ -961,7 +962,7 @@ The coefficients $\Gamma_{ij}$ are dependant on the irrep $\rho.$
 \section{Bounding the gap}
 
 We restrict our attention to Hamiltonians whose off-diagonal entries
-are non-negative.
+are non-negative (in some basis).
 These are also known as \emph{stoquastic} Hamiltonians \cite{Bravyi2006}.
 This can be achieved by considering Hamiltonians where each term
 involves either $X$-type operators or $Z$-type operators but not both.
