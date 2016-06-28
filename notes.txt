@@ -1,4 +1,46 @@
 
+28/6/16
+=======
+
+time ./orbit.py 5 
+marked: 1
+orbits: 2 bdy: 1
+orbits: 10 bdy: 8
+orbits: 38 bdy: 28
+orbits: 164 bdy: 126
+orbits: 452 bdy: 288
+orbits: 728 bdy: 276
+orbits: 748 bdy: 20
+orbits: 748 bdy: 0
+orbits: 748
+
+real0m5.354s
+user0m5.284s
+sys0m0.016s
+
+
+time ./orbit.py 4 
+marked: 1
+orbits: 2 bdy: 1
+orbits: 10 bdy: 8
+orbits: 16 bdy: 6
+orbits: 34 bdy: 18
+orbits: 34 bdy: 0
+orbits: 34
+
+real0m50m0.080s
+user0m50m0.064s
+sys0m00m0.008s
+
+
+time ./orbit.py 3 
+marked: 1
+orbits: 2 bdy: 1
+orbits: 3 bdy: 1
+orbits: 3 bdy: 0
+orbits: 3
+
+
 
 
 
