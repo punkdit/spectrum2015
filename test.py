@@ -46,14 +46,22 @@ def test():
         print v[i] / v[i+4]
     
 
+def reflect(A, n):
+    assert n < len(A)
+    B = A[:n, :n]
+    B[n-1, n-1] += A[n-1, n]
+    return B
 
-def gcolor_1():
+
+def test_gcolor():
 
     # This computes energy of the groundstate of the n=15 gauge color code
 
-    A = numpy.zeros((7, 7))
+    n = 7
+
+    A = numpy.zeros((n, n))
     
-    for k in range(7):
+    for k in range(n):
         A[k, k] = 3*(6-2*k)
         if k>0:
             # from k-1 to k
@@ -68,40 +76,66 @@ def gcolor_1():
     print u[0]
     print v[:, 0]
 
-#gcolor_1()
+    B = A[:n-1, :n-1]
+    print
+    print B
+
+    u, v = la.eig(B)
+    print u[0]
+    print v[:, 0]
 
 
-A = numpy.zeros((3, 3))
+    B = reflect(A, n-1)
+    #B[n-2, n-2] += 3
 
-# self interactions
-A[1,1] += 4
-A[2,2] += 3
+    for count in range(10):
+        print
+        print B
 
-# 1 --> 0
-A[0, 1] = 9
+        u, v = la.eig(B)
+        print "eigs:", u
+        for i in range(len(u)):
+            print v[:, i]
+    
+        B[2, 2] += 1
 
-# 0 --> 1
-A[1, 0] = 1
 
-# 2 --> 1
-A[1, 2] = 4
 
-# 1 --> 2
-A[2, 1] = 6
+test_gcolor()
 
-print A
 
-# G_z
-A[0,0] += 9
-A[1,1] += 1
-A[2,2] += -3
-
-print A
-u, v = la.eig(A)
-print u
-print v#[:, 0]
-
-# eigvals: [ 11.21110255   6.          -3.21110255]
+def test_compass():
+    A = numpy.zeros((3, 3))
+    
+    # self interactions
+    A[1,1] += 4
+    A[2,2] += 3
+    
+    # 1 --> 0
+    A[0, 1] = 9
+    
+    # 0 --> 1
+    A[1, 0] = 1
+    
+    # 2 --> 1
+    A[1, 2] = 4
+    
+    # 1 --> 2
+    A[2, 1] = 6
+    
+    print A
+    
+    # G_z
+    A[0,0] += 9
+    A[1,1] += 1
+    A[2,2] += -3
+    
+    print A
+    u, v = la.eig(A)
+    print u
+    print v#[:, 0]
+    
+    # eigvals: [ 11.21110255   6.          -3.21110255]
 
 
 
