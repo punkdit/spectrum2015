@@ -5,6 +5,7 @@ import sys
 import numpy
 from numpy import linalg as la
 
+from code import texstr
 
 
 I = numpy.array([[1, 0], [0, 1.]])
@@ -100,8 +101,8 @@ def test_gcolor():
         B[2, 2] += 1
 
 
-
-test_gcolor()
+if 0:
+    test_gcolor()
 
 
 def test_compass():
@@ -136,6 +137,19 @@ def test_compass():
     print v#[:, 0]
     
     # eigvals: [ 11.21110255   6.          -3.21110255]
+
+    print texstr(A)
+
+    A = A.astype(numpy.int32)
+    print A
+    from sympy import Matrix
+    A = Matrix(A)
+    print A
+    print A.eigenvals()
+
+
+test_compass()
+    
 
 
 

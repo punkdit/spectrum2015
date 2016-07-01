@@ -19,6 +19,20 @@ def reflect(H, k):
     return H1
 
 
+def build_cube(n):
+
+    m = n
+    Gx = zeros2(m, n)
+    Gz = zeros2(m, n)
+
+    for i in range(m):
+        Gx[i, i] = 1
+        Gz[i, i] = 1
+
+    return Gx, Gz
+
+
+
 def build_compass(l):
 
     n = l**2
@@ -49,6 +63,49 @@ def build_compass(l):
     return Gx, Gz
 
 
+EPSILON = 1e-8
+
+def lstr2(xs, decimals=4):
+    m, n = xs.shape
+    lines = [lstr(xs[i, :], decimals) for i in range(m)]
+    return '[%s]'%',\n '.join(line for line in lines)
+
+
+def lstr(xs, decimals=4, nozero=False):
+    if len(xs.shape)>1:
+        return lstr2(xs, decimals)
+    rxs = [] 
+    for x in xs:
+        if abs(x.imag)<EPSILON:
+            x = x.real
+        if abs(x-round(x))<EPSILON:
+            x = int(round(x))
+        x = "%.*f"%(decimals, x)
+        #if x.replace('0', '')=='.':
+        #    x = '0.'
+        rxs.append(x)
+    s = '[%s]'%', '.join(x.rjust(decimals+2) for x in rxs) 
+    if nozero:
+        s = s.replace(" 0,", "  ,")
+        s = s.replace(" 0]", "  ]")
+    return s
+
+
+def texstr(H, align='r'):
+    s = lstr(H, 0)
+    s = s.replace(', ', ' & ')
+    s = s.replace(',\n', ' \\cr\n')
+    s = s.replace('[', '')
+    s = s.replace(']', '')
+    s = r"""
+\left(\begin{array}{%s}
+%s
+\end{array}\right)
+    """ % (align*len(H), s)
+    return s
+
+
+
 
 def test():
 
@@ -56,6 +113,10 @@ def test():
 
         l = argv.get('l', 3)
         Gx, Gz = build_compass(l)
+
+    elif argv.cube:
+        n = argv.get('n', 3)
+        Gx, Gz = build_cube(n)
 
     else:
         m = argv.get("m", 5)
@@ -106,6 +167,8 @@ def test():
     #print
     print "G:", len(G)
 
+    if len(H)<10:
+        print texstr(H)
     #print shortstr(H)
 
     i = argv.truncate
@@ -136,21 +199,24 @@ def test():
         #print
 
     u, v = numpy.linalg.eigh(H)
-    print "eigval:", u[-1]
-    v = numpy.abs(v[:, -1])
     
-    print "eigvec:", 
-    #_x = 1.0
-    for idx, x in enumerate(v):
-        print "%.2f"%x,
-        for jdx in range(idx):
-            if H[idx, jdx]:
-                if v[jdx] < v[idx]-1e-6:
-                    print "*",
-        #if x > _x+1e-4:
-        #    print "*", H[idx-1,idx-1], H[idx, idx],
-        #_x = x
-    print
+    for i in range(k):
+        print "eigval: %.6f" % u[i],
+        evec = v[:, i]
+        print "eigvec:", 
+        for idx, x in enumerate(evec):
+            print "%.2f"%x,
+            #for jdx in range(idx):
+            #    if H[idx, jdx]:
+            #        if evec[jdx] < evec[idx]-1e-6:
+            #            print "*",
+        print
+
+    A = numpy.array([[3,3,0,0],[1,1,2,0],[0,2,-1,1],[0,0,3,-3]])
+    print texstr(A)
+    u, v = numpy.linalg.eig(A)
+    for i in range(len(A)):
+        print u[i], v[:, i]
 
     if argv.sort:
         idxs = range(len(v))
