@@ -1,3 +1,48 @@
+3/7/16
+======
+
+time ./orbit.py 6 compile
+i686-linux-gnu-gcc -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -Wall -Wstrict-prototypes -fPIC -I/usr/include/python2.7 -c c_orbits.c -o build/temp.linux-i686-2.7/c_orbits.o
+i686-linux-gnu-gcc -pthread -shared -Wl,-Bsymbolic-functions -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security build/temp.linux-i686-2.7/c_orbits.o -o /home/simon/home/github/spectrum2015/c_orbits.so
+marked: 1
+orbits: 2 bdy: 1
+orbits: 17 bdy: 15
+orbits: 87 bdy: 70
+orbits: 575 bdy: 488
+orbits: 2967 bdy: 2392
+orbits: 13118 bdy: 10151
+orbits: 44882 bdy: 31764
+orbits: 116442 bdy: 71560
+orbits: 199161 bdy: 82719
+orbits: 236452 bdy: 37291
+orbits: 239012 bdy: 2560
+orbits: 239012 bdy: 0
+orbits: 239012
+
+real0m148m49.652s
+user0m148m29.784s
+sys0m00m6.936s
+
+
+
+time ./orbit.py 5 
+marked: 1
+orbits: 2 bdy: 1
+orbits: 10 bdy: 8
+orbits: 38 bdy: 28
+orbits: 164 bdy: 126
+orbits: 452 bdy: 288
+orbits: 728 bdy: 276
+orbits: 748 bdy: 20
+orbits: 748 bdy: 0
+orbits: 748
+
+real0m1.632s
+user0m1.620s
+sys0m0.004s
+
+
+
 
 2/7/16
 =======
@@ -10,7 +55,6 @@ Wavefunction is monotonic with the syndrome.
 !!! non monotonic syndromes:
 time ./lanczos.py l=4
 build_compass...1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 done
-..............................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
 [ 18.36929982  19.01290329]
 iters: 830
 
@@ -310,7 +354,9 @@ orbits: 236452 bdy: 37291
 orbits: 239012 bdy: 2560
 orbits: 239012 bdy: 0
 orbits: 239012
-17822.80user 30.26system 6:12:29elapsed 79%CPU (0avgtext+0avgdata 29772maxresident)k
+17822.80user 
+30.26system 
+6:12:29elapsed 79%CPU (0avgtext+0avgdata 29772maxresident)k
 
 
 28/6/16
