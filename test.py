@@ -71,11 +71,18 @@ def test_gcolor():
             # from k+1 to k
             A[k, k+1] = 3*(6-k)
     
-    print A # not hermitian! not normal !
+    #print A # not hermitian! not normal !
+    print texstr(A)
 
     u, v = la.eig(A)
-    print u[0]
+    print "eigs:",
+    for x in u:
+        print x,
+    print
+    print "v[:, 0]:"
     print v[:, 0]
+
+    return
 
     B = A[:n-1, :n-1]
     print
@@ -100,9 +107,6 @@ def test_gcolor():
     
         B[2, 2] += 1
 
-
-if 0:
-    test_gcolor()
 
 
 def test_compass():
@@ -148,7 +152,14 @@ def test_compass():
     print A.eigenvals()
 
 
-test_compass()
+from argv import Argv
+argv = Argv()
+
+if argv.gcolor:
+    test_gcolor()
+elif argv.compass:
+    test_compass()
+
     
 
 

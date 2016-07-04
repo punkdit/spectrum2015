@@ -6,6 +6,8 @@ from heapq import heappush, heappop, heapify
 import numpy
 import scipy.sparse.linalg as la
 
+from code import texstr
+
 EPSILON = 1e-8
 scalar = numpy.float64
 
@@ -26,6 +28,9 @@ class Op(la.LinearOperator):
     def __len__(self):
         return self.n
 
+    def __rmul__(self, alpha):
+        return RMulOp(self, alpha)
+
     def matvec(self, v):
         n = len(v)
         w = numpy.zeros(n)
@@ -35,10 +40,8 @@ class Op(la.LinearOperator):
 
 
 
-
-
 class XOp(Op):
-    def __init__(self, n, idxs):
+    def __init__(self, n, idxs, alpha=1.0):
         " X operator to specified qubits "
         if type(idxs) in (int, long):
             idxs = [idxs]
@@ -65,6 +68,7 @@ class XOp(Op):
             #print j
             perm.append(j)
         self.perm = perm
+        self.alpha = alpha
         Op.__init__(self, 2**n)
 
     def matvec(self, v, w=None):
@@ -74,12 +78,12 @@ class XOp(Op):
         #for i, j in enumerate(self.perm):
         #    w[j] += v[i]
         v = v[self.perm]
-        w += v
+        w += self.alpha * v
         return w
 
 
 class ZOp(Op):
-    def __init__(self, n, idxs):
+    def __init__(self, n, idxs, alpha=1.0):
         " Z operator to specified qubits "
         if type(idxs) in (int, long):
             idxs = [idxs]
@@ -100,6 +104,7 @@ class ZOp(Op):
             phases.append(phase)
         #print "ZOp:", idxs, phases
         self.phases = numpy.array(phases)
+        self.alpha = alpha
         Op.__init__(self, 2**n)
 
     def matvec(self, v, w=None):
@@ -108,8 +113,17 @@ class ZOp(Op):
             w = numpy.zeros(len(v))
         #for i, phase in enumerate(self.phases):
         #    w[i] += phase * v[i]
-        w += self.phases * v
+        w += self.alpha * self.phases * v
         return w
+
+
+def mkop(tp, s):
+    n = len(s)
+    idxs = []
+    for i, x in enumerate(s):
+        if s[i]=='1':
+            idxs.append(i)
+    return tp(n, idxs)
 
 
 class SumOp(Op):
@@ -119,7 +133,7 @@ class SumOp(Op):
         self.count = 0
         Op.__init__(self, self.n)
 
-    def matvec(self, v, w=None):
+    def matvec(self, v, w=None, verbose=True):
         #print "SumOp.matvec"
         assert len(v)==self.n
         if w is None:
@@ -127,7 +141,22 @@ class SumOp(Op):
         for op in self.ops:
             op.matvec(v, w)
         self.count += 1
-        sys.stdout.write('.');sys.stdout.flush()
+        if verbose:
+            sys.stdout.write('.');sys.stdout.flush()
+        return w
+
+
+class RMulOp(Op):
+    def __init__(self, op, alpha=1.0):
+        self.op = op
+        self.alpha = alpha
+        Op.__init__(self, op.n)
+
+    def matvec(self, v, w=None, verbose=True):
+        assert len(v)==self.n
+        if w is None:
+            w = numpy.zeros(len(v))
+        w += self.alpha * self.op.matvec(v, verbose)
         return w
 
 
@@ -143,92 +172,184 @@ def strop(l, idx):
     return str(s)
     
 
-def build_compass(l):
+class Model(object):
+    pass
 
-    print "build_compass...",
-    n = l**2
+class CompassModel(Model):
+    def __init__(self, l):
+    
+        print "build_compass...",
+        n = l**2
+    
+        keys = [(i, j) for i in range(l) for j in range(l)]
+        coords = {}  
+        for i, j in keys:
+            for di in range(-l, l+1):
+              for dj in range(-l, l+1):
+                coords[i+di, j+dj] = keys.index(((i+di)%l, (j+dj)%l))
+    
+        m = n 
+        xops = []
+        zops = []
+    
+        idx = 0 
+        for i in range(l):
+            for j in range(l):
+                op = XOp(n, [coords[i, j], coords[i, j+1]])
+                xops.append(op)
+    
+                op = ZOp(n, [coords[i, j], coords[i+1, j]])
+                zops.append(op)
+    
+                idx += 1
+                write(idx)
+    
+        assert idx == m
+        assert len(xops) == len(zops) == n
+    
+        gauge = SumOp(n, xops+zops)
+        print "done"
+    
+        xstabs = []
+        for i in range(l-1):
+            idxs = []
+            for j in range(l):
+                idxs.append(coords[j, i])
+                idxs.append(coords[j, i+1])
+            op = XOp(n, idxs)
+            xstabs.append(op)
+    
+        self.n = n # qubits
+        self.A = gauge
+        self.xops = xops
+        self.zops = zops
+        self.xstabs = xstabs
 
-    keys = [(i, j) for i in range(l) for j in range(l)]
-    coords = {}  
-    for i, j in keys:
-        for di in range(-l, l+1):
-          for dj in range(-l, l+1):
-            coords[i+di, j+dj] = keys.index(((i+di)%l, (j+dj)%l))
 
-    m = n 
+gcolor_gauge = """
+1111...........
+11..11.........
+1.1.1.1........
+..11..11.......
+.1.1.1.1.......
+....1111.......
+11......11.....
+1.1.....1.1....
+........1111...
+..11......11...
+.1.1.....1.1...
+1...1...1...1..
+........11..11.
+.1...1...1...1.
+....11......11.
+........1.1.1.1
+..1...1...1...1
+....1.1.....1.1
+""".strip().split()
+
+gcolor_stab = """
+11111111.......
+1111....1111...
+11..11..11..11.
+1.1.1.1.1.1.1.1
+""".strip().split()
+
+class GColorModel(Model):
+  def __init__(self):
+
     xops = []
     zops = []
 
-    idx = 0 
-    for i in range(l):
-        for j in range(l):
-            op = XOp(n, [coords[i, j], coords[i, j+1]])
-            xops.append(op)
+    for op in gcolor_gauge:
+        xops.append(mkop(XOp, op))
+        zops.append(mkop(ZOp, op))
 
-            op = ZOp(n, [coords[i, j], coords[i+1, j]])
-            zops.append(op)
+    xstabs = []
+    for op in gcolor_stab:
+        xstabs.append(mkop(XOp, op))
+        #stabs.append(mkop(ZOp, op))
 
-            idx += 1
-            write(idx)
+    n = len(op)
+    self.A = SumOp(n, xops+zops)
+    self.n = n
+    self.xops = xops
+    self.zops = zops
 
-    assert idx == m
-    assert len(xops) == len(zops) == n
+    self.xstabs = xstabs
 
-    gauge = SumOp(n, xops+zops)
-    print "done"
+  def get_syndrome(self, v):
 
-    stabs = []
-    for i in range(l-1):
-        idxs = []
-        for j in range(l):
-            idxs.append(coords[j, i])
-            idxs.append(coords[j, i+1])
-        op = XOp(n, idxs)
-        stabs.append(op)
-
-    return gauge, xops, zops, stabs
-
+    syndrome = []
+    for op in self.xstabs:
+        v1 = op.matvec(v)
+        r = numpy.dot(v, v1) # real values
+        syndrome.append(r)
+    return syndrome
 
 
 
 def test():
 
-    l = argv.get("l", 3)
-    A, xops, zops, stabs = build_compass(l)
+    if argv.compass:
+        l = argv.get("l", 3)
+        model = CompassModel(l)
 
-    n = A.n
+    elif argv.gcolor:
+        model = GColorModel()
+
+    else:
+        return
+
+
+    dim = model.A.n
+
     v0 = None
-    v0 = numpy.zeros(len(A))
-    v0[0] = 1
+
+    if argv.stabdist:
+        v0 = numpy.zeros(len(model.A))
+        v0[0] = 1
     
+    k = argv.get("k", 2)
+
+    A = model.A
+    alpha = 0.0001
+    perturb = [alpha * op for op in model.xstabs]
+    A = SumOp(model.n, A.ops+perturb)
     
-    vals, vecs = la.eigsh(A, k=2, v0=v0, which='LA', maxiter=1000) #, tol=1e-8)
+    vals, vecs = la.eigsh(A, k=k, v0=v0, which='LA', maxiter=None) #, tol=1e-8)
     print
 
+    # vals go from smallest to highest
     print vals
-    print "iters:", A.count
+    print "iterations:", model.A.count
+
+    for i in range(k):
+        print i, "syndrome", model.get_syndrome(vecs[:, i])
 
     v0 = vecs[:, -1]
+
     v0 = numpy.abs(v0)
 
     count = 0
     idxs = []
     values = []
-    for i in range(n):
+    for i in range(dim):
         if abs(v0[i]) > EPSILON:
             #write(i)
             idxs.append(i)
             values.append(v0[i])
-    print
     print "nnz:", len(idxs)
 
-    propagate = SumOp(l**2, xops)
 
-    syndrome = numpy.zeros(n)
-    for op in zops:
+    return
+
+    propagate = SumOp(model.n, model.xops)
+
+    syndrome = numpy.zeros(dim)
+    for op in model.zops:
         syndrome += op.phases
 
-    idxs = [i for i in range(n) if v0[i]>EPSILON]
+    idxs = [i for i in range(dim) if v0[i]>EPSILON]
     idxs.sort(key = lambda i : -syndrome[i])
 
     value = v0[idxs[0]]
@@ -242,7 +363,7 @@ def test():
     print "best:", best
     marked = set(best)
     for i in idxs:
-        for xop in xops:
+        for xop in model.xops:
             j = xop.perm[i]
             if j in marked:
                 continue
@@ -257,7 +378,7 @@ def test():
                 print
 
     for i in idxs:
-        for xop in xops:
+        for xop in model.xops:
             j = xop.perm[i]
             if syndrome[j] > syndrome[i] and v0[j]<v0[i]:
                 #print "*", i, '->', j, 'and', syndrome[i], syndrome[j]

@@ -992,7 +992,8 @@ elements that sends any particular element $v$ of the
 $\auto-$orbit $i$ to the $\auto-$orbit $j.$
 
 Here is a simple example.
-We take as gauge group $G = \{XII, IXI, IIX, ZII, IZI, IIZ\}.$
+We take as gauge group 
+$$G = \{XII, IXI, IIX, ZII, IZI, IIZ\}.$$
 The Hamiltonian $H = \sum_{g\in G} g$ has matrix:
 $$
 H = \left(\begin{array}{rrrrrrrr}
@@ -1030,6 +1031,7 @@ automorphisms by ...
 In general there may be more symmetry in the graph that
 we cannot access via a group automorphism.
 
+\subsection{Compass model}
 For the next example we take the $l=3$ compass model.
 The gauge group has ...
 This time $Aut(G) = A$ and we find three $A-$orbits.
@@ -1041,7 +1043,39 @@ H//\auto =
   0 &  6 &  0
 \end{array}\right)
 $$
-has $\lambda_1 = 4+2\sqrt{13}.$
+has $\lambda_1 = 4+2\sqrt{13} \cong 11.21110255.$
+
+\subsection{Gauge color code model}
+The Gauge color code \cite{Bombin2015,Bombin2015single}...
+This is a self-dual code...
+The smallest in the ensemble has $n=15$ qubits,
+$G_0$ has $18$ each of X/Z-type gauge operators,
+and $4$ each of X/Z-type stabilizer generators.
+
+$$
+H//\auto = 
+\left(\begin{array}{rrrrrrr}
+18 & 18 &  0 &  0 &  0 &  0 &  0 \cr
+  3 & 12 & 15 &  0 &  0 &  0 &  0 \cr
+  0 &  6 &  6 & 12 &  0 &  0 &  0 \cr
+  0 &  0 &  9 &  0 &  9 &  0 &  0 \cr
+  0 &  0 &  0 & 12 & -6 &  6 &  0 \cr
+  0 &  0 &  0 &  0 & 15 & -12 &  3 \cr
+  0 &  0 &  0 &  0 &  0 & 18 & -18
+\end{array}\right)
+$$
+This gives the recurrence relation:
+$$
+    \lambda a_k = 3ka_{k-1} + (18-6k)a_k + (18-3k)a_{k+1}.
+$$
+which has largest solution 
+$\lambda_1 = 18\sqrt{2} \cong 25.4558441.$
+
+The second eigenvalue is given by 
+$\lambda_2 = 9\sqrt{2} + 3\sqrt{10} \cong 22.21475504.$
+This eigenspace is $14$ dimensional.
+Interestingly, this eigenspace has $4$ dimensional support in
+the stabilized subspace.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
