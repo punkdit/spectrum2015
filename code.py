@@ -101,7 +101,7 @@ def texstr(H, align='r'):
 \left(\begin{array}{%s}
 %s
 \end{array}\right)
-    """ % (align*len(H), s)
+    """ % (align*H.shape[1], s)
     return s
 
 

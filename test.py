@@ -71,8 +71,8 @@ def test_gcolor():
             # from k+1 to k
             A[k, k+1] = 3*(6-k)
     
-    #print A # not hermitian! not normal !
-    print texstr(A)
+    print A # not hermitian! not normal !
+    #print texstr(A)
 
     u, v = la.eig(A)
     print "eigs:",
@@ -152,6 +152,48 @@ def test_compass():
     print A.eigenvals()
 
 
+def test_orbits():
+
+    A = [
+    [3, 1, 1, 1, 0, 0, 0, 0],
+    [1, 1, 0, 0, 1, 1, 0, 0],
+    [1, 0, 1, 0, 1, 0, 1, 0],
+    [1, 0, 0, 1, 0, 1, 1, 0],
+    [0, 1, 1, 0, -1, 0, 0, 1],
+    [0, 1, 0, 1, 0, -1, 0, 1],
+    [0, 0, 1, 1, 0, 0, -1, 1],
+    [0, 0, 0, 0, 1, 1, 1, -3]]
+
+    A = numpy.array(A)
+    #u, v = numpy.linalg.eigh(A)
+
+    P = numpy.array([
+        [1, 0, 0, 0],
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 1, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]])
+    print texstr(P)
+
+    AP = numpy.dot(A, P)
+    print AP
+
+    Q = numpy.array([
+        [1, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 1]])
+
+    print texstr(Q)
+
+    QAP = numpy.dot(Q, AP)
+    print QAP
+
+
+
 from argv import Argv
 argv = Argv()
 
@@ -159,6 +201,9 @@ if argv.gcolor:
     test_gcolor()
 elif argv.compass:
     test_compass()
+elif argv.orbits:
+    test_orbits()
+
 
     
 

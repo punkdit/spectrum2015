@@ -28,16 +28,21 @@ class Op(la.LinearOperator):
     def __len__(self):
         return self.n
 
+    def __mul__(self, other):
+        return MulOp(self, other)
+
+    def __add__(self, other):
+        return SumOp(self.n, [self, other])
+
     def __rmul__(self, alpha):
         return RMulOp(self, alpha)
 
-    def matvec(self, v):
-        n = len(v)
-        w = numpy.zeros(n)
-        for i in range(n):
-            w[i] = (i%2)*v[i]
+    def matvec(self, v, w=None):
+        assert len(v) == self.n
+        if w is None:
+            return v
+        w += v
         return w
-
 
 
 class XOp(Op):
@@ -129,7 +134,7 @@ def mkop(tp, s):
 class SumOp(Op):
     def __init__(self, n, ops):
         self.ops = ops
-        self.n = 2**n
+        self.n = n
         self.count = 0
         Op.__init__(self, self.n)
 
@@ -156,8 +161,29 @@ class RMulOp(Op):
         assert len(v)==self.n
         if w is None:
             w = numpy.zeros(len(v))
-        w += self.alpha * self.op.matvec(v, verbose)
+        w += self.alpha * self.op.matvec(v, verbose=verbose)
         return w
+
+
+class MulOp(Op):
+    def __init__(self, a, b):
+        # first do b then a !!
+        self.ops = a, b
+        assert a.n == b.n, (a.n, b.n)
+        Op.__init__(self, a.n)
+
+    def matvec(self, v, w=None, verbose=True):
+        assert len(v)==self.n
+        if w is None:
+            w = numpy.zeros(len(v))
+        a, b = self.ops
+        v = b.matvec(v, verbose=verbose)
+        v = a.matvec(v, verbose=verbose)
+        w += v
+        return w
+
+class IdOp(Op):
+    pass
 
 
 from smap import SMap
@@ -207,7 +233,7 @@ class CompassModel(Model):
         assert idx == m
         assert len(xops) == len(zops) == n
     
-        gauge = SumOp(n, xops+zops)
+        gauge = SumOp(2**n, xops+zops)
         print "done"
     
         xstabs = []
@@ -270,7 +296,7 @@ class GColorModel(Model):
         #stabs.append(mkop(ZOp, op))
 
     n = len(op)
-    self.A = SumOp(n, xops+zops)
+    self.A = SumOp(2**n, xops+zops)
     self.n = n
     self.xops = xops
     self.zops = zops
@@ -312,11 +338,73 @@ def test():
     k = argv.get("k", 2)
 
     A = model.A
-    alpha = 0.0001
-    perturb = [alpha * op for op in model.xstabs]
-    A = SumOp(model.n, A.ops+perturb)
+
+    if argv.perturb:
+        # doesn't work very well...
+        alpha = 0.0001
+        perturb = [alpha * op for op in model.xstabs]
+        A = SumOp(2**model.n, A.ops+perturb)
+
+    projs = []
+    I = IdOp(A.n)
+    for op in model.xstabs:
+        op = 0.5 * (I + op)
+        projs.append(op)
+
+#        v = numpy.random.normal(size=A.n)
+#        w1 = 0.5 * (I(v) + op(v))
+#        w2 = op(v)
+#        print numpy.sum(numpy.abs(w1-w2))
+#
+#        w3 = op(w2)
+#        print numpy.sum(numpy.abs(w3-w2))
+#        print w3
+
+    P = projs[0]
+    for i in range(1, len(projs)):
+        P = P * projs[i]
+
+    projs = list(reversed(projs))
+    Padj = projs[0]
+    for i in range(1, len(projs)):
+        Padj = Padj * projs[i]
+
+    A = P*A*P
+
+    norm = lambda v : (v**2).sum()**0.5
+
+
+    if argv.power:
+
+        v = numpy.random.normal(size=A.n)
+        v /= norm(v)
     
+        sigma = 1.0
+    
+        while 1:
+    
+            u = A.matvec(v)
+            eigval = numpy.dot(v, u)
+    
+            u = u + sigma * v
+    
+            r = norm(u)
+            if r>EPSILON:
+                u /= r
+    
+            err = norm(u-v)
+            print "delta:", err 
+            print "eig:", eigval
+    
+            if err < 1e-4:
+                break
+    
+            v = u
+    
+        return
+
     vals, vecs = la.eigsh(A, k=k, v0=v0, which='LA', maxiter=None) #, tol=1e-8)
+    #vals, vecs = la.eigs(A, k=k, v0=v0, which='LR', maxiter=None) #, tol=1e-8)
     print
 
     # vals go from smallest to highest
@@ -343,7 +431,7 @@ def test():
 
     return
 
-    propagate = SumOp(model.n, model.xops)
+    propagate = SumOp(2**model.n, model.xops)
 
     syndrome = numpy.zeros(dim)
     for op in model.zops:

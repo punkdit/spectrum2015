@@ -1024,6 +1024,30 @@ but in general it is possible that $Aut(G) < \auto.$
 Note that the orbi-Hamiltonian is no longer Hermitian,
 and in general will not even be normal.
 
+We can also write $H//A = QHP$ using the following two matrices for $P$ and $Q:$
+$$
+Q = 
+\left(\begin{array}{rrrrrrrr}
+ 1 &  0 &  0 &  0 &  0 &  0 &  0 &  0 \cr
+  0 &  1 &  0 &  0 &  0 &  0 &  0 &  0 \cr
+  0 &  0 &  0 &  0 &  1 &  0 &  0 &  0 \cr
+  0 &  0 &  0 &  0 &  0 &  0 &  0 &  1
+\end{array}\right),
+P = 
+\left(\begin{array}{rrrr}
+ 1 &  0 &  0 &  0 \cr
+  0 &  1 &  0 &  0 \cr
+  0 &  1 &  0 &  0 \cr
+  0 &  1 &  0 &  0 \cr
+  0 &  0 &  1 &  0 \cr
+  0 &  0 &  1 &  0 \cr
+  0 &  0 &  1 &  0 \cr
+  0 &  0 &  0 &  1
+\end{array}\right).
+$$
+The idea is that each column of $P$ sums over an orbit,
+and each row of $Q$ chooses one member of each orbit.
+
 The automorphisms of the gauge group, $Aut(G)$ will induce an
 automorphism of the graph by ...
 In particular, elements of the stabilizer group $\Stab$ induce graph 
