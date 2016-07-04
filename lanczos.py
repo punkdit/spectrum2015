@@ -369,7 +369,8 @@ def test():
     for i in range(1, len(projs)):
         Padj = Padj * projs[i]
 
-    A = P*A*P
+    if argv.stabilize:
+        A = P*A*P
 
     norm = lambda v : (v**2).sum()**0.5
 
