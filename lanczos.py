@@ -34,10 +34,13 @@ class Op(la.LinearOperator):
     def __add__(self, other):
         return SumOp(self.n, [self, other])
 
+    def __sub__(self, other):
+        return SumOp(self.n, [self, -1.0*other])
+
     def __rmul__(self, alpha):
         return RMulOp(self, alpha)
 
-    def matvec(self, v, w=None):
+    def matvec(self, v, w=None, verbose=False):
         assert len(v) == self.n
         if w is None:
             return v
@@ -45,9 +48,14 @@ class Op(la.LinearOperator):
         return w
 
 
+class IdOp(Op):
+    pass
+
+
 class XOp(Op):
     def __init__(self, n, idxs, alpha=1.0):
         " X operator to specified qubits "
+
         if type(idxs) in (int, long):
             idxs = [idxs]
         for idx in idxs:
@@ -76,7 +84,7 @@ class XOp(Op):
         self.alpha = alpha
         Op.__init__(self, 2**n)
 
-    def matvec(self, v, w=None):
+    def matvec(self, v, w=None, verbose=False):
         assert len(v) == len(self.perm)
         if w is None:
             w = numpy.zeros(len(v))
@@ -112,7 +120,7 @@ class ZOp(Op):
         self.alpha = alpha
         Op.__init__(self, 2**n)
 
-    def matvec(self, v, w=None):
+    def matvec(self, v, w=None, verbose=False):
         assert len(v) == len(self.phases)
         if w is None:
             w = numpy.zeros(len(v))
@@ -181,9 +189,6 @@ class MulOp(Op):
         v = a.matvec(v, verbose=verbose)
         w += v
         return w
-
-class IdOp(Op):
-    pass
 
 
 from smap import SMap
@@ -271,14 +276,88 @@ gcolor_gauge = """
 ........1.1.1.1
 ..1...1...1...1
 ....1.1.....1.1
-""".strip().split()
+"""
 
 gcolor_stab = """
 11111111.......
 1111....1111...
 11..11..11..11.
 1.1.1.1.1.1.1.1
-""".strip().split()
+"""
+
+def parse(s):
+    s = s.replace('.', '0') 
+    lines = s.split()
+    lines = [l.strip() for l in lines if l.strip()]
+    rows = [list(int(c) for c in l) for l in lines]
+    if rows:
+        n = len(rows[0])
+        for row in rows:
+            assert len(row)==n, "rows have varying lengths"
+    a = numpy.array(rows, dtype=numpy.int32)
+    return a
+
+
+class Vertex(object):
+    def __init__(self, desc):
+        self.desc = desc
+        self.nbd = []
+
+    def get_desc(self, depth=0, source=None):
+        assert self.nbd
+        assert depth>=0
+        if depth==0:
+            return self.desc
+        if source is None:
+            source = []
+        else:
+            assert self not in source
+        descs = [a.get_desc(depth-1, source+[self]) for a in self.nbd if a not in source]
+        descs.sort()
+        desc = "%s(%s)"%(self.desc, ' '.join(descs))
+        return desc
+
+    def __str__(self):
+        return "Vertex(%s: %s)"%(self.desc, descs)
+
+
+def search():
+
+    Gx = parse(gcolor_gauge)
+
+    print Gx
+    m, n = Gx.shape
+
+    sizes = [Gx[:, i].sum() for i in range(n)]
+    print sizes
+
+    verts = []
+    for i in range(m):
+        g = Gx[i]
+        assert g.sum()==4
+        weights = []
+        for j in numpy.where(g)[0]:
+            weights.append(Gx[:, j].sum())
+        weights.sort()
+        desc = ''.join(str(w) for w in weights)
+        a = Vertex(desc)
+        verts.append(a)
+    print [a.desc for a in verts]
+    
+    for i in range(m):
+        g = Gx[i]
+        a = verts[i]
+        for j in numpy.where(g)[0]:
+            for i1 in numpy.where(Gx[:, j])[0]:
+                if i1 != i:
+                    a.nbd.append(verts[i1])
+
+    descs = [a.get_desc() for a in verts]
+    
+    uniq = list(set(descs))
+    a, b = uniq
+    print descs.count(a), descs.count(b)
+
 
 class GColorModel(Model):
   def __init__(self):
@@ -286,12 +365,12 @@ class GColorModel(Model):
     xops = []
     zops = []
 
-    for op in gcolor_gauge:
+    for op in gcolor_gauge.strip().split():
         xops.append(mkop(XOp, op))
         zops.append(mkop(ZOp, op))
 
     xstabs = []
-    for op in gcolor_stab:
+    for op in gcolor_stab.strip().split():
         xstabs.append(mkop(XOp, op))
         #stabs.append(mkop(ZOp, op))
 
@@ -347,27 +426,18 @@ def test():
 
     projs = []
     I = IdOp(A.n)
+    flip = 2
     for op in model.xstabs:
-        op = 0.5 * (I + op)
+        if flip:
+            op = 0.5 * (I - op)
+            flip -= 1
+        else:
+            op = 0.5 * (I + op)
         projs.append(op)
-
-#        v = numpy.random.normal(size=A.n)
-#        w1 = 0.5 * (I(v) + op(v))
-#        w2 = op(v)
-#        print numpy.sum(numpy.abs(w1-w2))
-#
-#        w3 = op(w2)
-#        print numpy.sum(numpy.abs(w3-w2))
-#        print w3
 
     P = projs[0]
     for i in range(1, len(projs)):
         P = P * projs[i]
-
-    projs = list(reversed(projs))
-    Padj = projs[0]
-    for i in range(1, len(projs)):
-        Padj = Padj * projs[i]
 
     if argv.stabilize:
         A = P*A*P
@@ -482,9 +552,13 @@ def test():
 from argv import Argv 
 argv = Argv()
 
+
 if __name__ == "__main__":
 
-    test()
+    if argv.search:
+        search()
+    else:
+        test()
 
 
 

@@ -1,4 +1,19 @@
 
+
+5/7/16
+======
+
+flipping a single stabilizer: first excited level has 2 dimensional support (because logical ops)
+
+1st ex level on stabilized subspace: this is perhaps the simplex symmetry of the code with
+one face fixed (because this is a logop.) this group has order 6 (S_3.)
+
+4/7/16
+======
+
+# see also: qupy/spectrum.py
+
+
 # first excited level has 6 dimension support on stabilized subspace
 
 time ./lanczos.py gcolor stabilize k=10
