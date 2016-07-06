@@ -285,79 +285,6 @@ gcolor_stab = """
 1.1.1.1.1.1.1.1
 """
 
-def parse(s):
-    s = s.replace('.', '0') 
-    lines = s.split()
-    lines = [l.strip() for l in lines if l.strip()]
-    rows = [list(int(c) for c in l) for l in lines]
-    if rows:
-        n = len(rows[0])
-        for row in rows:
-            assert len(row)==n, "rows have varying lengths"
-    a = numpy.array(rows, dtype=numpy.int32)
-    return a
-
-
-class Vertex(object):
-    def __init__(self, desc):
-        self.desc = desc
-        self.nbd = []
-
-    def get_desc(self, depth=0, source=None):
-        assert self.nbd
-        assert depth>=0
-        if depth==0:
-            return self.desc
-        if source is None:
-            source = []
-        else:
-            assert self not in source
-        descs = [a.get_desc(depth-1, source+[self]) for a in self.nbd if a not in source]
-        descs.sort()
-        desc = "%s(%s)"%(self.desc, ' '.join(descs))
-        return desc
-
-    def __str__(self):
-        return "Vertex(%s: %s)"%(self.desc, descs)
-
-
-def search():
-
-    Gx = parse(gcolor_gauge)
-
-    print Gx
-    m, n = Gx.shape
-
-    sizes = [Gx[:, i].sum() for i in range(n)]
-    print sizes
-
-    verts = []
-    for i in range(m):
-        g = Gx[i]
-        assert g.sum()==4
-        weights = []
-        for j in numpy.where(g)[0]:
-            weights.append(Gx[:, j].sum())
-        weights.sort()
-        desc = ''.join(str(w) for w in weights)
-        a = Vertex(desc)
-        verts.append(a)
-    print [a.desc for a in verts]
-    
-    for i in range(m):
-        g = Gx[i]
-        a = verts[i]
-        for j in numpy.where(g)[0]:
-            for i1 in numpy.where(Gx[:, j])[0]:
-                if i1 != i:
-                    a.nbd.append(verts[i1])
-
-    descs = [a.get_desc() for a in verts]
-    
-    uniq = list(set(descs))
-    a, b = uniq
-    print descs.count(a), descs.count(b)
-
 
 class GColorModel(Model):
   def __init__(self):
@@ -426,7 +353,7 @@ def test():
 
     projs = []
     I = IdOp(A.n)
-    flip = 2
+    flip = argv.get("flip", 0)
     for op in model.xstabs:
         if flip:
             op = 0.5 * (I - op)

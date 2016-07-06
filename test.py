@@ -176,7 +176,7 @@ def test_orbits():
         [0, 0, 1, 0],
         [0, 0, 1, 0],
         [0, 0, 0, 1]])
-    print texstr(P)
+    #print texstr(P)
 
     AP = numpy.dot(A, P)
     print AP
@@ -187,7 +187,7 @@ def test_orbits():
         [0, 0, 0, 0, 1, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 1]])
 
-    print texstr(Q)
+    #print texstr(Q)
 
     QAP = numpy.dot(Q, AP)
     print QAP
