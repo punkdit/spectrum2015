@@ -218,7 +218,7 @@ def get_perm(m, n, fn):
     return U, V
 
 
-def isos(bag0, bag1, fn=None, depth=2):
+def search_recursive(bag0, bag1, fn=None, depth=2):
 
     assert depth>0
 
@@ -265,7 +265,7 @@ def isos(bag0, bag1, fn=None, depth=2):
 
         else:
 
-            for _fn in isos(bag0, bag1, fn, depth):
+            for _fn in search_recursive(bag0, bag1, fn, depth):
                 yield _fn
 
         del fn[idx]
@@ -276,6 +276,148 @@ def isos(bag0, bag1, fn=None, depth=2):
     p.colour = ''
 
 
+
+"""
+class Search(object):
+
+    def __init__(self, bag0, bag1, depth=2):
+        assert depth>0
+        assert len(bag0)==len(bag1)
+        assert bag0 is not bag1
+        self.bags = bag0, bag1
+        self.fn = {} # current state
+        self.stack = []
+
+    def search(self):
+        self.done = False
+        while not done:
+
+    def push(self, state):
+        self.stack.append(state)
+
+    def pop(self):
+        if len
+
+    def attempt(self):
+
+        fn = self.fn
+        bag0, bag1 = self.bags
+        assert len(fn) == len(stack)
+"""
+
+
+class Backtrack(Exception):
+    pass
+
+
+class State(object):
+    def __init__(self, bag0, bag1, idx0, depth):
+        orbits0 = bag0.get_orbits(depth) # map: desc -> list of points
+        orbits1 = bag1.get_orbits(depth) # map: desc -> list of points
+    
+        if len(orbits0) != len(orbits1):
+            raise Backtrack()
+    
+        keys0 = orbits0.keys()
+        keys1 = orbits1.keys()
+        keys0.sort()
+        keys1.sort()
+        if keys0 != keys1:
+            raise Backtrack()
+
+        # choose any uncoloured bag0 point
+        p0 = bag0.points[idx0]
+        assert p0.colour == ''
+    
+        key0 = p0.get_desc(depth)
+        self.orbit1 = orbits1[key0]
+        assert self.orbit1 # otherwise: wtf?
+        self.idx0 = idx0 # source index
+        self.idx1 = 0 # search target index
+        self.p0 = p0
+        self.p1 = None
+    
+    def do(self, fn):
+        # make assignment: idx0 -> idx1
+        p0 = self.p0
+        assert p0.colour == ''
+        p0.colour = str(self.idx0)
+
+        p1 = self.orbit1[self.idx1]
+        assert p1.colour == ''
+        p1.colour = str(self.idx0)
+    
+        assert fn.get(self.idx0) is None
+        fn[self.idx0] = p1.idx
+        assert self.p1 is None
+        self.p1 = p1
+
+    def undo(self, fn):
+        # undo assignment
+        del fn[self.idx0]
+        assert self.p1 is not None
+        p0 = self.p0
+        p1 = self.p1
+        assert p1.colour==str(self.idx0)
+        assert p0.colour==str(self.idx0)
+        p0.colour = ''
+        p1.colour = ''
+        self.p1 = None
+
+    def next(self):
+        assert self.p1 is None
+        self.idx1 += 1
+        if self.idx1 >= len(self.orbit1):
+            raise Backtrack()
+
+
+def search(bag0, bag1, depth):
+
+    fn = {}
+    idx = 0
+    state = State(bag0, bag1, idx, depth)
+    stack = [state]
+
+    while stack:
+
+        #print "stack:", len(stack)
+
+        state = stack[-1]
+        state.do(fn)
+
+        #print fn
+
+        if len(fn) == len(bag0):
+            #print "FOUND"
+            yield fn
+
+        else:
+            # try to add another state
+            try:
+                idx = len(fn)
+                _state = State(bag0, bag1, idx, depth)
+                stack.append(_state)
+                continue
+    
+            except Backtrack:
+                # the above do() doesn't work
+                pass
+
+        # next
+        while stack:
+            state = stack[-1]
+            #print "UNDO"
+            state.undo(fn)
+            try:
+                #print "NEXT"
+                state.next()
+                break # ok, finished backtracking
+            except Backtrack:
+                #print "POP"
+                stack.pop() # discard this guy
+
+
+
 def all_autos(Gx):
     #Gx = parse(gcolor_gauge)
     m, n = Gx.shape
@@ -283,7 +425,7 @@ def all_autos(Gx):
     bag0 = Tanner.build(Gx)
     bag1 = Tanner.build(Gx)
 
-    for fn in isos(bag0, bag1):
+    for fn in search(bag0, bag1):
         U, V = get_perm(m, n, fn)
         yield U, V
 
@@ -298,8 +440,11 @@ def test():
     bag0 = Tanner.build(Gx)
     bag1 = Tanner.build(Gx)
 
+    #global search
+    #search = search_recursive
+
     count = 0
-    for fn in isos(bag0, bag1):
+    for fn in search(bag0, bag1, depth=2):
         #print "iso", fn
         bag = bag0.map(fn)
         #print bag.shortstr()
@@ -316,7 +461,7 @@ def test():
     bag0 = from_ham(H)
     bag1 = from_ham(H)
     count = 0 
-    for fn in isos(bag0, bag1, depth=depth):
+    for fn in search(bag0, bag1, depth=depth):
 #        #write('.')
 #        print [fn[i] for i in range(len(fn))]
 #        for i in range(len(fn)):
@@ -327,25 +472,6 @@ def test():
 #        print
         count += 1
     assert count == 6
-
-
-
-
-def search():
-
-    print len(bag.get_orbits(2))
-
-    v = bag.points[0]
-    v.colour = 'X'
-
-    orbits = bag.get_orbits(2)
-    print "uniq:", len(orbits)
-    for orbit in orbits.values():
-        print len(orbit),
-    print
-
-
-    
 
 
 
