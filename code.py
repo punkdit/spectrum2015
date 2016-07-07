@@ -7,6 +7,7 @@ import numpy
 from qupy.ldpc.solve import *
 from qupy.gauge import lstr2
 
+
 ra.seed(0)
 
 def reflect(H, k):
@@ -106,6 +107,36 @@ def texstr(H, align='r'):
 
 
 
+gcolor_gauge = """ 
+1111...........
+11..11.........
+1.1.1.1........
+..11..11.......
+.1.1.1.1.......
+....1111.......
+11......11.....
+1.1.....1.1....
+........1111...
+..11......11...
+.1.1.....1.1...
+1...1...1...1..
+........11..11.
+.1...1...1...1.
+....11......11.
+........1.1.1.1
+..1...1...1...1
+....1.1.....1.1
+"""
+
+gcolor_stab = """
+11111111.......
+1111....1111...
+11..11..11..11.
+1.1.1.1.1.1.1.1
+"""
+
+
+
 
 def test():
 
@@ -113,6 +144,12 @@ def test():
 
         l = argv.get('l', 3)
         Gx, Gz = build_compass(l)
+
+    elif argv.gcolor:
+
+        from isomorph import parse
+        Gx = parse(gcolor_gauge)
+        Gz = Gx.copy()
 
     elif argv.cube:
         n = argv.get('n', 3)
@@ -135,6 +172,7 @@ def test():
 
     G = list(span(Gx))
     #print "<Gx>:", len(G)
+    print "G:", len(G)
     
     states = {} # map shortstr -> idx
     #v = zeros2(n, 1)
@@ -165,11 +203,32 @@ def test():
             jdx = states[shortstr(v1)]
             H[idx, jdx] += 1
     #print
-    print "G:", len(G)
+
+    from isomorph import write
+    if argv.isomorph:
+
+        depth = argv.get('depth', 1)
+
+        import isomorph
+        bag0 = isomorph.from_ham(H)
+        bag1 = isomorph.from_ham(H)
+        count = 0
+        for fn in isomorph.isos(bag0, bag1, depth=depth):
+#            #write('.')
+#            print [fn[i] for i in range(len(fn))]
+#            for i in range(len(fn)):
+#                assert bag0[i].get_desc(depth) == bag1[fn[i]].get_desc(depth)
+#                print '\t', bag0[i].get_desc(depth),
+#                print len(bag0[i].nbd)
+#                print '\t', bag1[fn[i]].get_desc(depth)
+#            print
+            count += 1
+        print
+        print count
 
     if len(H)<10:
-        print texstr(H)
-    #print shortstr(H)
+        #print texstr(H)
+        print shortstr(H)
 
     i = argv.truncate
     if i:
@@ -198,25 +257,30 @@ def test():
         #    print H[i, i],
         #print
 
-    u, v = numpy.linalg.eigh(H)
-    
-    for i in range(k):
-        print "eigval: %.6f" % u[i],
-        evec = v[:, i]
-        print "eigvec:", 
-        for idx, x in enumerate(evec):
-            print "%.2f"%x,
-            #for jdx in range(idx):
-            #    if H[idx, jdx]:
-            #        if evec[jdx] < evec[idx]-1e-6:
-            #            print "*",
-        print
 
-    A = numpy.array([[3,3,0,0],[1,1,2,0],[0,2,-1,1],[0,0,3,-3]])
-    print texstr(A)
-    u, v = numpy.linalg.eig(A)
-    for i in range(len(A)):
-        print u[i], v[:, i]
+    if argv.eigs:
+
+        u, v = numpy.linalg.eigh(H)
+        print "eigs:", u[-20:]
+        
+#        for i in range(20):
+#            print "eigval: %.6f" % u[i],
+#            evec = v[:, i]
+#            #print "eigvec:", 
+#            #for idx, x in enumerate(evec):
+#            #    print "%.2f"%x,
+#                #for jdx in range(idx):
+#                #    if H[idx, jdx]:
+#                #        if evec[jdx] < evec[idx]-1e-6:
+#                #            print "*",
+#            print
+
+    if 0:
+        A = numpy.array([[3,3,0,0],[1,1,2,0],[0,2,-1,1],[0,0,3,-3]])
+        print texstr(A)
+        u, v = numpy.linalg.eig(A)
+        for i in range(len(A)):
+            print u[i], v[:, i]
 
     if argv.sort:
         idxs = range(len(v))

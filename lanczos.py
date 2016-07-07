@@ -18,6 +18,7 @@ def write(s):
 
 class Op(la.LinearOperator):
 
+    verbose = False
     def __init__(self, n):
         self.n = n
         la.LinearOperator.__init__(self, 
@@ -154,7 +155,7 @@ class SumOp(Op):
         for op in self.ops:
             op.matvec(v, w)
         self.count += 1
-        if verbose:
+        if self.verbose:
             sys.stdout.write('.');sys.stdout.flush()
         return w
 
@@ -285,6 +286,8 @@ gcolor_stab = """
 1.1.1.1.1.1.1.1
 """
 
+gcolor_logop = "........1111111"
+
 
 class GColorModel(Model):
   def __init__(self):
@@ -300,6 +303,8 @@ class GColorModel(Model):
     for op in gcolor_stab.strip().split():
         xstabs.append(mkop(XOp, op))
         #stabs.append(mkop(ZOp, op))
+
+    self.xlogop = mkop(XOp, gcolor_logop)
 
     n = len(op)
     self.A = SumOp(2**n, xops+zops)
@@ -369,6 +374,10 @@ def test():
     if argv.stabilize:
         A = P*A*P
 
+    if argv.logop:
+        P = 0.5 * (I + model.xlogop)
+        A = P*A*P
+
     norm = lambda v : (v**2).sum()**0.5
 
 
@@ -401,6 +410,7 @@ def test():
     
         return
 
+    A.verbose = True
     vals, vecs = la.eigsh(A, k=k, v0=v0, which='LA', maxiter=None) #, tol=1e-8)
     #vals, vecs = la.eigs(A, k=k, v0=v0, which='LR', maxiter=None) #, tol=1e-8)
     print

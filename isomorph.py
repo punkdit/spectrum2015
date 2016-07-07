@@ -44,6 +44,18 @@ gcolor_stab = """
 1.1.1.1.1.1.1.1
 """
 
+cube_ham = """
+6111....
+14..11..
+1.4.1.1.
+1..4.11.
+.11.2..1
+.1.1.2.1
+..11..21
+....1110
+"""
+
+
 def parse(s):
     s = s.replace('.', '0') 
     lines = s.split()
@@ -78,7 +90,7 @@ class Point(object):
             assert self not in source
         descs = [a.get_desc(depth-1, source+[self]) for a in self.nbd if a not in source]
         descs.sort()
-        desc = "%s(%s)"%(desc, ' '.join(descs))
+        desc = "%s[%s]"%(desc, ' '.join(descs))
         return desc
 
     def __str__(self):
@@ -94,8 +106,11 @@ class Bag(object):
     def __len__(self):
         return len(self.points)
 
+    def __getitem__(self, idx):
+        return self.points[idx]
+
     @classmethod
-    def build1(cls, Gx):
+    def build(cls, Gx):
     
         m, n = Gx.shape
         points = []
@@ -171,6 +186,23 @@ class Tanner(Bag):
             rows.append(row)
         return '\n'.join(rows)
 
+
+def from_ham(H):
+    n = len(H)
+    points = []
+    for i in range(n):
+        p = Point('(%s)'%H[i, i], i)
+        points.append(p)
+    for i in range(n):
+      for j in range(n):
+        if i==j:
+            continue
+        if H[i, j]:
+            points[i].nbd.append(points[j])
+    bag = Bag(n, n, points)
+    return bag
+
+
 def get_perm(m, n, fn):
 
     U = numpy.zeros((m, m), dtype=int)
@@ -186,14 +218,15 @@ def get_perm(m, n, fn):
     return U, V
 
 
-def isos(bag0, bag1, fn=None):
+def isos(bag0, bag1, fn=None, depth=2):
+
+    assert depth>0
 
     if fn is None:
         fn = {}
         assert len(bag0)==len(bag1)
         assert bag0 is not bag1
 
-    depth = 2
     orbits0 = bag0.get_orbits(depth)
     orbits1 = bag1.get_orbits(depth)
 
@@ -232,7 +265,7 @@ def isos(bag0, bag1, fn=None):
 
         else:
 
-            for _fn in isos(bag0, bag1, fn):
+            for _fn in isos(bag0, bag1, fn, depth):
                 yield _fn
 
         del fn[idx]
@@ -255,7 +288,9 @@ def all_autos(Gx):
         yield U, V
 
 
-def search():
+def test():
+
+    # Find rotation symmetry of the code. It's S_4 with order 24.
 
     Gx = parse(gcolor_gauge)
     m, n = Gx.shape
@@ -265,16 +300,38 @@ def search():
 
     count = 0
     for fn in isos(bag0, bag1):
-        print "iso", fn
+        #print "iso", fn
         bag = bag0.map(fn)
         #print bag.shortstr()
         U, V = get_perm(m, n, fn)
         Gx1 = numpy.dot(U, numpy.dot(Gx, V))
         assert numpy.abs(Gx-Gx1).sum()==0
         count += 1
-    print "count:", count
+    #print "count:", count
+    assert count == 24
 
-    return
+    # S_3 symmetry of cubical hamiltonian
+    depth = 1
+    H = parse(cube_ham)
+    bag0 = from_ham(H)
+    bag1 = from_ham(H)
+    count = 0 
+    for fn in isos(bag0, bag1, depth=depth):
+#        #write('.')
+#        print [fn[i] for i in range(len(fn))]
+#        for i in range(len(fn)):
+#            assert bag0[i].get_desc(depth) == bag1[fn[i]].get_desc(depth)
+#            print '\t', bag0[i].get_desc(depth),
+#            print len(bag0[i].nbd)
+#            print '\t', bag1[fn[i]].get_desc(depth)
+#        print
+        count += 1
+    assert count == 6
+
+
+
+
+def search():
 
     print len(bag.get_orbits(2))
 
@@ -298,8 +355,9 @@ argv = Argv()
 
 if __name__ == "__main__":
 
-    search()
+    test()
 
+    print "OK"
 
 
 

@@ -1,4 +1,28 @@
 
+7/7/16
+======
+
+restricting to Lz=1 subspace gives 1st excited only 4 dim.
+
+time ./code.py gcolor eigs
+Gx: 18
+Gz: 18
+G: 1024
+idx: 0 18
+idx: 16 12
+idx: 112 6
+idx: 352 0
+idx: 672 -6
+idx: 912 -12
+idx: 1008 -18
+[ 16.97056275  16.97056275  16.97056275  16.97056275  18.97366596
+  18.97366596  18.97366596  18.97366596  18.97366596  20.05402899
+  20.05402899  20.05402899  20.05402899  20.05402899  20.05402899
+  22.21475504  22.21475504  22.21475504  22.21475504  25.45584412]
+
+real0m18.386s
+user0m18.252s
+
 
 5/7/16
 ======
@@ -7,6 +31,39 @@ flipping a single stabilizer: first excited level has 2 dimensional support (bec
 
 1st ex level on stabilized subspace: this is perhaps the simplex symmetry of the code with
 one face fixed (because this is a logop.) this group has order 6 (S_3.)
+
+7/7/16
+======
+
+flip one stabilizer and stabilize logop:
+
+time ./lanczos.py gcolor  k=16 logop stabilize flip=1
+
+[ 14.80983669  14.80983669  14.80983669  14.80983669  14.80983669
+  15.47753777  15.47753777  15.47753777  15.89019972  15.89019972
+  15.89019972  17.63826382  17.63826382  17.63826382  18.97366596
+  22.21475504]
+
+
+Just stabilizing the xlogop:
+
+time ./lanczos.py gcolor  k=16 logop
+
+[ 20.05402899  20.05402899  20.05402899  20.05402899  20.05402899
+  20.05402899  20.05402899  22.21475504  22.21475504  22.21475504
+  22.21475504  22.21475504  22.21475504  22.21475504  22.21475504
+  25.45584412]
+iterations: 468
+
+
+Also stabilizing the xlogop:
+
+time ./lanczos.py gcolor stabilize k=10 logop
+
+[ 20.05402899  20.05402899  20.05402899  20.05402899  20.05402899
+  22.21475504  22.21475504  22.21475504  22.21475504  25.45584412]
+iterations: 304
+
 
 4/7/16
 ======
