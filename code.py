@@ -213,8 +213,8 @@ def test():
         bag0 = isomorph.from_ham(H)
         bag1 = isomorph.from_ham(H)
         count = 0
-        for fn in isomorph.isos(bag0, bag1, depth=depth):
-#            #write('.')
+        for fn in isomorph.search(bag0, bag1, depth=depth):
+            write('.')
 #            print [fn[i] for i in range(len(fn))]
 #            for i in range(len(fn)):
 #                assert bag0[i].get_desc(depth) == bag1[fn[i]].get_desc(depth)

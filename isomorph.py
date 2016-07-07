@@ -222,6 +222,8 @@ def search_recursive(bag0, bag1, fn=None, depth=2):
 
     assert depth>0
 
+    FAIL
+
     if fn is None:
         fn = {}
         assert len(bag0)==len(bag1)
