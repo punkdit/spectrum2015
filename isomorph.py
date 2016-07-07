@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import sys
-from heapq import heappush, heappop, heapify
+#from heapq import heappush, heappop, heapify
+from random import randint, choice, seed
 
 import numpy
 #import scipy.sparse.linalg as la
@@ -72,17 +73,31 @@ def parse(s):
 class Point(object):
     def __init__(self, desc, idx, nbd=None, colour=""):
         self.desc = desc
-        self.colour = colour
+        self._colour = colour
+        self._desc = {} # cache get_desc
         self.idx = idx
         if nbd is None:
             nbd = []
         self.nbd = nbd
 
-    def get_desc(self, depth=0, source=None):
+    def get_colour(self):
+        return self._colour
+
+    def set_colour(self, colour):
+        self._desc = {} # clear cache
+        self._colour = colour
+    colour = property(get_colour, set_colour)
+
+    def get_desc(self, depth=1, source=None):
         assert self.nbd
         assert depth>=0
-        desc = self.desc+str(self.colour)
+        assert depth<=1
+        #_desc = self._desc.get(depth)
+        #if _desc:
+        #    return _desc
+        desc = self.desc+str(self._colour)
         if depth==0:
+            #self._desc = desc
             return desc
         if source is None:
             source = []
@@ -91,6 +106,7 @@ class Point(object):
         descs = [a.get_desc(depth-1, source+[self]) for a in self.nbd if a not in source]
         descs.sort()
         desc = "%s[%s]"%(desc, ' '.join(descs))
+        #self._desc = desc
         return desc
 
     def __str__(self):
@@ -98,9 +114,11 @@ class Point(object):
 
 
 class Bag(object):
-    def __init__(self, m, n, points):
-        self.m = m
-        self.n = n
+    def __init__(self, points, **attrs):
+        self.__dict__.update(attrs)
+        self.descs = {}  # cache, map point -> desc
+        self.deps = None # map point -> list of points
+        self.attrs = dict(attrs)
         self.points = points
 
     def __len__(self):
@@ -108,6 +126,13 @@ class Bag(object):
 
     def __getitem__(self, idx):
         return self.points[idx]
+
+    def join(self, i, j):
+        points = self.points
+        if points[i] not in points[j].nbd:
+            points[j].nbd.append(points[i])
+        if points[j] not in points[i].nbd:
+            points[i].nbd.append(points[j])
 
     @classmethod
     def build(cls, Gx):
@@ -134,7 +159,7 @@ class Bag(object):
                     if i1 != i:
                         a.nbd.append(points[i1])
 
-        return cls(m, n, points)
+        return cls(points, m=m, n=n)
 
     def map(self, fn):
         points = [None]*len(self)
@@ -145,18 +170,38 @@ class Bag(object):
             for p1 in p.nbd:
                 points[fn[p.idx]].nbd.append(points[fn[p1.idx]]) # whoops.. tricky
         
-        return self.__class__(self.m, self.n, points)
+        return self.__class__(points, **self.attrs)
 
-    def get_desc(self, depth=0):
+    def get_desc(self, depth=1):
         return [v.get_desc(depth) for v in self.points]
 
-    def get_orbits(self, depth=0):
+    def get_orbits(self, depth=1):
         orbits = {}
+        assert depth==1
+        if self.deps is None:
+            deps = {}
+            for p in self.points:
+                deps[p] = [p]+p.nbd # 1-neighbours
+            self.deps = deps
+        descs = self.descs
         for p in self.points:
-            key = p.get_desc(depth)
-            orbit = orbits.setdefault(key, [])
+            desc = descs.get(p)
+            if desc is None:
+                desc = p.get_desc(depth)
+                descs[p] = desc
+            orbit = orbits.setdefault(desc, [])
             orbit.append(p)
-        return orbits
+        return orbits # map desc -> list of points
+
+    def set_colour(self, p, colour=''):
+        if colour:
+            assert p.colour==''
+        else:
+            assert p.colour
+        p.colour = colour
+
+        for p in self.deps[p]:
+            self.descs[p] = None # clear cache
 
 
 class Tanner(Bag):
@@ -172,7 +217,7 @@ class Tanner(Bag):
                     continue
                 checks[i].nbd.append(bits[j])
                 bits[j].nbd.append(checks[i])
-        return cls(m, n, checks+bits)
+        return cls(checks+bits, m=m, n=n)
 
     def shortstr(self):
         m, n = self.m, self.n
@@ -199,7 +244,7 @@ def from_ham(H):
             continue
         if H[i, j]:
             points[i].nbd.append(points[j])
-    bag = Bag(n, n, points)
+    bag = Bag(points)
     return bag
 
 
@@ -218,7 +263,7 @@ def get_perm(m, n, fn):
     return U, V
 
 
-def search_recursive(bag0, bag1, fn=None, depth=2):
+def search_recursive(bag0, bag1, fn=None, depth=1):
 
     assert depth>0
 
@@ -249,13 +294,15 @@ def search_recursive(bag0, bag1, fn=None, depth=2):
     key = p.get_desc(depth)
     orbit = orbits1[key]
 
-    p.colour = str(idx)
+    #p.colour = str(idx)
+    bag0.set_colour(p, str(idx))
 
     # go through each candidate in bag1
     for p1 in orbit:
         assert p1.colour == ''
     
-        p1.colour = str(idx)
+        #p1.colour = str(idx)
+        bag1.set_colour(p1, str(idx))
     
         assert fn.get(idx) is None
         fn[idx] = p1.idx
@@ -271,81 +318,73 @@ def search_recursive(bag0, bag1, fn=None, depth=2):
         del fn[idx]
         assert len(fn) == idx
 
-        p1.colour = ''
+        #p1.colour = ''
+        bag1.set_colour(p1)
 
-    p.colour = ''
-
-
-
-"""
-class Search(object):
-
-    def __init__(self, bag0, bag1, depth=2):
-        assert depth>0
-        assert len(bag0)==len(bag1)
-        assert bag0 is not bag1
-        self.bags = bag0, bag1
-        self.fn = {} # current state
-        self.stack = []
-
-    def search(self):
-        self.done = False
-        while not done:
-
-    def push(self, state):
-        self.stack.append(state)
-
-    def pop(self):
-        if len
-
-    def attempt(self):
-
-        fn = self.fn
-        bag0, bag1 = self.bags
-        assert len(fn) == len(stack)
-"""
+    #p.colour = ''
+    bag0.set_colour(p, '')
 
 
 class Backtrack(Exception):
     pass
 
-
 class State(object):
-    def __init__(self, bag0, bag1, idx0, depth):
+    def __init__(self, bag0, bag1, depth=1):
         orbits0 = bag0.get_orbits(depth) # map: desc -> list of points
         orbits1 = bag1.get_orbits(depth) # map: desc -> list of points
     
         if len(orbits0) != len(orbits1):
-            raise Backtrack()
+            raise Backtrack() # <-------------- raise
     
         keys0 = orbits0.keys()
         keys1 = orbits1.keys()
         keys0.sort()
         keys1.sort()
         if keys0 != keys1:
-            raise Backtrack()
+            raise Backtrack() # <-------------- raise
+        self.bags = bag0, bag1
+        self.orbitss = orbits0, orbits1
+        self.keyss = keys0, keys1
+        self.idx0 = None
+        self.depth = depth
 
-        # choose any uncoloured bag0 point
+    def choose(self, idx0):
+        assert self.idx0 is None
+        assert idx0 is not None
+
+        bag0, bag1 = self.bags
         p0 = bag0.points[idx0]
         assert p0.colour == ''
     
-        key0 = p0.get_desc(depth)
-        self.orbit1 = orbits1[key0]
+        key0 = p0.get_desc(self.depth)
+        self.orbit1 = self.orbitss[1][key0]
         assert self.orbit1 # otherwise: wtf?
-        self.idx0 = idx0 # source index
+        self.idx0 = idx0 # source index: this is constant
         self.idx1 = 0 # search target index
         self.p0 = p0
         self.p1 = None
-    
+
+    def choose_best(self):
+        XXX
+        orbits0 = self.orbitss[0]
+        items = orbits0.items()
+        items.sort(key = lambda item : len(item[1]))
+        p = items[0][1][0] # first guy in smallest orbit
+        self.choose(p.idx)
+        return p.idx
+
     def do(self, fn):
+        bag0, bag1 = self.bags
         # make assignment: idx0 -> idx1
         p0 = self.p0
-        assert p0.colour == ''
-        p0.colour = str(self.idx0)
+        #assert p0.colour == ''
+        #p0.colour = str(self.idx0)
+        bag0.set_colour(p0, str(self.idx0))
 
         p1 = self.orbit1[self.idx1]
-        assert p1.colour == ''
-        p1.colour = str(self.idx0)
+        #assert p1.colour == ''
+        #p1.colour = str(self.idx0)
+        bag1.set_colour(p1, str(self.idx0))
     
         assert fn.get(self.idx0) is None
         fn[self.idx0] = p1.idx
@@ -353,6 +392,7 @@ class State(object):
         self.p1 = p1
 
     def undo(self, fn):
+        bag0, bag1 = self.bags
         # undo assignment
         del fn[self.idx0]
         assert self.p1 is not None
@@ -360,61 +400,111 @@ class State(object):
         p1 = self.p1
         assert p1.colour==str(self.idx0)
         assert p0.colour==str(self.idx0)
-        p0.colour = ''
-        p1.colour = ''
+        #p0.colour = ''
+        #p1.colour = ''
+        bag0.set_colour(p0)
+        bag1.set_colour(p1)
         self.p1 = None
 
     def next(self):
         assert self.p1 is None
         self.idx1 += 1
         if self.idx1 >= len(self.orbit1):
-            raise Backtrack()
+            raise Backtrack() # <-------------- raise
 
 
-def search(bag0, bag1, depth):
+def search(bag0, bag1, depth=1, fn=None, verbose=False):
 
-    fn = {}
-    idx = 0
-    state = State(bag0, bag1, idx, depth)
+    if fn is None:
+        fn = {}
+    remain = range(len(bag0))
+
+    orbits = bag0.get_orbits(depth)
+    keys = orbits.keys()
+    keys.sort(key = lambda key : len(orbits[key]))
+    remain = []
+    for key in keys:
+        for p in orbits[key]:
+            if p.idx not in fn:
+                remain.append(p.idx)
+
+    #for idx in fn.keys():
+    #    remain.remove(idx)
+    remain.sort()
+
+    state = State(bag0, bag1, depth)
+
+    idx = remain.pop(0)
+    state.choose(idx)
+    #idx = remain.pop(randint(0, len(remain)-1))
+    #state.choose(idx)
+    #idx = state.choose_best()
+    #remain.remove(idx)
+
     stack = [state]
 
     while stack:
 
-        #print "stack:", len(stack)
+        if verbose:
+            print "SEARCH", len(stack)
+
+        for idx in remain:
+            assert fn.get(idx) is None
+
+        assert len(remain)+len(fn)+1==len(bag0)
 
         state = stack[-1]
         state.do(fn)
 
-        #print fn
+        assert len(remain)+len(fn)==len(bag0)
+
+        if verbose:
+            print fn
 
         if len(fn) == len(bag0):
-            #print "FOUND"
+            if verbose:
+                print "FOUND"
             yield fn
 
         else:
             # try to add another state
             try:
-                idx = len(fn)
-                _state = State(bag0, bag1, idx, depth)
+                _state = State(bag0, bag1, depth)
+                #idx = remain.pop(randint(0, len(remain)-1))
+                idx = remain.pop(0)
+                _state.choose(idx)
+                #idx = _state.choose_best()
+                #remain.remove(idx)
                 stack.append(_state)
+                if verbose: 
+                    print "PUSH"
                 continue
     
             except Backtrack:
+                if verbose: 
+                    print "BACK"
                 # the above do() doesn't work
                 pass
 
         # next
         while stack:
             state = stack[-1]
-            #print "UNDO"
+            if verbose:
+                print "UNDO"
+            assert len(remain)+len(fn)==len(bag0)
             state.undo(fn)
+            assert len(remain)+len(fn)+1==len(bag0)
             try:
-                #print "NEXT"
+                if verbose:
+                    print "NEXT"
                 state.next()
                 break # ok, finished backtracking
             except Backtrack:
-                #print "POP"
-                stack.pop() # discard this guy
+                if verbose:
+                    print "POP"
+                state = stack.pop() # discard this guy
+                #remain.append(state.idx0)
+                remain.insert(0, state.idx0)
 
 
 
@@ -428,6 +518,27 @@ def all_autos(Gx):
     for fn in search(bag0, bag1):
         U, V = get_perm(m, n, fn)
         yield U, V
+
+
+def peterson_graph():
+
+    inside = [Point('', i) for i in range(5)]
+    outside = [Point('', i+5) for i in range(5)]
+
+    bag = Bag(inside+outside)
+
+    for i in range(5):
+
+        bag.join(i, (i+2)%5)
+        bag.join(i, (i+3)%5)
+        bag.join(i, i+5)
+
+        if i<4:
+            bag.join(i+5, i+6)
+        else:
+            bag.join(i+5, i+1)
+
+    return bag
 
 
 def test():
@@ -444,7 +555,7 @@ def test():
     #search = search_recursive
 
     count = 0
-    for fn in search(bag0, bag1, depth=2):
+    for fn in search(bag0, bag1):
         #print "iso", fn
         bag = bag0.map(fn)
         #print bag.shortstr()
@@ -462,26 +573,27 @@ def test():
     bag1 = from_ham(H)
     count = 0 
     for fn in search(bag0, bag1, depth=depth):
-#        #write('.')
-#        print [fn[i] for i in range(len(fn))]
-#        for i in range(len(fn)):
-#            assert bag0[i].get_desc(depth) == bag1[fn[i]].get_desc(depth)
-#            print '\t', bag0[i].get_desc(depth),
-#            print len(bag0[i].nbd)
-#            print '\t', bag1[fn[i]].get_desc(depth)
-#        print
         count += 1
     assert count == 6
 
+    bag0 = peterson_graph()
+    bag1 = peterson_graph()
+    assert len(list(search(bag0, bag1, depth=1))) == 120
 
 
 from argv import Argv 
 argv = Argv()
+seed(0)
 
 
 if __name__ == "__main__":
 
-    test()
+    if argv.profile:
+        import cProfile as profile
+        profile.run("test()")
+
+    else:
+        test()
 
     print "OK"
 
