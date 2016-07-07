@@ -297,7 +297,7 @@ def test():
 
 
 
-from qupy.tool.argv import Argv 
+from argv import Argv 
 argv = Argv()
 
 if __name__ == "__main__":
