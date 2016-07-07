@@ -4,11 +4,9 @@ import sys
 
 import numpy
 
-from qupy.ldpc.solve import *
-from qupy.gauge import lstr2
 
+from solve import zeros2, rand2, span, dot2, shortstr
 
-ra.seed(0)
 
 def reflect(H, k):
 
