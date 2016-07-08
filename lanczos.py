@@ -63,6 +63,7 @@ class XOp(Op):
             idxs = [idxs]
         for idx in idxs:
             assert 0<=idx<n
+        assert len(set(idxs))==len(idxs), idxs
         perm = []
         assert n<=30
         ns = range(n)
@@ -84,8 +85,12 @@ class XOp(Op):
             #print j
             perm.append(j)
         self.perm = perm
+        self.idxs = list(idxs)
         self.alpha = alpha
         Op.__init__(self, 2**n)
+
+    def __str__(self):
+        return "XOp(%d, %s, %s)"%(self.n, self.idxs, self.alpha)
 
     def matvec(self, v, w=None, verbose=False):
         if self.verbose:
@@ -107,6 +112,7 @@ class ZOp(Op):
             idxs = [idxs]
         for idx in idxs:
             assert 0<=idx<n
+        assert len(set(idxs))==len(idxs), idxs
         phases = []
         assert n<=30
         ns = range(n)
@@ -122,8 +128,12 @@ class ZOp(Op):
             phases.append(phase)
         #print "ZOp:", idxs, phases
         self.phases = numpy.array(phases)
+        self.idxs = list(idxs)
         self.alpha = alpha
         Op.__init__(self, 2**n)
+
+    def __str__(self):
+        return "ZOp(%d, %s, %s)"%(self.n, self.idxs, self.alpha)
 
     def matvec(self, v, w=None, verbose=False):
         if self.verbose:
@@ -272,9 +282,12 @@ class CompassModel(Model):
             idxs = []
             for j in range(l):
                 idxs.append(coords[i, j])
-                idxs.append(coords[i, j+1])
+                idxs.append(coords[i+1, j])
             op = ZOp(n, idxs)
             zstabs.append(op)
+
+        self.xlogop = XOp(n, [coords[i, 0] for i in range(l)]) 
+        self.zlogop = ZOp(n, [coords[0, i] for i in range(l)]) 
     
         self.n = n # qubits
         self.A = gauge
@@ -331,6 +344,7 @@ class GColorModel(Model):
         #stabs.append(mkop(ZOp, op))
 
     self.xlogop = mkop(XOp, gcolor_logop)
+    self.zlogop = mkop(ZOp, gcolor_logop)
 
     n = len(op)
     self.A = SumOp(2**n, xops+zops)
@@ -340,6 +354,20 @@ class GColorModel(Model):
 
     self.xstabs = xstabs
 
+
+def commutes(A, B):
+    n = A.n
+    v = numpy.random.normal(size=n)
+
+    Av = A.matvec(v)
+    BAv = B.matvec(Av)
+
+    Bv = B.matvec(v)
+    ABv = A.matvec(Bv)
+
+    r = numpy.abs(BAv - ABv).sum()
+
+    return r < 1e-6
 
 
 def test():
@@ -354,6 +382,13 @@ def test():
     else:
         return
 
+    if argv.test:
+        stabs = model.xstabs+model.zstabs
+        for A in stabs:
+            assert commutes(A, model.xlogop)
+            assert commutes(A, model.zlogop)
+            for B in stabs:
+                assert commutes(A, B)
 
     dim = model.A.n
 
