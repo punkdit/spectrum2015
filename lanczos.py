@@ -50,6 +50,16 @@ class Op(la.LinearOperator):
         w += v
         return w
 
+    def todense(self):
+        n = self.n
+        A = numpy.zeros((n, n))
+        v = numpy.zeros(n)
+        for i in range(n):
+            v[i] = 1
+            A[:, i] = self.matvec(v)
+            v[i] = 0
+        return A
+
 
 class IdOp(Op):
     pass
@@ -357,7 +367,7 @@ class GColorModel(Model):
     self.zstabs = zstabs
 
 
-def commutes(A, B):
+def commutes(A, B, sign=-1):
     n = A.n
     v = numpy.random.normal(size=n)
 
@@ -367,10 +377,32 @@ def commutes(A, B):
     Bv = B.matvec(v)
     ABv = A.matvec(Bv)
 
-    r = numpy.abs(BAv - ABv).sum()
+    r = numpy.abs(BAv + sign * ABv).sum()
 
     return r < 1e-6
 
+
+def anticommutes(A, B):
+    return commutes(A, B, +1)
+
+
+def show_eigs(vals):
+    vals = list(vals)
+    vals.sort()
+    counts = {}
+    val0 = vals[0]-10
+    for val in vals:
+        if abs(val-val0) < 1e-6:
+            counts[val0] += 1
+        else:
+            val0 = val
+            counts[val0] = 1
+    vals = counts.keys()
+    vals.sort()
+    print "eigval, degeneracy:"
+    for val in vals:
+        print '\t', val, counts[val]
+    
 
 def test():
 
@@ -391,6 +423,12 @@ def test():
             assert commutes(A, model.zlogop)
             for B in stabs:
                 assert commutes(A, B)
+        assert anticommutes(model.xlogop, model.zlogop)
+        print "OK"
+        return
+
+    if argv.threads:
+        os.environ['OMP_NUM_THREADS'] = str(argv.threads)
 
     dim = model.A.n
 
@@ -435,6 +473,14 @@ def test():
         P = 0.5 * (I + model.xlogop)
         A = P*A*P
 
+    if argv.exact:
+        assert A.n < 2**14
+        A = A.todense()
+        vals, vecs = numpy.linalg.eigh(A)
+        #print "eigvals:", vals
+        show_eigs(vals)
+        return
+
     norm = lambda v : (v**2).sum()**0.5
 
 
@@ -474,7 +520,7 @@ def test():
     print
 
     # vals go from smallest to highest
-    print vals
+    show_eigs(vals)
     print "iterations:", model.A.count
 
     if argv.verbose:
