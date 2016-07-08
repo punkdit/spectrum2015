@@ -192,6 +192,12 @@ def test_orbits():
     QAP = numpy.dot(Q, AP)
     print QAP
 
+    #PAP = numpy.dot(P.transpose(), AP)
+    #u, v = la.eigh(A)
+    #print u
+    #u1, v1 = la.eigh(PAP)
+    #print (u1[-1] / u[-1])**0.5
+
 
 
 from argv import Argv

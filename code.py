@@ -187,8 +187,12 @@ def test():
     #print
     mz = len(Gz)
     _count = None
+    stab_idxs = []
     for idx, v in enumerate(G):
         count = mz - 2*dot2(Gz, v).sum()
+        if count == mz:
+            print "stab:", idx, v
+            stab_idxs.append(idx)
         if count != _count:
             print "idx:", idx, count
             _count = count
@@ -210,16 +214,16 @@ def test():
         import isomorph
         bag0 = isomorph.from_ham(H)
         bag1 = isomorph.from_ham(H)
+        fn = {}
+        if argv.fixstabs:
+            for idx in stab_idxs:
+                fn[idx] = idx
         count = 0
-        for fn in isomorph.search(bag0, bag1, depth=depth):
+        for fn in isomorph.search(bag0, bag1, fn=fn, depth=depth):
+            if argv.fixstabs:
+                for idx in stab_idxs:
+                    assert fn[idx] == idx
             write('.')
-#            print [fn[i] for i in range(len(fn))]
-#            for i in range(len(fn)):
-#                assert bag0[i].get_desc(depth) == bag1[fn[i]].get_desc(depth)
-#                print '\t', bag0[i].get_desc(depth),
-#                print len(bag0[i].nbd)
-#                print '\t', bag1[fn[i]].get_desc(depth)
-#            print
             count += 1
         print
         print count

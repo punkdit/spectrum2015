@@ -417,9 +417,12 @@ def search(bag0, bag1, depth=1, fn=None, verbose=False):
 
     if fn is None:
         fn = {}
+
     remain = range(len(bag0))
 
     orbits = bag0.get_orbits(depth)
+    bag1.get_orbits()
+
     keys = orbits.keys()
     keys.sort(key = lambda key : len(orbits[key]))
     remain = []
@@ -431,6 +434,10 @@ def search(bag0, bag1, depth=1, fn=None, verbose=False):
     #for idx in fn.keys():
     #    remain.remove(idx)
     remain.sort()
+
+    for idx in fn:
+        bag0.set_colour(bag0[idx], str(idx))
+        bag1.set_colour(bag1[fn[idx]], str(idx))
 
     state = State(bag0, bag1, depth)
 

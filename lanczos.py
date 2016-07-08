@@ -42,6 +42,8 @@ class Op(la.LinearOperator):
         return RMulOp(self, alpha)
 
     def matvec(self, v, w=None, verbose=False):
+        if self.verbose:
+            write('.')
         assert len(v) == self.n
         if w is None:
             return v
@@ -86,6 +88,8 @@ class XOp(Op):
         Op.__init__(self, 2**n)
 
     def matvec(self, v, w=None, verbose=False):
+        if self.verbose:
+            write('.')
         assert len(v) == len(self.perm)
         if w is None:
             w = numpy.zeros(len(v))
@@ -122,6 +126,8 @@ class ZOp(Op):
         Op.__init__(self, 2**n)
 
     def matvec(self, v, w=None, verbose=False):
+        if self.verbose:
+            write('.')
         assert len(v) == len(self.phases)
         if w is None:
             w = numpy.zeros(len(v))
@@ -149,14 +155,14 @@ class SumOp(Op):
 
     def matvec(self, v, w=None, verbose=True):
         #print "SumOp.matvec"
+        if self.verbose:
+            write('.')
         assert len(v)==self.n
         if w is None:
             w = numpy.zeros(len(v))
         for op in self.ops:
             op.matvec(v, w)
         self.count += 1
-        if self.verbose:
-            sys.stdout.write('.');sys.stdout.flush()
         return w
 
 
@@ -167,6 +173,8 @@ class RMulOp(Op):
         Op.__init__(self, op.n)
 
     def matvec(self, v, w=None, verbose=True):
+        if self.verbose:
+            write('.')
         assert len(v)==self.n
         if w is None:
             w = numpy.zeros(len(v))
@@ -182,6 +190,8 @@ class MulOp(Op):
         Op.__init__(self, a.n)
 
     def matvec(self, v, w=None, verbose=True):
+        if self.verbose:
+            write('.')
         assert len(v)==self.n
         if w is None:
             w = numpy.zeros(len(v))
@@ -205,12 +215,19 @@ def strop(l, idx):
     
 
 class Model(object):
-    pass
+    def get_syndrome(self, v):
+        syndrome = []
+        for op in self.xstabs+self.zstabs:
+            v1 = op.matvec(v)
+            r = numpy.dot(v, v1) # real values
+            syndrome.append(r)
+        return syndrome
+
 
 class CompassModel(Model):
     def __init__(self, l):
     
-        print "build_compass...",
+        write("build_compass...")
         n = l**2
     
         keys = [(i, j) for i in range(l) for j in range(l)]
@@ -243,6 +260,7 @@ class CompassModel(Model):
         print "done"
     
         xstabs = []
+        zstabs = []
         for i in range(l-1):
             idxs = []
             for j in range(l):
@@ -251,11 +269,19 @@ class CompassModel(Model):
             op = XOp(n, idxs)
             xstabs.append(op)
     
+            idxs = []
+            for j in range(l):
+                idxs.append(coords[i, j])
+                idxs.append(coords[i, j+1])
+            op = ZOp(n, idxs)
+            zstabs.append(op)
+    
         self.n = n # qubits
         self.A = gauge
         self.xops = xops
         self.zops = zops
         self.xstabs = xstabs
+        self.zstabs = zstabs
 
 
 gcolor_gauge = """
@@ -314,15 +340,6 @@ class GColorModel(Model):
 
     self.xstabs = xstabs
 
-  def get_syndrome(self, v):
-
-    syndrome = []
-    for op in self.xstabs:
-        v1 = op.matvec(v)
-        r = numpy.dot(v, v1) # real values
-        syndrome.append(r)
-    return syndrome
-
 
 
 def test():
@@ -348,6 +365,9 @@ def test():
     
     k = argv.get("k", 2)
 
+    if k=="all":
+        k = A.n
+
     A = model.A
 
     if argv.perturb:
@@ -359,7 +379,7 @@ def test():
     projs = []
     I = IdOp(A.n)
     flip = argv.get("flip", 0)
-    for op in model.xstabs:
+    for op in model.xstabs + model.zstabs:
         if flip:
             op = 0.5 * (I - op)
             flip -= 1
@@ -411,7 +431,8 @@ def test():
         return
 
     A.verbose = True
-    vals, vecs = la.eigsh(A, k=k, v0=v0, which='LA', maxiter=None) #, tol=1e-8)
+    which = argv.get("which", 'LA')
+    vals, vecs = la.eigsh(A, k=k, v0=v0, which=which, maxiter=None) #, tol=1e-8)
     #vals, vecs = la.eigs(A, k=k, v0=v0, which='LR', maxiter=None) #, tol=1e-8)
     print
 
@@ -419,8 +440,9 @@ def test():
     print vals
     print "iterations:", model.A.count
 
-    for i in range(k):
-        print i, "syndrome", model.get_syndrome(vecs[:, i])
+    if argv.verbose:
+        for i in range(k):
+            print i, "syndrome", model.get_syndrome(vecs[:, i])
 
     v0 = vecs[:, -1]
 
