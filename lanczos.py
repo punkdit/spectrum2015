@@ -339,9 +339,10 @@ class GColorModel(Model):
         zops.append(mkop(ZOp, op))
 
     xstabs = []
+    zstabs = []
     for op in gcolor_stab.strip().split():
         xstabs.append(mkop(XOp, op))
-        #stabs.append(mkop(ZOp, op))
+        zstabs.append(mkop(ZOp, op))
 
     self.xlogop = mkop(XOp, gcolor_logop)
     self.zlogop = mkop(ZOp, gcolor_logop)
@@ -353,6 +354,7 @@ class GColorModel(Model):
     self.zops = zops
 
     self.xstabs = xstabs
+    self.zstabs = zstabs
 
 
 def commutes(A, B):
