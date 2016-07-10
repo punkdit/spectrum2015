@@ -1,4 +1,22 @@
 
+time ./gorbit.py compile size=2
+guage ops: 80
+qubits: 65
+stabs: 16
+Lattice(3:65, 2:128, 1:80, 0:16)
+i686-linux-gnu-gcc -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -Wall -Wstrict-prototypes -fPIC -I/usr/include/python2.7 -I/suphys/sburton/include/python2.7 -c c_gorbits.c -o c_gorbits.o
+i686-linux-gnu-gcc -pthread -shared -Wl,-Bsymbolic-functions -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security c_gorbits.o -o c_gorbits.so
+marked: 1
+marked: 53 bdy: 52
+marked: 1315 bdy: 1262
+marked: 20251 bdy: 18936
+marked: 20251
+
+real 4m46.434s
+user 4m45.936s
+
+
+
 10/7/16
 =======
 

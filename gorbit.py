@@ -15,37 +15,6 @@ def genidx(shape):
                 yield (idx,)+_idx
 
 
-gcolor_gauge = """ 
-1111...........
-11..11.........
-1.1.1.1........
-..11..11.......
-.1.1.1.1.......
-....1111.......
-11......11.....
-1.1.....1.1....
-........1111...
-..11......11...
-.1.1.....1.1...
-1...1...1...1..
-........11..11.
-.1...1...1...1.
-....11......11.
-........1.1.1.1
-..1...1...1...1
-....1.1.....1.1
-"""
-
-gcolor_stab = """ 
-11111111.......
-1111....1111...
-11..11..11..11.
-1.1.1.1.1.1.1.1
-"""
-
-gcolor_logop = "........1111111"
-
-
 def gen_code(n, gcolor_gauge, gcolor_stab):
 
     output = open("c_gorbits.c", "w")
@@ -56,26 +25,21 @@ def gen_code(n, gcolor_gauge, gcolor_stab):
 
 #define SWAP(a, b)  {tmp=a; a=b; b=tmp;}
 
-//typedef char Bitvec[%(n)s+1];
 typedef struct _bv
 {char bits[%(n)s+1];}
 Bitvec;
 
 static Bitvec s_uniq;
 
-static void
-clear_uniq(void)
-{
-    s_uniq.bits[0] = 0;
-}
+#define BV_CLR(bv)  {(bv).bits[0] = 0;}
+#define BV_SET(tgt, src)  {memcpy((tgt).bits, (src).bits, sizeof(tgt));}
+#define BV_CMP(tgt, src)  strncmp((tgt).bits, (src).bits, %(n)s+1)
+#define BV_FLIP(tgt, i) {(tgt).bits[(i)] = '0'+'1'-(tgt).bits[(i)];}
+#define BV_SETBIT(tgt, src, i) {(tgt).bits[(i)] = (src).bits[(i)];}
+#define BV_SETFLIP(tgt, src, i) {(tgt).bits[(i)] = '0'+'1'-(src).bits[(i)];}
 
-static void
-set_uniq(Bitvec *s)
-{
-    //printf("%%s <- %%s\n", &s_uniq.bits, &s->bits);
-    if(strncmp(s_uniq.bits, s->bits, %(n)s) < 0)
-        strncpy(s_uniq.bits, s->bits, %(n)s+1);
-}
+
+
 
 static void
 list_append(PyObject *items, Bitvec *s)
@@ -102,49 +66,62 @@ get_uniq(PyObject *self, PyObject *args)
     assert(strlen(src.bits)==%(n)s);
 
     Bitvec target;
-    target.bits[%(n)s] = 0;
+    //target.bits[%(n)s] = 0;
 
-    clear_uniq();
+    BV_CLR(s_uniq);
     """%{'n':n}
 
     stabs = gcolor_stab.replace('.', '0').strip().split()
     m = len(stabs)
-
-#    for mask in genidx((2,)*m):
-#        print >>output, "    // ", mask
-#        #print >>output, "    strncpy(target, src, %d);"%(n+1)
-#        for i in range(n):
-#            flip = 0
-#            for j, k in enumerate(mask):
-#                if k and stabs[j][i]=='1':
-#                    flip = 1-flip
-#            if flip:
-#                print >>output, "    target.bits[%d] = '0'+'1'-src.bits[%d];"%(i, i)
-#            else:
-#                print >>output, "    target.bits[%d] = src.bits[%d];"%(i, i)
-#        print >>output, "    set_uniq(&target);"
+    ops = gcolor_gauge.replace('.', '0').strip().split()
+    ng = len(ops)
 
     for i in range(m):
         print >>output, "    int i_%d;"%i
-    for i in range(n):
-        print >>output, "    target.bits[%d] = src.bits[%d];" % (i, i)
+    print >>output, "    BV_SET(target, src);"
     for i in range(m):
         print >>output, "    for(i_%d=0; i_%d<2; i_%d++)" % (i, i, i)
         print >>output, "    {"
 
-    print >>output, "    set_uniq(&target);"
+    print >>output, "    if(BV_CMP(s_uniq, target)<0) BV_SET(s_uniq, target);"
 
     for i in range(m):
         stab = stabs[i]
         for j in range(n):
             if stab[j]=='1':
-                print >>output, "    target.bits[%d] = '0'+'1'-target.bits[%d];"%(j, j)
+                print >>output, "    BV_FLIP(target, %d);"%j
         print >>output, "    }"
 
     print >>output, "    assert(strncmp(target.bits, src.bits, %d+1)==0);"%n
     print >>output, "    return PyString_FromString(s_uniq.bits);"
     print >>output, "}"
 
+
+    print >>output, """
+
+static Bitvec all_targets[%(ng)s];
+
+void
+fill_gauge(Bitvec src)
+{
+    Bitvec target;
+
+    """%locals()
+
+    for j, op in enumerate(ops):
+        print >>output, "    // ", op
+        #print >>output, "    strncpy(target, src, %d);"%(n+1)
+        for i in range(n):
+            flip = op[i]=='1'
+            if flip:
+                print >>output, "    BV_SETFLIP(all_targets[%d], src, %d)"%(j, i)
+            else:
+                print >>output, "    BV_SETBIT(all_targets[%d], src, %d)"%(j, i)
+
+#        print >>output, "    list_append(items, &target);"
+#        
+#    print >>output, "    return items;"
+    print >>output, "}"
 
     print >>output, """
 
@@ -159,29 +136,15 @@ get_gauge(PyObject *self, PyObject *args)
     assert(strlen(s_arg)==%(n)s);
     strncpy(src.bits, s_arg, %(n)s+1);
 
+    fill_gauge(src);
+
     PyObject *items = PyList_New(0);
+    int i;
+    for(i=0; i<%(ng)s; i++)
+        list_append(items, &all_targets[i]);
+    return items;
+}
 
-    Bitvec target;
-    target.bits[%(n)s] = 0;
-    """%{'n':n}
-
-    ops = gcolor_gauge.replace('.', '0').strip().split()
-    for op in ops:
-        print >>output, "    // ", op
-        #print >>output, "    strncpy(target, src, %d);"%(n+1)
-        for i in range(n):
-            flip = op[i]=='1'
-            if flip:
-                print >>output, "    target.bits[%d] = '0'+'1'-src.bits[%d];"%(i, i)
-            else:
-                print >>output, "    target.bits[%d] = src.bits[%d];"%(i, i)
-
-        print >>output, "    list_append(items, &target);"
-        
-    print >>output, "    return items;"
-    print >>output, "}"
-
-    print >>output, """
 
 static PyMethodDef OrbitsMethods[] = 
 {
@@ -198,18 +161,18 @@ initc_gorbits(void)
     (void) Py_InitModule("c_gorbits", OrbitsMethods);
 }
 
-    """
+    """%locals()
+
     output.flush()
     output.close()
 
 
 def build():
-    cmd = "i686-linux-gnu-gcc -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -Wall -Wstrict-prototypes -fPIC -I/usr/include/python2.7 -I/suphys/sburton/include/python2.7 -c c_gorbits.c -o c_gorbits.o"
-
+    cmd = "i686-linux-gnu-gcc -O3 -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -Wall -Wstrict-prototypes -fPIC -I/usr/include/python2.7 -I/suphys/sburton/include/python2.7 -c c_gorbits.c -o c_gorbits.o"
     print cmd
     rval = os.system(cmd)
     assert rval==0
-    cmd = "i686-linux-gnu-gcc -pthread -shared -Wl,-Bsymbolic-functions -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security c_gorbits.o -o c_gorbits.so"
+    cmd = "i686-linux-gnu-gcc -O3 -pthread -shared -Wl,-Bsymbolic-functions -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security c_gorbits.o -o c_gorbits.so"
     print cmd
     rval = os.system(cmd)
     assert rval==0
@@ -240,57 +203,34 @@ def main():
             os.unlink("c_gorbits.so")
         except:
             pass
-        #rval = os.system("python setup.py build_ext --inplace")
-        #assert rval == 0
-
-#        save = sys.argv[1:]
-#        sys.argv[1:] = "build_ext --inplace".split()
-#        from distutils.core import setup, Extension
-#        #from Cython.Build import cythonize
-#        
-#        setup(
-#          name = 'Orbit compute',
-#          #ext_modules = cythonize("orbits_wrap.pyx"),
-#          ext_modules=[Extension('c_gorbits', ['c_gorbits.c'])],
-#          #extra_compile_args = ["-O0"], 
-#        )
-#        sys.argv[1:] = save
-
         build()
 
-    import c_gorbits
+    import c_gorbits as cg
 
     s = "0"*n
-    s = c_gorbits.get_uniq(s)
-    marked = {s:1}
+    s = cg.get_uniq(s)
+    orbits = {s:1}
     bdy = [s]
-    print "marked:", len(marked)
+    print "orbits:", len(orbits)
 
     while bdy:
         _bdy = []
         for s0 in bdy:
             #print "bdy:", s0
-            for s1 in c_gorbits.get_gauge(s0):
+            for s1 in cg.get_gauge(s0):
                 #print "s1:", s1
-                s2 = c_gorbits.get_uniq(s1)
-                if s2 not in marked:
-                    marked[s2] = 1
+                s2 = cg.get_uniq(s1)
+                if s2 not in orbits:
+                    orbits[s2] = 1
                     _bdy.append(s2)
         # new boundary
         bdy = _bdy
-        print "marked:", len(marked), "bdy:", len(bdy)
+        print "orbits:", len(orbits), "bdy:", len(bdy)
+
+        if len(orbits)>5000:
+            break
 
     print "marked:", len(marked)
-
-    return
-
-    for s0 in marked:
-        obt = c_gorbits.get_orbit(s0)
-        for s1 in obt:
-            if s1!=s0 and s1 in marked:
-                print s0, s1, "both in marked"
-        obt.sort(key = lambda s : s.count('1'))
-        #print obt[0]
 
 
 from argv import Argv
