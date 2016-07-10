@@ -1,62 +1,108 @@
 
+10/7/16
+=======
+
+flipping xstabilizers makes a cheeger cut in the wavefunction.
+
+flippin zstabs does not use a cheeger cut, it's another +ve
+wavefunction but it bumps the
+wavefunction to a disconnected (from gs etc.) support.
+Same orbi-hamiltonian, but diagonnals offset ?
 
 8/7/16
 ======
 
+gcolor model
+~~~~~~~~~~~~
+
+time ./lanczos.py gcolor k=80
+eigval, degeneracy:
+    17.6382638193 10
+    18.973665961 28 <---- flip 3 stabs
+    20.054028988 24 <---- flip 2 stabs
+    22.2147550419 16  <------- 1st excited, 8 stabs * 2 logical = 16
+    25.4558441227 2
+
+
+XXX this misses two dimensions! XXX
+XXX time ./lanczos.py gcolor  k=20 
+    XXX 20.054028988 4+
+    XXX 22.2147550419 14  <------- 1st excited XXX
+    XXX 25.4558441227 2
+
+
+time ./lanczos.py gcolor  k=20 stabilize 
+eigval, degeneracy:
+    8.48528137424 6+
+    16.9705627485 12
+    25.4558441227 2
+iterations: 103
+nnz: 2048
+
+time ./lanczos.py gcolor  k=20 stabilize flip=1
+eigval, degeneracy:
+    9.56564440119 6
+    13.7294736676 6
+    15.8901997215 6
+    22.2147550419 2  <---------- 1st excited
+
+
+
+
 l=4 compass model
 ~~~~~~~~~~~~~~~~~
 
-1st excited & flip=1: dim=2
-./lanczos.py compass l=4 k=10 stabilize flip=1
-[ 16.76347136  16.76347136  16.76347136  16.95210905  16.95210905
-  16.95210905  16.95210905  16.95210905  18.36929982  18.36929982]
-iterations: 454
+
+time ./lanczos.py compass l=4 k=40 which=LA 
+eigval, degeneracy:
+    16.9521090478 10
+    18.0705549055 4
+    18.3366619361 8
+    18.3692998155 16 <--------- 8 stabs * 2
+    19.0129032917 2
 
 
-stabilized space contains first excited subspace!
-dim=8
-time python ./lanczos.py compass l=4 k=20 stabilize verbose
-[ 14.71146173  14.71146173  16.33570465  16.33570465  18.07055491
-  18.07055491  18.33666194  18.33666194  18.33666194  18.33666194
-  18.36929982  18.36929982  18.36929982  18.36929982  18.36929982
-  18.36929982  18.36929982  18.36929982  19.01290329  19.01290329]
-iterations: 499
 
-first excited subspace
-dim=10
-nice time python ./lanczos.py compass l=4 k=20 
-[ 18.33666194  18.33666194  18.33666194  18.33666194  18.33666194
-  18.33666194  18.33666194  18.33666194  18.36929982  18.36929982
-  18.36929982  18.36929982  18.36929982  18.36929982  18.36929982
-  18.36929982  18.36929982  18.36929982  19.01290329  19.01290329]
-iterations: 905
+time ./lanczos.py compass l=4 k=20 which=LA stabilize
+eigval, degeneracy:
+    12.3873405351 8+
+    12.8228924189 8
+    16.3357046498 2
+    19.0129032917 2
+iterations: 551
+
+
+time ./lanczos.py compass l=4 k=20 which=LA stabilize flip=1
+eigval, degeneracy:
+    11.8211856413 2+
+    11.8655888273 2
+    12.109653381 4
+    12.5976257038 2
+    12.8386372895 2
+    14.3460572266 4
+    14.6431789163 2
+    18.3692998155 2  <------- 1st excited
+
+
 
 
 
 l=3 compass model
 ~~~~~~~~~~~~~~~~~
 
-1st excited & flip=1: 2 dim
-./lanczos.py compass l=3 k=20 stabilize flip=1
-[  4.64680855   4.64680855   4.68584617   4.68584617   4.68584617
-   4.68584617   6.40294468   6.40294468   6.40294468   6.40294468
-   6.40294468   6.40294468   8.16774472   8.16774472   8.16774472
-   8.16774472   8.16774472   8.16774472  10.2459954   10.2459954 ]
+time ./lanczos.py compass l=3 exact
+eigval, degeneracy:
+    ...
+    10.2459954027 12 # <------------- 1st excited
+    11.2111025509 2
 
-1st excited & stabilized: 6 dim
-./lanczos.py compass l=3 k=20 stabilize
-[  4.68584617   4.68584617   4.68584617   4.68584617   4.68584617
-   4.68584617   4.68584617   4.68584617   4.68584617   4.68584617   6.           6.
-  10.2459954   10.2459954   10.2459954   10.2459954   10.2459954
-  10.2459954   11.21110255  11.21110255]
+1st excited corresponds to single flipped stabilizer (6 of these * 2 logops):
 
+time ./lanczos.py compass l=3 exact stabilize flip=1
+eigval, degeneracy:
+    ...
+    10.2459954027 2 # <------------- 1st excited
 
-1st excited: 12 dim
-./lanczos.py compass l=3 k=20
-[  8.16774472   8.16774472   8.16774472   8.16774472   8.16774472
-   8.16774472  10.2459954   10.2459954   10.2459954   10.2459954
-  10.2459954   10.2459954   10.2459954   10.2459954   10.2459954
-  10.2459954   10.2459954   10.2459954   11.21110255  11.21110255]
 
 
 
@@ -65,20 +111,33 @@ l=3 compass model
 
 
 gcolor orbi-hamiltonian spectrum,
-look for these values in stabilized hamiltonian:
+spectrum exactly corresponds to the hamiltonian stabilized spectrum:
+(appart from degeneracy)
 
-25.4558441227  FOUND
-16.9705627485  FOUND
+25.4558441227 
+16.9705627485 
 8.48528137424 
 -2.01077110523e-15 
 -8.48528137424 
 -16.9705627485 
--25.4558441227 FOUND
+-25.4558441227
 
 
 l=3 compass orbi-hamiltonian has spectrum
 # eigvals: [ 11.21110255   6.          -3.21110255]
-these also live inside the stabilized hamiltonian, as verified by numerics
+these also live inside the stabilized hamiltonian, as verified by numerics:
+eigval, degeneracy:
+    -6.0 2
+    -4.0 8
+    -3.21110255093 2
+    -4.43096980137e-15 488
+    2.0 8
+    6.0 2
+    11.2111025509 2
+
+we get more eigvals perhaps because compass model has more
+symmetry that is not fixed by stabilizer symmetries of gauge group
+
 
 
 searching symmetry in graph

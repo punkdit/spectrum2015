@@ -6,6 +6,54 @@ from heapq import heappush, heappop, heapify
 import numpy
 import scipy.sparse.linalg as la
 
+
+try:
+    from pyx import canvas, path, deco, trafo, style, text, color, deformer
+    from pyx.color import rgb 
+    
+    text.set(mode="latex") 
+    text.set(docopt="12pt")
+    text.preamble(r"\usepackage{amsmath,amsfonts,amssymb}")
+    
+    text.preamble(r"\def\ket #1{|#1\rangle}")
+
+    black = rgb(0., 0., 0.)
+    blue = rgb(0., 0., 0.8)
+    lred = rgb(1., 0.4, 0.4)
+    white = rgb(1., 1., 1.)
+    grey = rgb(0.75, 0.75, 0.75)
+    shade = grey
+    shade0 = rgb(0.75, 0.75, 0.75)
+    shade1 = rgb(0.80, 0.80, 0.80)
+    shade2 = rgb(0.85, 0.85, 0.85)
+    
+    light_shade = rgb(0.85, 0.65, 0.1)
+    light_shade = rgb(0.9, 0.75, 0.4)
+    
+    north = [text.halign.boxcenter, text.valign.top]
+    northeast = [text.halign.boxright, text.valign.top]
+    northwest = [text.halign.boxleft, text.valign.top]
+    south = [text.halign.boxcenter, text.valign.bottom]
+    southeast = [text.halign.boxright, text.valign.bottom]
+    southwest = [text.halign.boxleft, text.valign.bottom]
+    east = [text.halign.boxright, text.valign.middle]
+    west = [text.halign.boxleft, text.valign.middle]
+    center = [text.halign.boxcenter, text.valign.middle]
+    
+    st_dashed = [style.linestyle.dashed]
+    st_dotted = [style.linestyle.dotted]
+    st_round = [style.linecap.round]
+    
+    st_thick = [style.linewidth.thick]
+    st_Thick = [style.linewidth.Thick]
+    st_THICK = [style.linewidth.THICK]
+    
+
+except ImportError:
+    print "no pyx module found"
+
+
+
 from code import texstr
 
 EPSILON = 1e-8
@@ -244,6 +292,7 @@ class Model(object):
         return syndrome
 
 
+
 class CompassModel(Model):
     def __init__(self, l):
     
@@ -307,6 +356,114 @@ class CompassModel(Model):
         self.zstabs = zstabs
 
 
+def plot(model, v):
+
+    import networkx as nx
+
+    graph = nx.Graph()
+
+    dim = len(v)
+    syndrome = numpy.zeros(dim)
+    for op in model.zops:
+        syndrome += op.phases
+
+    idxs = [i for i in range(dim) if abs(v[i])>EPSILON]
+    print "nnz:", len(idxs)
+
+    for i in idxs:
+        graph.add_node(i, value=v[i])
+
+    for i in idxs:
+        for xop in model.xops:
+            j = xop.perm[i]
+            graph.add_edge(i, j)
+            graph.add_edge(j, i)
+
+    #idxs.sort(key = lambda i : -syndrome[i]) # stable sort
+    idxs.sort(key = lambda i : -abs(v[i]))
+
+    row = []
+    rows = [row]
+    val = v[idxs[0]]
+    for idx in idxs:
+        val1 = v[idx]
+        #print idx, val1
+        if abs(abs(val)-abs(val1))>1e-6:
+            assert row
+            val = val1
+            row = []
+            rows.append(row)
+            #print idx, val1
+        row.append((idx, val1))
+
+    print "species:", len(rows)
+    for row in rows:
+        print len(row),
+    print
+
+    row = rows[0]
+    n0 = len(row)
+    row.sort(key = lambda (idx,val):-val)
+
+    paths = {}
+    for idx,_ in row:
+        assert idx in graph, idx
+        ps = nx.shortest_path(graph, target=idx) # paths to idx
+        ps = dict((jdx, len(path)) for jdx,path in ps.items())
+        #print idx, ps
+        paths[idx] = ps
+
+    for row in rows[1:]:
+        n = len(row)
+        closest = []
+        targets = {}
+        for i in range(n):
+            idx,_ = row[i]
+            jdxs = [jdx for jdx,_ in rows[0]]
+            #jdxs.sort(key = lambda jdx,idx=idx : len(nx.shortest_path(graph, idx, jdx)))
+            jdxs.sort(key = lambda jdx,idx=idx : paths[jdx].get(idx, 9999))
+            targets[idx] = jdxs[0] # closest guy in top row
+        #print targets
+        row.sort(key = lambda (idx,val) : targets[idx])
+
+    r = 0.05
+    dy = 0.2
+    dx = 1.2*r
+
+    c = canvas.canvas()
+
+    x, y = 0., 0.
+    for row in rows:
+        x = -len(row)*0.5*dx
+        for idx, val in row:
+            #p = path.circle(x, y, r)
+            p = path.rect(x, y, r, r)
+            if val > 0.:
+                #print "F",
+                c.fill(p)
+            c.stroke(p)
+            x += dx
+        y -= dy
+
+    c.writePDFfile("pic-wavefunction.pdf")
+
+
+def save(v, fname):
+    a = v.tostring()
+    f = open(fname, 'w')
+    f.write(a)
+    f.close()
+
+
+def load(fname):
+    f = open(fname)
+    s = f.read()
+    f.close()
+    a = numpy.fromstring(s)
+    return a
+
+
+
 gcolor_gauge = """
 1111...........
 11..11.........
@@ -344,6 +501,8 @@ class GColorModel(Model):
     xops = []
     zops = []
 
+    write("building GColorModel...")
+
     for op in gcolor_gauge.strip().split():
         xops.append(mkop(XOp, op))
         zops.append(mkop(ZOp, op))
@@ -365,6 +524,8 @@ class GColorModel(Model):
 
     self.xstabs = xstabs
     self.zstabs = zstabs
+
+    write("done\n")
 
 
 def commutes(A, B, sign=-1):
@@ -405,6 +566,8 @@ def show_eigs(vals):
     
 
 def test():
+
+    norm = lambda v : (v**2).sum()**0.5
 
     if argv.compass:
         l = argv.get("l", 3)
@@ -454,7 +617,13 @@ def test():
     projs = []
     I = IdOp(A.n)
     flip = argv.get("flip", 0)
-    for op in model.xstabs + model.zstabs:
+    zflip = argv.get("zflip", 0)
+    if zflip:
+        stabs = model.zstabs + model.xstabs
+        flip = zflip
+    else:
+        stabs = model.xstabs + model.zstabs
+    for op in stabs:
         if flip:
             op = 0.5 * (I - op)
             flip -= 1
@@ -477,14 +646,8 @@ def test():
         assert A.n < 2**14
         A = A.todense()
         vals, vecs = numpy.linalg.eigh(A)
-        #print "eigvals:", vals
-        show_eigs(vals)
-        return
 
-    norm = lambda v : (v**2).sum()**0.5
-
-
-    if argv.power:
+    elif argv.power:
 
         v = numpy.random.normal(size=A.n)
         v /= norm(v)
@@ -511,14 +674,15 @@ def test():
     
             v = u
     
-        return
 
-    A.verbose = True
-    which = argv.get("which", 'LA')
-    vals, vecs = la.eigsh(A, k=k, v0=v0, which=which, maxiter=None) #, tol=1e-8)
-    #vals, vecs = la.eigs(A, k=k, v0=v0, which='LR', maxiter=None) #, tol=1e-8)
-    print
+    else:
 
+        A.verbose = True
+        which = argv.get("which", 'LA')
+        vals, vecs = la.eigsh(A, k=k, v0=v0, which=which, maxiter=None) #, tol=1e-8)
+        #vals, vecs = la.eigs(A, k=k, v0=v0, which='LR', maxiter=None) #, tol=1e-8)
+        print
+    
     # vals go from smallest to highest
     show_eigs(vals)
     print "iterations:", model.A.count
@@ -527,20 +691,31 @@ def test():
         for i in range(k):
             print i, "syndrome", model.get_syndrome(vecs[:, i])
 
-    v0 = vecs[:, -1]
+    idx = argv.get("idx", 0)
+    k = vecs.shape[1]
 
-    v0 = numpy.abs(v0)
+    v0 = vecs[:, k-1-idx]
 
-    count = 0
-    idxs = []
-    values = []
-    for i in range(dim):
-        if abs(v0[i]) > EPSILON:
-            #write(i)
-            idxs.append(i)
-            values.append(v0[i])
-    print "nnz:", len(idxs)
+    pos, = numpy.where(v0>+EPSILON)
+    neg, = numpy.where(v0<-EPSILON)
+    print "pos: %d, neg: %d"%(len(pos), len(neg))
+    print "v[0]", v0[0]
+    print v0[pos[:10]], v0[neg[:10]]
 
+#    v0 = numpy.abs(v0)
+#
+#    count = 0
+#    idxs = []
+#    values = []
+#    for i in range(dim):
+#        if abs(v0[i]) > EPSILON:
+#            #write(i)
+#            idxs.append(i)
+#            values.append(v0[i])
+#    print "nnz:", len(idxs)
+
+    if argv.plot:
+        plot(model, v0)
 
     return
 
