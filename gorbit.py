@@ -104,19 +104,19 @@ static Bitvec all_targets[%(ng)s];
 void
 fill_gauge(Bitvec src)
 {
-    Bitvec target;
-
     """%locals()
 
     for j, op in enumerate(ops):
         print >>output, "    // ", op
         #print >>output, "    strncpy(target, src, %d);"%(n+1)
+        print >>output, "    BV_SET(all_targets[%d], src);"%j
+        
         for i in range(n):
             flip = op[i]=='1'
             if flip:
-                print >>output, "    BV_SETFLIP(all_targets[%d], src, %d)"%(j, i)
-            else:
-                print >>output, "    BV_SETBIT(all_targets[%d], src, %d)"%(j, i)
+                print >>output, "    BV_FLIP(all_targets[%d], %d)"%(j, i)
+            #else:
+            #    print >>output, "    BV_SETBIT(all_targets[%d], src, %d)"%(j, i)
 
 #        print >>output, "    list_append(items, &target);"
 #        
@@ -204,6 +204,7 @@ def main():
         except:
             pass
         build()
+        return
 
     import c_gorbits as cg
 
@@ -230,7 +231,7 @@ def main():
         if len(orbits)>5000:
             break
 
-    print "marked:", len(marked)
+    print "orbits:", len(orbits)
 
 
 from argv import Argv
