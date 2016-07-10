@@ -46,9 +46,7 @@ gcolor_stab = """
 gcolor_logop = "........1111111"
 
 
-def gen_code(gcolor_gauge, gcolor_stab):
-
-    n = 15
+def gen_code(n, gcolor_gauge, gcolor_stab):
 
     output = open("c_gorbits.c", "w")
 
@@ -180,12 +178,12 @@ initc_gorbits(void)
 
 
 def build():
-    cmd = "i686-linux-gnu-gcc -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -Wall -Wstrict-prototypes -fPIC -I/usr/include/python2.7 -c c_gorbits.c -o build/temp.linux-i686-2.7/c_gorbits.o"
+    cmd = "i686-linux-gnu-gcc -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -Wall -Wstrict-prototypes -fPIC -I/usr/include/python2.7 -I/suphys/sburton/include/python2.7 -c c_gorbits.c -o c_gorbits.o"
 
     print cmd
     rval = os.system(cmd)
     assert rval==0
-    cmd = "i686-linux-gnu-gcc -pthread -shared -Wl,-Bsymbolic-functions -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security build/temp.linux-i686-2.7/c_gorbits.o -o /home/simon/home/github/spectrum2015/c_gorbits.so"
+    cmd = "i686-linux-gnu-gcc -pthread -shared -Wl,-Bsymbolic-functions -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security c_gorbits.o -o c_gorbits.so"
     print cmd
     rval = os.system(cmd)
     assert rval==0
@@ -211,7 +209,7 @@ def main():
     Hx = gcolor.shortstr(Hx)
 
     if "compile" in sys.argv:
-        gen_code(Gx, Hx)
+        gen_code(n, Gx, Hx)
         try:
             os.unlink("c_gorbits.so")
         except:
