@@ -50,31 +50,37 @@ def gen_code(n, gcolor_gauge, gcolor_stab):
 
     output = open("c_gorbits.c", "w")
 
-    print >>output, """
+    print >>output, r"""
 
 #include "Python.h"
 
 #define SWAP(a, b)  {tmp=a; a=b; b=tmp;}
 
-static char s_uniq[%(n)s+1];
+//typedef char Bitvec[%(n)s+1];
+typedef struct _bv
+{char bits[%(n)s+1];}
+Bitvec;
+
+static Bitvec s_uniq;
 
 static void
 clear_uniq(void)
 {
-    s_uniq[0] = 0;
+    s_uniq.bits[0] = 0;
 }
 
 static void
-set_uniq(char *s)
+set_uniq(Bitvec *s)
 {
-    if(strncmp(s_uniq, s, %(n)s) < 0)
-        strncpy(s_uniq, s, %(n)s+1);
+    //printf("%%s <- %%s\n", &s_uniq.bits, &s->bits);
+    if(strncmp(s_uniq.bits, s->bits, %(n)s) < 0)
+        strncpy(s_uniq.bits, s->bits, %(n)s+1);
 }
 
 static void
-list_append(PyObject *items, char *s)
+list_append(PyObject *items, Bitvec *s)
 {
-    PyObject *string = PyString_FromString(s);
+    PyObject *string = PyString_FromString(s->bits);
     PyList_Append(items, string);
     Py_DECREF(string);
 }
@@ -82,43 +88,61 @@ list_append(PyObject *items, char *s)
 """%{'n':n}
 
 
-    print >>output, """
+    print >>output, r"""
 static PyObject *
 get_uniq(PyObject *self, PyObject *args)
 {
-    const char *src;
-    if (!PyArg_ParseTuple(args, "s", &src))
+    Bitvec src;
+    const char *s_arg;
+    if (!PyArg_ParseTuple(args, "s", &s_arg))
         return NULL;
 
-    assert(strlen(src)==%(n)s);
-    //print "orbit", src
+    //printf("get_uniq %%s\n", s_arg);
+    strncpy(src.bits, s_arg, %(n)s+1);
+    assert(strlen(src.bits)==%(n)s);
 
-    char target[%(n)s+1];
-    //char target1[%(n)s+1];
-    //char tmp;
-
-    target[%(n)s] = 0;
-    //target1[%(n)s] = 0;
+    Bitvec target;
+    target.bits[%(n)s] = 0;
 
     clear_uniq();
     """%{'n':n}
 
     stabs = gcolor_stab.replace('.', '0').strip().split()
     m = len(stabs)
-    for mask in genidx((2,)*m):
-        print >>output, "    // ", mask
-        #print >>output, "    strncpy(target, src, %d);"%(n+1)
-        for i in range(n):
-            flip = 0
-            for j, k in enumerate(mask):
-                if k and stabs[j][i]=='1':
-                    flip = 1-flip
-            if flip:
-                print >>output, "    target[%d] = '0'+'1'-src[%d];"%(i, i)
-            else:
-                print >>output, "    target[%d] = src[%d];"%(i, i)
-        print >>output, "    set_uniq(target);"
-    print >>output, "    return PyString_FromString(s_uniq);"
+
+#    for mask in genidx((2,)*m):
+#        print >>output, "    // ", mask
+#        #print >>output, "    strncpy(target, src, %d);"%(n+1)
+#        for i in range(n):
+#            flip = 0
+#            for j, k in enumerate(mask):
+#                if k and stabs[j][i]=='1':
+#                    flip = 1-flip
+#            if flip:
+#                print >>output, "    target.bits[%d] = '0'+'1'-src.bits[%d];"%(i, i)
+#            else:
+#                print >>output, "    target.bits[%d] = src.bits[%d];"%(i, i)
+#        print >>output, "    set_uniq(&target);"
+
+    for i in range(m):
+        print >>output, "    int i_%d;"%i
+    for i in range(n):
+        print >>output, "    target.bits[%d] = src.bits[%d];" % (i, i)
+    for i in range(m):
+        print >>output, "    for(i_%d=0; i_%d<2; i_%d++)" % (i, i, i)
+        print >>output, "    {"
+
+    print >>output, "    set_uniq(&target);"
+
+    for i in range(m):
+        stab = stabs[i]
+        for j in range(n):
+            if stab[j]=='1':
+                print >>output, "    target.bits[%d] = '0'+'1'-target.bits[%d];"%(j, j)
+        print >>output, "    }"
+
+    print >>output, "    assert(strncmp(target.bits, src.bits, %d+1)==0);"%n
+    print >>output, "    return PyString_FromString(s_uniq.bits);"
     print >>output, "}"
 
 
@@ -127,30 +151,32 @@ get_uniq(PyObject *self, PyObject *args)
 static PyObject *
 get_gauge(PyObject *self, PyObject *args)
 {
-    const char *src;
-    if (!PyArg_ParseTuple(args, "s", &src))
+    Bitvec src;
+    const char *s_arg;
+    if (!PyArg_ParseTuple(args, "s", &s_arg))
         return NULL;
 
-    assert(strlen(src)==%(n)s);
-    //print "orbit", src
+    assert(strlen(s_arg)==%(n)s);
+    strncpy(src.bits, s_arg, %(n)s+1);
+
     PyObject *items = PyList_New(0);
 
-    char target[%(n)s+1];
-    target[%(n)s] = 0;
+    Bitvec target;
+    target.bits[%(n)s] = 0;
     """%{'n':n}
 
     ops = gcolor_gauge.replace('.', '0').strip().split()
     for op in ops:
-        print >>output, "    // ", mask
+        print >>output, "    // ", op
         #print >>output, "    strncpy(target, src, %d);"%(n+1)
         for i in range(n):
             flip = op[i]=='1'
             if flip:
-                print >>output, "    target[%d] = '0'+'1'-src[%d];"%(i, i)
+                print >>output, "    target.bits[%d] = '0'+'1'-src.bits[%d];"%(i, i)
             else:
-                print >>output, "    target[%d] = src[%d];"%(i, i)
+                print >>output, "    target.bits[%d] = src.bits[%d];"%(i, i)
 
-        print >>output, "    list_append(items, target);"
+        print >>output, "    list_append(items, &target);"
         
     print >>output, "    return items;"
     print >>output, "}"
