@@ -379,8 +379,8 @@ def orbiham(H):
             P[j, i] = 1
         Q[i, j] = 1
 
-    print shortstr(P)
-    print shortstr(Q)
+    #print shortstr(P)
+    #print shortstr(Q)
 
     H = numpy.dot(Q, numpy.dot(H, P))
     return H
@@ -400,6 +400,8 @@ def main():
     else:
 
         return
+
+    #print shortstr(Gx)
 
     n = Gx.shape[1]
 
@@ -421,7 +423,11 @@ def main():
 
     import c_gorbits as cg
 
-    s0 = "0"*n
+    s0 = ["0"]*n
+    if argv.excite:
+        s0[argv.excite] = '1'
+    s0 = ''.join(s0)
+
     s0 = cg.get_uniq(s0)
     assert s0.count('0')+s0.count('1') == len(s0), repr(s0)
     orbits = {s0:1}
