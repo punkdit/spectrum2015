@@ -1,4 +1,109 @@
 
+11/7/16
+=======
+
+Dividing by code lattice isomorphisms (S_4) still doesn't find
+all they symmetry! Left with 11 orbits, eigval degeneracies are
+1, 1, 2, 3, 2, 1, 1. I guess the goal is to get down to 7 orbits
+with non-degenerate eigenvalues.
+
+time ./gorbit.py gcolor compile run isomorph
+guage ops: 18
+qubits: 15
+stabs: 4
+Lattice(3:15, 2:28, 1:18, 0:4)
+isomorphisms: 24
+orbits: 1
+orbits: 2 bdy: 1
+orbits: 4 bdy: 2
+orbits: 7 bdy: 3
+orbits: 9 bdy: 2
+orbits: 10 bdy: 1
+orbits: 11 bdy: 1
+orbits: 11 bdy: 0
+orbits: 11
+[[ 18.   0.   0.  18.   0.   0.   0.   0.   0.   0.   0.]
+ [  0.   6.   3.   6.   0.   0.   6.   3.   0.   0.   0.]
+ [  0.   9.   0.   0.   0.   9.   0.   0.   0.   0.   0.]
+ [  3.  12.   0.  12.   3.   0.   0.   0.   0.   0.   0.]
+ [  0.   0.   0.   6.   6.   0.  12.   0.   0.   0.   0.]
+ [  0.   0.   3.   0.   0.  -6.   6.   3.   0.   6.   0.]
+ [  0.   6.   0.   0.   3.   6.   0.   0.   3.   0.   0.]
+ [  0.   9.   0.   0.   0.   9.   0.   0.   0.   0.   0.]
+ [  0.   0.   0.   0.   0.   0.  12.   0.  -6.   6.   0.]
+ [  0.   0.   0.   0.   0.  12.   0.   0.   3. -12.   3.]
+ [  0.   0.   0.   0.   0.   0.   0.   0.   0.  18. -18.]]
+eigval, degeneracy:
+    (-25.4558441227+0j) 1
+    (-16.9705627485+0j) 1
+    (-8.48528137424+0j) 2
+    (5.38276234133e-16-1.71427025476e-16j) 3
+    (8.48528137424+0j) 2
+    (16.9705627485+0j) 1
+    (25.4558441227+0j) 1
+
+
+
+
+time ./gorbit.py size=1 gcolor run
+guage ops: 18
+qubits: 15
+stabs: 4
+Lattice(3:15, 2:28, 1:18, 0:4)
+orbits: 1
+orbits: 7 bdy: 6
+orbits: 22 bdy: 15
+orbits: 42 bdy: 20
+orbits: 57 bdy: 15
+orbits: 63 bdy: 6
+orbits: 64 bdy: 1
+orbits: 64 bdy: 0
+orbits: 64
+eigval, degeneracy:
+    -25.4558441227 1
+    -16.9705627485 6
+    -8.48528137424 15
+    -5.94889003719e-15 20
+    8.48528137424 15
+    16.9705627485 6
+    25.4558441227 1
+
+
+
+10/7/16
+=======
+
+Only four-fold symmetry in this color code:
+
+time ./gorbit.py size=2 isomorph
+guage ops: 80
+qubits: 65
+stabs: 16
+Lattice(3:65, 2:128, 1:80, 0:16)
+count: 4
+
+real1m40.836s
+user1m40.676s
+
+
+time ./gorbit.py size=2 compile run
+guage ops: 80
+qubits: 65
+stabs: 16
+Lattice(3:65, 2:128, 1:80, 0:16)
+i686-linux-gnu-gcc -O1 -pthread -fno-strict-aliasing -g -fwrapv -Wall -Wstrict-prototypes -fPIC -I/usr/include/python2.7 -I/suphys/sburton/include/python2.7 -c c_gorbits.c -o c_gorbits.o
+i686-linux-gnu-gcc -pthread -shared -Wl,-Bsymbolic-functions -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -g -fwrapv -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security c_gorbits.o -o c_gorbits.so
+orbits: 1
+orbits: 53 bdy: 52
+orbits: 1315 bdy: 1262
+orbits: 20251 bdy: 18936
+orbits: 20251
+
+real3m3.516s
+user3m3.204s
+
+
+
 time ./gorbit.py compile size=2
 guage ops: 80
 qubits: 65
