@@ -134,6 +134,48 @@ def orbiham(H):
     return H
 
 
+def sparse_orbiham_nx(n, H):
+    import networkx as nx
+    from networkx.algorithms.isomorphism import GraphMatcher
+
+    bag = nx.Graph()
+    for i in range(n):
+        bag.add_node(i, syndrome=H[i,i])
+
+    for i in range(n):
+      for j in range(n):
+        if i==j:
+            continue
+        if H.get((i, j)):
+            bag.add_edge(i, j)
+
+    def node_match(n0, n1):
+        return n0['syndrome'] == n1['syndrome']
+
+    matcher = GraphMatcher(bag, bag, node_match=node_match)
+
+    print "search..."
+
+    graph = nx.Graph()
+    for i in range(n):
+        graph.add_node(i)
+
+    count = 0
+    for iso in matcher.isomorphisms_iter(): # too slow :P
+        #print iso
+        write('.')
+        for i, j in iso.items():
+            graph.add_edge(i, j)
+        count += 1
+    print
+
+    equs = nx.connected_components(graph)
+    m = len(equs)
+
+    print "isomorphisms:", count
+    print "components:", m
+
+
 def sparse_orbiham(n, H):
     from isomorph import from_sparse_ham, search
     import networkx as nx
@@ -179,46 +221,68 @@ def sparse_orbiham(n, H):
     return H
 
 
-def sparse_orbiham_nx(n, H):
-    import networkx as nx
-    from networkx.algorithms.isomorphism import GraphMatcher
+def sparse_orbiham_nauty(n, degree, H):
 
-    bag = nx.Graph()
-    for i in range(n):
-        bag.add_node(i, syndrome=H[i,i])
+    idxs = H.keys()
+    idxs.sort()
+    edges = len(idxs) - n
+    assert len([0 for i, j in idxs if i!=j])==edges
+        
+    import pnauty
+    print "pnauty.init_graph", n, edges, degree
+    assert n*degree == edges
+    pnauty.init_graph(n, edges, degree)
 
-    for i in range(n):
-      for j in range(n):
+    i0 = None
+    for idx in idxs:
+        i, j = idx
         if i==j:
             continue
-        if H.get((i, j)):
-            bag.add_edge(i, j)
+        if i != i0:
+            edge = 0
+            i0 = i
+        else:
+            edge += 1
+        assert edge < degree
+        #print "add_edge", (i, j, edge)
+        pnauty.add_edge(i, j, edge)
 
-    def node_match(n0, n1):
-        return n0['syndrome'] == n1['syndrome']
+    #pnauty.search()
+    #return
 
-    matcher = GraphMatcher(bag, bag, node_match=node_match)
+    verts = range(n)
+    verts.sort(key = lambda i : H[i, i])
+    label = None
+    for idx in range(n-1):
+        i0 = verts[idx]
+        i1 = verts[idx+1]
+        if H[i0, i0] == H[i1, i1]:
+            pnauty.set_partition(idx, i0, 1)
+        else:
+            pnauty.set_partition(idx, i0, 0)
+    pnauty.set_partition(n-1, verts[-1], 0)
 
-    print "search..."
+    print "pnauty.search"
+    orbits = pnauty.search()
+    canonical = list(set(orbits))
+    canonical.sort()
+    print "orbits:", len(canonical)
+    
 
-    graph = nx.Graph()
+    # cyclic graph example
+    """
     for i in range(n):
-        graph.add_node(i)
+        pnauty.add_edge(i, (i+1)%n, 0)
+        pnauty.add_edge(i, (i-1)%n, 1)
+    
+    for i in range(n):
+        pnauty.set_partition(i, i, 1)
 
-    count = 0
-    for iso in matcher.isomorphisms_iter(): # too slow :P
-        #print iso
-        write('.')
-        for i, j in iso.items():
-            graph.add_edge(i, j)
-        count += 1
-    print
+    print "search:"
+    pnauty.search()
+    """
 
-    equs = nx.connected_components(graph)
-    m = len(equs)
 
-    print "isomorphisms:", count
-    print "components:", m
 
 
 
@@ -271,7 +335,8 @@ def main():
 
     Gxr = row_reduce(Gxr, truncate=True)
 
-    print "Gxr:", len(Gxr)
+    mr = len(Gxr)
+    print "Gxr:", mr
     print shortstr(Gxr)
 
     import networkx as nx
@@ -311,7 +376,7 @@ def main():
             show_eigs(vals)
 
     else:
-        print "building H..."
+        print "building H",
         H = {}
 
         for i, v in enumerate(verts):
@@ -325,10 +390,15 @@ def main():
                 j = lookup[v1.tostring()]
                 H[i, j] = H.get((i, j), 0) + 1
     
-        print "nnz:", len(H)
+        print "\nnnz:", len(H)
+        for i in range(len(verts)):
+            assert H.get((i, i)) is not None, i
 
         if argv.orbiham:
-            H1 = sparse_orbiham(len(verts), H)
+            H1 = sparse_orbiham_nauty(len(verts), mr, H)
+            if not H1:
+                return
+
             print "orbiham:"
             print H1
             vals, vecs = numpy.linalg.eig(H1)

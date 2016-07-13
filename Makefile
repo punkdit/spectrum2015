@@ -27,4 +27,7 @@ spectrum: spectrum.tex refs.bib
 	pdflatex spectrum.tex
 	open spectrum.pdf 
 
+pnauty.so: pnauty.c
+	gcc -g -shared -I/usr/include/python2.7 -o pnauty.so -O3 -march=i686 pnauty.c nauty/nauty.a -lefence -lpython2.7
+
 
