@@ -289,6 +289,7 @@ def build_gcolor(size):
     return Gx, Gz, Hx
 
 
+
 def build_compass(l):
 
     n = l**2
@@ -397,6 +398,11 @@ def main():
         l = argv.get('l', 3)
         Gx, Gz, Hx = build_compass(l)
 
+    elif argv.flatgcolor:
+
+        from gcolor import build as build_gcolor
+        Gx, Gz, Hx = build_gcolor()
+
     else:
 
         return
@@ -408,14 +414,16 @@ def main():
     perms = [tuple(range(n))]
     if argv.isomorph:
         perms = build_isomorph(Gx)
-    print perms[:10]
+    #print perms[:10]
 
     if argv.compile:
+        print "gen..."
         gen_code(n, Gx, Hx, perms)
         try:
             os.unlink("c_gorbits.so")
         except:
             pass
+        print "build..."
         build()
 
         if not argv.run:
@@ -450,10 +458,11 @@ def main():
         bdy = _bdy
         print "orbits:", len(orbits), "bdy:", len(bdy)
 
-        if len(orbits)>5000:
-            break
+        #if len(orbits)>5000:
+        #    break
 
     print "orbits:", len(orbits)
+    print "done"
     orbits = list(orbits.keys())
     orbits.sort()
 
