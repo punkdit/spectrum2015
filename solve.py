@@ -655,7 +655,7 @@ def image(H):
     image = set()
     for v in enum2(n):
         u = dot2(H, v)
-        su = shortstr(u)
+        su = u.tostring()
         if su in image:
             continue
         image.add(su)
