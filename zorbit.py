@@ -142,7 +142,10 @@ def sparse_orbiham(n, H):
     for i in range(n):
         graph.add_node(i)
 
+    print "bag0"
     bag0 = from_sparse_ham(n, H)
+
+    print "bag1"
     bag1 = from_sparse_ham(n, H)
 
     print "search..."
@@ -176,24 +179,37 @@ def sparse_orbiham(n, H):
     return H
 
 
-def sparse_orbiham_2(n, H):
-    from isomorph import from_sparse_ham, search
+def sparse_orbiham_nx(n, H):
     import networkx as nx
+    from networkx.algorithms.isomorphism import GraphMatcher
+
+    bag = nx.Graph()
+    for i in range(n):
+        bag.add_node(i, syndrome=H[i,i])
+
+    for i in range(n):
+      for j in range(n):
+        if i==j:
+            continue
+        if H.get((i, j)):
+            bag.add_edge(i, j)
+
+    def node_match(n0, n1):
+        return n0['syndrome'] == n1['syndrome']
+
+    matcher = GraphMatcher(bag, bag, node_match=node_match)
+
+    print "search..."
 
     graph = nx.Graph()
     for i in range(n):
         graph.add_node(i)
 
-    bag0 = from_sparse_ham(n, H)
-    bag1 = from_sparse_ham(n, H)
-
-    print "search..."
-
     count = 0
-    for fn in search(bag0, bag1):
-        #print fn
+    for iso in matcher.isomorphisms_iter(): # too slow :P
+        #print iso
         write('.')
-        for i, j in fn.items():
+        for i, j in iso.items():
             graph.add_edge(i, j)
         count += 1
     print
@@ -204,18 +220,6 @@ def sparse_orbiham_2(n, H):
     print "isomorphisms:", count
     print "components:", m
 
-    P = numpy.zeros((n, m))
-    Q = numpy.zeros((m, n))
-    for i, equ in enumerate(equs):
-        for j in equ:
-            P[j, i] = 1
-        Q[i, j] = 1
-
-    #print shortstr(P)
-    #print shortstr(Q)
-
-    H = numpy.dot(Q, numpy.dot(H, P))
-    return H
 
 
 def main():

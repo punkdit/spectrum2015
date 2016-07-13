@@ -237,11 +237,8 @@ def from_sparse_ham(n, H):
     for i in range(n):
         p = Point('(%s)'%H[i, i], i)
         points.append(p)
-    for i in range(n):
-      for j in range(n):
-        if i==j:
-            continue
-        if H.get((i, j)):
+    for i, j in H.keys():
+        if i!=j:
             points[i].nbd.append(points[j])
     bag = Bag(points)
     return bag
