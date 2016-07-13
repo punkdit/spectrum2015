@@ -221,12 +221,15 @@ def sparse_orbiham(n, H):
     return H
 
 
-def sparse_orbiham_nauty(n, degree, H):
+def sparse_orbiham_nauty(n, degree, A, U):
 
-    idxs = H.keys()
+    idxs = A.keys()
     idxs.sort()
-    edges = len(idxs) - n
-    assert len([0 for i, j in idxs if i!=j])==edges
+    edges = n*degree
+
+    rows = dict((i, []) for i in range(n))
+    for (i, j) in idxs:
+        rows[i].append(j)
         
     import pnauty
     print "pnauty.init_graph", n, edges, degree
@@ -234,29 +237,31 @@ def sparse_orbiham_nauty(n, degree, H):
     pnauty.init_graph(n, edges, degree)
 
     i0 = None
-    for idx in idxs:
+    #for idx, weight in A.items():
+    for idx in idxs: # sorted
         i, j = idx
-        if i==j:
-            continue
-        if i != i0:
-            edge = 0
-            i0 = i
-        else:
-            edge += 1
-        assert edge < degree
-        #print "add_edge", (i, j, edge)
-        pnauty.add_edge(i, j, edge)
+        assert A[idx] > 0
+        for count in range(A[idx]):
+            if i != i0:
+                edge = 0
+                i0 = i
+            else:
+                edge += 1
+            assert edge < degree
+            #print "add_edge", (i, j, edge)
+            pnauty.add_edge(i, j, edge)
 
     #pnauty.search()
     #return
 
     verts = range(n)
-    verts.sort(key = lambda i : H[i, i])
+    verts.sort(key = lambda i : U[i])
+
     label = None
     for idx in range(n-1):
         i0 = verts[idx]
         i1 = verts[idx+1]
-        if H[i0, i0] == H[i1, i1]:
+        if U[i0] == U[i1]:
             pnauty.set_partition(idx, i0, 1)
         else:
             pnauty.set_partition(idx, i0, 0)
@@ -266,24 +271,25 @@ def sparse_orbiham_nauty(n, degree, H):
     orbits = pnauty.search()
     canonical = list(set(orbits))
     canonical.sort()
-    print "orbits:", len(canonical)
-    
+    N = len(canonical)
+    print "orbits:", N
 
-    # cyclic graph example
-    """
-    for i in range(n):
-        pnauty.add_edge(i, (i+1)%n, 0)
-        pnauty.add_edge(i, (i-1)%n, 1)
-    
-    for i in range(n):
-        pnauty.set_partition(i, i, 1)
+    lookup = {}
+    for i, idx in enumerate(orbits):
+        lookup[i] = canonical.index(idx)
 
-    print "search:"
-    pnauty.search()
-    """
+    H = numpy.zeros((N, N))
+    for idx in range(N):
+        i = canonical[idx]
+        # i indexes a row of A
+        for j in rows[i]:
+            value = A[i, j]
+            jdx = lookup[j]
+            H[idx, jdx] += value
 
+        H[idx, idx] += U[i]
 
-
+    return H
 
 
 def main():
@@ -348,6 +354,7 @@ def main():
         lookup[v.tostring()] = i
         verts.append(v)
     print "span:", len(verts)
+    assert len(lookup) == len(verts)
 
     mz = len(Gz)
     n = len(verts)
@@ -377,26 +384,38 @@ def main():
 
     else:
         print "building H",
-        H = {}
+        A = {} # adjacency
+        U = [] # potential
 
         for i, v in enumerate(verts):
             if i%1000==0:
                 write('.')
             count = dot2(Gz, v).sum()
-            H[i, i] = mz - 2*count
+            #H[i, i] = mz - 2*count
+            U.append(mz - 2*count)
             for g in Gx:
                 v1 = (g+v)%2
                 v1 = rr.reduce(v1)
                 j = lookup[v1.tostring()]
-                H[i, j] = H.get((i, j), 0) + 1
+                A[i, j] = A.get((i, j), 0) + 1
     
-        print "\nnnz:", len(H)
-        for i in range(len(verts)):
-            assert H.get((i, i)) is not None, i
+        print "\nnnz:", len(A)
+        #print A
+        degrees = {} # out-degree
+        for key, value in A.items():
+            i, j = key
+            degrees[i] = degrees.get(i, 0) + value
+        degrees = list(set(degrees.values()))
+        print "degrees:", degrees
+        assert len(degrees) == 1
+        degree = degrees[0]
+
+        #for value in A.values():
+        #    assert value==1
 
         if argv.orbiham:
-            H1 = sparse_orbiham_nauty(len(verts), mr, H)
-            if not H1:
+            H1 = sparse_orbiham_nauty(len(verts), degree, A, U)
+            if H1 is None:
                 return
 
             print "orbiham:"
