@@ -1055,6 +1055,8 @@ automorphisms by ...
 In general there may be more symmetry in the graph that
 we cannot access via a group automorphism.
 
+See also \cite{Cvetkovic1980} chapter 5.
+
 \subsection{Compass model}
 For the next example we take the $l=3$ compass model.
 The gauge group has ...
@@ -1100,6 +1102,11 @@ $\lambda_2 = 9\sqrt{2} + 3\sqrt{10} \cong 22.21475504.$
 This eigenspace is $14$ dimensional.
 This eigenspace has $6$ dimensional support in
 the stabilized subspace.
+
+% RP^3 is homeomorphic to the solid ball with antipodal points identified
+% http://math.stackexchange.com/questions/507783/mathbbrp3-is-homeomorphic-to-the-solid-ball-with-antipodal-points-identifi
+% http://topospaces.subwiki.org/wiki/Homology_of_real_projective_space
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1180,9 +1187,34 @@ For any unit vector $v$ orthogonal to the top eigenspace of $\Ham$ we
 have $v^\top \Ham v \le \lambda_2.$
 
 
-See also,
-\cite{AlShimary2010}.
-And \cite{Jarret2015}.
+In \cite{AlShimary2010}, they 
+build a kind of graph laplacian from a known ground state:
+``This is not a major drawback as there
+are large families of physically relevant states, e.g. the
+Matrix Product States, that are ground states of Hamil-
+tonians which are not known to be gapped or not in two
+or higher dimensions. Such an important example is
+the two-dimensional AKLT model that can support uni-
+versal quantum computation by measurements only, but
+it is not proven yet if it is gapped which would establish
+its fault-tolerance.''
+This Laplacian has the same gap as the Hamiltonian.
+
+It would be nice to connect geometric properties of the
+graph to spectral gap properties. For example, the spectral gap of
+the normalized graph laplacian can be bounded from below
+by the Coarse Ricci curvature \cite{Lin2011}. 
+Unfortunately, it appears
+that there are no good connections between the spectrum
+of the normalized graph laplacian and the spectrum of the adjacency matrix.
+% http://mathoverflow.net/questions/118870/connection-between-eigenvalues-of-matrix-and-its-laplacian
+
+See also \cite{Jarret2014,Jarret2015}. 
+In \cite{Jarret2015modulus} they
+write the Hamiltonian as a sum of the
+the combinatorial graph Laplacian and a (diagonal) potential, 
+and then employ methods from PDE theory \cite{Andrews2011}.
+Also: \cite{Baume2016}. % Michaels' Phd thesis
 
 We expect generic local hamiltonians to be gapless \cite{Movassagh2016}.
 
