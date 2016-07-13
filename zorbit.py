@@ -345,12 +345,17 @@ def main():
     print "Gxr:", mr
     print shortstr(Gxr)
 
-    import networkx as nx
-    graph = nx.Graph()
+    v0 = None
+    excite = argv.excite
+    if excite is not None:
+        v0 = zeros2(n)
+        v0[excite] = 1
 
     verts = []
     lookup = {}
-    for i, v in enumerate(span(Gxr)):
+    for i, v in enumerate(span(Gxr)): # XXX does not scale well
+        if v0 is not None:
+            v = (v+v0)%2
         lookup[v.tostring()] = i
         verts.append(v)
     print "span:", len(verts)
@@ -413,16 +418,22 @@ def main():
         #for value in A.values():
         #    assert value==1
 
-        if argv.orbiham:
-            H1 = sparse_orbiham_nauty(len(verts), degree, A, U)
-            if H1 is None:
-                return
+        if not argv.orbiham:
+            return
 
-            print "orbiham:"
-            print H1
+        H1 = sparse_orbiham_nauty(len(verts), degree, A, U)
+        if H1 is None:
+            return
+
+        print "orbiham:"
+        print H1
+        if len(H1)<=1024 and 0:
             vals, vecs = numpy.linalg.eig(H1)
-            show_eigs(vals)
+        else:
+            from scipy.sparse.linalg import eigs
+            vals, vecs = eigs(H1, k=min(len(H1)-5, 40), which="LM")
 
+        show_eigs(vals)
 
 
 from argv import Argv
