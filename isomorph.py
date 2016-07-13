@@ -232,6 +232,21 @@ class Tanner(Bag):
         return '\n'.join(rows)
 
 
+def from_sparse_ham(n, H):
+    points = []
+    for i in range(n):
+        p = Point('(%s)'%H[i, i], i)
+        points.append(p)
+    for i in range(n):
+      for j in range(n):
+        if i==j:
+            continue
+        if H.get((i, j)):
+            points[i].nbd.append(points[j])
+    bag = Bag(points)
+    return bag
+
+
 def from_ham(H):
     n = len(H)
     points = []
