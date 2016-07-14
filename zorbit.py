@@ -3,11 +3,14 @@
 import sys, os
 
 import numpy
+from scipy import sparse
+from scipy.sparse.linalg import eigs, eigsh
 
 from solve import shortstr, parse, dot2, zeros2, array2
 from solve import row_reduce, RowReduction, span
 
 from lanczos import write, show_eigs
+from code import lstr2
 
 
 def genidx(shape):
@@ -93,7 +96,7 @@ def build_isomorph(Gx):
     return perms
 
 
-def orbiham(H):
+def build_orbiham(H):
     from isomorph import from_ham, search
     import networkx as nx
 
@@ -221,7 +224,9 @@ def sparse_orbiham(n, H):
     return H
 
 
-def sparse_orbiham_nauty(n, degree, A, U):
+def sparse_orbiham_nauty(degree, A, U):
+
+    n = len(U)
 
     idxs = A.keys()
     idxs.sort()
@@ -292,6 +297,69 @@ def sparse_orbiham_nauty(n, degree, A, U):
     return H
 
 
+def do_lanczos(A, U):
+    print "building Hs"
+    H = dict(A)
+    for i in range(len(U)):
+        H[i, i] = H.get((i, i), 0) + U[i]
+    #H1 = sparse.lil_matrix((len(U), len(U)))
+    keys = H.keys()
+    keys.sort()
+    data = []
+    rows = []
+    cols = []
+    for idx in keys:
+        #H1[idx] = H[idx]
+        data.append(H[idx])
+        rows.append(idx[0])
+        cols.append(idx[1])
+    H1 = sparse.coo_matrix((data, (rows, cols)), (len(U), len(U)))
+    H1 = sparse.csr_matrix(H1, dtype=numpy.float64)
+
+    vals, vecs = eigsh(H1, k=min(len(U)-5, 40), which="LM")
+
+    return vals, vecs
+
+
+def do_orbiham(A, U):
+    #print A
+    degrees = {} # out-degree
+    for key, value in A.items():
+        i, j = key
+        degrees[i] = degrees.get(i, 0) + value
+    degrees = list(set(degrees.values()))
+    print "degrees:", degrees
+    assert len(degrees) == 1
+    degree = degrees[0]
+
+    #for value in A.values():
+    #    assert value==1
+
+    H1 = sparse_orbiham_nauty(degree, A, U)
+    if H1 is None:
+        return
+
+    N = len(H1)
+    rows = range(N)
+    rows.sort(key = lambda i : -H1[i, i])
+
+    if 0:
+        print "orbiham:"
+        for i in rows:
+            print "%d:"%i,
+            for j in rows:
+                if H1[i, j]:
+                    print "%d:%d"%(j, H1[i, j]),
+            print
+
+    if len(H1)<=1024 and 0:
+        vals, vecs = numpy.linalg.eig(H1)
+    else:
+        vals, vecs = eigs(H1, k=min(len(H1)-5, 40), which="LM")
+
+    return vals, vecs
+
+
 def main():
 
     if argv.gcolor:
@@ -356,6 +424,7 @@ def main():
     for i, v in enumerate(span(Gxr)): # XXX does not scale well
         if v0 is not None:
             v = (v+v0)%2
+            v = rr.reduce(v)
         lookup[v.tostring()] = i
         verts.append(v)
     print "span:", len(verts)
@@ -372,16 +441,21 @@ def main():
             for g in Gx:
                 v1 = (g+v)%2
                 v1 = rr.reduce(v1)
+                #if v0 is not None:
+                #    v1 = (v0+v1)%2
                 j = lookup[v1.tostring()]
                 H[i, j] += 1
     
-        print H
+        if n <= 64:
+            s = lstr2(H, 0).replace(',  ', ' ')
+            s = s.replace(' 0', ' .')
+            print s
     
-        vals, vecs = numpy.linalg.eig(H)
+        vals, vecs = numpy.linalg.eigh(H)
         show_eigs(vals)
 
         if argv.orbiham:
-            H1 = orbiham(H)
+            H1 = build_orbiham(H)
             print "orbiham:"
             print H1
             vals, vecs = numpy.linalg.eig(H1)
@@ -392,12 +466,14 @@ def main():
         A = {} # adjacency
         U = [] # potential
 
+        offset = mz + 1 # make H positive definite
+
         for i, v in enumerate(verts):
             if i%1000==0:
                 write('.')
             count = dot2(Gz, v).sum()
             #H[i, i] = mz - 2*count
-            U.append(mz - 2*count)
+            U.append(offset + mz - 2*count)
             for g in Gx:
                 v1 = (g+v)%2
                 v1 = rr.reduce(v1)
@@ -405,44 +481,17 @@ def main():
                 A[i, j] = A.get((i, j), 0) + 1
     
         print "\nnnz:", len(A)
-        #print A
-        degrees = {} # out-degree
-        for key, value in A.items():
-            i, j = key
-            degrees[i] = degrees.get(i, 0) + value
-        degrees = list(set(degrees.values()))
-        print "degrees:", degrees
-        assert len(degrees) == 1
-        degree = degrees[0]
 
-        #for value in A.values():
-        #    assert value==1
+        if argv.lanczos:
+            vals, vecs = do_lanczos(A, U)
 
-        if not argv.orbiham:
-            return
+        elif argv.orbiham:
+            vals, vecs = do_orbiham(A, U)
 
-        H1 = sparse_orbiham_nauty(len(verts), degree, A, U)
-        if H1 is None:
-            return
-
-        N = len(H1)
-        rows = range(N)
-        rows.sort(key = lambda i : -H1[i, i])
-        H1 = H1[rows, :]
-        H1 = H1[:, rows]
-        print "orbiham:"
-        for i in range(N):
-            print "%d:"%i,
-            for j in range(N):
-                if H1[i, j]:
-                    print "%d:%d"%(j, H1[i, j]),
-            print
-        #print H1
-        if len(H1)<=1024 and 0:
-            vals, vecs = numpy.linalg.eig(H1)
         else:
-            from scipy.sparse.linalg import eigs
-            vals, vecs = eigs(H1, k=min(len(H1)-5, 40), which="LM")
+            return
+
+        vals -= offset # offset doesn't change vecs
 
         show_eigs(vals)
 

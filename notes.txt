@@ -1,4 +1,29 @@
 
+14/7/16
+=======
+
+time ./zorbit.py gcolor2 sparse  lanczos
+span: 262144
+nnz: 7077888
+eigval, degeneracy:
+    71.3182743227 6
+    73.6813685356 6
+    73.703699942 9
+    75.6551362222 6
+    78.7144674149 6
+    82.2652116301 6
+    90.8267233182 1
+
+real 16m4.286s
+user 15m59.140s
+
+
+
+Bug found: Lanczos iteration requires a positive definite matrix
+
+14/7/16
+=======
+
 time ./zorbit.py gcolor2 orbiham sparse
 Hx:
 1111...............1111................
