@@ -425,8 +425,19 @@ def main():
         if H1 is None:
             return
 
+        N = len(H1)
+        rows = range(N)
+        rows.sort(key = lambda i : -H1[i, i])
+        H1 = H1[rows, :]
+        H1 = H1[:, rows]
         print "orbiham:"
-        print H1
+        for i in range(N):
+            print "%d:"%i,
+            for j in range(N):
+                if H1[i, j]:
+                    print "%d:%d"%(j, H1[i, j]),
+            print
+        #print H1
         if len(H1)<=1024 and 0:
             vals, vecs = numpy.linalg.eig(H1)
         else:
