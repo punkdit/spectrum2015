@@ -298,7 +298,7 @@ def sparse_orbiham_nauty(degree, A, U):
 
 
 def do_lanczos(A, U):
-    print "building Hs"
+    print "do_lanczos: building Hs"
     H = dict(A)
     for i in range(len(U)):
         H[i, i] = H.get((i, i), 0) + U[i]
@@ -316,6 +316,7 @@ def do_lanczos(A, U):
     H1 = sparse.coo_matrix((data, (rows, cols)), (len(U), len(U)))
     H1 = sparse.csr_matrix(H1, dtype=numpy.float64)
 
+    print "do_lanczos: eigsh"
     vals, vecs = eigsh(H1, k=min(len(U)-5, 40), which="LM")
 
     return vals, vecs
@@ -388,18 +389,15 @@ def main():
 #        perms = build_isomorph(Gx)
 #    #print perms[:10]
 
-    print "Hx:"
-    print shortstr(Hx)
+    print "Hx:", len(Hx)
+    #print shortstr(Hx)
 
     Hxr = row_reduce(Hx)
 
-    print "Hxr:"
-    print shortstr(Hxr)
+    print "Hxr:", len(Hxr)
+    #print shortstr(Hxr)
 
     rr = RowReduction(Hx)
-
-    #print "Gx:"
-    #print shortstr(Gx)
 
     Gxr = []
     for g in Gx:
@@ -411,7 +409,7 @@ def main():
 
     mr = len(Gxr)
     print "Gxr:", mr
-    print shortstr(Gxr)
+    #print shortstr(Gxr)
 
     v0 = None
     excite = argv.excite

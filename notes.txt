@@ -2,6 +2,33 @@
 14/7/16
 =======
 
+time ./zorbit.py gcolor2 excite=38 sparse lanczos
+span: 262144
+nnz: 7077888
+building Hs
+eigval, degeneracy:
+    75.9733182342 3
+    78.3826290621 3
+    78.6303238176 3
+    81.9333732773 3
+    82.0962886806 3
+    90.4948849654 1 # <---- ouch... it's a fat stabilizer :P
+
+
+time ./zorbit.py gcolor2 excite=0 sparse lanczos
+span: 262144
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+nnz: 7077888
+building Hs
+
+eigval, degeneracy:
+    78.0409318465 3
+    78.535955054 1
+    78.7514474673 1
+    79.0733223938 1
+    86.6024435346 1
+
+
 time ./zorbit.py gcolor2 sparse  lanczos
 span: 262144
 nnz: 7077888
