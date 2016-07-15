@@ -7,7 +7,7 @@ from scipy import sparse
 from scipy.sparse.linalg import eigs, eigsh
 
 from solve import shortstr, parse, dot2, zeros2, array2
-from solve import row_reduce, RowReduction, span
+from solve import row_reduce, RowReduction, span, get_reductor
 
 from lanczos import write, show_eigs
 from code import lstr2
@@ -353,7 +353,7 @@ def do_orbiham(A, U):
                     print "%d:%d"%(j, H1[i, j]),
             print
 
-    if len(H1)<=1024 and 0:
+    if len(H1)<=1024:
         vals, vecs = numpy.linalg.eig(H1)
     else:
         vals, vecs = eigs(H1, k=min(len(H1)-5, 40), which="LM")
@@ -384,11 +384,6 @@ def main():
 
     n = Gx.shape[1]
 
-#    perms = [tuple(range(n))]
-#    if argv.isomorph:
-#        perms = build_isomorph(Gx)
-#    #print perms[:10]
-
     print "Hx:", len(Hx)
     #print shortstr(Hx)
 
@@ -397,22 +392,21 @@ def main():
     print "Hxr:", len(Hxr)
     #print shortstr(Hxr)
 
-    rr = RowReduction(Hx)
+    P = get_reductor(Hx)
 
     Gxr = []
     for g in Gx:
-        g = rr.reduce(g)
+        g = dot2(P, g)
         Gxr.append(g)
     Gxr = array2(Gxr)
-
     Gxr = row_reduce(Gxr, truncate=True)
 
     mr = len(Gxr)
     print "Gxr:", mr
     print shortstr(Gxr)
 
-    if n > 30:
-        return
+    #if n > 30:
+    #    return
 
     v0 = None
     excite = argv.excite
@@ -425,7 +419,7 @@ def main():
     for i, v in enumerate(span(Gxr)): # XXX does not scale well
         if v0 is not None:
             v = (v+v0)%2
-            v = rr.reduce(v)
+            v = dot2(P, v)
         lookup[v.tostring()] = i
         verts.append(v)
     print "span:", len(verts)
@@ -441,9 +435,7 @@ def main():
             H[i, i] = mz - 2*count
             for g in Gx:
                 v1 = (g+v)%2
-                v1 = rr.reduce(v1)
-                #if v0 is not None:
-                #    v1 = (v0+v1)%2
+                v1 = dot2(P, v1)
                 j = lookup[v1.tostring()]
                 H[i, j] += 1
     
@@ -477,7 +469,7 @@ def main():
             U.append(offset + mz - 2*count)
             for g in Gx:
                 v1 = (g+v)%2
-                v1 = rr.reduce(v1)
+                v1 = dot2(P, v1)
                 j = lookup[v1.tostring()]
                 A[i, j] = A.get((i, j), 0) + 1
     

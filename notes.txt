@@ -1,4 +1,28 @@
 
+16/7/16
+=======
+
+
+
+15/7/16
+=======
+
+./configure --with-cc=gcc --with-cxx=g++ --with-fc=gfortran --download-mpich --prefix=/suphys/sburton/ --with-64-bit-indices --known-64-bit-blas-indices --with-blas-lapack-dir=/usr/physics/ic15/composer_xe_2015.0.090/mkl/lib/intel64
+
+./ex3 -eps_hermitian -eps_largest_magnitude -eps_monitor ascii -eps_nev 1 -eps_type power -n 65536 > ex3.1.out
+
+export SLEPC_DIR=/suphys/sburton/local/slepc-3.7.1
+export PETSC_DIR=/suphys/sburton/local/petsc
+export PETSC_ARCH=arch-linux2-c-debug
+
+
+./configure --with-cc=gcc --with-cxx=g++ --with-fc=gfortran --download-mpich --prefix=/suphys/sburton/ --with-64-bit-indices --known-64-bit-blas-indices --with-blas-lapack-dir=/usr/physics/mwa/openblas/
+
+configure petsc:
+
+./configure --with-cc=gcc --with-cxx=g++ --with-fc=gfortran --download-fblaslapack --download-mpich --prefix=/suphys/sburton/ --with-64-bit-indices
+
+
 2-D Laplacian Eigenproblem (matrix-free version), N=4294967296 (65536x65536 grid)
 
 [0]PETSC ERROR: --------------------- Error Message --------------------------------------------------------------
