@@ -86,7 +86,8 @@ int main(int argc,char **argv)
     printf("EPSSetInitialSpace\n");
     Vec iv;
     VecCreateSeq(PETSC_COMM_SELF, N, &iv);
-    ierr = EPSSetInitialSpace(eps, 1, &iv);
+    ierr = EPSSetInitialSpace(eps, 1, &iv);CHKERRQ(ierr);
+    VecDestroy(&iv);
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                       Solve the eigensystem
