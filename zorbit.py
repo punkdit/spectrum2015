@@ -409,7 +409,10 @@ def main():
 
     mr = len(Gxr)
     print "Gxr:", mr
-    #print shortstr(Gxr)
+    print shortstr(Gxr)
+
+    if n > 30:
+        return
 
     v0 = None
     excite = argv.excite

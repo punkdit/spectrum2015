@@ -1,4 +1,38 @@
 
+2-D Laplacian Eigenproblem (matrix-free version), N=4294967296 (65536x65536 grid)
+
+[0]PETSC ERROR: --------------------- Error Message --------------------------------------------------------------
+[0]PETSC ERROR: Argument out of range
+[0]PETSC ERROR: Array too long for BLAS/LAPACK
+[0]PETSC ERROR: See http://www.mcs.anl.gov/petsc/documentation/faq.html for trouble shooting.
+[0]PETSC ERROR: Petsc Release Version 3.7.2, unknown 
+[0]PETSC ERROR: ./ex3 on a arch-linux2-c-debug named stan.physics.usyd.edu.au by sburton Fri Jul 15 01:15:10 2016
+[0]PETSC ERROR: Configure options --with-cc=gcc --with-cxx=g++ --with-fc=gfortran --download-fblaslapack --download-mpich --prefix=/suphys/sburton/ --with-64-bit-indices
+[0]PETSC ERROR: #1 PetscBLASIntCast() line 2253 in /suphys/sburton/include/petscsys.h
+[0]PETSC ERROR: #2 BVDotVec_BLAS_Private() line 262 in /suphys/sburton/local/slepc-3.7.1/src/sys/classes/bv/interface/bvblas.c
+[0]PETSC ERROR: #3 BVDotVec_Svec() line 150 in /suphys/sburton/local/slepc-3.7.1/src/sys/classes/bv/impls/svec/svec.c
+[0]PETSC ERROR: #4 BVDotVec() line 191 in /suphys/sburton/local/slepc-3.7.1/src/sys/classes/bv/interface/bvglobal.c
+[0]PETSC ERROR: #5 BVOrthogonalizeCGS1() line 81 in /suphys/sburton/local/slepc-3.7.1/src/sys/classes/bv/interface/bvorthog.c
+[0]PETSC ERROR: #6 BVOrthogonalizeCGS() line 214 in /suphys/sburton/local/slepc-3.7.1/src/sys/classes/bv/interface/bvorthog.c
+[0]PETSC ERROR: #7 BVOrthogonalizeColumn() line 371 in /suphys/sburton/local/slepc-3.7.1/src/sys/classes/bv/interface/bvorthog.c
+[0]PETSC ERROR: #8 EPSGetStartVector() line 750 in /suphys/sburton/local/slepc-3.7.1/src/eps/interface/epssolve.c
+[0]PETSC ERROR: #9 EPSSolve_Power() line 103 in /suphys/sburton/local/slepc-3.7.1/src/eps/impls/power/power.c
+[0]PETSC ERROR: #10 EPSSolve() line 101 in /suphys/sburton/local/slepc-3.7.1/src/eps/interface/epssolve.c
+[0]PETSC ERROR: #11 main() line 70 in ex3.c
+[0]PETSC ERROR: PETSc Option Table entries:
+[0]PETSC ERROR: -eps_hermitian
+[0]PETSC ERROR: -eps_largest_magnitude
+[0]PETSC ERROR: -eps_monitor ascii
+[0]PETSC ERROR: -eps_nev 1
+[0]PETSC ERROR: -eps_type power
+[0]PETSC ERROR: -n 65536
+[0]PETSC ERROR: ----------------End of Error Message -------send entire error message to petsc-maint@mcs.anl.gov----------
+application called MPI_Abort(MPI_COMM_WORLD, 63) - process 0
+[unset]: aborting job:
+application called MPI_Abort(MPI_COMM_WORLD, 63) - process 0
+
+
+
 14/7/16
 =======
 
