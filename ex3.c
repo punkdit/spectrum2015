@@ -83,6 +83,7 @@ int main(int argc,char **argv)
   */
   ierr = EPSSetFromOptions(eps);CHKERRQ(ierr);
 
+    printf("EPSSetInitialSpace\n");
     Vec iv;
     VecCreateSeq(PETSC_COMM_SELF, N, &iv);
     ierr = EPSSetInitialSpace(eps, 1, &iv);
@@ -91,6 +92,7 @@ int main(int argc,char **argv)
                       Solve the eigensystem
      - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+    printf("EPSSolve\n");
   ierr = EPSSolve(eps);CHKERRQ(ierr);
 
   /*
