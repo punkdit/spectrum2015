@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import sys
-from random import random, randint, shuffle
+from random import random, randint, shuffle, seed
 
 import numpy
 import numpy.random as ra
@@ -13,6 +13,8 @@ def array2(items):
 
 
 def zeros2(*shape):
+    if len(shape)==1 and type(shape[0]) is tuple:
+        shape = shape[0]
     return numpy.zeros(shape, dtype=numpy.int32)
 
 
@@ -616,6 +618,7 @@ def find_kernel(A, inplace=False, check=False, verbose=False):
 
 
 class RowReduction(object):
+    "deprecated: use get_reductor"
     def __init__(self, H):
         self.H = H
         self.H1 = H1 = row_reduce(H, truncate=True)
@@ -641,6 +644,32 @@ class RowReduction(object):
                 v += H1[i]
                 v %= 2
         return v
+
+
+def get_reductor(H):
+    """
+        Construct a projector P onto the complement of the rowspace of H.
+        Multiply with P on the right: u = dot2(v, P).
+    """
+    H = row_reduce(H, truncate=True)
+
+    A = zeros2(H.shape)
+    m, n = H.shape
+    for i in range(m):
+        j = i
+        while j<n and H[i, j] == 0:
+            j += 1
+        if j==n:
+            break
+        A[i, j] = 1
+        assert H[i, j] == 1
+        for i1 in range(i):
+            if H[i1, j]:
+                H[i1] = (H[i1] + H[i])%2
+    #P = identity2(n) + dot2(A.transpose(), H)
+    P = identity2(n) + dot2(H.transpose(), A)
+    P %= 2
+    return P
 
 
 def kernel(H):
@@ -1693,6 +1722,26 @@ def test_fromkernel():
     assert compose2(J.transpose(), f).sum() == 0
 
 
+def test_reductor():
+    #seed(0)
+    #numpy.random.seed(0)
+    m = 10
+    n = 20
+    for trial in range(10):
+        H = rand2(m, n)
+        rr = RowReduction(H)
+        P = get_reductor(H)
+        v = rand2(1, n)
+        v.shape = (n,)
+        vP = dot2(P, v)
+        rrv = rr.reduce(v)
+        vP.shape = rrv.shape
+        #print shortstr(vP)
+        #print shortstr(rrv)
+        assert eq2(vP, rrv)
+
+
+
 if __name__=="__main__":
 
     test_solve()
@@ -1707,6 +1756,7 @@ if __name__=="__main__":
     test_entry()
     test_pushout()
     test_fromkernel()
+    test_reductor()
 
     print "OK"
 
