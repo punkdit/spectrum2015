@@ -370,29 +370,90 @@ def do_orbiham(A, U):
 
     return vals, vecs
 
+class Code(object):
+    def __init__(self, filename):
+        self.filename = filename
+        self.lines = []
+        self.dent = 0
+    def indent(self):
+        self.dent += 1
+    def dedent(self):
+        self.dent -= 1
+    def begin(self):
+        self.append("{")
+        self.indent()
+    def end(self):
+        self.dedent()
+        self.append("}")
+    def append(self, line):
+        line = '    '*self.dent+line
+        self.lines.append(line)
+    def output(self):
+        f = open(self.filename, 'w')
+        for line in self.lines:
+            print >>f, line
+        f.close()
 
-def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Px, Pz, H, **kw):
+
+def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, **kw):
 
     print "slepc"
 
-    n = len(H)
+    r = len(Rx)
+    n = 2**r
+    assert (r<63)
 
-    f = open("body.h", 'w')
+    code = Code("body.h")
 
-    print >>f, "assert(nx == %d);"%n
-    print >>f, "memset(py, 0, sizeof(PetscScalar)*nx);"
+    code.append("#define DIMS (%d)"%n)
+
+    code.append("static void matmult(PetscScalar *py, const PetscScalar *px, long nx)")
+    code.begin()
+    code.append("assert(DIMS == %d);"%n)
+    code.append("assert(nx == %d);"%n)
+    code.append("memset(py, 0, sizeof(PetscScalar)*nx);")
 
     offset = argv.get("offset", 0)
 
-    for i in range(n):
-      for j in range(n):
-        r = H[i, j]
-        if i==j:
-            r += offset
-        if r:
-           print >>f, "py[%d] += %s*px[%d];"%(i, r, j)
+#    for i in range(n):
+#      for j in range(n):
+#        r = H[i, j]
+#        if i==j:
+#            r += offset
+#        if r:
+#           code.append( "py[%d] += %s*px[%d];"%(i, r, j))
 
-    f.close()
+    mz = len(Gz)
+    RR = dot2(Gz, Rx.transpose())
+
+    code.append("long v;")
+    code.append("int k;")
+    code.append("for(v=0; v<%d; v++)"%n)
+    code.begin()
+    PxtQx = dot2(Pxt, Qx)
+    code.append("k = 0;")
+    for row in RR:
+        code.append("k += countbits(v&%d) %% 2;" % getnum(row))
+    code.append("py[v] += px[v] * (%d - 2*k);" % mz)
+    #code.append(r'printf("%%d:%%d ", v, 18-2*k);//%d'%mz)
+    for g in Gx:
+        g = dot2(g, PxtQx)
+        code.append("// %s"%g)
+        g = getnum(g)
+        code.append("py[v^%d] += px[v];"%g)
+    code.end()
+
+    code.end()
+
+    code.output()
+
+def getnum(v):
+    x = 0
+    for i in v:
+        if i:
+            x += 1
+        x *= 2
+    return x/2
 
 
 def main():
@@ -453,11 +514,15 @@ def main():
     PxtQx = dot2(Pxt, Qx)
     lines = [shortstr(dot2(g, PxtQx)) for g in Gx]
     lines.sort()
-    print "PxtQx:"
-    for s in lines:
-        print s
-    print "RzRxt"
-    print shortstr(dot2(Rz, Rx.transpose()))
+    #print "PxtQx:"
+    #for s in lines:
+    #    print s
+    #print "RzRxt"
+    #print shortstr(dot2(Rz, Rx.transpose()))
+
+    if argv.slepc:
+        slepc(**locals())
+        return
 
     v0 = None
     excite = argv.excite
@@ -479,7 +544,7 @@ def main():
     mz = len(Gz)
     n = len(verts)
 
-    if n <= 1024 and argv.solve or argv.slepc:
+    if n <= 1024 and argv.solve:
         H = numpy.zeros((n, n))
         for i, v in enumerate(verts):
             count = dot2(Gz, v).sum()
@@ -492,10 +557,6 @@ def main():
                 j = lookup[v1.tostring()]
                 H[i, j] += 1
     
-        if argv.slepc:
-            slepc(**locals())
-            return
-
         if argv.showham:
             s = lstr2(H, 0).replace(',  ', ' ')
             s = s.replace(' 0', ' .')

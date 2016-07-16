@@ -8,6 +8,20 @@ static char help[] = "help !";
 /*
    User-defined routines
 */
+
+static int
+countbits(long v)
+{
+    int c;
+    for(c = 0; v; v >>= 1)
+    {
+      c += v & 1;
+    }
+    return c;
+}
+
+#include "body.h"
+
 #undef __FUNCT__
 #define __FUNCT__ "MatMult_Hamiltonian"
 /*
@@ -28,10 +42,12 @@ PetscErrorCode MatMult_Hamiltonian(Mat A,Vec x,Vec y)
   ierr = VecGetArray(y,&py);CHKERRQ(ierr);
 
     printf(".");
+    fflush(stdout);
     //printf("%f ", px[0]);
 
 // do it here
-#include "body.h"
+
+    matmult(py, px, nx);
 
   ierr = VecRestoreArrayRead(x,&px);CHKERRQ(ierr);
   ierr = VecRestoreArray(y,&py);CHKERRQ(ierr);
@@ -39,6 +55,26 @@ PetscErrorCode MatMult_Hamiltonian(Mat A,Vec x,Vec y)
 }
 
 #undef __FUNCT__
+
+void
+dump(nx)
+{
+    PetscScalar *px, *py;
+    long i, j;
+    px = (PetscScalar *)alloca(sizeof(PetscScalar)*nx);
+    py = (PetscScalar *)alloca(sizeof(PetscScalar)*nx);
+    for(i=0; i<nx; i++)
+    {
+        memset(px, 0, sizeof(PetscScalar)*nx);
+        memset(py, 0, sizeof(PetscScalar)*nx);
+        px[i] = 1.;
+
+        matmult(py, px, nx);
+        for(j=0; j<nx; j++)
+            printf("%.0f ", py[j]);
+        printf("\n");
+    }
+}
 
 
 #undef __FUNCT__
@@ -49,16 +85,19 @@ int main(int argc,char **argv)
   EPS            eps;             /* eigenproblem solver context */
   EPSType        type;
   PetscMPIInt    size;
-  PetscInt       N,n=10,nev;
+  PetscInt       n,nev;
   PetscBool      terse;
   PetscErrorCode ierr;
+
+    n = DIMS;
 
   SlepcInitialize(&argc,&argv,(char*)0,help);
   ierr = MPI_Comm_size(PETSC_COMM_WORLD,&size);CHKERRQ(ierr);
   if (size != 1) SETERRQ(PETSC_COMM_WORLD,1,"This is a uniprocessor example only");
 
-  ierr = PetscOptionsGetInt(NULL,NULL,"-n",&n,NULL);CHKERRQ(ierr);
   ierr = PetscPrintf(PETSC_COMM_WORLD,"\nHamiltonian Eigenproblem (matrix-free version), n=%D\n\n",n);CHKERRQ(ierr);
+
+//    dump(DIMS);
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
      Compute the operator matrix that defines the eigensystem, Ax=kx
