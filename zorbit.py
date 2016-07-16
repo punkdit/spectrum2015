@@ -6,8 +6,9 @@ import numpy
 from scipy import sparse
 from scipy.sparse.linalg import eigs, eigsh
 
-from solve import shortstr, parse, dot2, zeros2, array2
+from solve import shortstr, parse, eq2, dot2, zeros2, array2, identity2
 from solve import row_reduce, RowReduction, span, get_reductor
+from solve import u_inverse
 
 from lanczos import write, show_eigs
 from code import lstr2
@@ -74,7 +75,16 @@ def build_compass(l):
         Hx[idx, coords[j, idx]] = 1
         Hx[idx, coords[j, idx+1]] = 1
 
-    return Gx, Gz, Hx
+    mz = l-1
+    Hz = zeros2(mz, n)
+    for idx in range(l-1):
+      for j in range(l):
+        Hz[idx, coords[idx, j]] = 1
+        Hz[idx, coords[idx+1, j]] = 1
+
+    assert dot2(Hx, Hz.transpose()).sum() == 0
+
+    return Gx, Gz, Hx, Hz
 
 
 def build_isomorph(Gx):
@@ -361,20 +371,46 @@ def do_orbiham(A, U):
     return vals, vecs
 
 
+def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Px, Pz, H, **kw):
+
+    print "slepc"
+
+    n = len(H)
+
+    f = open("body.h", 'w')
+
+    print >>f, "assert(nx == %d);"%n
+    print >>f, "memset(py, 0, sizeof(PetscScalar)*nx);"
+
+    offset = argv.get("offset", 0)
+
+    for i in range(n):
+      for j in range(n):
+        r = H[i, j]
+        if i==j:
+            r += offset
+        if r:
+           print >>f, "py[%d] += %s*px[%d];"%(i, r, j)
+
+    f.close()
+
+
 def main():
 
     if argv.gcolor:
         size = argv.get("size", 1)
         Gx, Gz, Hx = build_gcolor(size)
+        Hz = Hx.copy()
 
     elif argv.compass:
         l = argv.get('l', 3)
-        Gx, Gz, Hx = build_compass(l)
+        Gx, Gz, Hx, Hz = build_compass(l)
 
     elif argv.gcolor2:
 
         from gcolor import build as build1
         Gx, Gz, Hx = build1()
+        Hz = Hx.copy()
 
     else:
 
@@ -387,26 +423,41 @@ def main():
     print "Hx:", len(Hx)
     #print shortstr(Hx)
 
-    Hxr = row_reduce(Hx)
-
-    print "Hxr:", len(Hxr)
+    #Hxr = row_reduce(Hx)
+    #print "Hxr:", len(Hxr)
     #print shortstr(Hxr)
 
-    P = get_reductor(Hx)
+    # projector onto complement of rowspan of Hx
+    Px = get_reductor(Hx) 
+    Pz = get_reductor(Hz) 
 
-    Gxr = []
-    for g in Gx:
-        g = dot2(P, g)
-        Gxr.append(g)
-    Gxr = array2(Gxr)
-    Gxr = row_reduce(Gxr, truncate=True)
+    Rx = [dot2(Px, g) for g in Gx]
+    Rx = array2(Rx)
+    Rx = row_reduce(Rx, truncate=True)
+    rx = len(Rx)
+    print "Rx:", rx
+    #print shortstr(Rx)
 
-    mr = len(Gxr)
-    print "Gxr:", mr
-    print shortstr(Gxr)
+    Qx = u_inverse(Rx)
+    Pxt = Px.transpose()
+    assert eq2(dot2(Rx, Qx), identity2(rx))
+    assert eq2(dot2(Rx, Pxt), Rx)
 
-    #if n > 30:
-    #    return
+    Rz = [dot2(Pz, g) for g in Gz]
+    Rz = array2(Rz)
+    Rz = row_reduce(Rz, truncate=True)
+    rz = len(Rz)
+    print "Rx:", rx
+
+    #print shortstr(dot2(Pxt, Qx))
+    PxtQx = dot2(Pxt, Qx)
+    lines = [shortstr(dot2(g, PxtQx)) for g in Gx]
+    lines.sort()
+    print "PxtQx:"
+    for s in lines:
+        print s
+    print "RzRxt"
+    print shortstr(dot2(Rz, Rx.transpose()))
 
     v0 = None
     excite = argv.excite
@@ -416,10 +467,10 @@ def main():
 
     verts = []
     lookup = {}
-    for i, v in enumerate(span(Gxr)): # XXX does not scale well
+    for i, v in enumerate(span(Rx)): # XXX does not scale well
         if v0 is not None:
             v = (v+v0)%2
-            v = dot2(P, v)
+            v = dot2(Px, v)
         lookup[v.tostring()] = i
         verts.append(v)
     print "span:", len(verts)
@@ -428,18 +479,24 @@ def main():
     mz = len(Gz)
     n = len(verts)
 
-    if n <= 1024 and not argv.sparse:
+    if n <= 1024 and argv.solve or argv.slepc:
         H = numpy.zeros((n, n))
         for i, v in enumerate(verts):
             count = dot2(Gz, v).sum()
+            Pxv = dot2(Px, v)
+            assert count == dot2(Gz, Pxv).sum()
             H[i, i] = mz - 2*count
             for g in Gx:
                 v1 = (g+v)%2
-                v1 = dot2(P, v1)
+                v1 = dot2(Px, v1)
                 j = lookup[v1.tostring()]
                 H[i, j] += 1
     
-        if n <= 64:
+        if argv.slepc:
+            slepc(**locals())
+            return
+
+        if argv.showham:
             s = lstr2(H, 0).replace(',  ', ' ')
             s = s.replace(' 0', ' .')
             print s
@@ -454,7 +511,7 @@ def main():
             vals, vecs = numpy.linalg.eig(H1)
             show_eigs(vals)
 
-    else:
+    elif argv.sparse:
         print "building H",
         A = {} # adjacency
         U = [] # potential
@@ -469,7 +526,7 @@ def main():
             U.append(offset + mz - 2*count)
             for g in Gx:
                 v1 = (g+v)%2
-                v1 = dot2(P, v1)
+                v1 = dot2(Px, v1)
                 j = lookup[v1.tostring()]
                 A[i, j] = A.get((i, j), 0) + 1
     

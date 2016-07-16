@@ -27,24 +27,26 @@ def gen_code(n, Gx, Hx, perms):
 #include "Python.h"
     """
 
-    if 1:
+    if 0:
         # char bitvectors
         print >>output, r"""
 
+#define NBITS (%(n)s)
+
 typedef struct _bv
-{char bits[%(n)s+1];}
+{char bits[NBITS+1];}
 Bitvec;
 
 static Bitvec s_uniq;
 
-#define BV_ASSERT(bv) { int i; for(i=0;i<%(n)s;i++) assert((bv).bits[i]=='0' || (bv).bits[i]=='1'); assert((bv).bits[i]==0); }
+#define BV_ASSERT(bv) { int i; for(i=0;i<NBITS;i++) assert((bv).bits[i]=='0' || (bv).bits[i]=='1'); assert((bv).bits[i]==0); }
 
 //#define BV_ASSERT(bv) 
 
 //#define BV_CLR(bv)  {(bv).bits[0] = 0;}
 #define BV_CLR(bv)  {memset(&bv, 0, sizeof(Bitvec));}
 #define BV_SET(tgt, src)  {memcpy((tgt).bits, (src).bits, sizeof(tgt));}
-#define BV_CMP(tgt, src)  strncmp((tgt).bits, (src).bits, %(n)s+1)
+#define BV_CMP(tgt, src)  strncmp((tgt).bits, (src).bits, NBITS+1)
 #define BV_FLIP(tgt, i) {(tgt).bits[(i)] = '0'+'1'-(tgt).bits[(i)];}
 #define BV_SETBIT(tgt, src, i) {(tgt).bits[(i)] = (src).bits[(i)];}
 #define BV_SETMAP(tgt, src, i, j) {(tgt).bits[(i)] = (src).bits[(j)];}
@@ -55,13 +57,13 @@ void
 BV_TOSTRING(char *str, Bitvec bv)
 {
     BV_ASSERT(bv);
-    strncpy(str, bv.bits, %(n)s+1);
+    strncpy(str, bv.bits, NBITS+1);
 }
 
 void
 BV_FROMSTRING(Bitvec *bv, const char *str)
 {
-    strncpy(bv->bits, str, %(n)s+1);
+    strncpy(bv->bits, str, NBITS+1);
     BV_ASSERT(*bv);
 }
 
@@ -71,13 +73,15 @@ BV_FROMSTRING(Bitvec *bv, const char *str)
         # int bitvectors
         print >>output, r"""
 
+#define NBITS (%(n)s)
+
 typedef struct _bv
-{int bits[%(n)s];}
+{int bits[NBITS];}
 Bitvec;
 
 static Bitvec s_uniq;
 
-#define BV_ASSERT(bv) { int i; for(i=0;i<%(n)s;i++) assert((bv).bits[i]==0 || (bv).bits[i]==1); }
+#define BV_ASSERT(bv) { int i; for(i=0;i<NBITS;i++) assert((bv).bits[i]==0 || (bv).bits[i]==1); }
 
 #define BV_CLR(bv)  {memset(&bv, 0, sizeof(Bitvec));}
 #define BV_SET(tgt, src)  {memcpy(&tgt, &src, sizeof(Bitvec));}
@@ -93,7 +97,7 @@ BV_TOSTRING(char *str, Bitvec bv)
 {
     BV_ASSERT(bv);
     int i;
-    for(i=0;i<%(n)s;i++)
+    for(i=0;i<NBITS;i++)
         str[i] = '0' + bv.bits[i];
     str[i] = 0;
 }
@@ -102,7 +106,7 @@ void
 BV_FROMSTRING(Bitvec *bv, const char *str)
 {
     int i;
-    for(i=0;i<%(n)s;i++)
+    for(i=0;i<NBITS;i++)
         bv->bits[i] = str[i]-'0';
     BV_ASSERT(*bv);
 }
@@ -114,7 +118,7 @@ BV_FROMSTRING(Bitvec *bv, const char *str)
 static void
 list_append(PyObject *items, Bitvec bv)
 {
-    char str[%(n)s+1];
+    char str[NBITS+1];
     BV_ASSERT(bv);
     BV_TOSTRING(str, bv);
     PyObject *string = PyString_FromString(str);
@@ -222,7 +226,7 @@ get_gauge(PyObject *self, PyObject *args)
         return NULL;
 
     //printf("get_gauge: s_arg = %%s\n", s_arg);
-    assert(strlen(s_arg)==%(n)s);
+    assert(strlen(s_arg)==NBITS);
     BV_FROMSTRING(&src, s_arg);
 
     fill_gauge(src);
@@ -235,7 +239,6 @@ get_gauge(PyObject *self, PyObject *args)
 }
 
 #define NGAUGE (%(ng)s)
-#define NBITS (%(n)s)
 #include "c_gorbits.h"
 
 static PyMethodDef OrbitsMethods[] = 

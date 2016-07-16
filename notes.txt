@@ -1,6 +1,170 @@
 
+
+
+
+./ex3 -n 64 -eps_nev 5 -eps_type arnoldi -eps_largest_real
+
+Hamiltonian Eigenproblem (matrix-free version), n=64
+
+EPSSolve
+.................................... Solution method: arnoldi
+
+ Number of requested eigenvalues: 5
+ Linear eigensolve converged (10 eigenpairs) due to CONVERGED_TOL; iterations 2
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+.       25.455844            3.98097e-16
+.       16.970563            6.12659e-16
+.       16.970563            9.89978e-16
+.       16.970563            4.84126e-16
+.       16.970563            2.59169e-16
+.       16.970563            3.16837e-16
+.       16.970563            3.33551e-16
+.        8.485281            5.41196e-16
+.        8.485281            1.11354e-15
+.        8.485281            7.89887e-16
+ ---------------------- --------------------
+
+
+
+17/7/16
+=======
+
+hacked on arch-linux2-c-debug/lib/petsc/conf/petscvariables
+to get it to link to the libmkl_intel_ilp64.
+
+
+  I think it failed because of the goofy way Matt wants libraries passed in. He wants \[-L/usr/physics/ic15/composer_xe_2015.0.090/mkl/lib/intel64/,libmkl_intel_ilp64.so,libmkl_sequential.so,libmkl_core.so\]
+
+
+same problem with OpenBlas
+
+Breakpoint 2, 0x00007ffff4f4cbd0 in dgemv_ ()
+   from /usr/physics/ic15/composer_xe_2015.0.090/mkl/lib/intel64/libmkl_intel_lp64.so
+(gdb) bt
+#0  0x00007ffff4f4cbd0 in dgemv_ () from /usr/physics/ic15/composer_xe_2015.0.090/mkl/lib/intel64/libmkl_intel_lp64.so
+#1  0x00007ffff5e14b4b in BVDotVec_BLAS_Private (bv=0x6ba6b0, n_=4294967296, k_=1, A=0x7fe7f23b3650, x=0x7fe7f23b3650, 
+    y=0x75a3b0, mpi=PETSC_FALSE) at /suphys/sburton/local/slepc-3.7.1/src/sys/classes/bv/interface/bvblas.c:274
+#2  0x00007ffff5dcbd86 in BVDotVec_Svec (X=0x6ba6b0, y=0x74dbc0, m=0x75a3b0)
+    at /suphys/sburton/local/slepc-3.7.1/src/sys/classes/bv/impls/svec/svec.c:150
+#3  0x00007ffff5dffd58 in BVDotVec (X=0x6ba6b0, y=0x74dbc0, m=0x75a3b0)
+    at /suphys/sburton/local/slepc-3.7.1/src/sys/classes/bv/interface/bvglobal.c:191
+#4  0x00007ffff5e1aad9 in BVOrthogonalizeCGS1 (bv=0x6ba6b0, j=0, v=0x0, H=0x75a3b0, onorm=0x7fffffffdc28, 
+    norm=0x7fffffffdc20) at /suphys/sburton/local/slepc-3.7.1/src/sys/classes/bv/interface/bvorthog.c:81
+#5  0x00007ffff5e1c1bb in BVOrthogonalizeCGS (bv=0x6ba6b0, j=0, v=0x0, H=0x0, norm=0x7fffffffddb0, lindep=0x7fffffffddac)
+    at /suphys/sburton/local/slepc-3.7.1/src/sys/classes/bv/interface/bvorthog.c:214
+#6  0x00007ffff5e1ddfd in BVOrthogonalizeColumn (bv=0x6ba6b0, j=0, H=0x0, norm=0x7fffffffddb0, lindep=0x7fffffffddac)
+    at /suphys/sburton/local/slepc-3.7.1/src/sys/classes/bv/interface/bvorthog.c:371
+#7  0x00007ffff6050986 in EPSGetStartVector (eps=0x6a3ee0, i=0, breakdown=0x0)
+    at /suphys/sburton/local/slepc-3.7.1/src/eps/interface/epssolve.c:758
+#8  0x00007ffff5f52812 in EPSSolve_Power (eps=0x6a3ee0) at /suphys/sburton/local/slepc-3.7.1/src/eps/impls/power/power.c:103
+#9  0x00007ffff6049b28 in EPSSolve (eps=0x6a3ee0) at /suphys/sburton/local/slepc-3.7.1/src/eps/interface/epssolve.c:101
+#10 0x0000000000401430 in main ()
+(gdb) up
+#1  0x00007ffff5e14b4b in BVDotVec_BLAS_Private (bv=0x6ba6b0, n_=4294967296, k_=1, A=0x7fe7f23b3650, x=0x7fe7f23b3650, 
+    y=0x75a3b0, mpi=PETSC_FALSE) at /suphys/sburton/local/slepc-3.7.1/src/sys/classes/bv/interface/bvblas.c:274
+274    if (n) PetscStackCallBLAS("BLASgemv",BLASgemv_("C",&n,&k,&done,A,&n,x,&one,&zero,y,&one));
+(gdb) print n
+$1 = 4294967296
+(gdb) print sizeof(n)
+$2 = 8
+(gdb) step
+Single stepping until exit from function dgemv_,
+which has no line number information.
+
+Intel MKL ERROR: Parameter 6 was incorrect on entry to DGEMV .
+PetscMallocValidate (line=274, function=0x7ffff620ebd0 "BVDotVec_BLAS_Private", 
+    file=0x7ffff620e950 "/suphys/sburton/local/slepc-3.7.1/src/sys/classes/bv/interface/bvblas.c")
+    at /suphys/sburton/local/petsc/src/sys/memory/mtr.c:128
+
+
+
+./eps/interface/epssolve.c:// some hacking - SB
+
+
+
+[1]+  Exit 1                  nice nohup ./ex3 -eps_nev 1 -eps_type power -n 65536 -info -eps_ncv 2 -eps_mpd 1 > ex3.2.out
+anne.physics.usyd.edu.au:spectrum2015$ 
+anne.physics.usyd.edu.au:spectrum2015$ cat ex3.2.out 
+[0] PetscInitialize(): PETSc successfully started: number of processors = 1
+[0] PetscInitialize(): Running on machine: anne.physics.usyd.edu.au
+[0] SlepcInitialize(): SLEPc successfully started
+
+2-D Laplacian Eigenproblem (matrix-free version), N=4294967296 (65536x65536 grid)
+
+[0] PetscCommDuplicate(): Duplicating a communicator 1140850688 -2080374784 max tags = 536870911
+[0] PetscCommDuplicate(): Using internal PETSc communicator 1140850688 -2080374784
+EPSSolve
+[0] EPSSetUp_Power(): Warning: parameter mpd ignored
+[0] STSetUp(): Setting up new ST
+BVSetRandomColumn: 0
+
+Intel MKL ERROR: Parameter 6 was incorrect on entry to DGEMV .
+[0] BV_SafeSqrt(): Zero norm, either the vector is zero or a semi-inner product is being used
+
+Intel MKL ERROR: Parameter 6 was incorrect on entry to DGEMV .
+[0]PETSC ERROR: --------------------- Error Message --------------------------------------------------------------
+[0]PETSC ERROR: Initial vector is zero or belongs to the deflation space
+[0]PETSC ERROR: See http://www.mcs.anl.gov/petsc/documentation/faq.html for trouble shooting.
+[0]PETSC ERROR: Petsc Release Version 3.7.2, unknown 
+[0]PETSC ERROR: ./ex3 on a arch-linux2-c-debug named anne.physics.usyd.edu.au by sburton Sat Jul 16 21:29:09 2016
+[0]PETSC ERROR: Configure options --with-cc=gcc --with-cxx=g++ --with-fc=gfortran --download-mpich --prefix=/suphys/sburton/ --with-64-bit-indices --known-64-bit-blas-indices --with-blas-lapack-dir=/usr/physics/ic15/composer_xe_2015.0.090/mkl/lib/intel64
+[0]PETSC ERROR: #1 EPSGetStartVector() line 761 in /suphys/sburton/local/slepc-3.7.1/src/eps/interface/epssolve.c
+[0]PETSC ERROR: #2 EPSSolve_Power() line 103 in /suphys/sburton/local/slepc-3.7.1/src/eps/impls/power/power.c
+[0]PETSC ERROR: #3 EPSSolve() line 101 in /suphys/sburton/local/slepc-3.7.1/src/eps/interface/epssolve.c
+[0]PETSC ERROR: #4 main() line 100 in ex3.c
+[0]PETSC ERROR: PETSc Option Table entries:
+[0]PETSC ERROR: -eps_mpd 1
+[0]PETSC ERROR: -eps_ncv 2
+[0]PETSC ERROR: -eps_nev 1
+[0]PETSC ERROR: -eps_type power
+[0]PETSC ERROR: -info
+[0]PETSC ERROR: -n 65536
+[0]PETSC ERROR: ----------------End of Error Message -------send entire error message to petsc-maint@mcs.anl.gov----------
+application called MPI_Abort(MPI_COMM_WORLD, 1) - process 0
+[unset]: aborting job:
+application called MPI_Abort(MPI_COMM_WORLD, 1) - process 0
+
+
+
 16/7/16
 =======
+
+
+
+time ./zorbit.py gcolor2 orbiham
+Hx: 10
+Hxr: 10
+Gxr: 18
+span: 262144
+nnz: 7077888
+degrees: [63]
+pnauty.init_graph 262144 16515072 63
+pnauty.search
+pnauty.search: Automorphism group size = 36
+orbits: 14400
+
+eigval, degeneracy:
+    (63.5428803189+0j) 3
+    (63.7536750548+0j) 2
+    (65.1198568475+0j) 4
+    (65.1421882538+0j) 4
+    (66.6022115115+0j) 3
+    (67.0936245341+0j) 4
+    (69.2966322895+0j) 2
+    (70.1529557268+0j) 4
+    (71.3182743227+0j) 2
+    (73.6813685356+0j) 2
+    (73.703699942+0j) 3
+    (75.6551362222+0j) 2
+    (78.7144674149+0j) 2
+    (82.2652116301+0j) 2
+    (90.8267233182+0j) 1
+
+real13m42.126s
+user13m26.948s
+
 
 
 
