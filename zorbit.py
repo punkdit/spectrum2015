@@ -430,6 +430,7 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, **kw):
     code.append("int k;")
     code.append("for(v=0; v<%d; v++)"%n)
     code.begin()
+    code.append(r'if(v %% %d == 0) {printf(".");fflush(stdout);}' % (n//128))
     PxtQx = dot2(Pxt, Qx)
     code.append("k = 0;")
     for row in RR:

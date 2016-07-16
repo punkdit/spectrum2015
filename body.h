@@ -8,6 +8,7 @@ static void matmult(PetscScalar *py, const PetscScalar *px, long nx)
     int k;
     for(v=0; v<262144; v++)
     {
+        if(v % 2048 == 0) {printf(".");fflush(stdout);}
         k = 0;
         k += countbits(v&131072) % 2;
         k += countbits(v&65536) % 2;
