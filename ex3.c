@@ -9,6 +9,7 @@ static char help[] = "help !";
    User-defined routines
 */
 
+// see also: https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetNaive
 static int
 countbits(long v)
 {
@@ -41,13 +42,9 @@ PetscErrorCode MatMult_Hamiltonian(Mat A,Vec x,Vec y)
   ierr = VecGetArrayRead(x,&px);CHKERRQ(ierr);
   ierr = VecGetArray(y,&py);CHKERRQ(ierr);
 
-    printf(".");
-    fflush(stdout);
-    //printf("%f ", px[0]);
-
-// do it here
-
+    printf("/"); fflush(stdout);
     matmult(py, px, nx);
+    printf("\\"); fflush(stdout);
 
   ierr = VecRestoreArrayRead(x,&px);CHKERRQ(ierr);
   ierr = VecRestoreArray(y,&py);CHKERRQ(ierr);
