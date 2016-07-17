@@ -1,5 +1,45 @@
 
 
+18/7/16
+=======
+
+with cutoff=10
+
+7 EPS nconv=0 first unconverged value (error) 95.9864 (1.24568490e-02)
+EPSStoppingBasic(): Linear eigensolver finished successfully: 1 eigenpairs converged at iteration 8
+ Linear eigensolve converged (1 eigenpair) due to CONVERGED_TOL; iterations 8
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+       96.011691              0.0080649
+ ---------------------- --------------------
+
+
+
+stan.physics.usyd.edu.au:spectrum2015$ ./ex3  -eps_nev 1 -eps_type arnoldi -info -eps_ncv 2 -eps_monitor -eps_tol 1e-2
+ 7 EPS nconv=0 first unconverged value (error) 96.139 (1.24598429e-02)
+EPSStoppingBasic(): Linear eigensolver finished successfully: 1 eigenpairs converged at iteration 8
+[0]PETSC ERROR: Out of memory. This could be due to allocating
+[0]PETSC ERROR: Memory allocated 206158549104 Memory used by process 199236468736
+[0]PETSC ERROR: Try running with -malloc_dump or -malloc_log for info.
+[0]PETSC ERROR: Memory requested 34359739972
+
+
+
+
+
+17/7/16
+=======
+
+time ./ex3 -eps_nev 1 -eps_ncv 2 -eps_type arnoldi -eps_largest_real -eps_monitor -eps_tol 1e-2 -cutoff 5
+
+
+krylovschur uses one matvec per iteration (except first time), arnoldi uses two matvecs per iteration.
+krylovschur exhausts memory on stan, but lives on anne.
+
+./ex3 -eps_nev 1 -eps_type krylovschur -info -eps_ncv 2 -eps_monitor -eps_tol 1e-2
+
+
 ./ex3 -eps_nev 1 -eps_ncv 2 -eps_type arnoldi -eps_largest_real -eps_monitor -eps_tol 1e-2
 
  Number of requested eigenvalues: 1

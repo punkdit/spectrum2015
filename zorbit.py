@@ -459,6 +459,8 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, **kw):
     cutoff = argv.cutoff
     if cutoff is not None:
         code.append("if(k>%d) continue; // <-------- continue" % cutoff)
+    else:
+        code.append("if(k>cutoff) continue; // <-------- continue")
     code.append("py[v] += pxv * (%d - 2*k);" % mz)
     for gx in uniq_gxs:
         s = '+'.join(['pxv']*gxs.count(gx))
