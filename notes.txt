@@ -3,7 +3,33 @@
 18/7/16
 =======
 
+matvec multiply is divided into 128 "slabs". we record the time taken (seconds) for each slab.
+
+stan is much faster than anne!
+./ex3  -eps_nev 1 -eps_type arnoldi -info -eps_ncv 2 -eps_monitor -eps_tol 1e-2 -cutoff 200
+/[11s][12s][12s][11s][12s][11s][12s][11s][12s][11s][11s][12s][11s][12s][12s][11s][12s][11s][11s][11s][11s][11s][11s][12s][11s][12s][11s][12s][11s][12s][11s][12s][13s][12s][13s][12s][13s][12s][13s][12s][13s][12s][12s][12s][13s][12s][13s][12s][13s][12s][12s][12s][13s][13s][13s][12s][13s][13s][13s][13s][13s][13s][13s][13s][12s][13s]
+
+
+anne.physics.usyd.edu.au:spectrum2015$
+./ex3 -eps_nev 1 -eps_type krylovschur -info -eps_ncv 2 -eps_monitor -eps_tol 1e-2 -cutoff 40
+/[39s][32s][39s]^C
+
+anne.physics.usyd.edu.au:spectrum2015$ 
+./ex3 -eps_nev 1 -eps_type krylovschur -info -eps_ncv 2 -eps_monitor -eps_tol 1e-2 -cutoff 30
+/[15s][8s][12s][10s][8s][9s][6s][11s][7s][3s][4s][4s][6s][5s][4s][7s][11s][4s][9s][5s][10s][8s][8s][11s][10s][4s][8s][6s][5s][5s][4s][7s][8s][4s][7s][5s][4s][5s][3s][6s][5s][3s][4s][4s][4s][5s][4s][6s][5s][3s][4s][3s][5s][5s][4s][6s][8s][4s][7s][5s][4s][5s][3s][6s][7s][3s][6s][4s][4s][3s][3s][5s][4s][3s][3s][3s][4s][4s][4s][4s][5s][2s][4s][3s][4s][4s]^C
+
+anne.physics.usyd.edu.au:spectrum2015$ 
+./ex3 -eps_nev 1 -eps_type krylovschur -info -eps_ncv 2 -eps_monitor -eps_tol 1e-2 -cutoff 20
+/[3s][2s][2s][3s][2s][2s][2s][3s][2s][2s][2s][3s][2s][2s][3s][2s][2s][3s][2s][2s][2s][3s][2s][2s]
+
+anne.physics.usyd.edu.au:spectrum2015$ 
+./ex3 -eps_nev 1 -eps_type krylovschur -info -eps_ncv 2 -eps_monitor -eps_tol 1e-2 -cutoff 10
+/[2s][2s][2s][2s][3s][2s][2s]^C
+
+
+
 with cutoff=10
+~~~~~~~~~~~~~~
 
 7 EPS nconv=0 first unconverged value (error) 95.9864 (1.24568490e-02)
 EPSStoppingBasic(): Linear eigensolver finished successfully: 1 eigenpairs converged at iteration 8

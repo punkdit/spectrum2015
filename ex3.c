@@ -123,7 +123,10 @@ int main(int argc,char **argv)
   ierr = MPI_Comm_size(PETSC_COMM_WORLD,&size);CHKERRQ(ierr);
   if (size != 1) SETERRQ(PETSC_COMM_WORLD,1,"This is a uniprocessor example only");
 
+    cutoff = 99999;
     ierr = PetscOptionsGetInt(NULL, NULL, "-cutoff", &cutoff, NULL);CHKERRQ(ierr);
+    if(cutoff != 99999)
+        printf("setting cutoff to %d\n", (int)cutoff);
 
   ierr = PetscPrintf(PETSC_COMM_WORLD,"Hamiltonian Eigenproblem (matrix-free version), n=%D\n",n);CHKERRQ(ierr);
   ierr = MatCreateShell(PETSC_COMM_WORLD,n,n,n,n,&n,&A);CHKERRQ(ierr);
