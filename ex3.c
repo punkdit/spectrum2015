@@ -10,7 +10,6 @@ static char help[] = "help !";
    User-defined routines
 */
 
-// see also: https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetNaive
 static int
 countbits(long v)
 {
@@ -19,6 +18,35 @@ countbits(long v)
     {
       c += v & 1;
     }
+    return c;
+}
+
+
+//
+// From:
+// https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetNaive
+//
+
+static const unsigned char BitsSetTable256[256] = 
+{
+#   define B2(n) n,     n+1,     n+1,     n+2
+#   define B4(n) B2(n), B2(n+1), B2(n+1), B2(n+2)
+#   define B6(n) B4(n), B4(n+1), B4(n+1), B4(n+2)
+    B6(0), B6(1), B6(1), B6(2)
+};
+
+static int
+countbits_fast(long v0)
+{
+    uint32_t v;
+    assert(0xffffffffL&v0 == v0);
+    v = (uint32_t)v0;
+
+    uint32_t c; // c is the total bits set in v
+    c = BitsSetTable256[v & 0xff] + 
+        BitsSetTable256[(v >> 8) & 0xff] + 
+        BitsSetTable256[(v >> 16) & 0xff] + 
+        BitsSetTable256[v >> 24]; 
     return c;
 }
 

@@ -464,22 +464,16 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, **kw):
         code.end()
     code.append("k = 0;")
     for row in RR:
-        code.append("k += countbits(v&%s) %% 2;" % getnum(row))
+        code.append("k += countbits_fast(v&%s) %% 2;" % getnum(row))
     code.append("double pxv = px[v];")
     code.append("py[v] += pxv * (%d - 2*k);" % mz)
-#    for g in Gx:
-#        g = dot2(g, PxtQx)
-#        #code.append("// %s"%g)
-#        g = getnum(g)
-#        code.append("py[v^%s] += pxv;"%g)
     for gx in uniq_gxs:
         s = '+'.join(['pxv']*gxs.count(gx))
         code.append("py[v^%s] += %s;" % (gx, s))
     code.end()
-
     code.end()
-
     code.output()
+
 
 def main():
 
