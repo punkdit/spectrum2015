@@ -1,5 +1,17 @@
 
 
+./ex3 -eps_nev 1 -eps_ncv 2 -eps_type arnoldi -eps_largest_real -eps_monitor -eps_tol 1e-2
+
+ Number of requested eigenvalues: 1
+ Linear eigensolve converged (1 eigenpair) due to CONVERGED_TOL; iterations 27
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+       90.773283             0.00994919
+
+compared to "exact" answer 90.826723 
+
+
 
 17/7/16
 =======

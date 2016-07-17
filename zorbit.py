@@ -441,6 +441,12 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, **kw):
     mz = len(Gz)
     RR = dot2(Gz, Rx.transpose())
 
+    PxtQx = dot2(Pxt, Qx)
+    gxs = [getnum(dot2(gx, PxtQx)) for gx in Gx]
+    gxs.sort()
+    uniq_gxs = list(set(gxs))
+    uniq_gxs.sort()
+
     code.append("long v;")
     code.append("int k;")
     code.append("struct timeval t0, t1;")
@@ -451,20 +457,23 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, **kw):
         code.append(r'if((v+1) %% %d == 0)' % (n//128))
         code.begin()
         code.append("gettimeofday(&t1, NULL);")
-        code.append('printf("[%lds]", t1.tv_sec-t0.tv_sec);fflush(stdout);')
+        code.append("long delta = t1.tv_sec-t0.tv_sec;")
+        code.append("if(delta>1)")
+        code.append('{printf("[%lds]", delta);fflush(stdout);}')
         code.append('t0 = t1;')
         code.end()
-    PxtQx = dot2(Pxt, Qx)
     code.append("k = 0;")
     for row in RR:
         code.append("k += countbits(v&%s) %% 2;" % getnum(row))
-    code.append("py[v] += px[v] * (%d - 2*k);" % mz)
-    #code.append(r'printf("%%d:%%d ", v, 18-2*k);//%d'%mz)
-    for g in Gx:
-        g = dot2(g, PxtQx)
-        #code.append("// %s"%g)
-        g = getnum(g)
-        code.append("py[v^%s] += px[v];"%g)
+    code.append("double pxv = px[v];")
+    code.append("py[v] += pxv * (%d - 2*k);" % mz)
+#    for g in Gx:
+#        g = dot2(g, PxtQx)
+#        #code.append("// %s"%g)
+#        g = getnum(g)
+#        code.append("py[v^%s] += pxv;"%g)
+    for gx in uniq_gxs:
+        code.append("py[v^%s] += %d*pxv;" % (gx, gxs.count(gx)))
     code.end()
 
     code.end()
@@ -523,7 +532,7 @@ def main():
     Rz = array2(Rz)
     Rz = row_reduce(Rz, truncate=True)
     rz = len(Rz)
-    print "Rx:", rx
+    print "Rz:", rz
 
     #print shortstr(dot2(Pxt, Qx))
     PxtQx = dot2(Pxt, Qx)
