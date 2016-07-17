@@ -473,7 +473,8 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, **kw):
 #        g = getnum(g)
 #        code.append("py[v^%s] += pxv;"%g)
     for gx in uniq_gxs:
-        code.append("py[v^%s] += %d*pxv;" % (gx, gxs.count(gx)))
+        s = '+'.join(['pxv']*gxs.count(gx))
+        code.append("py[v^%s] += %s;" % (gx, s))
     code.end()
 
     code.end()
