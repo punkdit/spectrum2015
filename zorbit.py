@@ -416,6 +416,16 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, **kw):
     n = 2**r
     assert (r<63)
 
+
+    """
+    gettimeofday(struct timeval *tv, struct timezone *tz);
+           struct timeval {
+               time_t      tv_sec;     /* seconds */
+               suseconds_t tv_usec;    /* microseconds */
+           };
+    """
+    
+
     code = Code("body.h")
 
     code.append("#define DIMS (%d)"%n)
@@ -433,10 +443,17 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, **kw):
 
     code.append("long v;")
     code.append("int k;")
+    code.append("struct timeval t0, t1;")
+    code.append("gettimeofday(&t0, NULL);")
     code.append("for(v=0; v<%d; v++)"%n)
     code.begin()
     if n >= 128:
-        code.append(r'if(v %% %d == 0) {printf(".");fflush(stdout);}' % (n//128))
+        code.append(r'if((v+1) %% %d == 0)' % (n//128))
+        code.begin()
+        code.append("gettimeofday(&t1, NULL);")
+        code.append('printf("[%lds]", t1.tv_sec-t0.tv_sec);fflush(stdout);')
+        code.append('t0 = t1;')
+        code.end()
     PxtQx = dot2(Pxt, Qx)
     code.append("k = 0;")
     for row in RR:

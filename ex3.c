@@ -4,6 +4,7 @@ static char help[] = "help !";
 #include <slepceps.h>
 #include <petscblaslapack.h>
 #include <assert.h>
+#include <sys/time.h>
 
 /*
    User-defined routines
