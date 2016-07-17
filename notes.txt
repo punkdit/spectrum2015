@@ -1,4 +1,28 @@
 
+
+
+17/7/16
+=======
+
+[0] PetscInitialize(): PETSc successfully started: number of processors = 1
+[0] PetscInitialize(): Running on machine: stan.physics.usyd.edu.au
+[0] SlepcInitialize(): SLEPc successfully started
+
+Hamiltonian Eigenproblem (matrix-free version), n=4294967296
+
+[0] PetscCommDuplicate(): Duplicating a communicator 1140850688 -2080374784 max tags = 536870911
+[0] PetscCommDuplicate(): Using internal PETSc communicator 1140850688 -2080374784
+EPSSolve
+[0] STSetUp(): Setting up new ST
+BVSetRandomColumn: 0
+BVSetRandomColumn: 0 Done
+/................................................................................................................................\/......................[0]PETSC ERROR: ------------------------------------------------------------------------
+[0]PETSC ERROR: Caught signal number 1 Hang up: Some other process (or the batch system) has told this process to end
+
+
+17/7/16
+=======
+
 anne.physics.usyd.edu.au:spectrum2015$ time ./ex3 -eps_nev 5 -eps_type arnoldi -eps_largest_real
 
 Hamiltonian Eigenproblem (matrix-free version), n=262144

@@ -395,6 +395,19 @@ class Code(object):
         f.close()
 
 
+def getnum(v):
+    x = 0
+    for i in v:
+        if i:
+            x += 1
+        x *= 2
+    return x/2
+
+def getnum(v):
+    s = ''.join(str(i) for i in v)
+    return '0b'+s
+
+
 def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, **kw):
 
     print "slepc"
@@ -415,14 +428,6 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, **kw):
 
     offset = argv.get("offset", 0)
 
-#    for i in range(n):
-#      for j in range(n):
-#        r = H[i, j]
-#        if i==j:
-#            r += offset
-#        if r:
-#           code.append( "py[%d] += %s*px[%d];"%(i, r, j))
-
     mz = len(Gz)
     RR = dot2(Gz, Rx.transpose())
 
@@ -430,32 +435,24 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, **kw):
     code.append("int k;")
     code.append("for(v=0; v<%d; v++)"%n)
     code.begin()
-    code.append(r'if(v %% %d == 0) {printf(".");fflush(stdout);}' % (n//128))
+    if n >= 128:
+        code.append(r'if(v %% %d == 0) {printf(".");fflush(stdout);}' % (n//128))
     PxtQx = dot2(Pxt, Qx)
     code.append("k = 0;")
     for row in RR:
-        code.append("k += countbits(v&%d) %% 2;" % getnum(row))
+        code.append("k += countbits(v&%s) %% 2;" % getnum(row))
     code.append("py[v] += px[v] * (%d - 2*k);" % mz)
     #code.append(r'printf("%%d:%%d ", v, 18-2*k);//%d'%mz)
     for g in Gx:
         g = dot2(g, PxtQx)
-        code.append("// %s"%g)
+        #code.append("// %s"%g)
         g = getnum(g)
-        code.append("py[v^%d] += px[v];"%g)
+        code.append("py[v^%s] += px[v];"%g)
     code.end()
 
     code.end()
 
     code.output()
-
-def getnum(v):
-    x = 0
-    for i in v:
-        if i:
-            x += 1
-        x *= 2
-    return x/2
-
 
 def main():
 
