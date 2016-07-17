@@ -39,7 +39,7 @@ static int
 countbits_fast(long v0)
 {
     uint32_t v;
-    assert(0xffffffffL&v0 == v0);
+    //assert(0xffffffffL&v0 == v0);
     v = (uint32_t)v0;
 
     uint32_t c; // c is the total bits set in v

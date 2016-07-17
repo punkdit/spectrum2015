@@ -414,17 +414,7 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, **kw):
 
     r = len(Rx)
     n = 2**r
-    assert (r<63)
-
-
-    """
-    gettimeofday(struct timeval *tv, struct timezone *tz);
-           struct timeval {
-               time_t      tv_sec;     /* seconds */
-               suseconds_t tv_usec;    /* microseconds */
-           };
-    """
-    
+    assert (r<40), "ugh"
 
     code = Code("body.h")
 
@@ -453,6 +443,7 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, **kw):
     code.append("gettimeofday(&t0, NULL);")
     code.append("for(v=0; v<%d; v++)"%n)
     code.begin()
+    code.append("double pxv = px[v];")
     if n >= 128:
         code.append(r'if((v+1) %% %d == 0)' % (n//128))
         code.begin()
@@ -465,7 +456,9 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, **kw):
     code.append("k = 0;")
     for row in RR:
         code.append("k += countbits_fast(v&%s) %% 2;" % getnum(row))
-    code.append("double pxv = px[v];")
+    cutoff = argv.cutoff
+    if cutoff is not None:
+        code.append("if(k>%d) continue; // <-------- continue" % cutoff)
     code.append("py[v] += pxv * (%d - 2*k);" % mz)
     for gx in uniq_gxs:
         s = '+'.join(['pxv']*gxs.count(gx))
@@ -502,6 +495,8 @@ def main():
 
     print "Hx:", len(Hx)
     #print shortstr(Hx)
+    print "Gx:", len(Gx)
+    print "Gz:", len(Gz)
 
     #Hxr = row_reduce(Hx)
     #print "Hxr:", len(Hxr)
