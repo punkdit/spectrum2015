@@ -1,4 +1,9 @@
 
+./configure --with-cc=gcc --with-cxx=g++ --with-fc=gfortran --download-mpich --prefix=/suphys/sburton/ --with-64-bit-indices --known-64-bit-blas-indices --with-blas-lapack-lib=\[-L/usr/physics/ic15/composer_xe_2015.0.090/mkl/lib/intel64/,libmkl_intel_ilp64.so,libmkl_sequential.so,libmkl_core.so\]
+
+stan:
+nohup ./ex3  -eps_nev 1 -eps_type arnoldi -info -eps_ncv 2 -eps_monitor -eps_tol 1e-3 > ex3.gs.out &
+
 
 18/7/16
 =======

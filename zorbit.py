@@ -8,7 +8,7 @@ from scipy.sparse.linalg import eigs, eigsh
 
 from solve import shortstr, parse, eq2, dot2, zeros2, array2, identity2
 from solve import row_reduce, RowReduction, span, get_reductor
-from solve import u_inverse
+from solve import u_inverse, find_logops, solve
 
 from lanczos import write, show_eigs
 from code import lstr2
@@ -21,6 +21,23 @@ def genidx(shape):
         for idx in range(shape[0]):
             for _idx in genidx(shape[1:]):
                 yield (idx,)+_idx
+
+
+def check_conjugate(A, B):
+    if A is None or B is None:
+        return
+    assert A.shape == B.shape
+    I = numpy.identity(A.shape[0], dtype=numpy.int32)
+    assert eq2(dot2(A, B.transpose()), I)
+
+
+def check_commute(A, B):
+    if A is None or B is None:
+        return
+    C = dot2(A, B.transpose())
+    assert C.sum() == 0, "\n%s"%shortstr(C)
+
+
 
 
 
@@ -408,7 +425,7 @@ def getnum(v):
     return '0b'+s
 
 
-def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, **kw):
+def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
 
     print "slepc"
 
@@ -429,6 +446,28 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, **kw):
     offset = argv.get("offset", 0)
 
     mz = len(Gz)
+#    print "Hz:"
+#    print shortstr(Hz)
+#    print "Hx:"
+#    print shortstr(Hx)
+#    print "Rx:"
+#    print shortstr(Rx)
+    print "Tx:", len(Tx)
+    #print shortstr(Tx)
+    t = None
+    excite = argv.excite
+    if excite is not None:
+        print "excite:", excite
+        if type(excite) is tuple:
+            t = Tx[excite[0]]
+            for i in range(1, len(excite)):
+                t = (t + Tx[excite[i]])%2
+        else:
+            t = Tx[excite]
+        print "t:", shortstr(t)
+        Gzt = dot2(Gz, t)
+        print "Gzt:", shortstr(Gzt)
+
     RR = dot2(Gz, Rx.transpose())
 
     PxtQx = dot2(Pxt, Qx)
@@ -454,8 +493,11 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, **kw):
         code.append('t0 = t1;')
         code.end()
     code.append("k = 0;")
-    for row in RR:
-        code.append("k += countbits_fast(v&%s) %% 2;" % getnum(row))
+    for i, row in enumerate(RR):
+        if t is not None and Gzt[i]==1:
+            code.append("k += (countbits_fast(v&%s)+1) %% 2;" % getnum(row))
+        else:
+            code.append("k += countbits_fast(v&%s) %% 2;" % getnum(row))
     cutoff = argv.cutoff
     if cutoff is not None:
         code.append("if(k>%d) continue; // <-------- continue" % cutoff)
@@ -468,6 +510,34 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, **kw):
     code.end()
     code.end()
     code.output()
+
+
+def find_errors(Hx, Lx, Rx):
+    # find Tz
+    n = Hx.shape[1]
+
+    k = len(Lx)
+    r = len(Rx)
+    mx = len(Hx)
+    assert k+r+mx <= n
+    #mz = n - (k+r+mx)
+
+    U = zeros2(mx+k+r, n)
+    U[:mx] = Hx 
+    U[mx:mx+k] = Lx 
+    U[mx+k:mx+k+r] = Rx 
+    B = zeros2(mx+k+r, mx)
+    B[:mx] = identity2(mx)
+
+    Tz_t = solve(U, B)
+    Tz = Tz_t.transpose()
+    assert len(Tz) == mx
+
+    check_conjugate(Hx, Tz)
+    check_commute(Lx, Tz)
+    check_commute(Rx, Tz)
+
+    return Tz
 
 
 def main():
@@ -491,40 +561,38 @@ def main():
 
         return
 
-    #print shortstr(Gx)
+    Lz = find_logops(Gx, Hz)
 
-    n = Gx.shape[1]
-
-    print "Hx:", len(Hx)
-    #print shortstr(Hx)
-    print "Gx:", len(Gx)
-    print "Gz:", len(Gz)
-
-    #Hxr = row_reduce(Hx)
-    #print "Hxr:", len(Hxr)
-    #print shortstr(Hxr)
-
-    # projector onto complement of rowspan of Hx
-    Px = get_reductor(Hx) 
+    check_commute(Lz, Gx)
+    check_commute(Lz, Hx)
+    
+    Px = get_reductor(Hx) # projector onto complement of rowspan of Hx
     Pz = get_reductor(Hz) 
-
-    Rx = [dot2(Px, g) for g in Gx]
-    Rx = array2(Rx)
-    Rx = row_reduce(Rx, truncate=True)
-    rx = len(Rx)
-    print "Rx:", rx
-    #print shortstr(Rx)
-
-    Qx = u_inverse(Rx)
-    Pxt = Px.transpose()
-    assert eq2(dot2(Rx, Qx), identity2(rx))
-    assert eq2(dot2(Rx, Pxt), Rx)
 
     Rz = [dot2(Pz, g) for g in Gz]
     Rz = array2(Rz)
     Rz = row_reduce(Rz, truncate=True)
     rz = len(Rz)
     print "Rz:", rz
+
+    Tx = find_errors(Hz, Lz, Rz)
+
+    n = Gx.shape[1]
+    print "Hx:", len(Hx)
+    print "Gx:", len(Gx)
+    print "Gz:", len(Gz)
+
+    Rx = [dot2(Px, g) for g in Gx]
+    Rx = array2(Rx)
+
+    Rx = row_reduce(Rx, truncate=True)
+    rx = len(Rx)
+    print "Rx:", rx
+
+    Qx = u_inverse(Rx)
+    Pxt = Px.transpose()
+    assert eq2(dot2(Rx, Qx), identity2(rx))
+    assert eq2(dot2(Rx, Pxt), Rx)
 
     #print shortstr(dot2(Pxt, Qx))
     PxtQx = dot2(Pxt, Qx)
@@ -541,10 +609,11 @@ def main():
         return
 
     v0 = None
-    excite = argv.excite
-    if excite is not None:
-        v0 = zeros2(n)
-        v0[excite] = 1
+
+#    excite = argv.excite
+#    if excite is not None:
+#        v0 = zeros2(n)
+#        v0[excite] = 1
 
     verts = []
     lookup = {}
