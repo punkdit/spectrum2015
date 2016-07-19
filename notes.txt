@@ -1,8 +1,24 @@
 
+
+19/7/16
+=======
+
+nohup ./ex3  -eps_nev 1 -eps_type arnoldi -info -eps_ncv 2 -eps_monitor -eps_tol 1e-3 > ex3.gs.1.out &
+
+
+18/7/16
+=======
+
 ./configure --with-cc=gcc --with-cxx=g++ --with-fc=gfortran --download-mpich --prefix=/suphys/sburton/ --with-64-bit-indices --known-64-bit-blas-indices --with-blas-lapack-lib=\[-L/usr/physics/ic15/composer_xe_2015.0.090/mkl/lib/intel64/,libmkl_intel_ilp64.so,libmkl_sequential.so,libmkl_core.so\]
 
 stan:
 nohup ./ex3  -eps_nev 1 -eps_type arnoldi -info -eps_ncv 2 -eps_monitor -eps_tol 1e-3 > ex3.gs.out &
+ 36 EPS nconv=0 first unconverged value (error) 104.004 (8.33949544e-03)
+
+sophie:
+./ex3 -eps_hermitian -eps_largest_magnitude -eps_monitor ascii -eps_nev 2 -eps_type  lanczos  -eps_monitor  -eps_tol 1e-3  > ex3.lanczos.out
+ 1 EPS nconv=0 first unconverged value (error) 104.075 (1.57055795e-03)
+ 2 EPS nconv=1 first unconverged value (error) 98.8205 (1.24262355e-02)
 
 
 18/7/16

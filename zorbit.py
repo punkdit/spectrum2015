@@ -388,7 +388,7 @@ def do_orbiham(A, U):
     return vals, vecs
 
 class Code(object):
-    def __init__(self, filename):
+    def __init__(self, filename=None):
         self.filename = filename
         self.lines = []
         self.dent = 0
@@ -406,6 +406,9 @@ class Code(object):
         line = '    '*self.dent+line
         self.lines.append(line)
     def output(self):
+        if self.filename is None:
+            self.lines.append("")
+            return '\n'.join(self.lines)
         f = open(self.filename, 'w')
         for line in self.lines:
             print >>f, line
@@ -433,7 +436,8 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     n = 2**r
     assert (r<40), "ugh"
 
-    code = Code("body.h")
+    #code = Code("body.h")
+    code = Code()
 
     code.append("#define DIMS (%d)"%n)
 
@@ -509,10 +513,35 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
         code.append("py[v^%s] += %s;" % (gx, s))
     code.end()
     code.end()
-    code.output()
+
+    s = code.output()
+
+    src = open("ex3.c").read()
+    match = '\n#include "body.h"\n'
+    assert match in src
+    src = src.replace(match, s)
+    name = argv.get("name")
+    assert name and name.endswith(".c")
+    f = open(name, 'w')
+    f.write(src)
+    f.close()
+
+    import socket
+    host = socket.gethostname()
+    if host == "bucket":
+        cmd = "gcc ex3.c -O3 -o ex3 -I/home/simon/local/petsc/arch-linux2-c-debug/include -I/home/simon/local/petsc/include/petsc/mpiuni -I/home/simon/local/petsc/include -I/home/simon/local/slepc-3.7.1/include -I/home/simon/local/slepc-3.7.1/arch-linux2-c-debug/include/ -L/home/simon/local/petsc/arch-linux2-c-debug/lib -L/home/simon/local/slepc-3.7.1/arch-linux2-c-debug/lib -lpetsc -lslepc"
+    else:
+        cmd = "gcc -O3 ex3.c -I/suphys/sburton/include/ -o ex3 -lpetsc -L$PETSC_DIR/$PETSC_ARCH/lib -L$SLEPC_DIR/$PETSC_ARCH/lib -lslepc"
+    cmd = cmd.replace("ex3.c", name)
+    cmd = cmd.replace("ex3", name[:-2])
+
+    print cmd
+    rval = os.system(cmd)
+    assert rval == 0
 
 
 def find_errors(Hx, Lx, Rx):
+    
     # find Tz
     n = Hx.shape[1]
 
