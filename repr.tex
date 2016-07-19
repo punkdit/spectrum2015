@@ -13,6 +13,9 @@
 \usepackage{color}
 \usepackage{natbib}
 %\usepackage{cite}
+\usepackage{fullpage} % uses 20 percent less pages.
+
+\usepackage{framed}
 
 \RequirePackage{amsmath}
 \RequirePackage{amssymb}
@@ -22,6 +25,7 @@
 %\RequirePackage{theorem}
 %\RequirePackage{eucal}
 \RequirePackage{color}
+\RequirePackage{xcolor}
 \RequirePackage{url}
 \RequirePackage{mdwlist}
 
@@ -33,6 +37,21 @@
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
+
+%\renewenvironment{framed}[1][\hsize]{%
+%\def\FrameCommand{{\color{red}\vrule width 3pt}\hspace{0pt}\fboxsep=\FrameSep\colorbox{yellow}}%
+%\MakeFramed{\hsize#1\advance\hsize-\width\FrameRestore}}
+%{\endMakeFramed}
+
+%\renewenvironment{framed}[1][\hsize]{%
+%\def\FrameCommand{{\color{red}\vrule width 3pt}\hspace{0pt}\fboxsep=\FrameSep\colorbox{yellow}}%
+%\MakeFramed{\hsize0.8\linewidth\advance\hsize-\width\FrameRestore}}
+%{\endMakeFramed}
+
+\renewenvironment{framed}[1][\hsize]{%
+\def\FrameCommand{{\color{black}\vrule width 3pt}\hspace{0pt}\fboxsep=\FrameSep\colorbox{lightgray}}%
+\MakeFramed{\hsize0.8\linewidth\advance\hsize-\width\FrameRestore}}
+{\endMakeFramed}
 
 
 \begin{document}
@@ -51,8 +70,23 @@
 \maketitle
 
 \begin{abstract}
+Highly frustrated systems tend to be gapless. Or are they?
+Even beyond the lattice symmetries of the spin model,
+these things have an extensive number of integrals of motion, 
+which are called \emph{stabilizers} in the code literature.
+This extensive growth of symmetry
+makes the representation theory interesting.
+In exploring the spectra we specialize to ``CSS'' models,
+and exploit the Perron-Frobenius theory.
+Even though there is strong evidence that the 2d
+compass model is gapless, 
+we provide the first rigorous proof of this.
+Finally, we conjecture the excitations in
+the gauge color code model are gapped.
+Some numerics and intuition provided.
 \end{abstract}
 
+\tableofcontents
 
 % CUT HERE
 
@@ -81,7 +115,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-\section{Motivating examples}
+\section{Representations}
+
+\subsection{Motivating examples}
 
 There's at least one version of mathematical wisdom that would
 have us perform our linear algebra without choosing a basis.
@@ -236,9 +272,9 @@ $$
 
 
 
-\section{Representation theory}
+\subsection{Representation theory}
 
-\subsection{The Pauli group}
+\subsubsection{The Pauli group}
 
 The Pauli group $\Pauli_1$ is normally 
 defined as a set of matrices closed under
@@ -318,8 +354,7 @@ elements. Similarly,
  $\{Z_1,...,Z_n\}$ generates % $\{Z_i\}_{i=1,..,n}$ 
 the subgroup of $Z$-type elements $\Pauli_n^Z$.
 
-
-\subsection{Subgroups of the Pauli group}
+\subsubsection{Subgroups of the Pauli group}
 
 We now define an {\it $n-$qubit gauge group} to be 
 any non-abelian subgroup $G$ of $\Pauli_n,$
@@ -389,7 +424,7 @@ The gauge group $G$ encloses $R$ and $S$, and one can
 immediately see how $L$ and $T$ also form a gauge group.
 
 
-\subsection{Representations of the Pauli group}
+\subsubsection{Representations of the Pauli group}
 
 We now define the
 {\it Pauli representation} 
@@ -504,15 +539,14 @@ and a single $2^n$-dimensional irrep.
 Summing the squares of the dimensions
 shows that we have a complete set of irreps of $\Pauli_n.$
 
-\subsection{Representations of stabilizer groups}
+%\subsubsection{Representations of stabilizer groups}
+%
+%Any abelian subgroup $\Stab\subset \Pauli_n$
+%that does not contain $-I$ we call a stabilizer group.
+%The reason for this name is...
 
-Any abelian subgroup $\Stab\subset \Pauli_n$
-that does not contain $-I$ we call a stabilizer group.
-The reason for this name is...
 
-
-
-\subsection{Representations of gauge groups}
+\subsubsection{Representations of gauge groups}
 
 %Our next job will be to find the irreps of {\it subgroups} of $\Pauli_n.$
 Although $\rho_{\mathrm{pauli}}$
@@ -598,7 +632,7 @@ $$
 %where we label the $2^r$-dimensional irreps by $t\in T.$
 %See appendix for details.
 
-\subsection{Symmetry invariant basis}
+\subsubsection{Symmetry invariant basis}
 
 In general, given a representation $\rho:G\to \GL(V)$
 and the character of some irreducible representation $\chi:G\to \C$
@@ -639,7 +673,7 @@ is a unitary transformation that sends
 physical qubits to encoded qubits.
 
 
-\section{The Hamiltonian}
+\subsection{The Hamiltonian}
 
 The Hamiltonian of interest is 
 an operator $\Ham:\Complex[2^n]\to\Complex[2^n]$:
@@ -659,6 +693,17 @@ Using the above decomposition we find:
 We will notate each block as
 $\Ham_t := \sum_{g\in G_0}\rho_t(g)$
 for each irrep $\rho_t$ appearing in $\Ham.$
+\begin{framed}
+\noindent{\bf Fact 0:}
+
+The Hamiltonian is block diagonalized, with blocks indexed by operators $t$ in
+the abelian group $T$ and multiplicity indexed by logical operators $l\in L:$
+$$
+    \Ham =  \bigoplus_{l\in L, t\in T} \Ham_t
+$$
+\end{framed}
+Writing $I$ for the identity element of $T$ we write the corresponding
+block of the hamiltonian as $\Ham_I.$
 
 More generally, we can assign (real valued) weights
 to each operator in $G_0,$ that is
@@ -668,13 +713,14 @@ and
     \Ham = \sum_{g\in G_0} w(g) \rho_{\mathrm{pauli}}(g)
             = \bigoplus_{l\in L, t\in T} \sum_{g\in G_0}\ w(g) \rho_t(g).
 \end{align*}
+In other words, using weights does not change the block structure of $\Ham.$
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-\section{Applications}
+\subsection{Applications}
 
 In the following applications we will make the identification
 between $g$ and $\rho_{pauli}(g)$.
@@ -686,7 +732,7 @@ to be the corresponding Pauli linear operators.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-\subsection{2D compass model}
+\subsubsection{2D compass model}
 
 Here we consider the two-dimensional compass model \cite{Bacon2006}.
 We coordinatize the qubits on a square 
@@ -746,29 +792,53 @@ the form of the hamiltonian in each block:
 $$
 \Ham_\rho = \sum_{g\in G_0} \rho(g) = \sum_{1\le i,j<l} \rho(X_{ij}X_{i,j+1}) + \rho(Z_{ij}Z_{i+1,j}).
 $$
-We note that in \cite{Brzezicki2013}, they perform a
+We note that in \cite{Brzezicki2013},
+they perform a
 spin transformation of the compass model
 which also results in a $(l-1)\times(l-1)$ lattice
-of spins and identical Hamiltonian except for some signs.
+of spins and identical Hamiltonian up to some signs.
+
+Note that the form of each of the Hamiltonian blocks $H_t$
+comes from another gauge code.
+In this case it has some non-local operators, as well as $\pm 1$ factors
+which can be subsumed into the gauge code as operators $\pm I.$
+
+%We have the following important fact which we will prove in section \ref{spectra} below:
+%\begin{framed}
+%\noindent{\bf Fact 1:}
+%
+%The blocks $H_t$ of a CSS Hamiltonian are also CSS.
+%\end{framed}
+%
+%By counting dimensions we can conclude the following:
+%\begin{framed}
+%\noindent{\bf Fact 2:}
+%
+%Each block $H_t$ has non-degenerate groundspace.
+%\end{framed}
+%
+%\emph{!! check what happens with weights $\pm 1.$}
+
+%\fbox{\parbox[b]{5cm}{This is long text that will be wrapped once it reaches five centimeters.}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-\subsection{Kitaev honeycomb model}
+\subsubsection{Kitaev honeycomb model}
 
 
-\begin{figure*}[th!]
-\begin{center}
-        \includegraphics[width=0.6\columnwidth]{fig_00.pdf}
-\caption{
-Gauge generators have support on the edges of the honeycomb lattice.
-Qubits here are depicted as circles.
-}
-\label{honeycomb}
-\end{center}
-\end{figure*}
+%\begin{figure*}[th!]
+%\begin{center}
+%        \includegraphics[width=0.6\columnwidth]{fig_00.pdf}
+%\caption{
+%Gauge generators have support on the edges of the honeycomb lattice.
+%Qubits here are depicted as circles.
+%}
+%\label{honeycomb}
+%\end{center}
+%\end{figure*}
 
 
 The Kitaev honeycomb model \cite{Kitaev2006} is built from spins on
@@ -778,7 +848,12 @@ which we coordinatize using integer triples $i, j, k$
 with $1\le j, k\le l$ and $k=1, 2.$
 We use periodic boundary conditions so $i, j$ are
 to be taken modulo $l$.
-See figure \ref{honeycomb}.
+Gauge generators have support on the edges of the honeycomb lattice,
+and we depict qubits here as circles:
+\begin{center}
+\includegraphics[width=0.6\columnwidth]{fig_00.pdf}
+\end{center}
+%See figure \ref{honeycomb}.
 The edges of the lattice are in one-to-one
 correspondence with the generators $G_0$:
 $$
@@ -819,15 +894,15 @@ so we find $|\Stab_0|=\half n+1.$
 There are no logical operators, so we
 must have $|R_0|=n-2.$
 
-\begin{figure*}[th!]
-\begin{center}
-        \includegraphics[width=0.5\columnwidth]{fig_01.pdf}
-%\caption{Two elements $g_{341}$ and $g_{342}$ of the set $R_0$}
-\caption{Two elements of the set $R_0$ corresponding
-to $i=3$, $j=4$ and $k=1,2.$}
-\label{jaws}
-\end{center}
-\end{figure*}
+%\begin{figure*}[th!]
+%\begin{center}
+%        \includegraphics[width=0.5\columnwidth]{fig_01.pdf}
+%%\caption{Two elements $g_{341}$ and $g_{342}$ of the set $R_0$}
+%\caption{Two elements of the set $R_0$ corresponding
+%to $i=3$, $j=4$ and $k=1,2.$}
+%\label{jaws}
+%\end{center}
+%\end{figure*}
 
 Now we construct a set of string operators $R_0$,
 one for each site on the lattice, except for
@@ -836,7 +911,14 @@ Each string $g_{ijk}\in R_0$
 is constructed as the product of
 gauge operators along a path starting at
 $(1,1,1)$ and terminating at $(i,j,k).$
-See figure \ref{jaws}.
+%See figure \ref{jaws}.
+
+Two elements of the set $R_0$ corresponding
+to $i=3$, $j=4$ and $k=1,2.$
+\begin{center}
+\includegraphics[width=0.5\columnwidth]{fig_01.pdf}
+\end{center}
+
 Each such path is built from two ``straight''
 path segments, first in the $i$ direction
 and then in the $j$ direction. 
@@ -846,8 +928,6 @@ but become disjoint in the $j$ direction:
 the $g_{ij1}$ path goes around the bottom
 of the hexagons and the $g_{ij2}$ path
 goes around the top.
-%In \cite{Kells2009} they introduce a set of
-%mutually anti-commuting string operators $R_0.$
 With periodic boundary conditions $R_0$ forms an
 independent generating set of $R$ of size $n-2.$
 
@@ -933,6 +1013,9 @@ $$
 $$
 The coefficients $\Gamma_{ij}$ are dependant on the irrep $\rho.$
 
+In \cite{Kells2009} they introduce a similar set of
+mutually anti-commuting string operators $R_0.$
+
 %A similar analysis applies to the ising model, Jordan-Wigner... 
 %http://arxiv.org/pdf/1504.01444 page 86.
 
@@ -941,7 +1024,7 @@ The coefficients $\Gamma_{ij}$ are dependant on the irrep $\rho.$
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-%\subsection{Self-representations}
+%\subsubsection{Self-representations}
 %
 %In general we can represent $G=\Stab\times R$ in $R$ itself..
 %and if we construct generators $R_0$ of $R$ by discarding
@@ -954,20 +1037,144 @@ The coefficients $\Gamma_{ij}$ are dependant on the irrep $\rho.$
 % Actually it doesn't even work on the 2d compass model.
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+\section{Spectra}
+\label{spectra}
+\subsection{Perron-Frobenius theory}
+
+%See \cite{Baez2012}
+
+We restrict our attention to Hamiltonians whose off-diagonal entries
+are non-negative (in some basis).
+These are also known as \emph{stoquastic} Hamiltonians \cite{Bravyi2006}.
+This can be achieved by considering Hamiltonians where each term
+involves either $X$-type operators or $Z$-type operators but not both.
+That is, $G_0$ consists only of $X$-type operators and $Z$-type operators.
+We will call this a \emph{CSS Hamiltonian} after the stabilizer codes
+of the same name.
+We also shift the Hamiltonian by a constant energy, so that
+the diagonal entries are non-negative:
+$$
+%\Ham := \sum_{g\in G_0} \rho_{\mathrm{pauli}}(g).
+\Ham := \sum_{g\in G_0} \rho_{\mathrm{pauli}}(g) + kI.
+$$
+This does not change the spectral gap or eigenvectors.
+
+%A simple variational argument
+%shows that the top eigenvector (the groundstate)
+%can be chosen to have all positive entries
+%(this is the Perron-Frobenius theorem)
+%and therefore is stabilized:
+An irreducible matrix is ... 
+% https://en.wikipedia.org/wiki/Perron%E2%80%93Frobenius_theorem#Non-negative_matrices
+In the computational basis we find the Hamiltonian matrix
+breaks into $2^k$ irreducible matrix blocks all of which are equal.
+The Perron-Frobenius theorem then tells us that
+for each such block, the largest eigenvalue is non-degenerate,
+and is associated with an eigenvector with all-positive entries.
+Taken together, these eigenvectors form a basis for the
+groundspace of the system.
+Stabilizers act as $+1$ or $-1$ on eigenvectors
+of the Hamiltonian.
+A stabilizer $s\in\Pauli^X$ just permutes the
+coordinates of the groundstate and so must fix any
+groundstate. 
+A stabilizer $s\in\Pauli^Z$ acts trivially
+on $\ket{0...0}$ and therefore must also fix any groundstate.
+We have demonstrated the following
+\begin{framed}
+\noindent{\bf Fact:}
+
+For a CSS Hamiltonian $\Ham$
+every groundstate is stabilized 
+and so $$\lambda_1(\Ham_I) = \lambda_1(\Ham)$$
+and for $t\ne I:$
+$$
+\lambda_1(\Ham_t) < \lambda_1(H).
+$$
+\end{framed}
+
+
+\begin{framed}
+\noindent{\bf Fact 1:}
+
+Given a CSS Hamiltonian $\Ham$ and
+$t\in T$ contained in $\Pauli^X$ or $\Pauli^Z,$
+the block $\Ham_t$ is also stoquastic.
+\end{framed}
+
+By counting dimensions we can conclude the following:
+\begin{framed}
+\noindent{\bf Fact 2:}
+
+Each block $\Ham_t$ has non-degenerate groundspace.
+\end{framed}
+\emph{!! check what happens with weights $\pm 1.$}
+
+\subsection{Cheeger inequalities}
+
+In \cite{Friedland2002}, they derive the following cheeger inequality
+by considering bi-partitions of the graph. We will do the
+same, but using matrix block notation.
+
+Let $v_2$ be a second eigenvector, $ \Ham v_2 = \lambda_2 v_2 $ 
+and $||v_2||=1$.
+We bi-partition the space 
+so that $v_2$ has (vector) blocks:
+$$
+v_2 = \left( \begin{array}{l}
+x\\
+y\end{array} \right)\quad
+$$
+with $x\ge 0$ and $y\le 0,$ component-wise.
+Let the blocks of $\Ham$ under the same partition be:
+$$
+\Ham = \left( \begin{array}{ll}
+A&C\\
+C^\top&B\end{array} \right).\quad
+$$
+If we denote $\lambda_1(A)$ as the top eigenvalue of $A$ and
+$\lambda_1(B)$ as the top eigenvalue of $B$,
+then
+\begin{align*}
+\lambda_2 = v_2^\top \Ham v_2 &= x^\top A x + 2 x^\top C y + y^\top B y \\
+        &\le x^\top A x + y^\top B y\ \le\ ||x||^2 \lambda_1(A) + ||y||^2 \lambda_1(B) \\
+        &\le \mbox{min}(\lambda_1(A), \lambda_1(B))\ \le\ \lambda_1.
+\end{align*}
+
+Defining the following constant as a maximisation over
+all bi-partitions of $\Ham:$
+$$
+    \nu(\Ham) := \max_{A, B}\ \mbox{min}(\lambda_1(A), \lambda_1(B)
+$$
+the above calculation shows that
+$$
+    \lambda_2 \le \nu(\Ham) \le \lambda_1.
+$$
+
+To bound $\lambda_2$ from below, we use a variational argument.
+For any unit vector $v$ orthogonal to the top eigenspace of $\Ham$ we
+have $v^\top \Ham v \le \lambda_2.$
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-\section{The Orbi-Hamiltonian}
+\subsection{The Orbi-Hamiltonian}
+
+We think of the Hamiltonian as the adjacency matrix of a graph.
+The diagonal terms (working in the computational basis)
+come from the $Z$ operators and the off-diagonal terms
+come from $X$ type operators.
+Loosely speaking we can view the off-diagonal terms as 
+raising and lowering operators, and the diagonal
+terms measure the energy of each level.
 
 A graph automorphism is a permutation matrix $P$
 such that $P^T \Ham P = \Ham$.
-This means $P$ commutes with $\Ham$ and so preserves
+Equivalently, $P$ commutes with $\Ham$ and this means it preserves
 the eigenspaces of $\Ham$.
-To show $P$ acts trivially on the groundstate we
-need to check that it commutes with the logical
-operators.
+%To show $P$ acts trivially on the groundstate we
+%need to check that it commutes with the logical
+%operators.
 
 \def\auto{A}
 \def\smbox#1{\ \ \mbox{#1}\ \ }
@@ -976,10 +1183,10 @@ form a group $\auto$.
 We now define a new matrix $\Ham//\auto$
 that acts on the vector space with basis consisting
 of the orbits of $\auto.$
-The groundspace wavefunction is constant
-on each $\auto-$orbit.
-The top eigenvalue of $\Ham//\auto$ will be the
-same as the top eigenvalue of $\Ham.$
+%The groundspace wavefunction is constant
+%on each $\auto-$orbit.
+%The top eigenvalue of $\Ham//\auto$ will be the
+%same as the top eigenvalue of $\Ham.$
 
 The matrix components of $\Ham//\auto$ will be
 $$
@@ -1032,7 +1239,7 @@ Q =
   0 &  1 &  0 &  0 &  0 &  0 &  0 &  0 \cr
   0 &  0 &  0 &  0 &  1 &  0 &  0 &  0 \cr
   0 &  0 &  0 &  0 &  0 &  0 &  0 &  1
-\end{array}\right),
+\end{array}\right),\ \ \ 
 P = 
 \left(\begin{array}{rrrr}
  1 &  0 &  0 &  0 \cr
@@ -1057,29 +1264,87 @@ we cannot access via a group automorphism.
 
 See also \cite{Cvetkovic1980} chapter 5.
 
-\subsection{Compass model}
+In general, we will apply this idea to each of the blocks $H_t$.
+From {\bf Fact 2} above, and using the fact that we are
+summing over a trivial representation of $Aut(G)$ we have the following:
+\begin{framed}
+\noindent{\bf Fact 3:}
+
+The orbi-Hamiltonian of $\Ham_I$ contains the ground eigenvalue of $\Ham_I.$
+\end{framed}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\subsubsection{Compass model}
 For the next example we take the $l=3$ compass model.
-The gauge group has ...
-This time $Aut(G) = A$ and we find three $A-$orbits.
+$\Ham_I$ acts on a 16 dimensional space.
+The order of $A$ is $72$, and we find three $A-$orbits.
+% This time $Aut(G) = A$ ???
+The orbi-Hamiltonian method can be applied in the case
+where the Hamiltonian weights for $X$ and $Z$ are uniform as $w_X$ and $w_Z.$
+We separate the $X$ and $Z$ terms of the orbi-Hamiltonian to show
+how this works:
 $$
-H//\auto = 
+\Ham_I//\auto = 
+\left(\begin{array}{rrr}
+ 0 &  9 &  0 \cr
+  1 &  4 &  4 \cr
+  0 &  6 &  3
+\end{array}\right) + 
+\left(\begin{array}{rrr}
+ 9 &  0 &  0 \cr
+  0 &  1 &  0 \cr
+  0 &  0 &  -3
+\end{array}\right)
+=
 \left(\begin{array}{rrr}
  9 &  9 &  0 \cr
   1 &  5 &  4 \cr
   0 &  6 &  0
 \end{array}\right)
 $$
-has $\lambda_1 = 4+2\sqrt{13} \cong 11.21110255.$
+This can be solved analytically and we find $\lambda_1 = 4+2\sqrt{13} \cong 11.21110255.$
+Keep in mind that the original state space has dimension $2^9=512$ so we
+have come a long way down to 3.
 
-\subsection{Gauge color code model}
+By exact\footnote{Exact in this context means that we do not do any
+perturbative approxiamations to the operator in question.}
+numerical diagonalization
+we get the spectrum of $\Ham_I$ and note that the orbi-Hamiltonian lifts
+all degeneracy as well as missing some excited eigenspaces:
+\begin{center}
+\begin{tabular}{ c|c|c } 
+$\lambda$ & $\Ham_I$ degeneracy & $\Ham_I//A$ degeneracy \\
+\hline
+    11.2111025509 & 1 & 1 \\
+    6.0 & 1 & 1 \\
+    2.0 & 4 &   \\
+    0.0 & 4 &   \\
+    -3.21110255093 & 1 & 1 \\
+    -4.0 & 4 &   \\
+    -6.0 & 1 &   
+\end{tabular}
+\end{center}
+The reason we miss some excited spaces is that they do not contain
+any trivial irrep of $A.$
+If we wanted to capture these other spaces we could construct
+a different orbi-Hamiltonian by 
+summing over the orbit using different characters
+(or \emph{momenta} using abelian terminology).
+See \cite{Cvetkovic1980} chapter 5 for more details.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\subsubsection{Gauge color code model}
 The Gauge color code \cite{Bombin2015,Bombin2015single}...
 This is a self-dual code...
 The smallest in the ensemble has $n=15$ qubits,
 $G_0$ has $18$ each of X/Z-type gauge operators,
 and $4$ each of X/Z-type stabilizer generators.
-
+$\Ham_I$ acts on a 64 dimensional space, and $A$ has
+order 720, and we find 7 orbits:
 $$
-H//\auto = 
+\Ham_I//\auto = 
 \left(\begin{array}{rrrrrrr}
 18 & 18 &  0 &  0 &  0 &  0 &  0 \cr
   3 & 12 & 15 &  0 &  0 &  0 &  0 \cr
@@ -1090,23 +1355,39 @@ H//\auto =
   0 &  0 &  0 &  0 &  0 & 18 & -18
 \end{array}\right)
 $$
-This gives the recurrence relation:
+The eigenvalue equation results in
+the recurrence relation:
 $$
-    \lambda a_k = 3ka_{k-1} + (18-6k)a_k + (18-3k)a_{k+1}.
+    \lambda a_k = 3ka_{k-1} + (18-6k)a_k + (18-3k)a_{k+1},
 $$
 which has largest solution 
 $\lambda_1 = 18\sqrt{2} \cong 25.4558441.$
-
-The second eigenvalue is given by 
-$\lambda_2 = 9\sqrt{2} + 3\sqrt{10} \cong 22.21475504.$
-This eigenspace is $14$ dimensional.
-This eigenspace has $6$ dimensional support in
-the stabilized subspace.
 
 % RP^3 is homeomorphic to the solid ball with antipodal points identified
 % http://math.stackexchange.com/questions/507783/mathbbrp3-is-homeomorphic-to-the-solid-ball-with-antipodal-points-identifi
 % http://topospaces.subwiki.org/wiki/Homology_of_real_projective_space
 
+Numerics give the full spectrum of $\Ham_I$ and we note that the orbi-Hamiltonian lifts
+all degeneracy as well as preserving every eigenvalue:
+\begin{center}
+\begin{tabular}{ c|c|c } 
+$\lambda$ & $\Ham_I$ degeneracy & $\Ham_I//A$ degeneracy \\
+\hline
+    25.4558441227 & 1 & 1 \\
+    16.9705627485 & 6 & 1 \\
+    8.48528137424 & 15 & 1 \\
+    0.0 & 20 & 1 \\
+    -8.48528137424 & 15 & 1 \\
+    -16.9705627485 & 6 & 1 \\
+    -25.4558441227 & 1 & 1 \\
+\end{tabular}
+\end{center}
+
+The second eigenvalue of $H$ comes from a recurrence
+relation in two variables which has solution
+$\lambda_2 = 9\sqrt{2} + 3\sqrt{10} \cong 22.21475504.$
+So the gap for this Hamiltonian  is 
+$$\lambda_1 - \lambda_2 = 9\sqrt{2} - 3\sqrt{10} \cong 3.24108908.$$
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1114,78 +1395,8 @@ the stabilized subspace.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-\section{Bounding the gap}
 
-We restrict our attention to Hamiltonians whose off-diagonal entries
-are non-negative (in some basis).
-These are also known as \emph{stoquastic} Hamiltonians \cite{Bravyi2006}.
-This can be achieved by considering Hamiltonians where each term
-involves either $X$-type operators or $Z$-type operators but not both.
-That is, $G_0$ consists only of $X$-type operators and $Z$-type operators.
-We also shift the Hamiltonian by a constant energy, so that
-the diagonal entries are non-negative:
-$$
-%\Ham := \sum_{g\in G_0} \rho_{\mathrm{pauli}}(g).
-\Ham := \sum_{g\in G_0} \rho_{\mathrm{pauli}}(g) + kI.
-$$
-This does not change the spectral gap or eigenvectors.
-
-A simple variational argument
-shows that the top eigenvector (the groundstate)
-can be chosen to have all positive entries
-(this is the Perron-Frobenius theorem)
-and therefore is stabilized:
-
-\noindent{\bf Theorem.}
-Every groundstate is stabilized.
-
-\noindent{\bf Proof.}
-\qed
-
-
-In \cite{Friedland2002}, they derive the following cheeger inequality
-by considering bi-partitions of the graph. We will do the
-same, but using matrix block notation.
-
-Let $v_2$ be a second eigenvector, $ \Ham v_2 = \lambda_2 v_2 $ 
-and $||v_2||=1$.
-We bi-partition the space 
-so that $v_2$ has (vector) blocks:
-$$
-v_2 = \left( \begin{array}{l}
-x\\
-y\end{array} \right)\quad
-$$
-with $x\ge 0$ and $y\le 0,$ component-wise.
-Let the blocks of $\Ham$ under the same partition be:
-$$
-\Ham = \left( \begin{array}{ll}
-A&C\\
-C^\top&B\end{array} \right).\quad
-$$
-If we denote $\lambda_1(A)$ as the top eigenvalue of $A$ and
-$\lambda_1(B)$ as the top eigenvalue of $B$,
-then
-\begin{align*}
-\lambda_2 = v_2^\top \Ham v_2 &= x^\top A x + 2 x^\top C y + y^\top B y \\
-        &\le x^\top A x + y^\top B y\ \le\ ||x||^2 \lambda_1(A) + ||y||^2 \lambda_1(B) \\
-        &\le \mbox{min}(\lambda_1(A), \lambda_1(B))\ \le\ \lambda_1.
-\end{align*}
-
-Defining the following constant as a maximisation over
-all bi-partitions of $\Ham:$
-$$
-    \nu(\Ham) := \max_{A, B}\ \mbox{min}(\lambda_1(A), \lambda_1(B)
-$$
-the above calculation shows that
-$$
-    \lambda_2 \le \nu(\Ham) \le \lambda_1.
-$$
-
-To bound $\lambda_2$ from below, we use a variational argument.
-For any unit vector $v$ orthogonal to the top eigenspace of $\Ham$ we
-have $v^\top \Ham v \le \lambda_2.$
-
+\subsection{Discussion}
 
 In \cite{AlShimary2010}, they 
 build a kind of graph laplacian from a known ground state:
@@ -1248,7 +1459,6 @@ have a corresponding representation theory.
 %\appendix
 %% CUT HERE
 
-%\section{Character theory}
 %\label{appendix}
 
 % CUT HERE

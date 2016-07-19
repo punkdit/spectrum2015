@@ -549,7 +549,7 @@ def anticommutes(A, B):
 
 def show_eigs(vals):
     vals = list(vals)
-    vals.sort()
+    vals.sort(reverse=True)
     counts = {}
     val0 = vals[0]-10
     for val in vals:
@@ -559,7 +559,7 @@ def show_eigs(vals):
             val0 = val
             counts[val0] = 1
     vals = counts.keys()
-    vals.sort()
+    vals.sort(reverse=True)
     print "eigval, degeneracy:"
     for val in vals:
         print '\t', val, counts[val]

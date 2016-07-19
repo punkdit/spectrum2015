@@ -380,7 +380,8 @@ def do_orbiham(A, U):
                     print "%d:%d"%(j, H1[i, j]),
             print
 
-    if len(H1)<=1024:
+    if len(H1)<=1024 and 0:
+        print "numpy.linalg.eig"
         vals, vecs = numpy.linalg.eig(H1)
     else:
         vals, vecs = eigs(H1, k=min(len(H1)-5, 40), which="LM")

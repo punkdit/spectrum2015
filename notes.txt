@@ -3,7 +3,12 @@
 19/7/16
 =======
 
-nohup ./ex3  -eps_nev 1 -eps_type arnoldi -info -eps_ncv 2 -eps_monitor -eps_tol 1e-3 > ex3.gs.1.out &
+sophie:
+./zorbit.py gcolor size=2 slepc excite=0 name="ex3-gcolor-excite-0.c"
+./ex3-gcolor-excite-0 -eps_hermitian -eps_largest_magnitude -eps_monitor ascii -eps_nev 1 -eps_type  lanczos  -eps_monitor  -eps_tol 1e-3 > ex3-gcolor-excite-0.out
+
+stan:
+./ex3 -eps_nev 1 -eps_type arnoldi -info -eps_ncv 2 -eps_monitor -eps_view_vectors binary:/export/stan1/sburton/evec.gs.bin -eps_tol 1e-3 > ex3.gs.1.out &
 
 
 18/7/16
