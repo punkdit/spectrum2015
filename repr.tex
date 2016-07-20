@@ -1041,7 +1041,7 @@ mutually anti-commuting string operators $R_0.$
 \section{Spectra}
 \label{spectra}
 
-\def\Fn{F_2^n}
+\def\Fn{F_2[n]}
 
 In the remainder of this paper, we restrict our
 attention to Hamiltonians formed from terms 
@@ -1054,13 +1054,13 @@ and can be identified with the additive
 group structure of the $n$ dimensional vector space
 over the finite field of two elements $F_2:$
 $$
-    \Pauli^X_n \cong F^n_2,  \ \ 
-    \Pauli^Z_n \cong F^n_2. 
+    \Pauli^X_n \cong \Fn,  \ \ 
+    \Pauli^Z_n \cong \Fn. 
 $$
 we do this in the obvious way by sending $X_i$ to the basis vector with
 $1$ in the $i-$th entry, and similarly for each $Z_i$. 
 We also identify the computational basis of our statespace $\Complex[n]$
-with $F^n_2$ in the obvious way.
+with $\Fn$ in the obvious way.
 This has the potential to be very confusing but 
 apart from $X$ and $Z$ subscripts
 we resist the physicist habit of endowing our symbols with decoration that remind us where the
@@ -1068,12 +1068,12 @@ symbol lives.
 
 $X$-type operators act on basis vectors using $F_2$ addition:
 $$
-    g_X \in \Pauli^X_n \cong F^n_2, \ \ g_X : v \longmapsto g_X + v
+    g_X \in \Pauli^X_n \cong \Fn, \ \ g_X : v \longmapsto g_X + v
 $$
 
 $Z$-type operators act on basis vectors using $F_2$ inner product:
 $$
-    g_Z \in \Pauli^Z_n \cong F^n_2, \ \ g_Z : v \longmapsto g_Z v^\top
+    g_Z \in \Pauli^Z_n \cong \Fn, \ \ g_Z : v \longmapsto g_Z v^\top
 $$
 This is a $F_2$ scalar, just zero or one. We think of this
 as a ``syndrome''.
