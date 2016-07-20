@@ -231,6 +231,61 @@ c.writePDFfile("pic-canonical.pdf")
 ###############################################################################
 
 
+c = canvas.canvas()
+
+
+w = 2.0
+h = 4.0
+
+hk = 0.2 * h
+hmx = 0.3 * h
+hmz = 0.3 * h
+hr = 0.4 * h
+
+dm = 0.2
+
+
+def pair(x, y0, y1, left, right, ldots=False, rdots=False):
+    p = path.rect(x, y0, w-0.5*dm, y1-y0)
+    c.stroke(p, (st_dashed if ldots else []))
+    c.text(x+0.5*w, 0.5*(y0+y1), "$%s$"%left, center)
+
+    p = path.rect(x+w+0.5*dm, y0, w-0.5*dm, y1-y0)
+    c.stroke(p, (st_dashed if rdots else []))
+    c.text(x+1.5*w, 0.5*(y0+y1), "$%s$"%right, center)
+
+
+x, y = 0., 0.
+
+pair(x, y, y+hr, "R_X", "R_Z")
+
+axis(x-0.5, y, y+hr, "$r$")
+
+y += hr + dm
+
+pair(x, y, y+hmx, "T_X", "S_Z", True, False)
+axis(x-0.5, y, y+hmx, "$m_Z$")
+
+y += hmx + dm
+
+pair(x, y, y+hmz, "S_X", "T_Z", False, True)
+axis(x-0.5, y, y+hmz, "$m_X$")
+
+y += hmz + dm
+
+pair(x, y, y+hk, "L_X", "L_Z", True, True)
+
+axis(x-0.5, y, y+hk, "$k$")
+
+axis(x+2*w+0.5, 0., hr+hm+hk+2*dm, "$n$")
+
+
+c.writePDFfile("pic-symplectic.pdf")
+
+
+###############################################################################
+
+
 
 c = canvas.canvas()
 

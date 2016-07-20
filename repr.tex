@@ -297,7 +297,8 @@ the symmetry group of a square.
 To define
 the {\it $n$-qubit Pauli group} $\Pauli_n$, 
 we use the $2n+1$ element 
-generating set $\{\omega , X_1, .., X_n, Z_1, .., Z_n\}$
+generating set 
+$$\{\omega , X_1, .., X_n, Z_1, .., Z_n\}$$
 with relation $\omega^2=I$ as before, and
 \begin{equation}\label{presentation}
 \begin{array}{c}
@@ -1039,35 +1040,107 @@ mutually anti-commuting string operators $R_0.$
 
 \section{Spectra}
 \label{spectra}
-\subsection{Perron-Frobenius theory}
+
+\def\Fn{F_2^n}
+
+In the remainder of this paper, we restrict our
+attention to Hamiltonians formed from terms 
+in $\Pauli^X\cup\Pauli^Z.$
+We briefly review the $F_2$ symplectic structure of
+these operators.
+
+Both $\Pauli^X_n$ and $\Pauli^Z_n$ are abelian groups,
+and can be identified with the additive 
+group structure of the $n$ dimensional vector space
+over the finite field of two elements $F_2:$
+$$
+    \Pauli^X_n \cong F^n_2,  \ \ 
+    \Pauli^Z_n \cong F^n_2. 
+$$
+we do this in the obvious way by sending $X_i$ to the basis vector with
+$1$ in the $i-$th entry, and similarly for each $Z_i$. 
+We also identify the computational basis of our statespace $\Complex[n]$
+with $F^n_2$ in the obvious way.
+This has the potential to be very confusing but 
+apart from $X$ and $Z$ subscripts
+we resist the physicist habit of endowing our symbols with decoration that remind us where the
+symbol lives.
+
+$X$-type operators act on basis vectors using $F_2$ addition:
+$$
+    g_X \in \Pauli^X_n \cong F^n_2, \ \ g_X : v \longmapsto g_X + v
+$$
+
+$Z$-type operators act on basis vectors using $F_2$ inner product:
+$$
+    g_Z \in \Pauli^Z_n \cong F^n_2, \ \ g_Z : v \longmapsto g_Z v^\top
+$$
+This is a $F_2$ scalar, just zero or one. We think of this
+as a ``syndrome''.
+Our $\Fn$ vectors come as row vectors by default, so a product $u v^\top$ of
+two $\Fn$ vectors is a scalar.
+
+It doesn't make sense to add an $X$-type operator and
+a $Z$-type operator:
+$$
+    g_Z + g_X \ \ \ \mbox{\emph{no no!!!}}
+$$
+but it does make sense to take the inner product:
+$$
+    g_Z g_X^\top = g_X g_Z^\top.
+$$
+This is an $F_2$ scalar which gives the commutator of the 
+two operators.
+
+Now we wish to use this language to decompose the gauge group $G.$
+First we write the gauge group generators in terms of
+$X$-type and $Z$-type operators:
+$$
+    G_0 = G_X \cup G_Z.
+$$
+Following the theory from the previous section,
+we are going to rewrite the gauge group generators
+as a union of stabilizer generators $S_0 = S_X \cup S_Z$
+and reduced gauge generators $R_0 = R_X \cup R_Z.$
+
+
+
+\begin{center}
+\includegraphics[]{pic-symplectic.pdf}
+\end{center}
+
+\subsection{Perron-Frobenius structure theory}
 
 %See \cite{Baez2012}
 
-We restrict our attention to Hamiltonians whose off-diagonal entries
-are non-negative (in some basis).
-These are also known as \emph{stoquastic} Hamiltonians \cite{Bravyi2006}.
-This can be achieved by considering Hamiltonians where each term
-involves either $X$-type operators or $Z$-type operators but not both.
-That is, $G_0$ consists only of $X$-type operators and $Z$-type operators.
-We will call this a \emph{CSS Hamiltonian} after the stabilizer codes
-of the same name.
-We also shift the Hamiltonian by a constant energy, so that
-the diagonal entries are non-negative:
-$$
-%\Ham := \sum_{g\in G_0} \rho_{\mathrm{pauli}}(g).
-\Ham := \sum_{g\in G_0} \rho_{\mathrm{pauli}}(g) + kI.
-$$
-This does not change the spectral gap or eigenvectors.
+We think of the Hamiltonian as the adjacency matrix of a graph.
+The diagonal terms (working in the computational basis)
+come from the $Z$ operators and the off-diagonal terms
+come from $X$ type operators.
+Loosely speaking we can view the off-diagonal terms as 
+raising and lowering operators, and the diagonal
+terms measure the energy of each level.
 
-%A simple variational argument
-%shows that the top eigenvector (the groundstate)
-%can be chosen to have all positive entries
-%(this is the Perron-Frobenius theorem)
-%and therefore is stabilized:
+%We restrict our attention to Hamiltonians whose off-diagonal entries
+%are non-negative (in some basis).
+%These are also known as \emph{stoquastic} Hamiltonians \cite{Bravyi2006}.
+%This can be achieved by considering Hamiltonians where each term
+%involves either $X$-type operators or $Z$-type operators but not both.
+%That is, $G_0$ consists only of $X$-type operators and $Z$-type operators.
+%We will call this a \emph{CSS Hamiltonian} after the stabilizer codes
+%of the same name.
+%We also shift the Hamiltonian by a constant energy, so that
+%the diagonal entries are non-negative:
+%$$
+%%\Ham := \sum_{g\in G_0} \rho_{\mathrm{pauli}}(g).
+%\Ham := \sum_{g\in G_0} \rho_{\mathrm{pauli}}(g) + kI.
+%$$
+%This does not change the spectral gap or eigenvectors.
+
 An irreducible matrix is ... 
 % https://en.wikipedia.org/wiki/Perron%E2%80%93Frobenius_theorem#Non-negative_matrices
 In the computational basis we find the Hamiltonian matrix
-breaks into $2^k$ irreducible matrix blocks all of which are equal.
+breaks into $2^{k+m_X}$ irreducible matrix blocks all of which are equal.
 The Perron-Frobenius theorem then tells us that
 for each such block, the largest eigenvalue is non-degenerate,
 and is associated with an eigenvector with all-positive entries.
@@ -1082,7 +1155,7 @@ A stabilizer $s\in\Pauli^Z$ acts trivially
 on $\ket{0...0}$ and therefore must also fix any groundstate.
 We have demonstrated the following
 \begin{framed}
-\noindent{\bf Fact:}
+\noindent{\bf Fact 1:}
 
 For a CSS Hamiltonian $\Ham$
 every groundstate is stabilized 
@@ -1092,23 +1165,27 @@ $$
 \lambda_1(\Ham_t) < \lambda_1(H).
 $$
 \end{framed}
+%A simple variational argument % ???
+%shows that the top eigenvector (the groundstate)
+%can be chosen to have all positive entries
+%(this is the Perron-Frobenius theorem)
+%and therefore is stabilized:
 
 
 \begin{framed}
-\noindent{\bf Fact 1:}
+\noindent{\bf Fact 2:}
 
 Given a CSS Hamiltonian $\Ham$ and
 $t\in T$ contained in $\Pauli^X$ or $\Pauli^Z,$
 the block $\Ham_t$ is also stoquastic.
 \end{framed}
 
-By counting dimensions we can conclude the following:
 \begin{framed}
-\noindent{\bf Fact 2:}
+\noindent{\bf Fact 3:}
 
-Each block $\Ham_t$ has non-degenerate groundspace.
+$\lambda_2(\Ham) = \lambda_1(\Ham_t)$ for some
+$t\in T$ contained in $\Pauli^X$ or $\Pauli^Z.$
 \end{framed}
-\emph{!! check what happens with weights $\pm 1.$}
 
 \subsection{Cheeger inequalities}
 
@@ -1158,15 +1235,7 @@ have $v^\top \Ham v \le \lambda_2.$
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-\subsection{The Orbi-Hamiltonian}
-
-We think of the Hamiltonian as the adjacency matrix of a graph.
-The diagonal terms (working in the computational basis)
-come from the $Z$ operators and the off-diagonal terms
-come from $X$ type operators.
-Loosely speaking we can view the off-diagonal terms as 
-raising and lowering operators, and the diagonal
-terms measure the energy of each level.
+\subsection{The orbigraph}
 
 A graph automorphism is a permutation matrix $P$
 such that $P^T \Ham P = \Ham$.
@@ -1198,7 +1267,7 @@ $(\Ham//\auto)_{ij} $ counts the number of gauge group
 elements that sends any particular element $v$ of the 
 $\auto-$orbit $i$ to the $\auto-$orbit $j.$
 
-Here is a simple example.
+Here is a simple example. % potential only depends on hamming weight: Jarret
 We take as gauge group 
 $$G = \{XII, IXI, IIX, ZII, IZI, IIZ\}.$$
 The Hamiltonian $H = \sum_{g\in G} g$ has matrix:
@@ -1228,7 +1297,7 @@ In this case the automorphism group $\auto$ of the graph
 is the same as the automorphism group $Aut(G)$ of the gauge group,
 but in general it is possible that $Aut(G) < \auto.$
 
-Note that the orbi-Hamiltonian is no longer Hermitian,
+Note that the orbigraph is no longer Hermitian,
 and in general will not even be normal.
 
 We can also write $H//A = QHP$ using the following two matrices for $P$ and $Q:$
@@ -1270,7 +1339,7 @@ summing over a trivial representation of $Aut(G)$ we have the following:
 \begin{framed}
 \noindent{\bf Fact 3:}
 
-The orbi-Hamiltonian of $\Ham_I$ contains the ground eigenvalue of $\Ham_I.$
+The orbigraph of $\Ham_I$ contains the ground eigenvalue of $\Ham_I.$
 \end{framed}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1280,9 +1349,9 @@ For the next example we take the $l=3$ compass model.
 $\Ham_I$ acts on a 16 dimensional space.
 The order of $A$ is $72$, and we find three $A-$orbits.
 % This time $Aut(G) = A$ ???
-The orbi-Hamiltonian method can be applied in the case
+The orbigraph method can be applied in the case
 where the Hamiltonian weights for $X$ and $Z$ are uniform as $w_X$ and $w_Z.$
-We separate the $X$ and $Z$ terms of the orbi-Hamiltonian to show
+We separate the $X$ and $Z$ terms of the orbigraph to show
 how this works:
 $$
 \Ham_I//\auto = 
@@ -1310,7 +1379,7 @@ have come a long way down to 3.
 By exact\footnote{Exact in this context means that we do not do any
 perturbative approxiamations to the operator in question.}
 numerical diagonalization
-we get the spectrum of $\Ham_I$ and note that the orbi-Hamiltonian lifts
+we get the spectrum of $\Ham_I$ and note that the orbigraph lifts
 all degeneracy as well as missing some excited eigenspaces:
 \begin{center}
 \begin{tabular}{ c|c|c } 
@@ -1328,7 +1397,7 @@ $\lambda$ & $\Ham_I$ degeneracy & $\Ham_I//A$ degeneracy \\
 The reason we miss some excited spaces is that they do not contain
 any trivial irrep of $A.$
 If we wanted to capture these other spaces we could construct
-a different orbi-Hamiltonian by 
+a different orbigraph by 
 summing over the orbit using different characters
 (or \emph{momenta} using abelian terminology).
 See \cite{Cvetkovic1980} chapter 5 for more details.
@@ -1367,7 +1436,7 @@ $\lambda_1 = 18\sqrt{2} \cong 25.4558441.$
 % http://math.stackexchange.com/questions/507783/mathbbrp3-is-homeomorphic-to-the-solid-ball-with-antipodal-points-identifi
 % http://topospaces.subwiki.org/wiki/Homology_of_real_projective_space
 
-Numerics give the full spectrum of $\Ham_I$ and we note that the orbi-Hamiltonian lifts
+Numerics give the full spectrum of $\Ham_I$ and we note that the orbigraph lifts
 all degeneracy as well as preserving every eigenvalue:
 \begin{center}
 \begin{tabular}{ c|c|c } 
