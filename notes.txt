@@ -1,4 +1,84 @@
 
+20/7/16
+=======
+
+block decomposition of l=4 compass model
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+./lanczos.py compass l=4 k=80
+eigval, degeneracy:
+    19.0129032917 2   = 2               FOUND
+    18.3692998155 16  = 2 * ( 4 + 4 )   FOUND
+    18.3366619361 8   = 2 * ( 2 + 2 )   FOUND
+    18.0705549055 4   = 2 * ( 1 + 1 )   FOUND
+    16.9521090478 32
+    16.7634713604 18
+iterations: 2951
+
+./zorbit.py compass l=4 dense
+Rz: 9 Hx: 3 Gx: 16 Gz: 16 Rx: 9
+Hx|Tx:
+11..11..11..11.. 1...............
+.11..11..11..11. 1...1...........
+..11..11..11..11 1...1...1.......
+GzTx
+0 1...........1... 2
+1 ....1.......1... 2
+2 ........1...1... 2
+excite: (0, 0, 0) eigval: 19.0129032917
+excite: (0, 0, 1) eigval:               18.3692998155
+excite: (0, 1, 0) eigval:                             18.3366619361
+excite: (0, 1, 1) eigval:               18.3692998155
+excite: (1, 0, 0) eigval:               18.3692998155
+excite: (1, 0, 1) eigval:                             18.3366619361
+excite: (1, 1, 0) eigval:               18.3692998155
+excite: (1, 1, 1) eigval:                                           18.0705549055
+
+
+block decomposition of n=15 gauge color model
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+time ./lanczos.py gcolor k=80
+eigval, degeneracy:
+    25.4558441227 2    = 2              FOUND
+    22.2147550419 16   = 2 * ( 4 + 4 )  FOUND
+    20.054028988 24    = 2 * ( 6 + 6 )  FOUND
+    18.973665961 28    = 2 * ( 4 + 4 )  FOUND  + 2 * ( 3 + 3 ) ?
+    17.6382638193 10
+
+./zorbit.py gcolor dense
+Rz: 6 Hx: 4 Gx: 18 Gz: 18 Rx: 6
+Hx|Tx:
+11111111....... .11.1..........
+1111....1111... 1...1..........
+11..11..11..11. 1.1............
+1.1.1.1.1.1.1.1 11.............
+GzTx
+0 ...11111.111.11.11 12
+1 1....111......1..1 6
+2 .1.1..1..1.1....1. 6
+3 ..1.1..1..11.1.... 6
+Tx: 4
+excite: (0, 0, 0, 0) eigval: 25.4558441227
+excite: (0, 0, 0, 1) eigval:               22.2147550419
+excite: (0, 0, 1, 0) eigval:               22.2147550419
+excite: (0, 0, 1, 1) eigval:                             20.054028988
+excite: (0, 1, 0, 0) eigval:               22.2147550419
+excite: (0, 1, 0, 1) eigval:                             20.054028988
+excite: (0, 1, 1, 0) eigval:                             20.054028988
+excite: (0, 1, 1, 1) eigval:                                           18.973665961
+excite: (1, 0, 0, 0) eigval:               22.2147550419
+excite: (1, 0, 0, 1) eigval:                             20.054028988
+excite: (1, 0, 1, 0) eigval:                             20.054028988
+excite: (1, 0, 1, 1) eigval:                                           18.973665961
+excite: (1, 1, 0, 0) eigval:                             20.054028988
+excite: (1, 1, 0, 1) eigval:                                           18.973665961
+excite: (1, 1, 1, 0) eigval:                                           18.973665961
+excite: (1, 1, 1, 1) eigval:                                           18.973665961
+
+
+
+
 
 19/7/16
 =======
@@ -6,6 +86,15 @@
 sophie:
 ./zorbit.py gcolor size=2 slepc excite=0 name="ex3-gcolor-excite-0.c"
 ./ex3-gcolor-excite-0 -eps_hermitian -eps_largest_magnitude -eps_monitor ascii -eps_nev 1 -eps_type  lanczos  -eps_monitor  -eps_tol 1e-3 > ex3-gcolor-excite-0.out
+1 EPS nconv=0 first unconverged value (error) 102.381 (1.89328870e-03)
+ Number of requested eigenvalues: 1
+ Linear eigensolve converged (1 eigenpair) due to CONVERGED_TOL; iterations 2
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+      102.382483            2.00043e-05
+ ---------------------- --------------------
+
 
 stan:
 ./ex3 -eps_nev 1 -eps_type arnoldi -info -eps_ncv 2 -eps_monitor -eps_view_vectors binary:/export/stan1/sburton/evec.gs.bin -eps_tol 1e-3 > ex3.gs.1.out &
@@ -839,8 +928,8 @@ gcolor model
 time ./lanczos.py gcolor k=80
 eigval, degeneracy:
     17.6382638193 10
-    18.973665961 28 <---- flip 3 stabs
-    20.054028988 24 <---- flip 2 stabs
+    18.973665961 28 <---- flip 3 stabs ??
+    20.054028988 24 <---- flip 2 stabs ??
     22.2147550419 16  <------- 1st excited, 8 stabs * 2 logical = 16
     25.4558441227 2
 

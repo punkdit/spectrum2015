@@ -6,7 +6,7 @@ import numpy
 from scipy import sparse
 from scipy.sparse.linalg import eigs, eigsh
 
-from solve import shortstr, parse, eq2, dot2, zeros2, array2, identity2
+from solve import shortstr, shortstrx, parse, eq2, dot2, zeros2, array2, identity2
 from solve import row_reduce, RowReduction, span, get_reductor
 from solve import u_inverse, find_logops, solve
 
@@ -371,7 +371,8 @@ def do_orbiham(A, U):
     rows = range(N)
     rows.sort(key = lambda i : -H1[i, i])
 
-    if 0:
+    if argv.show:
+        #print lstr2(H1, 0)
         print "orbiham:"
         for i in rows:
             print "%d:"%i,
@@ -416,6 +417,84 @@ class Code(object):
         f.close()
 
 
+def dense(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
+
+    r, n = Rx.shape
+
+    N = 2**r
+    assert N <= 1024
+
+    gz = len(Gz)
+#    print "Hz:"
+#    print shortstr(Hz)
+    print "Hx|Tx:"
+    print shortstrx(Hx, Tx)
+    print "Hx:"
+    for i, h in enumerate(Hx):
+        print i, shortstr(h), h.sum()
+    print "GzTx"
+    GzTx = dot2(Gz, Tx.transpose())
+    for i, h in enumerate(GzTx.transpose()):
+        print i, shortstr(h), h.sum()
+
+#    print "Rx:"
+#    print shortstr(Rx)
+    print "Tx:", len(Tx)
+    #print shortstr(Tx)
+
+    RR = dot2(Gz, Rx.transpose())
+
+    PxtQx = dot2(Pxt, Qx)
+    gxs = [getnum(dot2(gx, PxtQx)) for gx in Gx]
+    gxs.sort()
+    uniq_gxs = list(set(gxs))
+    uniq_gxs.sort()
+
+    for excite in genidx((2,)*len(Tx)):
+        t = zeros2(n)
+        for i, ex in enumerate(excite):
+            if ex:
+                t = (t + Tx[i])%2
+        #print "t:", shortstr(t)
+        Gzt = dot2(Gz, t)
+        #print "Gzt:", shortstr(Gzt)
+
+        H = numpy.zeros((N, N))
+
+        #for i in range(N):
+        for i, v in enumerate(genidx((2,)*r)):
+            v = array2(v)
+            syndrome = (dot2(Gz, Rx.transpose(), v) + Gzt)%2
+            H[i, i] = gz - 2*syndrome.sum()
+
+        for i, v in enumerate(genidx((2,)*r)):
+            v = array2(v)
+            #print shortstr(v),
+            for g in Gx:
+                u = (v + dot2(g, PxtQx))%2
+                j = eval('0b'+shortstr(u, zero='0'))
+            #print
+                H[i, j] += 1
+
+        #print H
+        assert numpy.allclose(H, H.transpose())
+
+        vals, vecs = numpy.linalg.eigh(H)
+        #show_eigs(vals)
+        #print vals
+        vals = list(vals)
+        vals.sort()
+        val0 = vals[-1] # top one is last
+        assert vals[-2] < val0 - 1e-4
+        print "excite:", excite,
+        print "eigval:", val0
+
+        #break
+
+
+
+
+
 def getnum(v):
     x = 0
     for i in v:
@@ -431,7 +510,8 @@ def getnum(v):
 
 def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
 
-    print "slepc"
+    name = argv.get("name")
+    print "slepc", name
 
     r = len(Rx)
     n = 2**r
@@ -453,8 +533,15 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     mz = len(Gz)
 #    print "Hz:"
 #    print shortstr(Hz)
-#    print "Hx:"
-#    print shortstr(Hx)
+    print "Hx|Tx:"
+    #print shortstrx(Hx, Tx)
+    for i, h in enumerate(Hx):
+        print i, shortstr(h), h.sum()
+    print "GzTx"
+    GzTx = dot2(Gz, Tx.transpose())
+    for i, h in enumerate(GzTx.transpose()):
+        print i, shortstr(h), h.sum()
+
 #    print "Rx:"
 #    print shortstr(Rx)
     print "Tx:", len(Tx)
@@ -515,13 +602,15 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     code.end()
     code.end()
 
+    if name is None:
+        return
+
     s = code.output()
 
     src = open("ex3.c").read()
     match = '\n#include "body.h"\n'
     assert match in src
     src = src.replace(match, s)
-    name = argv.get("name")
     assert name and name.endswith(".c")
     f = open(name, 'w')
     f.write(src)
@@ -633,6 +722,10 @@ def main():
     #    print s
     #print "RzRxt"
     #print shortstr(dot2(Rz, Rx.transpose()))
+
+    if argv.dense:
+        dense(**locals())
+        return
 
     if argv.slepc:
         slepc(**locals())
