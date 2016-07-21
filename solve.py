@@ -718,7 +718,7 @@ def find_logops(Hx, Hz, check=False, verbose=False):
 
     basis = find_kernel(Hx.copy(), check=check, verbose=verbose)
     if verbose:
-        print len(basis)
+        print "find_logops: basis len", len(basis)
 
     logops = basis
 

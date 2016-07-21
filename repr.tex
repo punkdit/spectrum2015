@@ -796,7 +796,7 @@ $$
 We note that in \cite{Brzezicki2013},
 they perform a
 spin transformation of the compass model
-which also results in a $(l-1)\times(l-1)$ lattice
+which also results in an $(l-1)\times(l-1)$ lattice
 of spins and identical Hamiltonian up to some signs.
 
 Note that the form of each of the Hamiltonian blocks $H_t$
@@ -1044,8 +1044,9 @@ mutually anti-commuting string operators $R_0.$
 \def\Fn{F_2[n]}
 
 In the remainder of this paper, we restrict our
-attention to Hamiltonians formed from terms 
+attention to gauge groups formed from terms 
 in $\Pauli^X\cup\Pauli^Z.$
+We call these \emph{CSS gauge codes.}
 We briefly review the $F_2$ symplectic structure of
 these operators.
 
@@ -1059,7 +1060,7 @@ $$
 $$
 we do this in the obvious way by sending $X_i$ to the basis vector with
 $1$ in the $i-$th entry, and similarly for each $Z_i$. 
-We also identify the computational basis of our statespace $\Complex[n]$
+We also identify the computational basis of our statespace $\Complex[2^n]$
 with $\Fn$ in the obvious way.
 This has the potential to be very confusing but 
 apart from $X$ and $Z$ subscripts
@@ -1075,7 +1076,7 @@ $Z$-type operators act on basis vectors using $F_2$ inner product:
 $$
     g_Z \in \Pauli^Z_n \cong \Fn, \ \ g_Z : v \longmapsto g_Z v^\top
 $$
-This is a $F_2$ scalar, just zero or one. We think of this
+This is an $F_2$ scalar, just zero or one. We think of this
 as a ``syndrome''.
 Our $\Fn$ vectors come as row vectors by default, so a product $u v^\top$ of
 two $\Fn$ vectors is a scalar.
@@ -1092,7 +1093,7 @@ $$
 This is an $F_2$ scalar which gives the commutator of the 
 two operators.
 
-Now we wish to use this language to decompose the gauge group $G.$
+We wish to use this language to decompose a CSS gauge group $G.$
 First we write the gauge group generators in terms of
 $X$-type and $Z$-type operators:
 $$
@@ -1103,11 +1104,94 @@ we are going to rewrite the gauge group generators
 as a union of stabilizer generators $S_0 = S_X \cup S_Z$
 and reduced gauge generators $R_0 = R_X \cup R_Z.$
 
-
-
+\def\Im{\mathrm{im}}
+\def\Ker{\mathrm{ker}}
+\def\Span{\mathrm{span}}
 \begin{center}
 \includegraphics[]{pic-symplectic.pdf}
 \end{center}
+
+Note that we consider each of these blocks 
+$L_X, L_Z, S_X, T_Z, T_X, S_Z, R_X, R_Z$
+as either a set of $\Fn$ vectors or as an $F_2$ matrix
+with $n$ columns.
+For example, we write $u\in R_X$ to mean $u$ is in
+the set $R_X$, or given $v\in F_2^r$ then $u = R_X v^\top$ is
+in the rowspace of $R_X.$
+
+We first find the stabilizers $S_Z$.
+These are built out of $\Fn$ vectors from the span of $G_Z$
+that commute with the rows of $G_X:$
+\begin{align*}
+    \Span(S_Z) &= \{\  vG_Z \ |\  v G_Z G_X^\top = 0, \ \ v \in F_2^{|G_Z|}\ \} \\
+               &= \{\  vG_Z \ |\  v^\top \in \Ker(G_X G_Z^\top)  \ \}.
+\end{align*}
+And similarly for $S_X.$
+
+To find the reduced gauge group $R_X$ we project the gauge
+group generators onto the orthogonal complement of $S_X.$
+Such a projector is given by
+$$
+    P_X := I + A^\top S_X
+$$
+where the matrix $A$ is the $m_X\times n$ matrix consisting of
+the leading 1's in a row-reduction of $S_X.$
+We find $R_Z$ in a similar way.
+
+The logical operators $L_Z$ 
+span the kernel of $G_X$ intersected with the complement
+of the span of $H_Z.$
+
+The error operators $T_X$ are found as the solution
+to the linear system:
+\begin{align*}
+    H_Z T_X^\top &= I \\
+    L_Z T_X^\top &= 0 \\
+    R_Z T_X^\top &= 0
+\end{align*}
+\emph{and on it goes...}
+
+All of this can be summarized in the block matrix equation:
+$$
+\left( \begin{array}{l}
+L_X\\
+S_X\\
+T_X\\
+R_X
+\end{array} \right)
+\left( \begin{array}{l}
+L_Z\\
+T_Z\\
+S_Z\\
+R_Z
+\end{array} \right)^\top =
+I.
+$$
+
+This is another kind of representation theory of $\Pauli_n.$
+We are representing either $G_X$ or $G_Z$ as a permutation representation (?)
+It has the ability to extract irreps of $G$ corresponding to
+the $X$ type operators as affine subspaces $\{vR_X+t\}$ of $\Fn.$
+For the $Z$ representations we will still need the complex
+representation theory to build states on $\Complex[\{vR_X+t\}]$
+that look like ``waves''.
+These (stationary) waves do indeed have a geometric interpretation,
+with the wavefronts being identified with so-called Cheeger cuts.
+To switch back and forth between the $X$ and $Z$ type
+representations 
+we make the following definitions.
+A gauge code is \emph{self-dual} when the $X$ and $Z$ type
+gauge generators are equal: $$G_X = G_Z.$$
+
+A gauge code is \emph{weakly self-dual}
+when there is a permutation $P$ on the set of $n$ qubits
+that induces equality of the gauge generators:
+$$
+    G_X P = G_Z,
+$$
+where we write $P$ as an $n\times n$ permutation matrix.
+The compass model is then weakly self-dual when we transpose
+the square lattice of $l\times l$ qubits.
 
 \subsection{Perron-Frobenius structure theory}
 
@@ -1231,6 +1315,14 @@ $$
 To bound $\lambda_2$ from below, we use a variational argument.
 For any unit vector $v$ orthogonal to the top eigenspace of $\Ham$ we
 have $v^\top \Ham v \le \lambda_2.$
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+\subsection{The compass model is gapless}
+
+Although there is strong evidence that the gap dissapears as the lattice size
+$l$ grows, it is still worthwhile considering the exact reasons for this.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %

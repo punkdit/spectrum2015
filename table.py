@@ -240,6 +240,7 @@ h = 4.0
 hk = 0.2 * h
 hmx = 0.3 * h
 hmz = 0.3 * h
+hm = hmx+hmz
 hr = 0.4 * h
 
 dm = 0.2
@@ -277,7 +278,7 @@ pair(x, y, y+hk, "L_X", "L_Z", True, True)
 
 axis(x-0.5, y, y+hk, "$k$")
 
-axis(x+2*w+0.5, 0., hr+hm+hk+2*dm, "$n$")
+axis(x+2*w+0.5, 0., hr+hm+hk+3*dm, "$n$")
 
 
 c.writePDFfile("pic-symplectic.pdf")

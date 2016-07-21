@@ -680,7 +680,8 @@ def main():
 
         return
 
-    Lz = find_logops(Gx, Hz)
+    Lz = find_logops(Gx, Hz, verbose=True)
+    print "Lz:", shortstr(Lz)
 
     check_commute(Lz, Gx)
     check_commute(Lz, Hx)
