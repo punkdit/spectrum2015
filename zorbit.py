@@ -8,7 +8,7 @@ from scipy.sparse.linalg import eigs, eigsh
 
 from solve import shortstr, shortstrx, parse, eq2, dot2, zeros2, array2, identity2
 from solve import row_reduce, RowReduction, span, get_reductor
-from solve import u_inverse, find_logops, solve
+from solve import u_inverse, find_logops, solve, find_kernel, linear_independant
 
 from lanczos import write, show_eigs
 from code import lstr2
@@ -100,6 +100,50 @@ def build_compass(l):
         Hz[idx, coords[idx+1, j]] = 1
 
     assert dot2(Hx, Hz.transpose()).sum() == 0
+
+    return Gx, Gz, Hx, Hz
+
+
+def XXbuild_chain(n):
+
+    assert n%2 == 0
+
+    m = n//2
+    Gx = zeros2(m, n)
+    Gz = zeros2(m, n)
+    for i in range(m):
+        Gx[i, 2*i] = 1
+        Gx[i, (2*i+1)%n] = 1
+        
+        Gz[i, 2*i] = 1
+        Gz[i, (2*i-1)%n] = 1
+
+    Hx = zeros2(1, n)
+    Hz = zeros2(1, n)
+
+    Hx[:] = 1
+    Hz[:] = 1
+
+    return Gx, Gz, Hx, Hz
+
+
+def build_chain(n):
+
+    m = n
+    Gx = zeros2(m, n)
+    Gz = zeros2(m, n)
+    for i in range(m):
+        Gx[i, i] = 1
+        Gx[i, (i+1)%n] = 1
+        
+        Gz[i, i] = 1
+        Gz[i, (i+1)%n] = 1
+
+    Hx = zeros2(1, n)
+    Hz = zeros2(1, n)
+
+    Hx[:] = 1
+    Hz[:] = 1
 
     return Gx, Gz, Hx, Hz
 
@@ -658,6 +702,19 @@ def find_errors(Hx, Lx, Rx):
 
     return Tz
 
+    
+def find_stabs(Gx, Gz):
+    n = Gx.shape[1]
+    A = dot2(Gx, Gz.transpose())
+    vs = find_kernel(A)
+    vs = list(vs)
+    #print "kernel GxGz^T:", len(vs)
+    Hz = zeros2(len(vs), n)
+    for i, v in enumerate(vs):
+        Hz[i] = dot2(v.transpose(), Gz)  
+    Hz = linear_independant(Hz)
+    return Hz    
+
 
 def main():
 
@@ -676,9 +733,18 @@ def main():
         Gx, Gz, Hx = build1()
         Hz = Hx.copy()
 
+    elif argv.chain:
+
+        n = argv.get('n', 4)
+        Gx, Gz, Hx, Hz = build_chain(n)
+
     else:
 
         return
+
+    print shortstrx(Gx, Gz)
+    print "Hz:"
+    print shortstr(find_stabs(Gx, Gz))
 
     Lz = find_logops(Gx, Hz, verbose=True)
     print "Lz:", shortstr(Lz)

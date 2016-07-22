@@ -57,7 +57,7 @@
 \begin{document}
 
 %\title{Representations of Pauli Operator Hamiltonians}
-\title{Representations and Spectra of Subsystem Code Hamiltonians}
+\title{Representations and Spectra of Gauge Code Hamiltonians}
 
 \author{Simon Burton}
 %\affiliation{Centre for Engineered Quantum Systems, School of Physics, The University of Sydney}
@@ -86,7 +86,9 @@ the gauge color code model are gapped.
 Some numerics and intuition provided.
 \end{abstract}
 
+\newpage
 \tableofcontents
+\newpage
 
 % CUT HERE
 
@@ -1167,6 +1169,10 @@ R_Z
 \end{array} \right)^\top =
 I.
 $$
+%The rows of the matrix are linearly
+%independant.
+This again is a presentation of the Pauli group.
+
 
 This is another kind of representation theory of $\Pauli_n.$
 We are representing either $G_X$ or $G_Z$ as a permutation representation (?)
@@ -1315,6 +1321,32 @@ $$
 To bound $\lambda_2$ from below, we use a variational argument.
 For any unit vector $v$ orthogonal to the top eigenspace of $\Ham$ we
 have $v^\top \Ham v \le \lambda_2.$
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+
+\subsection{On the gap}
+
+We first consider a linear graph Hamiltonian
+with a ``double-well'' potential.
+This does not correspond to any gauge code Hamiltonian.
+We take
+$ \Ham = A + U $
+with
+$$
+A_{ij} = \left\{ \begin{array}{ll}
+     1 &\mbox{if}\  |i-j|=1,  \\
+     0 &\mbox{otherwise}\end{array}\right.
+\ \ \mbox{and}\ \ 
+U_{ij} =  \left\{ \begin{array}{ll}
+     2 &\mbox{if}\  i=j=1 \ \ \mbox{or}\ \  i=j=n, \\
+     0 &\mbox{otherwise.}\end{array}\right.
+$$
+
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %

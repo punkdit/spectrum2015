@@ -1,7 +1,14 @@
+
 22/7/16
 =======
 
 sophie.physics.usyd.edu.au:spectrum2015$ nice ./ex3 -eps_nev 1 -eps_type lanczos -eps_hermitian -eps_largest_magnitude  -info -eps_monitor -eps_view_vectors binary:/import/stan1/sburton/evec.gs.2.bin -eps_tol 1e-3 > ex3.gs.2.out &
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+      104.076026             2.3181e-05
+ ---------------------- --------------------
+
 
 
 stan.physics.usyd.edu.au:spectrum2015$ ./ex3 -eps_nev 1 -eps_type arnoldi -info -eps_ncv 2 -eps_monitor -eps_view_vectors binary:/export/stan1/sburton/evec.gs.3.bin -eps_tol 1e-3 > ex3.gs.3.out &

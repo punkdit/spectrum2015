@@ -128,6 +128,10 @@ int main(int argc,char **argv)
     if(cutoff != 99999)
         printf("setting cutoff to %d\n", (int)cutoff);
 
+    char filename[256];
+    PetscBool set_filename;
+    ierr = PetscOptionsGetString(NULL, NULL, "-load", filename, sizeof(filename), &set_filename);CHKERRQ(ierr);
+
   ierr = PetscPrintf(PETSC_COMM_WORLD,"Hamiltonian Eigenproblem (matrix-free version), n=%D\n",n);CHKERRQ(ierr);
   ierr = MatCreateShell(PETSC_COMM_WORLD,n,n,n,n,&n,&A);CHKERRQ(ierr);
   ierr = MatSetFromOptions(A);CHKERRQ(ierr);
@@ -138,12 +142,29 @@ int main(int argc,char **argv)
   ierr = EPSSetProblemType(eps,EPS_HEP);CHKERRQ(ierr);
   ierr = EPSSetFromOptions(eps);CHKERRQ(ierr);
 
-    printf("EPSSetInitialSpace\n");
-    Vec iv;
-    VecCreateSeq(PETSC_COMM_SELF, n, &iv);
-    VecSet(iv, 1.0);
-    ierr = EPSSetInitialSpace(eps, 1, &iv);CHKERRQ(ierr);
-    VecDestroy(&iv);
+    if(set_filename)
+    {
+        printf("Loading vector from %s\n", filename);
+        Vec iv;
+        PetscViewer binv;
+        //ierr = PetscViewerCreate(PETSC_COMM_WORLD, &binv);
+        ierr = PetscViewerBinaryOpen(PETSC_COMM_WORLD, filename, FILE_MODE_READ, &binv);
+        //ierr = VecCreateSeq(PETSC_COMM_SELF, n, &iv);CHKERRQ(ierr);
+        ierr = VecCreate(PETSC_COMM_SELF, &iv);CHKERRQ(ierr);
+        ierr = VecLoad(iv, binv);CHKERRQ(ierr);
+        ierr = EPSSetInitialSpace(eps, 1, &iv);CHKERRQ(ierr);
+        VecDestroy(&iv);
+        PetscViewerDestroy(&binv);
+    }
+    else
+    {
+        printf("EPSSetInitialSpace\n");
+        Vec iv;
+        ierr = VecCreateSeq(PETSC_COMM_SELF, n, &iv);CHKERRQ(ierr);
+        ierr = VecSet(iv, 1.0);CHKERRQ(ierr);
+        ierr = EPSSetInitialSpace(eps, 1, &iv);CHKERRQ(ierr);
+        VecDestroy(&iv);
+    }
 
     printf("EPSSolve\n");
   ierr = EPSSolve(eps);CHKERRQ(ierr);
