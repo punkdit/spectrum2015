@@ -1043,6 +1043,121 @@ mutually anti-commuting string operators $R_0.$
 \section{Spectra}
 \label{spectra}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+\subsection{The double well model is gapless}
+
+We consider a linear graph Hamiltonian
+with a ``double-well'' potential.
+This does not correspond to any gauge code Hamiltonian.
+The state space will be $d$ dimensional with
+basis vectors numbered $\ket{1},...,\ket{d}.$
+We take
+$ \Ham = A + U $
+with
+$$
+A_{ij} = \left\{ \begin{array}{ll}
+     1 &\mbox{if}\  |i-j|=1,  \\
+     0 &\mbox{otherwise}\end{array}\right.
+\ \ \mbox{and}\ \ 
+U_{ij} =  \left\{ \begin{array}{ll}
+     2 &\mbox{if}\  i=j=1 \ \ \mbox{or}\ \  i=j=n, \\
+     0 &\mbox{otherwise.}\end{array}\right.
+$$
+For $d\gg 1$, the largest
+eigenvalue is $\lambda_1 \cong \frac{5}{2}$.
+The corresponding eigenvector $\ket{v_1}$
+has all positive components that
+decay exponentially away from the well sites
+at $\ket{1}$ and $\ket{d}:$
+$$
+    \braket{i}{v_1} 
+    \cong 2^{i-1} \braket{1}{v_1}
+    \ \ \mbox{for}\ \ i\ll \frac{d}{2}.
+$$
+For the second eigenvalue, $\lambda_2$
+we also have  $\lambda_2 \cong \frac{5}{2}$
+and indeed, as $d$ grows
+the gap $\lambda_1 - \lambda_2 \rightarrow 0$
+and so this model is gapless.
+
+Here we depict the wavefunctions for
+the first two eigenvectors for a system with $d=12:$
+\begin{center}
+\includegraphics[]{pic-dwell.pdf}
+\end{center}
+The simplest way to show this model
+is gapless is using a variational
+argument.
+Any another vector $\ket{u}$
+that is orthogonal to the groundspace
+vector will have $\bra{u}H\ket{u} \le \lambda_2.$
+To construct a candidate for $\ket{u}$
+partition the
+basis vectors into two parts:
+$$
+    \Gamma = \Gamma_A \cup \Gamma_B
+$$
+and write $\ket{v_1} = 
+\ket{v_A}\oplus\ket{v_B}$
+and write the Hamiltonian with this
+decomposition as
+$$
+H = 
+\left(\begin{array}{ll}
+H_{AA} & H_{AB} \\
+H_{BA} & H_{BB}
+\end{array}\right).
+$$
+Now let
+$$
+    \ket{u} = \ket{v_A} \oplus -\ket{v_B}
+$$
+%$$
+%\braket{i}{u} =
+%    \left\{ \begin{array}{ll}
+%     +\braket{i}{v_1} &\mbox{if}\ \ket{i}\in\Gamma_A \\
+%     -\braket{i}{v_1} &\mbox{if}\ \ket{i}\in\Gamma_B\end{array}\right..
+%$$
+And then
+\begin{align*}
+    \lambda_2 \ge \bra{u}H\ket{u} &= 
+\bra{v_A}H_{AA}\ket{v_A} +
+\bra{v_B}H_{BB}\ket{v_B} -
+\bra{v_B}H_{BA}\ket{v_A} -
+\bra{v_A}H_{AB}\ket{v_B} \\
+    &= \lambda_1 - 4 \bra{v_B}H_{BA}\ket{v_A}.
+\end{align*}
+So if we can show that 
+$ \bra{v_B}H_{BA}\ket{v_A}$
+tends to zero we are done.
+This term involves the 
+dynamical coupling between the
+groundstate wavefunction along
+the ``cut'' between $A$ and $B$.
+To succeed we must find such a cut where
+the wavefunction is small. In general
+this appears to be quite difficult,
+even though in the models we are considering
+numerics show that not only is the
+wavefunction small away from potential wells
+but it is exponentially small.
+
+In summary, we note the important
+features of this model.
+The groundstate wavefunction has all
+positive components, which implies
+that the size of the gap is controlled
+by the ``weight'' of a cut.
+Also, we are hinting at the role
+of symmetry as these cuts will
+turn out to be reflection lines
+under certain symmetries of the models
+we consider.
+
+\subsection{CSS gauge code Hamiltonians}
+
 \def\Fn{F_2[n]}
 
 In the remainder of this paper, we restrict our
@@ -1182,7 +1297,7 @@ For the $Z$ representations we will still need the complex
 representation theory to build states on $\Complex[\{vR_X+t\}]$
 that look like ``waves''.
 These (stationary) waves do indeed have a geometric interpretation,
-with the wavefronts being identified with so-called Cheeger cuts.
+with the wavefront nodes being identified with so-called Cheeger cuts.
 To switch back and forth between the $X$ and $Z$ type
 representations 
 we make the following definitions.
@@ -1321,31 +1436,6 @@ $$
 To bound $\lambda_2$ from below, we use a variational argument.
 For any unit vector $v$ orthogonal to the top eigenspace of $\Ham$ we
 have $v^\top \Ham v \le \lambda_2.$
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-
-
-\subsection{On the gap}
-
-We first consider a linear graph Hamiltonian
-with a ``double-well'' potential.
-This does not correspond to any gauge code Hamiltonian.
-We take
-$ \Ham = A + U $
-with
-$$
-A_{ij} = \left\{ \begin{array}{ll}
-     1 &\mbox{if}\  |i-j|=1,  \\
-     0 &\mbox{otherwise}\end{array}\right.
-\ \ \mbox{and}\ \ 
-U_{ij} =  \left\{ \begin{array}{ll}
-     2 &\mbox{if}\  i=j=1 \ \ \mbox{or}\ \  i=j=n, \\
-     0 &\mbox{otherwise.}\end{array}\right.
-$$
-
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
