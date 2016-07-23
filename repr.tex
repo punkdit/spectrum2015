@@ -237,7 +237,7 @@ Such an arrangement of basis vectors has a cartesian product
 structure which induces a tensor product decomposition of
 the original state space.
 \begin{center}
-\includegraphics[width=0.9\columnwidth]{pic-operators.pdf}
+\includegraphics[width=0.7\columnwidth]{pic-operators.pdf}
 \end{center}
 The Hamiltonian acts on states by left multiplication.
 Because this action
@@ -247,7 +247,7 @@ one for each $G-$orbit.
 We depict this action as a weighted graph, where we omit edges
 with zero weight:
 \begin{center}
-\includegraphics[width=0.9\columnwidth]{pic-orbit.pdf}
+\includegraphics[width=0.7\columnwidth]{pic-orbit.pdf}
 \end{center}
 
 \def\Xt{\tilde{X}}
@@ -274,7 +274,7 @@ $$
 
 
 
-\subsection{Representation theory}
+\subsection{Complex representations}
 
 \subsubsection{The Pauli group}
 
@@ -630,7 +630,8 @@ $2^m$ many irreps $\rho_t,$
 each with dimension $2^r,$ 
 and appearing with multiplicity $2^k:$
 $$
-    \rho_{\mathrm{pauli}} = \bigoplus_{l\in L, t\in T} \rho_t.
+    \rho_{\mathrm{pauli}} = 
+        \bigoplus_{t\in T}\ \rho_t \otimes I^{\otimes k}
 $$
 %where we label the $2^r$-dimensional irreps by $t\in T.$
 %See appendix for details.
@@ -700,9 +701,9 @@ for each irrep $\rho_t$ appearing in $\Ham.$
 \noindent{\bf Fact 0:}
 
 The Hamiltonian is block diagonalized, with blocks indexed by operators $t$ in
-the abelian group $T$ and multiplicity indexed by logical operators $l\in L:$
+the abelian group $T$ and multiplicity $2^k:$
 $$
-    \Ham =  \bigoplus_{l\in L, t\in T} \Ham_t
+    \Ham =  \bigoplus_{t\in T}\ \Ham_t \otimes I^{\otimes k}.
 $$
 \end{framed}
 Writing $I$ for the identity element of $T$ we write the corresponding
@@ -826,6 +827,20 @@ which can be subsumed into the gauge code as operators $\pm I.$
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+
+\subsubsection{The $XY$-model}
+
+The $XY$-model lives on a one dimensional chain of $n$ qubits.
+We write the gauge group generators as
+$$
+    G_0 = \{ X_i X_{i+1}, Z_i Z_{i+1} \ \mbox{for}\ i=1,...,n \}
+$$
+with periodic boundary conditions.
+
+This example shares features of both the previous and the next examples.
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
@@ -1024,20 +1039,265 @@ mutually anti-commuting string operators $R_0.$
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
 
-%\subsubsection{Self-representations}
-%
-%In general we can represent $G=\Stab\times R$ in $R$ itself..
-%and if we construct generators $R_0$ of $R$ by discarding
-%elements of $G$ (ie. $R_0\subset G$), then the resulting
-%Hamiltonian blocks look like a smaller version
-%of the original code, along with ``frozen'' logical
-%operators and stabilizers. {\it XXX work all this out XXX}
+%\subsection{CSS gauge code Hamiltonians}
+\subsection{Representations over a finite field}
 
-% apart from 2d compass model this seems like it will rarely work...
-% Actually it doesn't even work on the 2d compass model.
+\def\Cn{\Complex[2^n]}
+\def\Cr{\Complex[2^r]}
+\def\Fn{F_2[n]}
+\def\Fr{F_2[r]}
+
+This is a way of ``brute-forcing'' the representations when
+we cannot find a way of writing them down in a closed form expression.
+For finite systems this yields an algorithm that is efficiently implementable.
+
+In this section, and the remainder of this paper,
+we restrict our
+attention to gauge groups formed from terms 
+in $\Pauli^X\cup\Pauli^Z.$
+We call these \emph{CSS gauge codes.}
+We briefly review the $F_2$ symplectic structure of
+these operators.
+
+Both $\Pauli^X_n$ and $\Pauli^Z_n$ are abelian groups,
+and can be identified with the additive 
+group structure of the $n$ dimensional vector space
+over the finite field of two elements $F_2:$
+$$
+    \Pauli^X_n \cong \Fn,  \ \ 
+    \Pauli^Z_n \cong \Fn. 
+$$
+we do this in the obvious way by sending $X_i$ to the basis vector with
+$1$ in the $i-$th entry, and similarly for each $Z_i$. 
+We also identify the computational basis of our statespace $\Complex[2^n]$
+with $\Fn$ in the obvious way.
+This has the potential to be very confusing but 
+apart from $X$ and $Z$ subscripts
+we resist the physicist habit of endowing our symbols with decoration that remind us where the
+symbol lives.
+
+$X$-type operators act on basis vectors using $F_2$ addition:
+$$
+    g_X \in \Pauli^X_n \cong \Fn, \ \ g_X : v \longmapsto g_X + v
+$$
+
+$Z$-type operators act on basis vectors using $F_2$ inner product:
+$$
+    g_Z \in \Pauli^Z_n \cong \Fn, \ \ g_Z : v \longmapsto g_Z v^\top
+$$
+This is an $F_2$ scalar, just zero or one. We think of this
+as a ``syndrome''.
+Our $\Fn$ vectors come as row vectors by default, so a product $u v^\top$ of
+two $\Fn$ vectors is a scalar.
+
+It doesn't make sense to add an $X$-type operator and
+a $Z$-type operator:
+$$
+    g_Z + g_X \ \ \ \mbox{\emph{no no!!!}}
+$$
+but it does make sense to take the inner product:
+$$
+    g_Z g_X^\top = g_X g_Z^\top.
+$$
+This is an $F_2$ scalar which gives the commutator of the 
+two operators.
+
+We wish to use this language to decompose a CSS gauge group $G.$
+First we write the gauge group generators in terms of
+$X$-type and $Z$-type operators:
+$$
+    G_0 = G_X \cup G_Z.
+$$
+Following the theory from the previous section,
+we are going to rewrite the gauge group generators
+as a union of stabilizer generators $S_0 = S_X \cup S_Z$
+and reduced gauge generators $R_0 = R_X \cup R_Z.$
+
+\def\Im{\mathrm{im}}
+\def\Ker{\mathrm{ker}}
+\def\Span{\mathrm{span}}
+\begin{center}
+\includegraphics[]{pic-symplectic.pdf}
+\end{center}
+
+Note that we consider each of these blocks 
+$L_X, L_Z, S_X, T_Z, T_X, S_Z, R_X, R_Z$
+as either a set of $\Fn$ vectors or as an $F_2$ matrix
+with $n$ columns.
+For example, we write $u\in R_X$ to mean $u$ is in
+the set $R_X$, or given $v\in \Fr$ then $u = R_X v^\top$ is
+in the rowspace of $R_X.$
+
+We first find the stabilizers $S_Z$.
+These are built out of $\Fn$ vectors from the span of $G_Z$
+that commute with the rows of $G_X:$
+\begin{align*}
+    \Span(S_Z) &= \{\  vG_Z \ |\  v G_Z G_X^\top = 0, \ \ v \in F_2^{|G_Z|}\ \} \\
+               &= \{\  vG_Z \ |\  v^\top \in \Ker(G_X G_Z^\top)  \ \}.
+\end{align*}
+And similarly for $S_X.$
+
+To find the reduced gauge group $R_X$ we project the gauge
+group generators onto the orthogonal complement of $S_X.$
+Such a projector is given by
+$$
+    P_X := I + A^\top S_X
+$$
+where the matrix $A$ is the $m_X\times n$ matrix consisting of
+the leading 1's in a row-reduction of $S_X.$
+We find $R_Z$ in a similar way.
+
+The logical operators $L_Z$ 
+span the kernel of $G_X$ intersected with the complement
+of the span of $H_Z.$
+
+The error operators $T_X$ are found as the solution
+to the linear system:
+\begin{align*}
+    H_Z T_X^\top &= I \\
+    L_Z T_X^\top &= 0 \\
+    R_Z T_X^\top &= 0
+\end{align*}
+\emph{and on it goes...}
+
+All of this can be summarized in the block matrix equation:
+$$
+\left( \begin{array}{l}
+L_X\\
+S_X\\
+T_X\\
+R_X
+\end{array} \right)
+\left( \begin{array}{l}
+L_Z\\
+T_Z\\
+S_Z\\
+R_Z
+\end{array} \right)^\top =
+I.
+$$
+%The rows of the matrix are linearly
+%independant.
+And once again we have a presentation of the Pauli group.
+
+%This is another kind of representation theory of $\Pauli_n.$
+%We are representing either $G_X$ or $G_Z$ as a permutation representation (?)
+%It has the ability to extract irreps of $G$ corresponding to
+%the $X$ type operators as affine subspaces $\{vR_X+t\}$ of $\Fn.$
+%For the $Z$ representations we will still need the complex
+%representation theory to build states on $\Complex[\{vR_X+t\}]$
+%that look like ``waves''.
+%These (stationary) waves do indeed have a geometric interpretation,
+%with the wavefront nodes being identified with so-called Cheeger cuts.
+%To switch back and forth between the $X$ and $Z$ type
+%representations 
+
+We now wish to understand the action of the
+gauge group on each of its irreps.
+Let us start with the $t=I$ irrep.
+This is where each of the stabilizers has
+a trivial action, which in the $\Fn$ world
+corresponds to the zero vector.
+
+States $u\in\Span(R_X)$ correspond to
+states
+$$
+    u = v R_X
+$$
+with $v\in\Fr.$
+Indeed, since $R_X R_Z^\top = I$
+we can write $v = u R_Z^\top.$
+For each $g_X\in G_X$ these act as
+\begin{align*}
+    u_1 &= (u + g_X) \ \mbox{mod}\  S_X \\
+        &= (u + g_X) P_X \\
+        &= (v R_X + g_X) P_X.
+\end{align*}
+writing $u_1 = v_1 R_X$ we then have
+\begin{align*}
+    v_1 &= (v R_X + g_X) P_X R_Z^\top \\
+        &= v + g_X P_X R_Z^\top.
+\end{align*}
+
+So we have that working in the computational
+basis, the action of the $X$ part of the
+gauge group in the $t=I$ irrep is to send
+$v\in R_X$ to 
+$v + g_X P_X R_Z^\top.$
+
+In the computational basis, the Hamiltonian
+is a $2^n\times 2^n$ element matrix which
+we can index using a pair of $\Fn$ vectors.
+Here we use a function notation for this:
+\begin{align*}
+    H : \Fn \times \Fn &\to \Complex
+        %(u, v) &\mapsto H(u, v).
+\end{align*}
+Each irrep of the gauge group 
+will then be acting on a subspace of 
+$\Cn$ spanned by basis vectors 
+
+$$
+    \Cn \cong \Complex[\Fn]
+$$
+
+Lets record this in our Hamiltonian block $H_I$
+by indexing the matrix components with a function notation. 
+The Hamiltonian takes a pair of
+basis vectors and produces a complex number:
+$H_I : \Fr\times\Fr \to \Complex.$
+And we have the following off-diagonal components:
+$$
+    H_I(v, v+g_X P_Z R_Z^\top) = 1,\ \ \mbox{for}\ g_X\in G_X, v\in \Fr
+$$
+with all other off-diagonal components zero.
+The diagonal components come from 
+the action of the $G_Z$ gauge group.
+All that happens is that we multiply by
+a weighting that depends on the syndrome
+vector:
+$$
+    \mbox{syndrome}(u) = G_Z u
+$$
+for $u\in \Fn.$
+This is an $F_2$ vector that has one component for
+each row of $G_Z.$
+Write $|G_Z|$ for the number of these rows, and 
+using a \emph{weight} function $w$ that just counts
+the number of non-zero entries in any $F_2$ vector
+we have:
+$$
+    H_I(v, v) = |G_Z| - 2w(G_Z R_X^\top v^\top),
+$$
+for $v\in \Fr.$
+
+For any $t=t_X\in T_X$ the Hamiltonian block $H_t$
+has components indexed by basis vectors:
+$$
+    u = v R_X + t_X
+$$
+
+
+\subsubsection{Self-dual codes}
+
+We make the following definitions.
+A gauge code is \emph{self-dual} when the $X$ and $Z$ type
+gauge generators are equal: $$G_X = G_Z.$$
+
+The $XY$-model is an example of a self-dual code.
+A gauge code is \emph{weakly self-dual}
+when there is a permutation $P$ on the set of $n$ qubits
+that induces equality of the gauge generators:
+$$
+    G_X P = G_Z,
+$$
+where we write $P$ as an $n\times n$ permutation matrix.
+The compass model is then weakly self-dual when we transpose
+the square lattice of $l\times l$ qubits.
+
+
+\subsubsection{The gauge color code}
 
 
 \section{Spectra}
@@ -1155,164 +1415,6 @@ of symmetry as these cuts will
 turn out to be reflection lines
 under certain symmetries of the models
 we consider.
-
-\subsection{CSS gauge code Hamiltonians}
-
-\def\Fn{F_2[n]}
-
-In the remainder of this paper, we restrict our
-attention to gauge groups formed from terms 
-in $\Pauli^X\cup\Pauli^Z.$
-We call these \emph{CSS gauge codes.}
-We briefly review the $F_2$ symplectic structure of
-these operators.
-
-Both $\Pauli^X_n$ and $\Pauli^Z_n$ are abelian groups,
-and can be identified with the additive 
-group structure of the $n$ dimensional vector space
-over the finite field of two elements $F_2:$
-$$
-    \Pauli^X_n \cong \Fn,  \ \ 
-    \Pauli^Z_n \cong \Fn. 
-$$
-we do this in the obvious way by sending $X_i$ to the basis vector with
-$1$ in the $i-$th entry, and similarly for each $Z_i$. 
-We also identify the computational basis of our statespace $\Complex[2^n]$
-with $\Fn$ in the obvious way.
-This has the potential to be very confusing but 
-apart from $X$ and $Z$ subscripts
-we resist the physicist habit of endowing our symbols with decoration that remind us where the
-symbol lives.
-
-$X$-type operators act on basis vectors using $F_2$ addition:
-$$
-    g_X \in \Pauli^X_n \cong \Fn, \ \ g_X : v \longmapsto g_X + v
-$$
-
-$Z$-type operators act on basis vectors using $F_2$ inner product:
-$$
-    g_Z \in \Pauli^Z_n \cong \Fn, \ \ g_Z : v \longmapsto g_Z v^\top
-$$
-This is an $F_2$ scalar, just zero or one. We think of this
-as a ``syndrome''.
-Our $\Fn$ vectors come as row vectors by default, so a product $u v^\top$ of
-two $\Fn$ vectors is a scalar.
-
-It doesn't make sense to add an $X$-type operator and
-a $Z$-type operator:
-$$
-    g_Z + g_X \ \ \ \mbox{\emph{no no!!!}}
-$$
-but it does make sense to take the inner product:
-$$
-    g_Z g_X^\top = g_X g_Z^\top.
-$$
-This is an $F_2$ scalar which gives the commutator of the 
-two operators.
-
-We wish to use this language to decompose a CSS gauge group $G.$
-First we write the gauge group generators in terms of
-$X$-type and $Z$-type operators:
-$$
-    G_0 = G_X \cup G_Z.
-$$
-Following the theory from the previous section,
-we are going to rewrite the gauge group generators
-as a union of stabilizer generators $S_0 = S_X \cup S_Z$
-and reduced gauge generators $R_0 = R_X \cup R_Z.$
-
-\def\Im{\mathrm{im}}
-\def\Ker{\mathrm{ker}}
-\def\Span{\mathrm{span}}
-\begin{center}
-\includegraphics[]{pic-symplectic.pdf}
-\end{center}
-
-Note that we consider each of these blocks 
-$L_X, L_Z, S_X, T_Z, T_X, S_Z, R_X, R_Z$
-as either a set of $\Fn$ vectors or as an $F_2$ matrix
-with $n$ columns.
-For example, we write $u\in R_X$ to mean $u$ is in
-the set $R_X$, or given $v\in F_2^r$ then $u = R_X v^\top$ is
-in the rowspace of $R_X.$
-
-We first find the stabilizers $S_Z$.
-These are built out of $\Fn$ vectors from the span of $G_Z$
-that commute with the rows of $G_X:$
-\begin{align*}
-    \Span(S_Z) &= \{\  vG_Z \ |\  v G_Z G_X^\top = 0, \ \ v \in F_2^{|G_Z|}\ \} \\
-               &= \{\  vG_Z \ |\  v^\top \in \Ker(G_X G_Z^\top)  \ \}.
-\end{align*}
-And similarly for $S_X.$
-
-To find the reduced gauge group $R_X$ we project the gauge
-group generators onto the orthogonal complement of $S_X.$
-Such a projector is given by
-$$
-    P_X := I + A^\top S_X
-$$
-where the matrix $A$ is the $m_X\times n$ matrix consisting of
-the leading 1's in a row-reduction of $S_X.$
-We find $R_Z$ in a similar way.
-
-The logical operators $L_Z$ 
-span the kernel of $G_X$ intersected with the complement
-of the span of $H_Z.$
-
-The error operators $T_X$ are found as the solution
-to the linear system:
-\begin{align*}
-    H_Z T_X^\top &= I \\
-    L_Z T_X^\top &= 0 \\
-    R_Z T_X^\top &= 0
-\end{align*}
-\emph{and on it goes...}
-
-All of this can be summarized in the block matrix equation:
-$$
-\left( \begin{array}{l}
-L_X\\
-S_X\\
-T_X\\
-R_X
-\end{array} \right)
-\left( \begin{array}{l}
-L_Z\\
-T_Z\\
-S_Z\\
-R_Z
-\end{array} \right)^\top =
-I.
-$$
-%The rows of the matrix are linearly
-%independant.
-This again is a presentation of the Pauli group.
-
-
-This is another kind of representation theory of $\Pauli_n.$
-We are representing either $G_X$ or $G_Z$ as a permutation representation (?)
-It has the ability to extract irreps of $G$ corresponding to
-the $X$ type operators as affine subspaces $\{vR_X+t\}$ of $\Fn.$
-For the $Z$ representations we will still need the complex
-representation theory to build states on $\Complex[\{vR_X+t\}]$
-that look like ``waves''.
-These (stationary) waves do indeed have a geometric interpretation,
-with the wavefront nodes being identified with so-called Cheeger cuts.
-To switch back and forth between the $X$ and $Z$ type
-representations 
-we make the following definitions.
-A gauge code is \emph{self-dual} when the $X$ and $Z$ type
-gauge generators are equal: $$G_X = G_Z.$$
-
-A gauge code is \emph{weakly self-dual}
-when there is a permutation $P$ on the set of $n$ qubits
-that induces equality of the gauge generators:
-$$
-    G_X P = G_Z,
-$$
-where we write $P$ as an $n\times n$ permutation matrix.
-The compass model is then weakly self-dual when we transpose
-the square lattice of $l\times l$ qubits.
 
 \subsection{Perron-Frobenius structure theory}
 
@@ -1610,10 +1712,15 @@ $\lambda$ & $\Ham_I$ degeneracy & $\Ham_I//A$ degeneracy \\
 \end{center}
 The reason we miss some excited spaces is that they do not contain
 any trivial irrep of $A.$
-If we wanted to capture these other spaces we could construct
-a different orbigraph by 
-summing over the orbit using different characters
-(or \emph{momenta} using abelian terminology).
+Note that we miss the eigenspace with $\lambda = -6$
+even though this is one dimensional. It must contain some other non-trivial
+one dimensional irrep. This cannot happen with the groundspace because
+those eigenvectors are all positive.
+
+If we want to make an orbigraph for these other spaces we would construct
+the orbigraph by
+summing over orbits using different characters of $A$
+(these are \emph{momenta} in the abelian terminology).
 See \cite{Cvetkovic1980} chapter 5 for more details.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

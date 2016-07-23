@@ -1,4 +1,21 @@
 
+23/7/16
+=======
+
+the XY model orbigraph:
+
+[[ 8   8   .   .   .   .   .   .   .   0],
+ [ 1   4   2   4   .   .   1   .   .   0],
+ [ .   4   4   .   4   .   .   .   .   0],
+ [ .   2   .   .   4   .   .   2   .   0],
+ [ .   .   1   4   .   2   .   .   1   0],
+ [ .   .   .   .   8   .   .   .   .   0],
+ [ .   4   .   .   .   .   .   4   .   0],
+ [ .   .   .   4   .   .   1  -4   2   1],
+ [ .   .   .   .   4   .   .   4  -4   0],
+ [ .   .   .   .   .   .   .   8   .  -8]]
+
+
 
 
 ./ex3 -eps_nev 1 -eps_ncv 2 -eps_type arnoldi -eps_largest_real -info -eps_monitor -load /import/stan1/sburton/evec.gs.2.bin -eps_tol 1e-3

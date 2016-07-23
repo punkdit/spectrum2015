@@ -104,30 +104,7 @@ def build_compass(l):
     return Gx, Gz, Hx, Hz
 
 
-def XXbuild_chain(n):
-
-    assert n%2 == 0
-
-    m = n//2
-    Gx = zeros2(m, n)
-    Gz = zeros2(m, n)
-    for i in range(m):
-        Gx[i, 2*i] = 1
-        Gx[i, (2*i+1)%n] = 1
-        
-        Gz[i, 2*i] = 1
-        Gz[i, (2*i-1)%n] = 1
-
-    Hx = zeros2(1, n)
-    Hz = zeros2(1, n)
-
-    Hx[:] = 1
-    Hz[:] = 1
-
-    return Gx, Gz, Hx, Hz
-
-
-def build_chain(n):
+def build_xy(n):
 
     m = n
     Gx = zeros2(m, n)
@@ -144,6 +121,25 @@ def build_chain(n):
 
     Hx[:] = 1
     Hz[:] = 1
+
+    return Gx, Gz, Hx, Hz
+
+
+def build_ising(n):
+
+    m = n
+    Gx = zeros2(m, n)
+    Gz = zeros2(m, n)
+    for i in range(m):
+        Gz[i, i] = 1
+        Gz[i, (i+1)%n] = 1
+
+        Gx[i, i] = 1 # transverse field
+
+    Hx = zeros2(1, n)
+    Hz = zeros2(0, n)
+
+    Hx[:] = 1
 
     return Gx, Gz, Hx, Hz
 
@@ -415,6 +411,10 @@ def do_orbiham(A, U):
     rows = range(N)
     rows.sort(key = lambda i : -H1[i, i])
 
+    if argv.sort:
+        H1 = H1[rows, :]
+        H1 = H1[:, rows]
+
     if argv.show:
         #print lstr2(H1, 0)
         print "orbiham:"
@@ -572,7 +572,7 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     code.append("assert(nx == %d);"%n)
     code.append("memset(py, 0, sizeof(PetscScalar)*nx);")
 
-    offset = argv.get("offset", 0)
+    offset = argv.get("offset", None)
 
     mz = len(Gz)
 #    print "Hz:"
@@ -728,15 +728,17 @@ def main():
         Gx, Gz, Hx, Hz = build_compass(l)
 
     elif argv.gcolor2:
-
         from gcolor import build as build1
         Gx, Gz, Hx = build1()
         Hz = Hx.copy()
 
-    elif argv.chain:
-
+    elif argv.xy:
         n = argv.get('n', 4)
-        Gx, Gz, Hx, Hz = build_chain(n)
+        Gx, Gz, Hx, Hz = build_xy(n)
+
+    elif argv.ising:
+        n = argv.get('n', 4)
+        Gx, Gz, Hx, Hz = build_ising(n)
 
     else:
 
@@ -749,6 +751,7 @@ def main():
     Lz = find_logops(Gx, Hz, verbose=True)
     print "Lz:", shortstr(Lz)
 
+    #print Lz.shape, Gx.shape
     check_commute(Lz, Gx)
     check_commute(Lz, Hx)
     
@@ -789,6 +792,8 @@ def main():
     #    print s
     #print "RzRxt"
     #print shortstr(dot2(Rz, Rx.transpose()))
+
+    offset = argv.offset
 
     if argv.dense:
         dense(**locals())
@@ -852,7 +857,8 @@ def main():
         A = {} # adjacency
         U = [] # potential
 
-        offset = mz + 1 # make H positive definite
+        if offset is None:
+            offset = mz + 1 # make H positive definite
 
         for i, v in enumerate(verts):
             if i%1000==0:
