@@ -527,10 +527,11 @@ def dense(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
         for i, v in enumerate(genidx((2,)*r)):
             v = array2(v)
             syndrome = (dot2(Gz, Rx.transpose(), v) + Gzt)%2
-            xz = gz - 2*syndrome.sum()
+            value = gz - 2*syndrome.sum()
+            #print shortstr(dot2(Rx.transpose(), v)), value
             if H is not None:
-                H[i, i] = xz
-            U.append(xz)
+                H[i, i] = value
+            U.append(value)
 
         for i, v in enumerate(genidx((2,)*r)):
             v = array2(v)
@@ -744,6 +745,48 @@ def find_stabs(Gx, Gz):
     return Hz    
 
 
+def get_perm(fn):
+    n = len(fn)
+    perm = {}
+    for i in range(n):
+        if i != fn[i]:
+            perm[i] = fn[i]
+    return perm
+
+
+def do_symmetry(Gx, Gz):
+
+    rows = [shortstr(g) for g in Gx]
+    rows.sort()
+    assert len(set(rows)) == len(rows)
+    #print '\n'.join(rows)
+
+    from isomorph import Tanner, search
+    bag0 = Tanner.build(Gx, Gz)
+    bag1 = Tanner.build(Gx, Gz)
+
+    count = 0
+    perms = []
+    #keys = range(m, len(bag0))
+    #print "keys:", keys
+    for fn in search(bag0, bag1):
+        write('.')
+        perm = get_perm(fn)
+        for i, j in perm.items():
+            p0, p1 = bag0[i], bag0[j]
+            i, j = p0.row, p1.row
+            assert i!=j
+            #print shortstr(Gz[i])
+            #print shortstr(Gz[j])
+            #print
+        #print "="*70
+        #perm = tuple(fn[i]-m for i in keys)
+        #perms.append(perm)
+        count += 1
+    print
+    print "isomorphisms:", count
+
+
 def main():
 
     if argv.gcolor:
@@ -772,6 +815,10 @@ def main():
 
         return
 
+    if argv.symmetry:
+        do_symmetry(Gx, Gz)
+        return
+    
     print shortstrx(Gx, Gz)
     print "Hz:"
     print shortstr(find_stabs(Gx, Gz))
@@ -783,26 +830,6 @@ def main():
     check_commute(Lz, Gx)
     check_commute(Lz, Hx)
 
-    if argv.symmetry:
-        from isomorph import Tanner, search
-        bag0 = Tanner.build(Gx, Gz)
-        bag1 = Tanner.build(Gx, Gz)
-
-        count = 0
-        perms = []
-        #keys = range(m, len(bag0))
-        #print "keys:", keys
-        for fn in search(bag0, bag1):
-            write('.')
-            #print fn
-            #perm = tuple(fn[i]-m for i in keys)
-            #perms.append(perm)
-            count += 1
-        print
-        print "isomorphisms:", count
-
-        return
-    
     Px = get_reductor(Hx) # projector onto complement of rowspan of Hx
     Pz = get_reductor(Hz) 
 

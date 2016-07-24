@@ -71,7 +71,7 @@ def parse(s):
 
 
 class Point(object):
-    def __init__(self, desc, idx, nbd=None, colour=""):
+    def __init__(self, desc, idx, nbd=None, colour="", **kw):
         self.desc = desc
         self._colour = colour
         self._desc = {} # cache get_desc
@@ -79,6 +79,11 @@ class Point(object):
         if nbd is None:
             nbd = []
         self.nbd = nbd
+        self.__dict__.update(kw)
+
+    def __str__(self):
+        return "Point(%s, %s)"%(self.desc, self.idx)
+    __repr__ = __str__
 
     def get_colour(self):
         return self._colour
@@ -109,8 +114,8 @@ class Point(object):
         #self._desc = desc
         return desc
 
-    def __str__(self):
-        return "Point(%s: %s)"%(self.desc, descs)
+    #def __str__(self):
+    #    return "Point(%s: %s)"%(self.desc, descs)
 
 
 class Bag(object):
@@ -228,9 +233,9 @@ class Tanner(Bag):
         # This is the Tanner graph
         mx, n = Gx.shape
         mz, n = Gz.shape
-        xchecks = [Point('x', i) for i in range(mx)]
-        zchecks = [Point('z', i+mx) for i in range(mz)]
-        bits = [Point('b', i+mx+mz) for i in range(n)]
+        xchecks = [Point('x', i, row=i) for i in range(mx)]
+        zchecks = [Point('z', i+mx, row=i) for i in range(mz)]
+        bits = [Point('b', i+mx+mz, row=i) for i in range(n)]
         for i in range(mx):
             for j in range(n):
                 if Gx[i, j]==0:

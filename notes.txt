@@ -1,4 +1,31 @@
 
+25/7/16
+=======
+
+./zorbit.py slepc gcolor2 name=ex3.gcolor2.c  > /dev/null && ./ex3.gcolor2
+./zorbit.py slepc gcolor2 name=ex3.gcolor2.c excite=0 > /dev/null && ./ex3.gcolor2
+# etc.
+
+ground   /\       64.476081            2.45132e-10
+
+excite=0 /\       60.706477             3.6964e-10
+excite=1 /\       61.366348            2.47748e-09
+excite=2 /\       60.357053            8.32563e-10
+excite=3 /\       60.357053            8.32564e-10
+excite=4 /\       61.366348            2.47748e-09
+excite=5 /\       60.706477            3.69643e-10
+excite=6 /\       61.366348            2.47748e-09
+excite=7 /\       60.357053            8.32563e-10
+excite=8 /\       60.706477             3.6964e-10
+excite=9 /\       63.495916             3.5156e-09 # <--- fat stabilizer
+
+excite=8,9 /\     60.053034            9.90256e-09
+
+
+BUG found in gcolor2 construction, some gauge operators were duplicated
+
+
+
 24/7/16
 =======
 
@@ -431,38 +458,38 @@ application called MPI_Abort(MPI_COMM_WORLD, 1) - process 0
 
 
 
-time ./zorbit.py gcolor2 orbiham
-Hx: 10
-Hxr: 10
-Gxr: 18
-span: 262144
-nnz: 7077888
-degrees: [63]
-pnauty.init_graph 262144 16515072 63
-pnauty.search
-pnauty.search: Automorphism group size = 36
-orbits: 14400
-
-eigval, degeneracy:
-    (63.5428803189+0j) 3
-    (63.7536750548+0j) 2
-    (65.1198568475+0j) 4
-    (65.1421882538+0j) 4
-    (66.6022115115+0j) 3
-    (67.0936245341+0j) 4
-    (69.2966322895+0j) 2
-    (70.1529557268+0j) 4
-    (71.3182743227+0j) 2
-    (73.6813685356+0j) 2
-    (73.703699942+0j) 3
-    (75.6551362222+0j) 2
-    (78.7144674149+0j) 2
-    (82.2652116301+0j) 2
-    (90.8267233182+0j) 1
-
-real13m42.126s
-user13m26.948s
-
+XXX time ./zorbit.py gcolor2 orbiham
+XXX Hx: 10
+XXX Hxr: 10
+XXX Gxr: 18
+XXX span: 262144
+XXX nnz: 7077888
+XXX degrees: [63]
+XXX pnauty.init_graph 262144 16515072 63
+XXX pnauty.search
+XXX pnauty.search: Automorphism group size = 36
+XXX orbits: 14400
+XXX 
+XXX eigval, degeneracy:
+    XXX (63.5428803189+0j) 3
+    XXX (63.7536750548+0j) 2
+    XXX (65.1198568475+0j) 4
+    XXX (65.1421882538+0j) 4
+    XXX (66.6022115115+0j) 3
+    XXX (67.0936245341+0j) 4
+    XXX (69.2966322895+0j) 2
+    XXX (70.1529557268+0j) 4
+    XXX (71.3182743227+0j) 2
+    XXX (73.6813685356+0j) 2
+    XXX (73.703699942+0j) 3
+    XXX (75.6551362222+0j) 2
+    XXX (78.7144674149+0j) 2
+    XXX (82.2652116301+0j) 2
+    XXX (90.8267233182+0j) 1
+XXX 
+XXX real13m42.126s
+XXX user13m26.948s
+XXX 
 
 
 
@@ -522,47 +549,47 @@ application called MPI_Abort(MPI_COMM_WORLD, 63) - process 0
 14/7/16
 =======
 
-time ./zorbit.py gcolor2 excite=38 sparse lanczos
-span: 262144
-nnz: 7077888
-building Hs
-eigval, degeneracy:
-    75.9733182342 3
-    78.3826290621 3
-    78.6303238176 3
-    81.9333732773 3
-    82.0962886806 3
-    90.4948849654 1 # <---- ouch... it's a fat stabilizer :P
-
-
-time ./zorbit.py gcolor2 excite=0 sparse lanczos
-span: 262144
-. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
-nnz: 7077888
-building Hs
-
-eigval, degeneracy:
-    78.0409318465 3
-    78.535955054 1
-    78.7514474673 1
-    79.0733223938 1
-    86.6024435346 1
-
-
-time ./zorbit.py gcolor2 sparse  lanczos
-span: 262144
-nnz: 7077888
-eigval, degeneracy:
-    71.3182743227 6
-    73.6813685356 6
-    73.703699942 9
-    75.6551362222 6
-    78.7144674149 6
-    82.2652116301 6
-    90.8267233182 1
-
-real 16m4.286s
-user 15m59.140s
+XXX time ./zorbit.py gcolor2 excite=38 sparse lanczos
+XXX span: 262144
+XXX nnz: 7077888
+XXX building Hs
+XXX eigval, degeneracy:
+    XXX 75.9733182342 3
+    XXX 78.3826290621 3
+    XXX 78.6303238176 3
+    XXX 81.9333732773 3
+    XXX 82.0962886806 3
+    XXX 90.4948849654 1 # <---- ouch... it's a fat stabilizer :P
+XXX 
+XXX 
+XXX time ./zorbit.py gcolor2 excite=0 sparse lanczos
+XXX span: 262144
+XXX . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+XXX nnz: 7077888
+XXX building Hs
+XXX 
+XXX eigval, degeneracy:
+    XXX 78.0409318465 3
+    XXX 78.535955054 1
+    XXX 78.7514474673 1
+    XXX 79.0733223938 1
+    XXX 86.6024435346 1
+XXX 
+XXX 
+XXX time ./zorbit.py gcolor2 sparse  lanczos
+XXX span: 262144
+XXX nnz: 7077888
+XXX eigval, degeneracy:
+    XXX 71.3182743227 6
+    XXX 73.6813685356 6
+    XXX 73.703699942 9
+    XXX 75.6551362222 6
+    XXX 78.7144674149 6
+    XXX 82.2652116301 6
+    XXX 90.8267233182 1
+XXX 
+XXX real 16m4.286s
+XXX user 15m59.140s
 
 
 

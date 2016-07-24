@@ -31,7 +31,7 @@ def build():
 
     top = n-1 # top qubit
 
-    # bottom faces
+    # bottom faces: points must be adjacent in each face
     bfaces = [
         [0, 1, 2, 3],
         [1, 4, 5, 6, 7, 2],
@@ -45,6 +45,14 @@ def build():
 
     faces = list(bfaces) + [[i+delta for i in face] for face in bfaces]
 
+    def check_faces():
+        items = [list(face) for face in faces]
+        for face in items:
+            assert len(face)%2 == 0, face
+            face.sort()
+        assert len(set([tuple(face) for face in items]))==len(items)
+    check_faces()
+
     # bottom edges
     bedges = []
     for face in bfaces:
@@ -52,11 +60,18 @@ def build():
         for i in range(f):
             bedges.append([face[i], face[(i+1)%f]])
 
+    # edges are not yet unique..
+    for edge in bedges:
+        edge.sort()
+    bedges = list(set([tuple(e) for e in bedges]))
+
     # extrude bottom edges to make a face
     for edge in bedges:
+        edge = list(edge)
         a, b = edge
         face = edge + [a+delta, b+delta]
         faces.append(face)
+    check_faces()
 
     stabs = []
     for face in bfaces:
@@ -69,6 +84,7 @@ def build():
         [14, 15, 16, 17, 18]]:
         face = [i+delta for i in face] + [top]
         faces.append(face)
+    check_faces()
 
     stabs.append([i+delta for i in range(19)] + [top])
 
@@ -78,11 +94,18 @@ def build():
     for stab in stabs:
         assert len(stab)%2 == 0, stab
 
-    for face in faces:
-        assert len(face)%2 == 0, face
+    #faces.sort()
+    #for face in faces:
+    #    print face
 
     Gx = mkop(n, faces)
     Gz = Gx.copy()
+
+    rows = [shortstr(g) for g in Gx]
+    #rows.sort()
+    #for i, row in enumerate(rows):
+    #    print row, faces[i]
+    assert len(set(rows))==len(rows)
 
     Hz = mkop(n, stabs)
     Hx = Hz.copy()
