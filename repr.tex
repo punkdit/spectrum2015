@@ -707,7 +707,7 @@ $$
 $$
 \end{framed}
 Writing $I$ for the identity element of $T$ we write the corresponding
-block of the hamiltonian as $\Ham_I.$
+block of the hamiltonian as $\Ham_{0,0}.$
 
 More generally, we can assign (real valued) weights
 to each operator in $G_0,$ that is
@@ -1193,20 +1193,92 @@ And once again we have a presentation of the Pauli group.
 %To switch back and forth between the $X$ and $Z$ type
 %representations 
 
+The complex Hilbert state space of our
+Hamiltonian has $2^n$ dimensions and we
+write this space as $\Complex[2^n]$.
+This notation is meant to suggest that
+we are forming a $\Complex$ vector space
+using $2^n$ ``points'' 
+as basis vectors.
+Working in the computational basis,
+we do indeed have $2^n$ such points; 
+these are the elements of $\Fn.$
+And so we make the identification
+$$
+    \Complex[2^n] \cong \Complex[\Fn].
+$$
+In other words, we are labelling 
+our basis vectors with elements of $\Fn$
+and therefore such notation as
+$$
+    \bra{u} H \ket{v}
+$$
+with $u, v \in \Fn$ makes sense.
+We will make further use of this below,
+by writing computations in vector
+spaces over $F_2$ inside the Dirac brakets.
+
+Returning to the code $L,S,T,R$-decomposition
+above,
+given $t\in T$ such that $t = t_X t_Z$
+we get a basis for the irrep $\rho_t$:
+$$
+    \{ \ket{v R_X + t_X} \ \mbox{such that}\  v \in \Fr \}.
+$$
+In other words,
+the basis of the irrep $\rho_t$ is 
+an affine subspace of $\Fn.$
+Each such affine subspace is indexed by an
+element of $\Fr$ and
+all of these are
+translates of each other,
+so we make the following identification:
+$$
+\Complex[\{vR_X+t_X\}_{v\in\Fr}]
+\cong \Complex[\Fr].
+$$
+This will allow us to write the components
+of each block $H_t$ of the Hamiltonian
+as $\bra{u}H_t\ket{v}$ for $u,v\in\Fr.$
+
+
+\begin{framed}
+\noindent{\bf Important:}
+The computational basis identifies
+basis vectors of $\Complex[2^n]$
+with elements of a finite vector space $\Fn$:
+$$
+    \Complex[2^n] \cong \Complex[\Fn].
+$$
+The $L,S,T,R$-decomposition naturally
+splits $\Fn$ into $2^{m_Z+k}$ affine subspaces:
+$$
+    \{ v R_X + t_X + l_X \}_{v\in\Fr}
+$$
+for each $t_X \in \Span(T_X), l_X \in \Span(L_X).$
+Each such affine subspace forms a basis
+for the irreducible blocks $H_{t_X,t_Z}$ of $H$,
+and can be naturally identified with $\Fr:$
+$$
+    H_{t_X,t_Z} : \Complex[\Fr] \to \Complex[\Fr].
+$$
+\end{framed}
+
 We now wish to understand the action of the
 gauge group on each of its irreps.
-Let us start with the $t=I$ irrep.
-This is where each of the stabilizers has
-a trivial action, which in the $\Fn$ world
-corresponds to the zero vector.
+Starting with the $t=0$ irrep,
+this is where each of the stabilizers has
+a trivial action. 
+In $\Fn$ this
+corresponds to additive action of the zero vector.
 
-States $u\in\Span(R_X)$ correspond to
-states
+States $u\in\Span(R_X)$ can be built from a
+vector matrix product
 $$
     u = v R_X
 $$
 with $v\in\Fr.$
-Indeed, since $R_X R_Z^\top = I$
+Since $R_X R_Z^\top = I$
 we can write $v = u R_Z^\top.$
 For each $g_X\in G_X$ these act as
 \begin{align*}
@@ -1222,34 +1294,36 @@ writing $u_1 = v_1 R_X$ we then have
 
 So we have that working in the computational
 basis, the action of the $X$ part of the
-gauge group in the $t=I$ irrep is to send
+gauge group in the $t=0$ irrep is to send
 $v\in R_X$ to 
 $v + g_X P_X R_Z^\top.$
 
-In the computational basis, the Hamiltonian
-is a $2^n\times 2^n$ element matrix which
-we can index using a pair of $\Fn$ vectors.
-Here we use a function notation for this:
-\begin{align*}
-    H : \Fn \times \Fn &\to \Complex
-        %(u, v) &\mapsto H(u, v).
-\end{align*}
-Each irrep of the gauge group 
-will then be acting on a subspace of 
-$\Cn$ spanned by basis vectors 
+%In the computational basis, the Hamiltonian
+%is a $2^n\times 2^n$ element matrix which
+%we can index using a pair of $\Fn$ vectors.
+%Here we use a function notation for this:
+%\begin{align*}
+%    H : \Fn \times \Fn &\to \Complex
+%        %(u, v) &\mapsto H(u, v).
+%\end{align*}
+%Each irrep of the gauge group 
+%will then be acting on a subspace of 
+%$\Cn$ spanned by basis vectors 
+%
+%$$
+%    \Cn \cong \Complex[\Fn]
+%$$
 
-$$
-    \Cn \cong \Complex[\Fn]
-$$
+%Lets record this in our Hamiltonian block $H_{0,0}$
+%by indexing the matrix components with a function notation. 
+%The Hamiltonian takes a pair of
+%basis vectors and produces a complex number:
+%$H_{0,0} : \Fr\times\Fr \to \Complex.$
 
-Lets record this in our Hamiltonian block $H_I$
-by indexing the matrix components with a function notation. 
-The Hamiltonian takes a pair of
-basis vectors and produces a complex number:
-$H_I : \Fr\times\Fr \to \Complex.$
-And we have the following off-diagonal components:
+We have the following off-diagonal components:
 $$
-    H_I(v, v+g_X P_X R_Z^\top) = 1,\ \ \mbox{for}\ g_X\in G_X, v\in \Fr
+%    H_{0,0}(v, v+g_X P_X R_Z^\top) = 1,\ \ \mbox{for}\ g_X\in G_X, v\in \Fr
+    \bra{v} H_{0,0} \ket{v+g_X P_X R_Z^\top} = 1,\ \ \mbox{for}\ g_X\in G_X, v\in \Fr
 $$
 with all other off-diagonal components zero.
 The diagonal components come from 
@@ -1268,7 +1342,7 @@ using a \emph{weight} function $w$ that just counts
 the number of non-zero entries in any $F_2$ vector
 we have:
 $$
-    H_I(v, v) = |G_Z| - 2w(G_Z R_X^\top v^\top),
+    \bra{v} H_{0,0} \ket{v} = |G_Z| - 2w(G_Z R_X^\top v^\top),
 $$
 for $v\in \Fr.$
 
@@ -1466,7 +1540,7 @@ We have demonstrated the following
 
 For a CSS Hamiltonian $\Ham$
 every groundstate is stabilized 
-and so $$\lambda_1(\Ham_I) = \lambda_1(\Ham)$$
+and so $$\lambda_1(\Ham_{0,0}) = \lambda_1(\Ham)$$
 and for $t\ne I:$
 $$
 \lambda_1(\Ham_t) < \lambda_1(H).
@@ -1655,14 +1729,14 @@ summing over a trivial representation of $Aut(G)$ we have the following:
 \begin{framed}
 \noindent{\bf Fact 3:}
 
-The orbigraph of $\Ham_I$ contains the ground eigenvalue of $\Ham_I.$
+The orbigraph of $\Ham_{0,0}$ contains the ground eigenvalue of $\Ham_{0,0}.$
 \end{framed}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \subsubsection{Compass model}
 For the next example we take the $l=3$ compass model.
-$\Ham_I$ acts on a 16 dimensional space.
+$\Ham_{0,0}$ acts on a 16 dimensional space.
 The order of $A$ is $72$, and we find three $A-$orbits.
 % This time $Aut(G) = A$ ???
 The orbigraph method can be applied in the case
@@ -1670,7 +1744,7 @@ where the Hamiltonian weights for $X$ and $Z$ are uniform as $w_X$ and $w_Z.$
 We separate the $X$ and $Z$ terms of the orbigraph to show
 how this works:
 $$
-\Ham_I//\auto = 
+\Ham_{0,0}//\auto = 
 \left(\begin{array}{rrr}
  0 &  9 &  0 \cr
   1 &  4 &  4 \cr
@@ -1695,11 +1769,11 @@ have come a long way down to 3.
 By exact\footnote{Exact in this context means that we do not do any
 perturbative approxiamations to the operator in question.}
 numerical diagonalization
-we get the spectrum of $\Ham_I$ and note that the orbigraph lifts
+we get the spectrum of $\Ham_{0,0}$ and note that the orbigraph lifts
 all degeneracy as well as missing some excited eigenspaces:
 \begin{center}
 \begin{tabular}{ c|c|c } 
-$\lambda$ & $\Ham_I$ degeneracy & $\Ham_I//A$ degeneracy \\
+$\lambda$ & $\Ham_{0,0}$ degeneracy & $\Ham_{0,0}//A$ degeneracy \\
 \hline
     11.2111025509 & 1 & 1 \\
     6.0 & 1 & 1 \\
@@ -1731,10 +1805,10 @@ This is a self-dual code...
 The smallest in the ensemble has $n=15$ qubits,
 $G_0$ has $18$ each of X/Z-type gauge operators,
 and $4$ each of X/Z-type stabilizer generators.
-$\Ham_I$ acts on a 64 dimensional space, and $A$ has
+$\Ham_{0,0}$ acts on a 64 dimensional space, and $A$ has
 order 720, and we find 7 orbits:
 $$
-\Ham_I//\auto = 
+\Ham_{0,0}//\auto = 
 \left(\begin{array}{rrrrrrr}
 18 & 18 &  0 &  0 &  0 &  0 &  0 \cr
   3 & 12 & 15 &  0 &  0 &  0 &  0 \cr
@@ -1757,11 +1831,11 @@ $\lambda_1 = 18\sqrt{2} \cong 25.4558441.$
 % http://math.stackexchange.com/questions/507783/mathbbrp3-is-homeomorphic-to-the-solid-ball-with-antipodal-points-identifi
 % http://topospaces.subwiki.org/wiki/Homology_of_real_projective_space
 
-Numerics give the full spectrum of $\Ham_I$ and we note that the orbigraph lifts
+Numerics give the full spectrum of $\Ham_{0,0}$ and we note that the orbigraph lifts
 all degeneracy as well as preserving every eigenvalue:
 \begin{center}
 \begin{tabular}{ c|c|c } 
-$\lambda$ & $\Ham_I$ degeneracy & $\Ham_I//A$ degeneracy \\
+$\lambda$ & $\Ham_{0,0}$ degeneracy & $\Ham_{0,0}//A$ degeneracy \\
 \hline
     25.4558441227 & 1 & 1 \\
     16.9705627485 & 6 & 1 \\
@@ -1817,7 +1891,7 @@ model &\ $n$\ &\ $r$\ &\ $t$\ & $|A|$ & orbits & Aut(code) \\
 \end{tabular}
 \end{center}
 
-From this table it looks like $H_I$ for the compass model $|A| = 8l^2.$
+From this table it looks like $H_{0,0}$ for the compass model $|A| = 8l^2.$
 
 Note that for large graphs, numerically finding the orbigraph has comparable
 difficulty to just (numerically) solving the original eigenvalue problem.
