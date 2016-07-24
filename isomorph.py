@@ -205,9 +205,13 @@ class Bag(object):
 
 
 class Tanner(Bag):
+    # This is the Tanner graph
+
     @classmethod
-    def build(cls, Gx):
-        # This is the Tanner graph
+    def build(cls, Gx, Gz=None):
+        if Gz is not None:
+            return cls.build2(Gx, Gz)
+
         m, n = Gx.shape
         checks = [Point('c', i) for i in range(m)]
         bits = [Point('b', i+m) for i in range(n)]
@@ -218,6 +222,28 @@ class Tanner(Bag):
                 checks[i].nbd.append(bits[j])
                 bits[j].nbd.append(checks[i])
         return cls(checks+bits, m=m, n=n)
+
+    @classmethod
+    def build2(cls, Gx, Gz):
+        # This is the Tanner graph
+        mx, n = Gx.shape
+        mz, n = Gz.shape
+        xchecks = [Point('x', i) for i in range(mx)]
+        zchecks = [Point('z', i+mx) for i in range(mz)]
+        bits = [Point('b', i+mx+mz) for i in range(n)]
+        for i in range(mx):
+            for j in range(n):
+                if Gx[i, j]==0:
+                    continue
+                xchecks[i].nbd.append(bits[j])
+                bits[j].nbd.append(xchecks[i])
+        for i in range(mz):
+            for j in range(n):
+                if Gz[i, j]==0:
+                    continue
+                zchecks[i].nbd.append(bits[j])
+                bits[j].nbd.append(zchecks[i])
+        return cls(xchecks+zchecks+bits, mx=mx, mz=mz, n=n)
 
     def shortstr(self):
         m, n = self.m, self.n

@@ -396,7 +396,7 @@ def do_orbiham(A, U):
         i, j = key
         degrees[i] = degrees.get(i, 0) + value
     degrees = list(set(degrees.values()))
-    print "degrees:", degrees
+    #print "degrees:", degrees
     assert len(degrees) == 1
     degree = degrees[0]
 
@@ -415,8 +415,9 @@ def do_orbiham(A, U):
         H1 = H1[rows, :]
         H1 = H1[:, rows]
 
-    if argv.show:
-        #print lstr2(H1, 0)
+    if argv.show and N < 40:
+        print lstr2(H1, 0)
+    elif argv.show:
         print "orbiham:"
         for i in rows:
             print "%d:"%i,
@@ -425,13 +426,20 @@ def do_orbiham(A, U):
                     print "%d:%d"%(j, H1[i, j]),
             print
 
-    if len(H1)<=1024 and 0:
-        print "numpy.linalg.eig"
+    if argv.sympy:
+        from sympy import Matrix
+        A = H1.astype(numpy.int32)
+        A = Matrix(A)
+        print A.eigenvals()
+
+    if len(H1)<=1024:
+        #print "numpy.linalg.eig"
         vals, vecs = numpy.linalg.eig(H1)
     else:
         vals, vecs = eigs(H1, k=min(len(H1)-5, 40), which="LM")
 
     return vals, vecs
+
 
 class Code(object):
     def __init__(self, filename=None):
@@ -466,7 +474,6 @@ def dense(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     r, n = Rx.shape
 
     N = 2**r
-    assert N <= 1024
 
     gz = len(Gz)
 #    print "Hz:"
@@ -487,14 +494,20 @@ def dense(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     #print shortstr(Tx)
 
     RR = dot2(Gz, Rx.transpose())
-
     PxtQx = dot2(Pxt, Qx)
-    gxs = [getnum(dot2(gx, PxtQx)) for gx in Gx]
-    gxs.sort()
-    uniq_gxs = list(set(gxs))
-    uniq_gxs.sort()
 
-    for excite in genidx((2,)*len(Tx)):
+    if argv.excite:
+
+        excites = [argv.excite]
+
+    else:
+        excites = genidx((2,)*len(Tx))
+
+    for excite in excites:
+
+        print "excite:", excite
+        assert len(excite)==len(Tx)
+
         t = zeros2(n)
         for i, ex in enumerate(excite):
             if ex:
@@ -503,13 +516,21 @@ def dense(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
         Gzt = dot2(Gz, t)
         #print "Gzt:", shortstr(Gzt)
 
-        H = numpy.zeros((N, N))
+        if N<=1024:
+            H = numpy.zeros((N, N))
+        else:
+            H = None
+        A = {}
+        U = []
 
         #for i in range(N):
         for i, v in enumerate(genidx((2,)*r)):
             v = array2(v)
             syndrome = (dot2(Gz, Rx.transpose(), v) + Gzt)%2
-            H[i, i] = gz - 2*syndrome.sum()
+            xz = gz - 2*syndrome.sum()
+            if H is not None:
+                H[i, i] = xz
+            U.append(xz)
 
         for i, v in enumerate(genidx((2,)*r)):
             v = array2(v)
@@ -517,21 +538,28 @@ def dense(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
             for g in Gx:
                 u = (v + dot2(g, PxtQx))%2
                 j = eval('0b'+shortstr(u, zero='0'))
-            #print
-                H[i, j] += 1
+                if H is not None:
+                    H[i, j] += 1
+                A[i, j] = A.get((i, j), 0) + 1
 
         #print H
-        assert numpy.allclose(H, H.transpose())
 
-        vals, vecs = numpy.linalg.eigh(H)
-        #show_eigs(vals)
-        #print vals
-        vals = list(vals)
-        vals.sort()
-        val0 = vals[-1] # top one is last
-        assert vals[-2] < val0 - 1e-4
-        print "excite:", excite,
-        print "eigval:", val0
+        if argv.orbiham:
+            vals, vecs = do_orbiham(A, U)
+            show_eigs(vals)
+
+        if H is not None and argv.solve:
+            assert N <= 1024
+            assert numpy.allclose(H, H.transpose())
+            vals, vecs = numpy.linalg.eigh(H)
+            #show_eigs(vals)
+            #print vals
+            vals = list(vals)
+            vals.sort()
+            val0 = vals[-1] # top one is last
+            assert vals[-2] < val0 - 1e-4
+            print "excite:", excite,
+            print "eigval:", val0
 
         #break
 
@@ -748,12 +776,32 @@ def main():
     print "Hz:"
     print shortstr(find_stabs(Gx, Gz))
 
-    Lz = find_logops(Gx, Hz, verbose=True)
-    print "Lz:", shortstr(Lz)
+    Lz = find_logops(Gx, Hz)
+    #print "Lz:", shortstr(Lz)
 
     #print Lz.shape, Gx.shape
     check_commute(Lz, Gx)
     check_commute(Lz, Hx)
+
+    if argv.symmetry:
+        from isomorph import Tanner, search
+        bag0 = Tanner.build(Gx, Gz)
+        bag1 = Tanner.build(Gx, Gz)
+
+        count = 0
+        perms = []
+        #keys = range(m, len(bag0))
+        #print "keys:", keys
+        for fn in search(bag0, bag1):
+            write('.')
+            #print fn
+            #perm = tuple(fn[i]-m for i in keys)
+            #perms.append(perm)
+            count += 1
+        print
+        print "isomorphisms:", count
+
+        return
     
     Px = get_reductor(Hx) # projector onto complement of rowspan of Hx
     Pz = get_reductor(Hz) 
