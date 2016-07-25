@@ -754,16 +754,20 @@ def get_perm(fn):
     return perm
 
 
-def do_symmetry(Gx, Gz):
+def do_symmetry(Gx, Gz, Hx, Hz):
 
-    rows = [shortstr(g) for g in Gx]
-    rows.sort()
-    assert len(set(rows)) == len(rows)
-    #print '\n'.join(rows)
-
-    from isomorph import Tanner, search
+    from isomorph import Tanner, search, search_recursive
     bag0 = Tanner.build(Gx, Gz)
     bag1 = Tanner.build(Gx, Gz)
+
+    #n = Gx.shape[1]
+    #for i in range(n):
+    #    print Gx[:, i].sum(),
+    #print
+
+    rows = [shortstr(h) for h in Hx]
+    bits = [p for p in bag0 if p.desc=='b']
+    #print bits
 
     count = 0
     perms = []
@@ -771,17 +775,22 @@ def do_symmetry(Gx, Gz):
     #print "keys:", keys
     for fn in search(bag0, bag1):
         write('.')
-        perm = get_perm(fn)
-        for i, j in perm.items():
-            p0, p1 = bag0[i], bag0[j]
-            i, j = p0.row, p1.row
-            assert i!=j
-            #print shortstr(Gz[i])
-            #print shortstr(Gz[j])
-            #print
-        #print "="*70
-        #perm = tuple(fn[i]-m for i in keys)
-        #perms.append(perm)
+        perm = [bag1[fn[p.idx]].row for p in bits]
+        #print perm
+
+        # this is the action of graph automorphism on the stabilizers
+        rows1 = [rows.index(shortstr(h[perm])) for h in Hx]
+        print rows1 
+
+#        perm = get_perm(fn)
+#        #print perm
+#        for i, j in perm.items():
+#            p0, p1 = bag0[i], bag0[j]
+#            i, j = p0.row, p1.row
+#            assert i!=j
+#            #print shortstr(Gz[i])
+#            #print shortstr(Gz[j])
+#            #print
         count += 1
     print
     print "isomorphisms:", count
@@ -816,7 +825,7 @@ def main():
         return
 
     if argv.symmetry:
-        do_symmetry(Gx, Gz)
+        do_symmetry(Gx, Gz, Hx, Hz)
         return
     
     print shortstrx(Gx, Gz)

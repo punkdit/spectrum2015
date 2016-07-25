@@ -1041,7 +1041,7 @@ mutually anti-commuting string operators $R_0.$
 %
 
 %\subsection{CSS gauge code Hamiltonians}
-\subsection{Representations over a finite field}
+\subsection{Representations over the finite field $F_2$}
 
 \def\Cn{\Complex[2^n]}
 \def\Cr{\Complex[2^r]}
@@ -1113,10 +1113,18 @@ Following the theory from the previous section,
 we are going to rewrite the gauge group generators
 as a union of stabilizer generators $S_0 = S_X \cup S_Z$
 and reduced gauge generators $R_0 = R_X \cup R_Z.$
+Similarly, the error operators
+will be split into $X$ and $Z$ type
+operators $T_X$ and $T_Z$ and
+finally the logical operators
+$L_X$ and $L_Z.$
 
+We summarize all of these sets
+in the following table:
 \def\Im{\mathrm{im}}
 \def\Ker{\mathrm{ker}}
-\def\Span{\mathrm{span}}
+%\def\Span#1{\mathrm{span}(#1)}
+\def\Span#1{\langle #1 \rangle}
 \begin{center}
 \includegraphics[]{pic-symplectic.pdf}
 \end{center}
@@ -1126,17 +1134,46 @@ $L_X, L_Z, S_X, T_Z, T_X, S_Z, R_X, R_Z$
 as either a set of $\Fn$ vectors or as an $F_2$ matrix
 with $n$ columns.
 For example, we write $u\in R_X$ to mean $u$ is in
-the set $R_X$, or given $v\in \Fr$ then $u = R_X v^\top$ is
-in the rowspace of $R_X.$
+the set $R_X$. 
+Given $v\in \Fr$ then $u = R_X v^\top$ is
+a generic vector in the rowspace of $R_X.$
+We call the rowspace of an $F_2$
+matrix $M$ the \emph{span} and denote 
+it as $\Span{M}.$
 
 We first find the stabilizers $S_Z$.
 These are built out of $\Fn$ vectors from the span of $G_Z$
 that commute with the rows of $G_X:$
 \begin{align*}
-    \Span(S_Z) &= \{\  vG_Z \ |\  v G_Z G_X^\top = 0, \ \ v \in F_2^{|G_Z|}\ \} \\
+    \Span{S_Z} &= \{\  vG_Z \ |\  v G_Z G_X^\top = 0, \ \ v \in F_2^{|G_Z|}\ \} \\
                &= \{\  vG_Z \ |\  v^\top \in \Ker(G_X G_Z^\top)  \ \}.
 \end{align*}
 And similarly for $S_X.$
+
+Once we have the stabilizers, in order to
+complete the above table as a presentation
+of the Pauli group we need to solve the
+following $F_2$ block matrix equation:
+%All of this can be summarized in the block matrix equation:
+$$
+\left( \begin{array}{l}
+L_X\\
+S_X\\
+T_X\\
+R_X
+\end{array} \right)
+\left( \begin{array}{l}
+L_Z\\
+T_Z\\
+S_Z\\
+R_Z
+\end{array} \right)^\top =
+I.
+$$
+%And once again we have a presentation of the Pauli group.
+This is a non-linear system of 16 equations and so it
+is not obvious how to proceed, but it turns out a
+systematic way can be found which we outline below.
 
 To find the reduced gauge group $R_X$ we project the gauge
 group generators onto the orthogonal complement of $S_X.$
@@ -1161,37 +1198,12 @@ to the linear system:
 \end{align*}
 \emph{and on it goes...}
 
-All of this can be summarized in the block matrix equation:
-$$
-\left( \begin{array}{l}
-L_X\\
-S_X\\
-T_X\\
-R_X
-\end{array} \right)
-\left( \begin{array}{l}
-L_Z\\
-T_Z\\
-S_Z\\
-R_Z
-\end{array} \right)^\top =
-I.
-$$
-%The rows of the matrix are linearly
-%independant.
-And once again we have a presentation of the Pauli group.
+We call this array of eight $F_2$
+valued matrices 
+an $(L,S,T,R)$-decomposition of the gauge group.
+In general this will not be unique.
 
-%This is another kind of representation theory of $\Pauli_n.$
-%We are representing either $G_X$ or $G_Z$ as a permutation representation (?)
-%It has the ability to extract irreps of $G$ corresponding to
-%the $X$ type operators as affine subspaces $\{vR_X+t\}$ of $\Fn.$
-%For the $Z$ representations we will still need the complex
-%representation theory to build states on $\Complex[\{vR_X+t\}]$
-%that look like ``waves''.
-%These (stationary) waves do indeed have a geometric interpretation,
-%with the wavefront nodes being identified with so-called Cheeger cuts.
-%To switch back and forth between the $X$ and $Z$ type
-%representations 
+\subsubsection{The Hamiltonian}
 
 The complex Hilbert state space of our
 Hamiltonian has $2^n$ dimensions and we
@@ -1218,7 +1230,7 @@ We will make further use of this below,
 by writing computations in vector
 spaces over $F_2$ inside the Dirac brakets.
 
-Returning to the code $L,S,T,R$-decomposition
+Returning to the code $(L,S,T,R)$-decomposition
 above,
 given $t\in T$ such that $t = t_X t_Z$
 we get a basis for the irrep $\rho_t$:
@@ -1240,7 +1252,10 @@ $$
 This will allow us to write the components
 of each block $H_t$ of the Hamiltonian
 as $\bra{u}H_t\ket{v}$ for $u,v\in\Fr.$
-
+We make this identification of affine subspaces
+not out of laziness but because it will
+help us to compare each of
+the Hamiltonian blocks $H_t$ below.
 
 \begin{framed}
 \noindent{\bf Important:}
@@ -1250,12 +1265,12 @@ with elements of a finite vector space $\Fn$:
 $$
     \Complex[2^n] \cong \Complex[\Fn].
 $$
-The $L,S,T,R$-decomposition naturally
+The $(L,S,T,R)$-decomposition naturally
 splits $\Fn$ into $2^{m_Z+k}$ affine subspaces:
 $$
     \{ v R_X + t_X + l_X \}_{v\in\Fr}
 $$
-for each $t_X \in \Span(T_X), l_X \in \Span(L_X).$
+for each $t_X \in \Span{T_X}, l_X \in \Span{L_X}.$
 Each such affine subspace forms a basis
 for the irreducible blocks $H_{t_X,t_Z}$ of $H$,
 and can be naturally identified with $\Fr:$
@@ -1272,7 +1287,7 @@ a trivial action.
 In $\Fn$ this
 corresponds to additive action of the zero vector.
 
-States $u\in\Span(R_X)$ can be built from a
+States $u\in\Span{R_X}$ can be built from a
 vector matrix product
 $$
     u = v R_X
@@ -1294,7 +1309,7 @@ writing $u_1 = v_1 R_X$ we then have
 
 So we have that working in the computational
 basis, the action of the $X$ part of the
-gauge group in the $t=0$ irrep is to send
+gauge group in the $t=0,0$ irrep is to send
 $v\in R_X$ to 
 $v + g_X P_X R_Z^\top.$
 
@@ -1320,38 +1335,112 @@ $v + g_X P_X R_Z^\top.$
 %basis vectors and produces a complex number:
 %$H_{0,0} : \Fr\times\Fr \to \Complex.$
 
-We have the following off-diagonal components:
+\newcommand{\pluseq}{\mathrel{+}=}
+
+We have the following contributions from the
+$G_X$ terms of the Hamiltonian:
 $$
-%    H_{0,0}(v, v+g_X P_X R_Z^\top) = 1,\ \ \mbox{for}\ g_X\in G_X, v\in \Fr
-    \bra{v} H_{0,0} \ket{v+g_X P_X R_Z^\top} = 1,\ \ \mbox{for}\ g_X\in G_X, v\in \Fr
+%    H_{0,0}(v, v+g_X P_X R_Z^\top) \ne 0,\ \ \mbox{for}\ g_X\in G_X, v\in \Fr
+    \bra{v} H_{0,0} \ket{v+g_X P_X R_Z^\top} 
+        \pluseq 1,\ \ \mbox{for}\ g_X\in G_X, v\in \Fr
 $$
-with all other off-diagonal components zero.
-The diagonal components come from 
-the action of the $G_Z$ gauge group.
-All that happens is that we multiply by
-a weighting that depends on the syndrome
-vector:
+Where we use the $\pluseq$ notation
+because there may be other ``contributions'' to the
+same component.
+These terms will always be off
+the diagonal unless $g_X$ is a stabilizer.
+
+The action of the $G_Z$ gauge group
+contributes to the diagonal of $H.$
+These diagonal terms apply a kind of
+``potential energy'' penalty
+to the basis states
+that depends on the \emph{syndrome} vector:
 $$
     \mbox{syndrome}(u) = G_Z u
 $$
 for $u\in \Fn.$
 This is an $F_2$ vector that has one component for
 each row of $G_Z.$
-Write $|G_Z|$ for the number of these rows, and 
+Writing $|G_Z|$ for the number of these rows, and 
 using a \emph{weight} function $w$ that just counts
 the number of non-zero entries in any $F_2$ vector
-we have:
+we have the following contributions to
+the Hamiltonian:
 $$
-    \bra{v} H_{0,0} \ket{v} = |G_Z| - 2w(G_Z R_X^\top v^\top),
+    \bra{v} H_{0,0} \ket{v} 
+        \pluseq |G_Z| - 2w(G_Z R_X^\top v^\top),
 $$
 for $v\in \Fr.$
 
-For any $t=t_X\in T_X$ the Hamiltonian block $H_t$
+Adding up all of the above we
+have in summary,
+$$
+H_{0,0} = \sum_{g_X\in G_X, v\in\Fr} 
+  \ket{v+g_X P_X R_Z^\top}\bra{v} 
+  + \sum_{v\in\Fr} \bigl(|G_Z| - 2w(G_Z R_X^\top v^\top)
+    \bigr) \ \ket{v}\bra{v}.
+$$
+
+Now we turn to ...
+For any $t_X\in \Span{T_X}$ the Hamiltonian block $H_{t_X,0}$
 has components indexed by basis vectors:
 $$
     u = v R_X + t_X
 $$
 
+... this means that the $G_X$ gauge terms
+have the same effect on $H_{t_X,0}$
+as $H_{0,0}$ and only the diagonal has changed:
+$$
+H_{t_X,0} = \sum_{g_X\in G_X, v\in\Fr} 
+  \ket{v+g_X P_X R_Z^\top}\bra{v} 
+  + \sum_{v\in\Fr} \bigl(
+    |G_Z| - 2w(G_Z R_X^\top v^\top + G_Z t_X^\top)
+    \bigr) \ \ket{v}\bra{v}.
+$$
+
+Writing the difference explicitly:
+$$
+    H_{0,0} - H_{t_X,0} = 
+  \sum_{v\in\Fr} 2\bigl(
+    w(G_Z R_X^\top v^\top + G_Z t_X^\top)
+    -w(G_Z R_X^\top v^\top)
+    \bigr) \ \ket{v}\bra{v}.
+$$
+
+Although we won't need this below,
+here is the general form of
+the Hamiltonian block for completeness:
+\begin{align*}
+H_{t_X,t_Z} = &\sum_{g_X\in G_X, v\in\Fr} 
+    \eta(t_Z g_X^\top)
+  \ \ket{v+g_X P_X R_Z^\top}\bra{v} \\
+  &+ \sum_{v\in\Fr} \bigl(
+    |G_Z| - 2w(G_Z R_X^\top v^\top + G_Z t_X^\top)
+    \bigr) \ \ket{v}\bra{v}.
+\end{align*}
+Here we use $\eta$ to send 
+$t_Zg_X^\top$ which is an $F_2$ value
+to the multiplicative subgroup $\{\pm1\}$
+of $\Complex:$
+$$
+    \eta(0) = 1,\ \eta(1) = -1.
+$$
+The $\eta(t_Zg_X^\top)$ term
+is a kind of parity check that
+picks up one phase flip for (some of)
+the $X$ type stabilizers found in $g_X.$
+This works because $T_Z$ is a left inverse
+of $S_X^\top.$
+The $t_Z\in\Span{T_Z}$ selects which
+$X$ type stabilizers act as $-1$ in this irrep.
+
+In summary, we have the
+complete representation
+theory for $CSS$ gauge code Hamiltonians.
+It is a remarkable fact that this involves such
+a close interplay with $F_2$ linear algebra.
 
 \subsubsection{Self-dual codes}
 
@@ -1373,12 +1462,17 @@ the square lattice of $l\times l$ qubits.
 
 \subsubsection{The gauge color code}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
 
 \section{Spectra}
 \label{spectra}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+We begin this section with a motivating example,
+and then turn to the application of
+Perron-Frobenius theory to
+CSS gauge code Hamiltonians.
 
 \subsection{The double well model is gapless}
 
@@ -1399,6 +1493,9 @@ U_{ij} =  \left\{ \begin{array}{ll}
      2 &\mbox{if}\  i=j=1 \ \ \mbox{or}\ \  i=j=n, \\
      0 &\mbox{otherwise.}\end{array}\right.
 $$
+$A$ here is a kind of transition matrix,
+and $U$ is a diagonal potential energy term.
+
 For $d\gg 1$, the largest
 eigenvalue is $\lambda_1 \cong \frac{5}{2}$.
 The corresponding eigenvector $\ket{v_1}$
@@ -1493,14 +1590,29 @@ we consider.
 \subsection{Perron-Frobenius structure theory}
 
 %See \cite{Baez2012}
-
-We think of the Hamiltonian as the adjacency matrix of a graph.
+We return to the investigation of Hamiltonians
+formed from CSS gauge codes.
+We can think of such Hamiltonians as the adjacency matrix of a graph.
 The diagonal terms (working in the computational basis)
 come from the $Z$ operators and the off-diagonal terms
 come from $X$ type operators.
 Loosely speaking we can view the off-diagonal terms as 
 raising and lowering operators, and the diagonal
 terms measure the energy of each level.
+
+\begin{framed}
+In the computational basis, a CSS gauge code
+Hamiltonian is the direct sum of $2^{m_Z}$
+irreducible
+matrices $\Gamma_{t_X}$
+indexed by $t_X\in\Span{T_X}$
+with multiplicity $2^k$:
+$$
+    H = \bigoplus_{
+    \substack{t_X\in\Span{T_X}\\l_X\in\Span{L_X}}}
+        \Gamma_{t_X}.
+$$
+\end{framed}
 
 %We restrict our attention to Hamiltonians whose off-diagonal entries
 %are non-negative (in some basis).
@@ -1517,6 +1629,18 @@ terms measure the energy of each level.
 %\Ham := \sum_{g\in G_0} \rho_{\mathrm{pauli}}(g) + kI.
 %$$
 %This does not change the spectral gap or eigenvectors.
+
+%This is another kind of representation theory of $\Pauli_n.$
+%We are representing either $G_X$ or $G_Z$ as a permutation representation (?)
+%It has the ability to extract irreps of $G$ corresponding to
+%the $X$ type operators as affine subspaces $\{vR_X+t\}$ of $\Fn.$
+%For the $Z$ representations we will still need the complex
+%representation theory to build states on $\Complex[\{vR_X+t\}]$
+%that look like ``waves''.
+%These (stationary) waves do indeed have a geometric interpretation,
+%with the wavefront nodes being identified with so-called Cheeger cuts.
+%To switch back and forth between the $X$ and $Z$ type
+%representations 
 
 An irreducible matrix is ... 
 % https://en.wikipedia.org/wiki/Perron%E2%80%93Frobenius_theorem#Non-negative_matrices
@@ -1540,10 +1664,10 @@ We have demonstrated the following
 
 For a CSS Hamiltonian $\Ham$
 every groundstate is stabilized 
-and so $$\lambda_1(\Ham_{0,0}) = \lambda_1(\Ham)$$
+and so $$\lambda_1(\Ham) = \lambda_1(\Ham_{0,0})$$
 and for $t\ne I:$
 $$
-\lambda_1(\Ham_t) < \lambda_1(H).
+\lambda_1(\Ham) > \lambda_1(H_t).
 $$
 \end{framed}
 %A simple variational argument % ???
@@ -1552,17 +1676,24 @@ $$
 %(this is the Perron-Frobenius theorem)
 %and therefore is stabilized:
 
-
+Using a basis change and the
+above equation (???) for $H_{t_X,0}$
+we have
 \begin{framed}
 \noindent{\bf Fact 2:}
 
 Given a CSS Hamiltonian $\Ham$ and
-$t\in T$ contained in $\Pauli^X$ or $\Pauli^Z,$
-the block $\Ham_t$ is also stoquastic.
+$t_X\in \Span{T_X},\  t_X\in \Span{T_Z}$
+the blocks $\Ham_{t_X,0}$ and 
+$\Ham_{0,t_Z}$ are Perron-Frobenius.
 \end{framed}
 
+The following fact would appear to
+be true under certain conditions,
+but is not at all true
+for example when $T$ is trivial.
 \begin{framed}
-\noindent{\bf Fact 3:}
+\noindent{\bf Proto-fact 3:}
 
 $\lambda_2(\Ham) = \lambda_1(\Ham_t)$ for some
 $t\in T$ contained in $\Pauli^X$ or $\Pauli^Z.$
@@ -1887,7 +2018,7 @@ model &\ $n$\ &\ $r$\ &\ $t$\ & $|A|$ & orbits & Aut(code) \\
     gauge color & 15 & 6  & $I$ & 720 & 7 & 24  \\
                 & 15 & 6  & $t_X$ & 36 & 16 &  \\
                 & 39 & 18 & $I$ & 36 & 14400 & 3  \\
-                & 65 & 32 & $I$ & ?? & ?? &  \\
+                & 65 & 32 & $I$ & ?? & ?? & 4 \\
 \end{tabular}
 \end{center}
 

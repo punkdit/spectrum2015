@@ -1,4 +1,36 @@
 
+27/7/16
+=======
+
+./zorbit.py  gcolor size=2 symmetry
+isomorphisms: 4
+Z_4 symmetry.
+
+./zorbit.py  gcolor size=2 symmetry
+guage ops: 80 qubits: 65 stabs: 16
+
+# this is the action of code automorphism on the stabilizers
+>>> perms = [
+... [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+... [9, 0, 10, 4, 6, 1, 8, 13, 3, 5, 15, 2, 7, 14, 12, 11]
+... ,[5, 9, 15, 6, 8, 0, 3, 14, 4, 1, 11, 10, 13, 12, 7, 2]
+... ,[1, 5, 11, 8, 3, 9, 4, 12, 6, 0, 2, 15, 14, 7, 13, 10]
+... ]
+>>> 
+>>> marked = {}
+>>> for i in range(16):
+...   if i in marked:
+...     continue
+...   print i,
+...   marked[i] = True
+...   for perm in perms:
+...     marked[perm[i]] = True
+... 
+0 2 3 7
+
+
+
+
 25/7/16
 =======
 
@@ -79,6 +111,8 @@ sophie.physics.usyd.edu.au:spectrum2015$ nice ./ex3 -eps_nev 1 -eps_type lanczos
 
 
 stan.physics.usyd.edu.au:spectrum2015$ ./ex3 -eps_nev 1 -eps_type arnoldi -info -eps_ncv 2 -eps_monitor -eps_view_vectors binary:/export/stan1/sburton/evec.gs.3.bin -eps_tol 1e-3 > ex3.gs.3.out &
+72 EPS nconv=0 first unconverged value (error) 104.075 (1.03705340e-03)
+
 
 
 

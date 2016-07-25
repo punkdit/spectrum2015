@@ -63,8 +63,8 @@ init_graph(PyObject *self, PyObject *args)
 
     for(i=0; i<verts; i++)
     {
-        sg.d[i] = degree;
-        sg.v[i] = degree*i;
+        sg.d[i] = degree; // set vertex degree
+        sg.v[i] = degree*i; // index into sg.e array
         for(j=0; j<degree; j++)
         {
             assert(degree*i + j < 2*edges);
