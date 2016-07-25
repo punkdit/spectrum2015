@@ -706,16 +706,15 @@ $$
     \Ham =  \bigoplus_{t\in T}\ \Ham_t \otimes I^{\otimes k}.
 $$
 \end{framed}
-Writing $I$ for the identity element of $T$ we write the corresponding
-block of the hamiltonian as $\Ham_{0,0}.$
+%Writing $I$ for the identity element of $T$ we write the corresponding
+%block of the hamiltonian as $\Ham_{0,0}.$
 
-More generally, we can assign (real valued) weights
-to each operator in $G_0,$ that is
-$w:G_0\to\R,$
-and 
+More generally, we can assign real valued weights
+$J_g\in\R$
+to each operator $g\in G_0,$
 \begin{align*}
-    \Ham = \sum_{g\in G_0} w(g) \rho_{\mathrm{pauli}}(g)
-            = \bigoplus_{l\in L, t\in T} \sum_{g\in G_0}\ w(g) \rho_t(g).
+    \Ham = \sum_{g\in G_0} J_g \rho_{\mathrm{pauli}}(g)
+            = \bigoplus_{l\in L, t\in T} \sum_{g\in G_0}\ J_g \rho_t(g).
 \end{align*}
 In other words, using weights does not change the block structure of $\Ham.$
 
@@ -811,7 +810,7 @@ which can be subsumed into the gauge code as operators $\pm I.$
 %\begin{framed}
 %\noindent{\bf Fact 1:}
 %
-%The blocks $H_t$ of a CSS Hamiltonian are also CSS.
+%The blocks $H_t$ of a CSS gauge code Hamiltonian are also CSS.
 %\end{framed}
 %
 %By counting dimensions we can conclude the following:
@@ -1445,11 +1444,11 @@ a close interplay with $F_2$ linear algebra.
 \subsubsection{Self-dual codes}
 
 We make the following definitions.
-A gauge code is \emph{self-dual} when the $X$ and $Z$ type
+A CSS gauge code is \emph{self-dual} when the $X$ and $Z$ type
 gauge generators are equal: $$G_X = G_Z.$$
 
 The $XY$-model is an example of a self-dual code.
-A gauge code is \emph{weakly self-dual}
+A CSS gauge code is \emph{weakly self-dual}
 when there is a permutation $P$ on the set of $n$ qubits
 that induces equality of the gauge generators:
 $$
@@ -1589,38 +1588,13 @@ we consider.
 
 \subsection{Perron-Frobenius structure theory}
 
-%See \cite{Baez2012}
-We return to the investigation of Hamiltonians
-formed from CSS gauge codes.
-We can think of such Hamiltonians as the adjacency matrix of a graph.
-The diagonal terms (working in the computational basis)
-come from the $Z$ operators and the off-diagonal terms
-come from $X$ type operators.
-Loosely speaking we can view the off-diagonal terms as 
-raising and lowering operators, and the diagonal
-terms measure the energy of each level.
-
-\begin{framed}
-In the computational basis, a CSS gauge code
-Hamiltonian is the direct sum of $2^{m_Z}$
-irreducible
-matrices $\Gamma_{t_X}$
-indexed by $t_X\in\Span{T_X}$
-with multiplicity $2^k$:
-$$
-    H = \bigoplus_{
-    \substack{t_X\in\Span{T_X}\\l_X\in\Span{L_X}}}
-        \Gamma_{t_X}.
-$$
-\end{framed}
-
 %We restrict our attention to Hamiltonians whose off-diagonal entries
 %are non-negative (in some basis).
 %These are also known as \emph{stoquastic} Hamiltonians \cite{Bravyi2006}.
 %This can be achieved by considering Hamiltonians where each term
 %involves either $X$-type operators or $Z$-type operators but not both.
 %That is, $G_0$ consists only of $X$-type operators and $Z$-type operators.
-%We will call this a \emph{CSS Hamiltonian} after the stabilizer codes
+%We will call this a \emph{CSS gauge code Hamiltonian} after the stabilizer codes
 %of the same name.
 %We also shift the Hamiltonian by a constant energy, so that
 %the diagonal entries are non-negative:
@@ -1642,39 +1616,108 @@ $$
 %To switch back and forth between the $X$ and $Z$ type
 %representations 
 
+%See \cite{Baez2012}
+We return to the investigation of Hamiltonians
+formed from CSS gauge codes.
+We can think of such Hamiltonians as the adjacency matrix of a graph.
+The diagonal terms (working in the computational basis)
+come from the $Z$ operators and the off-diagonal terms
+come from $X$ type operators.
+Loosely speaking we can view the off-diagonal terms as 
+raising and lowering operators, and the diagonal
+terms measure the energy of each level.
+
+The off-diagonal entries are all positive, and
+if we use a spectral shift operator ($+cI$) we
+find that $H+cI$ is a non-negative matrix and
+now we can use the Peron-Frobenius theorem.
+
 An irreducible matrix is ... 
 % https://en.wikipedia.org/wiki/Perron%E2%80%93Frobenius_theorem#Non-negative_matrices
-In the computational basis we find the Hamiltonian matrix
-breaks into $2^{k+m_X}$ irreducible matrix blocks all of which are equal.
-The Perron-Frobenius theorem then tells us that
-for each such block, the largest eigenvalue is non-degenerate,
-and is associated with an eigenvector with all-positive entries.
-Taken together, these eigenvectors form a basis for the
-groundspace of the system.
-Stabilizers act as $+1$ or $-1$ on eigenvectors
-of the Hamiltonian.
-A stabilizer $s\in\Pauli^X$ just permutes the
-coordinates of the groundstate and so must fix any
-groundstate. 
-A stabilizer $s\in\Pauli^Z$ acts trivially
-on $\ket{0...0}$ and therefore must also fix any groundstate.
-We have demonstrated the following
+
+\begin{framed}
+In the computational basis, any CSS gauge code
+Hamiltonian $H$ is the direct sum of $2^{m_Z}$
+irreducible matrices $\Gamma_{t_X}$
+indexed by $t_X\in\Span{T_X}$
+with multiplicity $2^k$:
+$$
+    H = \bigoplus_{
+    \substack{t_X\in\Span{T_X}\\l_X\in\Span{L_X}}}
+        \Gamma_{t_X}.
+$$
+\end{framed}
+
+Each of these blocks $\Gamma_{t_X}$ is also Perron-Frobenius
+and this means the following:
+\begin{framed}
+For each $t_X\in\Span{T_X}$
+the largest eigenvalue 
+of $\Gamma_{t_X},$
+$$\lambda_1(\Gamma_{t_X})
+$$
+is non-degenerate,
+and is associated with an eigenvector 
+$$v_1(\Gamma_{t_X})
+$$
+with positive components.
+\end{framed}
+
+Now we make the restriction that $H$
+comes from a weakly self-dual gauge code.
+Our goal will be to show that the
+groundspace of $H$ is spanned
+by vectors which are stabilized.
+This will imply that $\lambda_1(H)=\lambda_1(H_{0,0}).$
+To begin, let $v_1$ be the top
+eigenvector of $\Gamma_{t_X}$ with $t_X\in\Span{T_X}.$
+Because $v_1$ has all positive components
+it will be fixed by  any operator
+$s\in\Span{S_Z}$.
+To show that the $X$ type stabilizers
+also fix $v_1$ 
+we use weak self-duality
+and see that by change of basis
+we can swap the roles of the $X$ and $Z$ type operators.
 \begin{framed}
 \noindent{\bf Fact 1:}
 
-For a CSS Hamiltonian $\Ham$
+For any weakly self-dual gauge code Hamiltonian $\Ham$
 every groundstate is stabilized 
 and so $$\lambda_1(\Ham) = \lambda_1(\Ham_{0,0})$$
-and for $t\ne I:$
+and for $t_X\in\Span{T_X}, t_Z\in\Span{T_Z}$
+with $t_X\ne 0$ or $t_Z\ne 0$
 $$
-\lambda_1(\Ham) > \lambda_1(H_t).
+\lambda_1(\Ham) > \lambda_1(H_{t_X,t_Z}).
 $$
 \end{framed}
+Notice that 
+$H_{0,0}$ is also Perron-Frobenius (in the computational basis)
+and so has non-degenerate
+groundspace, but it appears with multiplicity $2^k$ within
+the Hamiltonian $H$ and this accounts for the degeneracy of the
+groundspace of $H$.
+
+%Taken together, these eigenvectors form a basis for the
+%groundspace of the system.
+%Stabilizers act as $+1$ or $-1$ on eigenvectors
+%of the Hamiltonian.
+%A stabilizer $s\in\Pauli^X$ just permutes the
+%coordinates of the groundstate and so must fix any
+%groundstate. 
+%A stabilizer $s\in\Pauli^Z$ acts trivially
+%on $\ket{0...0}$ and therefore must also fix any groundstate.
+%We have demonstrated the following
+
 %A simple variational argument % ???
 %shows that the top eigenvector (the groundstate)
 %can be chosen to have all positive entries
 %(this is the Perron-Frobenius theorem)
 %and therefore is stabilized:
+
+The next goal is to search for
+the second eigenvalue of $H$,
+$\lambda_2(H).$
 
 Using a basis change and the
 above equation (???) for $H_{t_X,0}$
@@ -1682,10 +1725,24 @@ we have
 \begin{framed}
 \noindent{\bf Fact 2:}
 
-Given a CSS Hamiltonian $\Ham$ and
+Given a weakly self-dual
+gauge code Hamiltonian $\Ham$ and
 $t_X\in \Span{T_X},\  t_X\in \Span{T_Z}$
 the blocks $\Ham_{t_X,0}$ and 
 $\Ham_{0,t_Z}$ are Perron-Frobenius.
+\end{framed}
+
+We extend the above argument:
+\begin{framed}
+For a weakly self-dual gauge code
+Hamiltonian,
+and $t_X\ne 0$, $t_Z\ne 0$
+\begin{align*}
+\lambda_1(\Ham_{t_X,0}) &< 
+    \lambda_1(\Ham_{t_X,t_Z}) \ \mbox{and}\\
+\lambda_1(\Ham_{0,t_Z}) &< 
+    \lambda_1(\Ham_{t_X,t_Z}).
+\end{align*}
 \end{framed}
 
 The following fact would appear to
@@ -1693,10 +1750,18 @@ be true under certain conditions,
 but is not at all true
 for example when $T$ is trivial.
 \begin{framed}
-\noindent{\bf Proto-fact 3:}
+\noindent{\bf Proto-fact:}
 
-$\lambda_2(\Ham) = \lambda_1(\Ham_t)$ for some
-$t\in T$ contained in $\Pauli^X$ or $\Pauli^Z.$
+For a sufficiently ``well-behaved''
+weakly self-dual
+gauge code Hamiltonian $H$
+\begin{align*}
+\lambda_2(\Ham) 
+    &= \min_{t_X\ne 0} \lambda_1(\Ham_{t_X,0})\\
+    &= \min_{t_Z\ne 0} \lambda_1(\Ham_{0,t_Z}).
+\end{align*}
+%for some
+%$(t_X,t_Z) \ne (0, 0).$
 \end{framed}
 
 \subsection{Cheeger inequalities}
@@ -1752,6 +1817,21 @@ have $v^\top \Ham v \le \lambda_2.$
 
 Although there is strong evidence that the gap dissapears as the lattice size
 $l$ grows, it is still worthwhile considering the exact reasons for this.
+
+We use a variational argument to show that $\lambda_1(H_{t_X,0})$
+is close to $\lambda_1(H_{0,0}).$
+Given the similarity of the form of these two blocks, we
+take the ground eigenvector $v_1$ of $H_{0,0}$ and apply it
+to $H_{t_X,0}$. % where $t_X$ has low weight.
+Recall that we identified the bases of these two Hamiltonian blocks.
+\begin{align*}
+    \lambda_1 - \lambda_2 &\le \bra{v_1}H_{0,0}\ket{v_1} - \bra{v_1}H_{t_X,0}\ket{v_1}  \\
+            &= \bra{v_1}(H_{0,0} - H_{t_X,0})\ket{v_1}  \\
+    &= \sum_{v\in\Fr} 2\bigl(w(G_Z R_X^\top v^\top + G_Z t_X^\top) -w(G_Z R_X^\top v^\top)\bigr) 
+    |\braket{v}{v_1}|^2.
+\end{align*}
+
+FAIL
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %

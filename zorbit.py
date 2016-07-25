@@ -524,14 +524,24 @@ def dense(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
         U = []
 
         #for i in range(N):
+        pos = neg = 0
         for i, v in enumerate(genidx((2,)*r)):
             v = array2(v)
+            syndrome0 = dot2(Gz, Rx.transpose(), v)
             syndrome = (dot2(Gz, Rx.transpose(), v) + Gzt)%2
+            delta = syndrome.sum() - syndrome0.sum()
+            if delta > 0:
+                pos += 1
+            elif delta < 0:
+                neg += 1
+            if delta:
+                print "%3d %3d" % (gz-2*syndrome0.sum(), gz-2*syndrome.sum())
             value = gz - 2*syndrome.sum()
             #print shortstr(dot2(Rx.transpose(), v)), value
             if H is not None:
                 H[i, i] = value
             U.append(value)
+        print pos, neg, "total:", i+1
 
         for i, v in enumerate(genidx((2,)*r)):
             v = array2(v)
