@@ -1836,6 +1836,37 @@ FAIL
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
+\subsection{Numerics}
+
+\begin{center}
+\begin{tabular}{ c|c|c|c|cc|c } 
+model       & $n$ &  $t_X$    & $\lambda_1$ & $\lambda_2$ ?&  & gap \\
+\hline
+\hline
+gauge color & 15  & 0         &  25.4558441  & 16.970563   & &  \\
+            &     & $T_X(0)$  &              & 22.21475504 &\checkmark & 3.24108908           \\
+%           &     &           &              &              &            \\
+\hline
+gauge color & 39  & 0         &  64.476081   & 58.137233   & &  \\
+            &     & $T_X(0)$  &              & 60.706477   & &   \\
+            &     & $T_X(1)$  &              & 61.366348  & &  \\
+            &     & $T_X(2)$  &              & 60.357053 & &    \\
+            &     & $T_X(9)$  &              & 63.495916 & \checkmark  & 0.980165 \\
+\hline
+gauge color & 65  & 0         &  104.076     & 98.8 $\pm$1 &  &    \\
+            &     &  $T_X(0)$ &              &  102.382   & \checkmark  &  1.694 \\
+            &     &  $T_X(2)$ &              &  100.585   &  &            \\
+            &     &  $T_X(3)$ &              &            &  &            \\
+            &     &  $T_X(7)$ &              &            &  &            \\
+\end{tabular}
+\end{center}
+
+We use the iterative solvers in software library {\tt SLEPc} \cite{Hernandez2005} to find these
+eigenvalues.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
 \subsection{The orbigraph}
 
 A graph automorphism is a permutation matrix $P$
@@ -2076,29 +2107,29 @@ We define a group of symmetries of the code as...
 
 \begin{center}
 \begin{tabular}{ c|c|c|c|c|c|c } 
-model &\ $n$\ &\ $r$\ &\ $t$\ & $|A|$ & orbits & Aut(code) \\
+model &\ $n$\ &\ $r$\ &\ $t_X$\ & $|A|$ & orbits & Aut(code) \\
 \hline
-    xy & 4 &  2& $I$ & 2 & 3 & 8 \\
-       & 5 &  4& $I$ & 10 & 4 & 10 \\
-       & 6 &  4& $I$ & 72 & 3 & 12 \\
-       & 7 &  6& $I$ & 14 & 9 & 14 \\
-       & 8 &  6& $I$ & 4608 & 10 & 16 \\
-       & 9 &  8& $I$ & 18 & 23 & 18  \\
-       & 10 & 8& $I$ & 200 & 10 & 20  \\
-    %   & 11 & & $I$ & 22 & 63 & 22  \\
-    %   & 12 & & $I$ & 288 & 36 & 24  \\
+    xy & 4 &  2& 0 & 2 & 3 & 8 \\
+       & 5 &  4& 0 & 10 & 4 & 10 \\
+       & 6 &  4& 0 & 72 & 3 & 12 \\
+       & 7 &  6& 0 & 14 & 9 & 14 \\
+       & 8 &  6& 0 & 4608 & 10 & 16 \\
+       & 9 &  8& 0 & 18 & 23 & 18  \\
+       & 10 & 8& 0 & 200 & 10 & 20  \\
+    %   & 11 & & 0 & 22 & 63 & 22  \\
+    %   & 12 & & 0 & 288 & 36 & 24  \\
 \hline
-    compass $l=3$ & 9 & 4 & $I$ & 72 & 3 & 36 \\
+    compass $l=3$ & 9 & 4 & 0 & 72 & 3 & 36 \\
                   & 9 & 4 & $t_X$ & 12 & 4 &  \\
-            $l=4$  & 16 & 9  & $I$ & 128 & 24 & 64 \\
+            $l=4$  & 16 & 9  & 0 & 128 & 24 & 64 \\
                    & 16 & 9  & $t_X$ & 16 & 48 &  \\
-            $l=5$  & 25 & 16 & $I$ & 200 & 430 & 100 \\
+            $l=5$  & 25 & 16 & 0 & 200 & 430 & 100 \\
                    & 25 & 16 & $t_X$ & 20  & 3418 &  \\
 \hline
-    gauge color & 15 & 6  & $I$ & 720 & 7 & 24  \\
+    gauge color & 15 & 6  & 0 & 720 & 7 & 24  \\
                 & 15 & 6  & $t_X$ & 36 & 16 &  \\
-                & 39 & 18 & $I$ & 36 & 14400 & 3  \\
-                & 65 & 32 & $I$ & ?? & ?? & 4 \\
+                & 39 & 18 & 0 & 36 & 14400 & 3  \\
+                & 65 & 32 & 0 & ?? & ?? & 4 \\
 \end{tabular}
 \end{center}
 
@@ -2106,6 +2137,8 @@ From this table it looks like $H_{0,0}$ for the compass model $|A| = 8l^2.$
 
 Note that for large graphs, numerically finding the orbigraph has comparable
 difficulty to just (numerically) solving the original eigenvalue problem.
+
+We use the software library {\tt nauty}\cite{McKay2014} for computing graph automorphisms.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

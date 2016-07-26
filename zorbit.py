@@ -527,21 +527,12 @@ def dense(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
         pos = neg = 0
         for i, v in enumerate(genidx((2,)*r)):
             v = array2(v)
-            syndrome0 = dot2(Gz, Rx.transpose(), v)
             syndrome = (dot2(Gz, Rx.transpose(), v) + Gzt)%2
-            delta = syndrome.sum() - syndrome0.sum()
-            if delta > 0:
-                pos += 1
-            elif delta < 0:
-                neg += 1
-            if delta:
-                print "%3d %3d" % (gz-2*syndrome0.sum(), gz-2*syndrome.sum())
             value = gz - 2*syndrome.sum()
             #print shortstr(dot2(Rx.transpose(), v)), value
             if H is not None:
                 H[i, i] = value
             U.append(value)
-        print pos, neg, "total:", i+1
 
         for i, v in enumerate(genidx((2,)*r)):
             v = array2(v)
@@ -574,6 +565,50 @@ def dense(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
 
         #break
 
+
+def show_delta(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
+
+    r, n = Rx.shape
+
+    N = 2**r
+
+    gz = len(Gz)
+    GzTx = dot2(Gz, Tx.transpose())
+    RR = dot2(Gz, Rx.transpose())
+    PxtQx = dot2(Pxt, Qx)
+
+    if argv.excite:
+        excites = [argv.excite]
+    else:
+        excites = genidx((2,)*len(Tx))
+
+    for excite in excites:
+
+        print "excite:", excite
+        assert len(excite)==len(Tx)
+
+        t = zeros2(n)
+        for i, ex in enumerate(excite):
+            if ex:
+                t = (t + Tx[i])%2
+        print "t:", shortstr(t)
+        Gzt = dot2(Gz, t)
+        #print "Gzt:", shortstr(Gzt)
+
+        #for i in range(N):
+        pos = neg = 0
+        for i, v in enumerate(genidx((2,)*r)):
+            v = array2(v)
+            syndrome0 = dot2(Gz, Rx.transpose(), v)
+            syndrome = (dot2(Gz, Rx.transpose(), v) + Gzt)%2
+            delta = syndrome.sum() - syndrome0.sum()
+            if delta > 0:
+                pos += 1
+            elif delta < 0:
+                neg += 1
+            if delta:
+                print "%3d %3d" % (gz-2*syndrome0.sum(), gz-2*syndrome.sum())
+        print pos, neg, "total:", i+1
 
 
 
@@ -791,19 +826,23 @@ def do_symmetry(Gx, Gz, Hx, Hz):
         # this is the action of graph automorphism on the stabilizers
         rows1 = [rows.index(shortstr(h[perm])) for h in Hx]
         print rows1 
+        perms.append(rows1)
 
-#        perm = get_perm(fn)
-#        #print perm
-#        for i, j in perm.items():
-#            p0, p1 = bag0[i], bag0[j]
-#            i, j = p0.row, p1.row
-#            assert i!=j
-#            #print shortstr(Gz[i])
-#            #print shortstr(Gz[j])
-#            #print
         count += 1
     print
     print "isomorphisms:", count
+
+    print "stabilizer orbits:",
+    marked = {}
+    for i in range(len(Hx)):
+        if i in marked:
+            continue
+        print i,
+        marked[i] = True
+        for perm in perms:
+            marked[perm[i]] = True
+    print
+
 
 
 def main():
@@ -891,6 +930,10 @@ def main():
 
     if argv.dense:
         dense(**locals())
+        return
+
+    if argv.show_delta:
+        show_delta(**locals())
         return
 
     if argv.slepc:
