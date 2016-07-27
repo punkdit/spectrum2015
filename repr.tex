@@ -1375,7 +1375,7 @@ for $v\in \Fr.$
 Adding up all of the above we
 have in summary,
 $$
-H_{0,0} = \sum_{g_X\in G_X, v\in\Fr} 
+H_{0,0} = \sum_{\substack{v\in\Fr\\g_X\in G_X } }
   \ket{v+g_X P_X R_Z^\top}\bra{v} 
   + \sum_{v\in\Fr} \bigl(|G_Z| - 2w(G_Z R_X^\top v^\top)
     \bigr) \ \ket{v}\bra{v}.
@@ -1392,7 +1392,7 @@ $$
 have the same effect on $H_{t_X,0}$
 as $H_{0,0}$ and only the diagonal has changed:
 $$
-H_{t_X,0} = \sum_{g_X\in G_X, v\in\Fr} 
+H_{t_X,0} = \sum_{\substack{v\in\Fr\\g_X\in G_X } }
   \ket{v+g_X P_X R_Z^\top}\bra{v} 
   + \sum_{v\in\Fr} \bigl(
     |G_Z| - 2w(G_Z R_X^\top v^\top + G_Z t_X^\top)
@@ -1412,7 +1412,7 @@ Although we won't need this below,
 here is the general form of
 the Hamiltonian block for completeness:
 \begin{align*}
-H_{t_X,t_Z} = &\sum_{g_X\in G_X, v\in\Fr} 
+H_{t_X,t_Z} = &\sum_{\substack{v\in\Fr\\g_X\in G_X } }
     \eta(t_Z g_X^\top)
   \ \ket{v+g_X P_X R_Z^\top}\bra{v} \\
   &+ \sum_{v\in\Fr} \bigl(
