@@ -2,6 +2,8 @@
 26/7/16
 =======
 
+./zorbit.py compass l=4 show_delta excite=1,0,0
+
 apply t_X excitation to l=4 compass model, only diagonal of H changes.
 we examine this.
 
@@ -37,6 +39,15 @@ Here we have promotions outweigh demotions:
 26/7/16
 =======
 
+./zorbit.py  gcolor2 symmetry
+. [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+. [8, 4, 7, 2, 6, 0, 1, 3, 5, 9]
+. [5, 6, 3, 7, 1, 8, 4, 2, 0, 9]
+
+isomorphisms: 3
+stabilizer orbits: 0 1 2 9
+
+
 ./zorbit.py  gcolor size=2 symmetry
 isomorphisms: 4
 Z_4 symmetry.
@@ -61,7 +72,7 @@ guage ops: 80 qubits: 65 stabs: 16
 ...   for perm in perms:
 ...     marked[perm[i]] = True
 ... 
-0 2 3 7
+stabilizer orbits: 0 2 3 7
 
 
 
@@ -75,16 +86,16 @@ guage ops: 80 qubits: 65 stabs: 16
 
 ground   /\       64.476081            2.45132e-10
 
-excite=0 /\       60.706477             3.6964e-10
-excite=1 /\       61.366348            2.47748e-09
-excite=2 /\       60.357053            8.32563e-10
+excite=0 /\       60.706477     *       3.6964e-10   
+excite=1 /\       61.366348     *      2.47748e-09   
+excite=2 /\       60.357053     *      8.32563e-10   
 excite=3 /\       60.357053            8.32564e-10
 excite=4 /\       61.366348            2.47748e-09
 excite=5 /\       60.706477            3.69643e-10
 excite=6 /\       61.366348            2.47748e-09
 excite=7 /\       60.357053            8.32563e-10
 excite=8 /\       60.706477             3.6964e-10
-excite=9 /\       63.495916             3.5156e-09 # <--- fat stabilizer
+excite=9 /\       63.495916     *       3.5156e-09    # <--- fat stabilizer
 
 excite=8,9 /\     60.053034            9.90256e-09
 
@@ -129,6 +140,7 @@ the XY model orbigraph:
 =======
 
 ./ex3 -eps_nev 1 -eps_ncv 2 -eps_type arnoldi -eps_largest_real -info -eps_monitor -load /import/stan1/sburton/evec.gs.2.bin -eps_tol 1e-3
+
 
 
 

@@ -611,6 +611,91 @@ def show_delta(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
         print pos, neg, "total:", i+1
 
 
+def dense_full(Gx, Gz, Hx, Hz, Rx, Pxt, Qx, Pz, Tx, **kw):
+    " find orbigraph for hamiltonian component Gamma "
+
+    gz, n = Gz.shape
+
+    if argv.excite:
+        excites = [argv.excite]
+
+    else:
+        excites = genidx((2,)*len(Tx))
+
+    for excite in excites:
+
+        print "excite:", excite
+        assert len(excite)==len(Tx)
+
+        t = zeros2(n)
+        for i, ex in enumerate(excite):
+            if ex:
+                t = (t + Tx[i])%2
+        #print "t:", shortstr(t)
+        Gzt = dot2(Gz, t)
+        #print "Gzt:", shortstr(Gzt)
+
+        # This is our basis
+        Bx = array2([v+t for v in Rx] + [v+t for v in Hx])
+        Bx %= 2
+        r = len(Bx)
+        N = 2**r
+        Bx = row_reduce(Bx, truncate=True)
+        assert len(Bx)==r # linearly independant rows
+        Cx = u_inverse(Bx)
+
+        if N<=1024:
+            H = numpy.zeros((N, N))
+        else:
+            H = None
+        A = {}
+        U = []
+
+        #for i in range(N):
+        pos = neg = 0
+        for i, v in enumerate(genidx((2,)*r)):
+            v = array2(v)
+            syndrome = dot2(Gz, Bx.transpose(), v)
+            value = gz - 2*syndrome.sum()
+            #print shortstr(dot2(Rx.transpose(), v)), value
+            if H is not None:
+                H[i, i] = value
+            U.append(value)
+
+        for i, v in enumerate(genidx((2,)*r)):
+            v = array2(v)
+            u0 = dot2(Bx.transpose(), v)
+            #print shortstr(v),
+            for g in Gx:
+                u1 = (u0 + g) % 2
+                v1 = dot2(Cx.transpose(), u1)
+                assert v1.shape == v.shape
+                j = eval('0b'+shortstr(v1, zero='0'))
+                if H is not None:
+                    H[i, j] += 1
+                A[i, j] = A.get((i, j), 0) + 1
+
+        #print H
+
+        if argv.orbiham:
+            vals, vecs = do_orbiham(A, U)
+            show_eigs(vals)
+
+        if H is not None and argv.solve:
+            assert N <= 1024
+            assert numpy.allclose(H, H.transpose())
+            vals, vecs = numpy.linalg.eigh(H)
+            #show_eigs(vals)
+            #print vals
+            vals = list(vals)
+            vals.sort()
+            val0 = vals[-1] # top one is last
+            assert vals[-2] < val0 - 1e-4
+            print "excite:", excite,
+            print "eigval:", val0
+
+        #break
+
 
 
 def getnum(v):
@@ -930,6 +1015,10 @@ def main():
 
     if argv.dense:
         dense(**locals())
+        return
+
+    if argv.dense_full:
+        dense_full(**locals())
         return
 
     if argv.show_delta:
