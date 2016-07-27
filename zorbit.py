@@ -550,20 +550,39 @@ def dense(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
             vals, vecs = do_orbiham(A, U)
             show_eigs(vals)
 
-        if H is not None and argv.solve:
+        if argv.solve:
             assert N <= 1024
             assert numpy.allclose(H, H.transpose())
             vals, vecs = numpy.linalg.eigh(H)
-            #show_eigs(vals)
-            #print vals
+            if argv.show_eigs:
+                show_eigs(vals)
             vals = list(vals)
             vals.sort()
             val0 = vals[-1] # top one is last
             assert vals[-2] < val0 - 1e-4
             print "excite:", excite,
             print "eigval:", val0
+            vec0 = vecs[:,-1]
+            if vec0[0] < 0:
+                vec0 = -vec0
 
         #break
+        if argv.plot:
+            from pyx import graph
+
+            xdata = U
+            ydata = list(vec0)
+
+            g = graph.graphxy(
+                width=16,
+                x=graph.axis.linear(reverse=True),
+                y=graph.axis.log(min=0.8*vec0.min(), max=1.0))
+            # either provide lists of the individual coordinates
+            g.plot(graph.data.values(x=xdata, y=ydata))
+            # or provide one list containing the whole points
+            #g.plot(graph.data.points(list(zip(range(10), range(10))), x=1, y=2))
+            g.writePDFfile("pic-groundstate.pdf")
+
 
 
 def show_delta(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
@@ -681,20 +700,23 @@ def dense_full(Gx, Gz, Hx, Hz, Rx, Pxt, Qx, Pz, Tx, **kw):
             vals, vecs = do_orbiham(A, U)
             show_eigs(vals)
 
-        if H is not None and argv.solve:
+        if argv.solve:
             assert N <= 1024
             assert numpy.allclose(H, H.transpose())
             vals, vecs = numpy.linalg.eigh(H)
-            #show_eigs(vals)
+            if argv.show_eigs:
+                show_eigs(vals)
             #print vals
             vals = list(vals)
             vals.sort()
             val0 = vals[-1] # top one is last
+            vec0 = vecs[:,-1]
+            if vec0[0] < 0:
+                vec0 = -vec0
             assert vals[-2] < val0 - 1e-4
             print "excite:", excite,
             print "eigval:", val0
 
-        #break
 
 
 
@@ -734,21 +756,6 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     offset = argv.get("offset", None)
 
     mz = len(Gz)
-#    print "Hz:"
-#    print shortstr(Hz)
-    print "Hx|Tx:"
-    #print shortstrx(Hx, Tx)
-    for i, h in enumerate(Hx):
-        print i, shortstr(h), h.sum()
-    print "GzTx"
-    GzTx = dot2(Gz, Tx.transpose())
-    for i, h in enumerate(GzTx.transpose()):
-        print i, shortstr(h), h.sum()
-
-#    print "Rx:"
-#    print shortstr(Rx)
-    print "Tx:", len(Tx)
-    #print shortstr(Tx)
     t = None
     excite = argv.excite
     if excite is not None:
@@ -826,11 +833,71 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     else:
         cmd = "gcc -O3 MATCH.c -I/suphys/sburton/include/ -o MATCH -lpetsc -L$PETSC_DIR/$PETSC_ARCH/lib -L$SLEPC_DIR/$PETSC_ARCH/lib -lslepc"
     cmd = cmd.replace("MATCH.c", name)
-    cmd = cmd.replace("MATCH", name[:-2])
+    stem = name[:-2]
+    cmd = cmd.replace("MATCH", stem)
 
     print cmd
     rval = os.system(cmd)
     assert rval == 0
+
+
+    if argv.run:
+        cmd = "./%s -eps_nev 1 -eps_ncv 2 -eps_largest_real -eps_view_vectors binary:evec.bin "%stem
+        #cmd += " -eps_type arnoldi -info -eps_monitor -eps_tol 1e-3"
+        print cmd
+        rval = os.system(cmd)
+        assert rval == 0
+
+    if argv.plot:
+        from pyx import graph
+
+        assert argv.plot.endswith(".pdf")
+
+        s = open("evec.bin").read()
+        sz = 8*2**r
+        if len(s)==sz+8:
+            s = s[8:]
+        elif len(s)==sz+16:
+            s = s[16:]
+        else:
+            assert 0
+        vec0 = numpy.fromstring(s, dtype=">d")
+        
+        r0, r1 = vec0.min(), vec0.max()
+        if abs(r0)>abs(r1):
+            vec0 = -vec0
+            
+        r0, r1 = vec0.min(), vec0.max()
+        if r0 < 0.:
+            vec0 += -r0 + 1e-9
+
+        assert excite is None
+
+        print "building U.."
+        gz, n = Gz.shape
+        U = []
+        for i, v in enumerate(genidx((2,)*r)):
+            v = array2(v)
+            syndrome = dot2(Gz, Rx.transpose(), v)
+            value = gz - 2*syndrome.sum()
+            #print shortstr(dot2(Rx.transpose(), v)), value
+            U.append(value)
+
+        xdata = U
+        ydata = list(vec0)
+
+        assert vec0.min() > 0.
+
+        print "graph.."
+        g = graph.graphxy(
+            width=16,
+            x=graph.axis.linear(reverse=True),
+            y=graph.axis.log(min=0.8*vec0.min(), max=1.2*vec0.max()))
+        # either provide lists of the individual coordinates
+        g.plot(graph.data.values(x=xdata, y=ydata))
+        # or provide one list containing the whole points
+        #g.plot(graph.data.points(list(zip(range(10), range(10))), x=1, y=2))
+        g.writePDFfile(argv.plot)
 
 
 def find_errors(Hx, Lx, Rx):
@@ -962,9 +1029,9 @@ def main():
         do_symmetry(Gx, Gz, Hx, Hz)
         return
     
-    print shortstrx(Gx, Gz)
-    print "Hz:"
-    print shortstr(find_stabs(Gx, Gz))
+    #print shortstrx(Gx, Gz)
+    #print "Hz:"
+    #print shortstr(find_stabs(Gx, Gz))
 
     Lz = find_logops(Gx, Hz)
     #print "Lz:", shortstr(Lz)

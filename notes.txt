@@ -1,4 +1,31 @@
 
+
+
+27/7/16
+=======
+
+find orbigraph for \Gamma_{t_X}
+
+./zorbit.py gcolor dense_full orbiham excite=0,0,0,0
+pnauty.init_graph 1024 18432 18
+pnauty.search
+pnauty.search: Automorphism group size = 384
+orbits: 11
+eigval, degeneracy:
+    (25.4558441227+0j) 1
+    (16.9705627485+0j) 1
+    (8.48528137424+0j) 2
+    (1.62411837021e-15+0j) 3
+    (-8.48528137424+0j) 2
+    (-16.9705627485+0j) 1
+    (-25.4558441227+0j) 1
+
+Does not lift all degeneracy. Smaller group: 384 vs 720. More orbits: 11 vs 7.
+Compare with orbigraph of H_{0,0} 
+
+Similar story with other models.
+
+
 26/7/16
 =======
 
