@@ -1844,25 +1844,42 @@ FAIL
 % !!!                                              !!!
 % !!!                                              !!!
 \begin{center}
-\begin{tabular}{ c|c|c|c|cc|c } 
-model       & $n$ &  $t_X$    & $\lambda_1$ & $\lambda_2$ ?&  & gap \\
+\begin{tabular}{ c|c|c|c|c|cc|c } 
+model       & $n$ &  $t_X$    & $w(s_X)$ & $\lambda_1$ & $\lambda_2$ ?&  & gap \\
 \hline
 \hline
-gauge color & 15  & 0         &  25.4558441  & 16.970563   & &  \\
-            &     & $T_X(1)$  &              & 22.21475504 &\checkmark & 3.24108908           \\
-%           &     &           &              &              &            \\
+gauge color & 15  & 0         & &  25.455844  & 16.970563   & &  \\
+            &     & $T_X(1)$  & 8 &              & 22.214755 &\checkmark & 3.241089           \\
+%           &     &           & &              &              &            \\
 \hline
-gauge color & 39  & 0         &  64.476081   & 58.137233   & &  \\
-            &     & $T_X(1)$  &              & 60.706477   & &   \\
-            &     & $T_X(2)$  &              & 61.366348  & &  \\
-            &     & $T_X(3)$  &              & 60.357053 & &    \\
-            &     & $T_X(10)$  &              & 63.495916 & \checkmark  & 0.980165 \\
+gauge color & 39  & 0         & &  64.476081   & 58.137233   & &  \\
+            &     & $T_X(1)$  & 8 &              & 60.706477   & &   \\
+            &     & $T_X(2)$  & 12 &              & 61.366348  & &  \\
+            &     & $T_X(3)$  & 8 &              & 60.357053 & &    \\
+            &     & $T_X(10)$  & 20 &              & 63.495916 & \checkmark  & 0.980165 \\
 \hline
-gauge color & 65  & 0         &  104.076     & 98.8 $\pm$1 &  &    \\
-            &     &  $T_X(1)$ &              &  102.382   & \checkmark  &  1.694 \\
-            &     &  $T_X(3)$ &              &  100.585   &  &            \\
-            &     &  $T_X(4)$ &              &            &  &            \\
-            &     &  $T_X(8)$ &              &            &  &            \\
+gauge color & 65  & 0         & &  104.076     & 98.8 $\pm$1 &  &    \\
+            &     &  $T_X(1)$ & 18 &              &  102.382   & \checkmark  &  1.694 \\
+            &     &  $T_X(3)$ & 12 &              &  100.585   &  &            \\
+            &     &  $T_X(4)$ & 8  &              &    100.4  &  &            \\
+            &     &  $T_X(8)$ & 12 &              &            &  &            \\
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{ c|c|c|c|c|cc|c } 
+model       & $n$ &  $t_X$    & $w(s_X)$ & $\lambda_1$ & $\lambda_2$ ?&  & gap \\
+\hline
+\hline
+compass $l=4$ & 16  &   0        &   &  19.012903&    16.335705     &     &            \\
+              &     &   $T_X(1)$ & 8 &              &  18.369300    &\checkmark & 0.643603 \\
+\hline
+compass $l=5$ & 25  &   0        &   &  &    &     &            \\
+              &     &   $T_X(1)$ & 10 &              &  &\checkmark & \\
+\hline
+compass $l=6$ & 36  &   0        &   &  &    &     &            \\
+              &     &   $T_X(1)$ & 12 &              &  &\checkmark & \\
+%             &     &           &   &              &          &    &            \\
 \end{tabular}
 \end{center}
 

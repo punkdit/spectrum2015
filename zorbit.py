@@ -735,7 +735,7 @@ def getnum(v):
 
 def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
 
-    name = argv.get("name")
+    name = argv.get("name", "ex3.tmp.c")
     print "slepc", name
 
     r = len(Rx)
@@ -842,7 +842,7 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
 
 
     if argv.run:
-        cmd = "./%s -eps_nev 1 -eps_ncv 2 -eps_largest_real -eps_view_vectors binary:evec.bin "%stem
+        cmd = "./%s -eps_nev 2 -eps_ncv 3 -eps_largest_real -eps_view_vectors binary:evec.bin "%stem
         #cmd += " -eps_type arnoldi -info -eps_monitor -eps_tol 1e-3"
         print cmd
         rval = os.system(cmd)
@@ -1030,7 +1030,10 @@ def main():
         return
     
     #print shortstrx(Gx, Gz)
-    #print "Hz:"
+    if argv.report:
+        print "Hz:"
+        for i, h in enumerate(Hz):
+            print i, shortstr(h), h.sum()
     #print shortstr(find_stabs(Gx, Gz))
 
     Lz = find_logops(Gx, Hz)
