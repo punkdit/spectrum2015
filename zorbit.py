@@ -163,7 +163,7 @@ def build_isomorph(Gx):
     return perms
 
 
-def build_orbiham(H):
+def build_orbigraph(H):
     from isomorph import from_ham, search
     import networkx as nx
 
@@ -204,7 +204,7 @@ def build_orbiham(H):
     return H
 
 
-def sparse_orbiham_nx(n, H):
+def sparse_orbigraph_nx(n, H):
     import networkx as nx
     from networkx.algorithms.isomorphism import GraphMatcher
 
@@ -246,7 +246,7 @@ def sparse_orbiham_nx(n, H):
     print "components:", m
 
 
-def sparse_orbiham(n, H):
+def sparse_orbigraph(n, H):
     from isomorph import from_sparse_ham, search
     import networkx as nx
 
@@ -291,7 +291,7 @@ def sparse_orbiham(n, H):
     return H
 
 
-def sparse_orbiham_nauty(degree, A, U):
+def sparse_orbigraph_nauty(degree, A, U):
 
     n = len(U)
 
@@ -389,7 +389,7 @@ def do_lanczos(A, U):
     return vals, vecs
 
 
-def do_orbiham(A, U):
+def do_orbigraph(A, U):
     #print A
     degrees = {} # out-degree
     for key, value in A.items():
@@ -403,7 +403,7 @@ def do_orbiham(A, U):
     #for value in A.values():
     #    assert value==1
 
-    H1 = sparse_orbiham_nauty(degree, A, U)
+    H1 = sparse_orbigraph_nauty(degree, A, U)
     if H1 is None:
         return
 
@@ -418,7 +418,7 @@ def do_orbiham(A, U):
     if argv.show and N < 40:
         print lstr2(H1, 0)
     elif argv.show:
-        print "orbiham:"
+        print "orbigraph:"
         for i in rows:
             print "%d:"%i,
             for j in rows:
@@ -546,8 +546,8 @@ def dense(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
 
         #print H
 
-        if argv.orbiham:
-            vals, vecs = do_orbiham(A, U)
+        if argv.orbigraph:
+            vals, vecs = do_orbigraph(A, U)
             show_eigs(vals)
 
         if argv.solve:
@@ -696,8 +696,12 @@ def dense_full(Gx, Gz, Hx, Hz, Rx, Pxt, Qx, Pz, Tx, **kw):
 
         #print H
 
-        if argv.orbiham:
-            vals, vecs = do_orbiham(A, U)
+        if argv.orbistab:
+            hx = Hx[0]
+            do_orbistab(Bx, Cx, H, hx)
+
+        if argv.orbigraph:
+            vals, vecs = do_orbigraph(A, U)
             show_eigs(vals)
 
         if argv.solve:
@@ -718,6 +722,73 @@ def dense_full(Gx, Gz, Hx, Hz, Rx, Pxt, Qx, Pz, Tx, **kw):
             print "eigval:", val0
 
 
+
+def do_orbistab(Bx, Cx, H, sx):
+
+    r, n = Bx.shape
+    N = 2**r
+
+    S = numpy.zeros((N, N))
+    for i, v in enumerate(genidx((2,)*r)):
+        v = array2(v)
+        u = dot2(Bx.transpose(), v)
+
+        u1 = (u+sx)%2
+        v1 = dot2(Cx.transpose(), u1)
+        j = eval('0b'+shortstr(v1, zero='0'))
+        S[i, j] = 1.0
+    assert numpy.allclose(S, S.transpose())
+
+    P = 0.5*(numpy.eye(N) - S)
+    H1 = numpy.dot(P, numpy.dot(H, P))
+
+    vals, vecs = numpy.linalg.eigh(H1)
+    show_eigs(vals)
+    idx = numpy.argmax(vals)
+    evec = vecs[:, idx]
+    print idx
+    print evec
+    #return
+
+    pairs = []
+    for i, v in enumerate(genidx((2,)*r)):
+        v = array2(v)
+        u = dot2(Bx.transpose(), v)
+
+        u1 = (u+sx)%2
+        v1 = dot2(Cx.transpose(), u1)
+        j = eval('0b'+shortstr(v1, zero='0'))
+        assert i!=j
+        if evec[i]>evec[j] or (evec[i]==evec[j] and i<j):
+            pairs.append((i, j)) # uniq
+
+    print "pairs:", len(pairs)
+    print "N:", N
+    print pairs
+
+    P = numpy.zeros((N, N/2))
+    Q = numpy.zeros((N/2, N))
+    for idx, pair in enumerate(pairs):
+        i, j = pair
+        P[i, idx] = 1
+        P[j, idx] = -1
+        Q[idx, i] = 1
+
+    H = numpy.dot(Q, numpy.dot(H, P))
+    print lstr2(H, 0)
+
+    evec = numpy.dot(Q, evec)
+    print evec
+    print "val:", (numpy.dot(evec, numpy.dot(H, evec))) / (numpy.dot(evec, evec))
+
+    vals, vecs = numpy.linalg.eig(H)
+    show_eigs(vals.real)
+    #idx = numpy.argmax(vals)
+    print vals.real
+    #print "idx:", idx
+    #v = vecs[:, idx]
+    #print "v:", v 
+    
 
 
 def getnum(v):
@@ -1025,6 +1096,8 @@ def main():
 
         return
 
+    assert not argv.orbiham, "it's called orbigraph now"
+
     if argv.symmetry:
         do_symmetry(Gx, Gz, Hx, Hz)
         return
@@ -1141,9 +1214,9 @@ def main():
         vals, vecs = numpy.linalg.eigh(H)
         show_eigs(vals)
 
-        if argv.orbiham:
-            H1 = build_orbiham(H)
-            print "orbiham:"
+        if argv.orbigraph:
+            H1 = build_orbigraph(H)
+            print "orbigraph:"
             print H1
             vals, vecs = numpy.linalg.eig(H1)
             show_eigs(vals)
@@ -1173,8 +1246,8 @@ def main():
         if argv.lanczos:
             vals, vecs = do_lanczos(A, U)
 
-        elif argv.orbiham:
-            vals, vecs = do_orbiham(A, U)
+        elif argv.orbigraph:
+            vals, vecs = do_orbigraph(A, U)
 
         else:
             return

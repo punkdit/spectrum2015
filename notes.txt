@@ -1,4 +1,9 @@
 
+./zorbit.py compass dense_full orbistab excite=0,0
+
+
+./zorbit.py compass l=6 slepc name=ex3.tmp.c
+./ex3.tmp  -eps_nev 2  -eps_hermitian   -eps_largest_real 
 
 
 27/7/16
