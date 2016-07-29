@@ -1,15 +1,29 @@
 
+
+./ex3 -load /import/stan1/sburton/evec.gs.2.bin -eps_largest_real -eps_nev 2 -eps_ncv 3 -eps_type arnoldi -info -eps_monitor -eps_tol 1e-4 > ex3.gs.4.out &
+
+
 29/7/16
 =======
 
+Show size of cheeger cut and weight of groundstate along the cut:
+
+./cayley.py gcolor
+cut: 3072 18432 6.0
+weight: 2.12132034356
+
+
 ./cayley.py compass l=3
 cut: 192 576=64*9=2**6
+weight: 1.03646679748
 576=64*9
 192=576/3
 
 ./cayley.py compass l=4
 cut: 24576
 cut: 16896 65536
+weight: 1.12626948096
+
 
 65536=2**16=4096*l*l=2**12*l*l
 16896=65536/4 + 512 # zeroes not handled well...

@@ -127,9 +127,12 @@ def main():
 
     print "build U"
     pos = neg = 0
+    lookup = {}
     for i, v in enumerate(genidx((2,)*r)):
         v = array2(v)
-        syndrome = dot2(Gz, Bx.transpose(), v)
+        u = dot2(Bx.transpose(), v)
+        lookup[u.tostring()] = i
+        syndrome = dot2(Gz, u)
         value = gz - 2*syndrome.sum()
         #print shortstr(dot2(Rx.transpose(), v)), value
         H[i, i] = value
@@ -142,18 +145,26 @@ def main():
         #print shortstr(v),
         for g in Gx:
             u1 = (u0 + g) % 2
-            v1 = dot2(Cx.transpose(), u1)
-            assert v1.shape == v.shape
-            j = eval('0b'+shortstr(v1, zero='0'))
+            #v1 = dot2(Cx.transpose(), u1)
+            #assert v1.shape == v.shape
+            #j = eval('0b'+shortstr(v1, zero='0'))
+            j = lookup[u1.tostring()]
             A[i, j] = A.get((i, j), 0) + 1
             H[i, j] = H.get((i, j), 0) + 1
 
     #print A
 
     H1 = mksparse(H, N)
+    vals, vecs = sparse.linalg.eigsh(H1, k=40, which="LA")
+    idx = numpy.argmax(vals)
+    vec0 = vecs[:, idx]
+    if vec0.min() < -1e-4:
+        vec0 *= -1
+    vec0 *= 1./numpy.linalg.norm(vec0)
+    print vec0
 
-    print "Hx:"
-    print shortstr(Hx)
+    #print "Hx:"
+    #print shortstr(Hx)
     for i in range(mx):
         sign = -1 if i==0 else 1
         P = mkprojector(Bx, Cx, Hx[i], sign)
@@ -163,7 +174,7 @@ def main():
     #H1 = P.dot(H1.dot(P))
 
     print "eigsh"
-    vals, vecs = sparse.linalg.eigsh(H1, k=min(len(U)-5, 40), which="LM")
+    vals, vecs = sparse.linalg.eigsh(H1, k=min(len(U)-5, 40), which="LA")
 
     #print list(vals)
     idx = numpy.argmax(vals)
@@ -173,18 +184,27 @@ def main():
 
     print vec
 
+    weight = 0.
+
     cut = set()
     for i, j in A:
         assert i!=j
+        assert (j,i) in A
 
         vivj = vec[i] * vec[j]
         if vivj==0.:
             fail
-        if vivj<0:
+        if vivj<0: #-1e-10:
             cut.add((i, j))
-    print "cut:", len(cut), len(A)
+            w = vec0[i] * vec0[j] * A[i, j]
+            assert w>1e-8
+            weight += w
+    print "cut:", len(cut), len(A),
+    print 1.*len(A)/len(cut)
+    print "weight:", weight
     for i, j in cut:
-        assert j, i in cut
+        assert (j, i) in cut
+
 
 
 
@@ -193,5 +213,10 @@ def main():
 
 if __name__=="__main__":
 
-    main()
+    if argv.profile:
+        import cProfile as profile
+        profile.run("main()")
+    else:
+
+        main()
 
