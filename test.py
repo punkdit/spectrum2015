@@ -199,6 +199,19 @@ def test_orbits():
     #print (u1[-1] / u[-1])**0.5
 
 
+def test_circulant():
+
+    n = argv.get("n", 8)
+
+    A = numpy.zeros((n, n))
+
+    for i in range(n):
+        A[i, (i+1)%n] = 1
+        A[i, (i-1)%n] = 1
+
+    vals, vecs = la.eigh(A)
+    print list(vals)
+
 
 from argv import Argv
 argv = Argv()
@@ -209,6 +222,8 @@ elif argv.compass:
     test_compass()
 elif argv.orbits:
     test_orbits()
+elif argv.circulant:
+    test_circulant()
 
 
     
