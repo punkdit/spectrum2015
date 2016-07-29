@@ -1,4 +1,24 @@
 
+29/7/16
+=======
+
+./cayley.py compass l=3
+cut: 192 576=64*9=2**6
+576=64*9
+192=576/3
+
+./cayley.py compass l=4
+cut: 24576
+cut: 16896 65536
+
+65536=2**16=4096*l*l=2**12*l*l
+16896=65536/4 + 512 # zeroes not handled well...
+
+
+
+28/7/16
+=======
+
 ./zorbit.py compass dense_full orbistab excite=0,0
 
 
