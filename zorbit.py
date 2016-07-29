@@ -40,110 +40,6 @@ def check_commute(A, B):
 
 
 
-
-def build_gcolor(size):
-
-    from qupy.ldpc import gcolor
-
-    lattice = gcolor.Lattice(size)
-
-    n = len(lattice.qubits)
-    print lattice
-
-    code = lattice.build_code(check=False)
-    #Ex = lattice.Ex
-    Gx, Gz = code.Gx, code.Gz
-    Hx, Hz = code.Hx, code.Hz
-
-    return Gx, Gz, Hx
-
-
-def build_compass(l):
-
-    n = l**2
-
-    keys = [(i, j) for i in range(l) for j in range(l)]
-    coords = {}  
-    for i, j in keys:
-        for di in range(-l, l+1):
-          for dj in range(-l, l+1):
-            coords[i+di, j+dj] = keys.index(((i+di)%l, (j+dj)%l))
-
-    m = n 
-    Gx = zeros2(m, n)
-    Gz = zeros2(m, n)
-
-    idx = 0 
-    for i in range(l):
-      for j in range(l):
-        Gx[idx, coords[i, j]] = 1 
-        Gx[idx, coords[i, j+1]] = 1 
-
-        Gz[idx, coords[i, j]] = 1 
-        Gz[idx, coords[i+1, j]] = 1 
-        idx += 1
-
-    assert idx == m
-
-    mx = l-1
-    Hx = zeros2(mx, n)
-    for idx in range(l-1):
-      for j in range(l):
-        Hx[idx, coords[j, idx]] = 1
-        Hx[idx, coords[j, idx+1]] = 1
-
-    mz = l-1
-    Hz = zeros2(mz, n)
-    for idx in range(l-1):
-      for j in range(l):
-        Hz[idx, coords[idx, j]] = 1
-        Hz[idx, coords[idx+1, j]] = 1
-
-    assert dot2(Hx, Hz.transpose()).sum() == 0
-
-    return Gx, Gz, Hx, Hz
-
-
-def build_xy(n):
-
-    m = n
-    Gx = zeros2(m, n)
-    Gz = zeros2(m, n)
-    for i in range(m):
-        Gx[i, i] = 1
-        Gx[i, (i+1)%n] = 1
-        
-        Gz[i, i] = 1
-        Gz[i, (i+1)%n] = 1
-
-    Hx = zeros2(1, n)
-    Hz = zeros2(1, n)
-
-    Hx[:] = 1
-    Hz[:] = 1
-
-    return Gx, Gz, Hx, Hz
-
-
-def build_ising(n):
-
-    m = n
-    Gx = zeros2(m, n)
-    Gz = zeros2(m, n)
-    for i in range(m):
-        Gz[i, i] = 1
-        Gz[i, (i+1)%n] = 1
-
-        Gx[i, i] = 1 # transverse field
-
-    Hx = zeros2(1, n)
-    Hz = zeros2(0, n)
-
-    Hx[:] = 1
-
-    return Gx, Gz, Hx, Hz
-
-
 def build_isomorph(Gx):
     from isomorph import Tanner, search
     bag0 = Tanner.build(Gx)
@@ -775,7 +671,7 @@ def do_orbistab(Bx, Cx, H, sx):
         Q[idx, i] = 1
 
     H = numpy.dot(Q, numpy.dot(H, P))
-    print lstr2(H, 0)
+    #print lstr2(H, 0)
 
     evec = numpy.dot(Q, evec)
     print evec
@@ -913,62 +809,85 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
 
 
     if argv.run:
-        cmd = "./%s -eps_nev 2 -eps_ncv 3 -eps_largest_real -eps_view_vectors binary:evec.bin "%stem
+        cmd = "./%s -eps_nev 1 -eps_ncv 3 -eps_largest_real -eps_view_vectors binary:evec.bin "%stem
         #cmd += " -eps_type arnoldi -info -eps_monitor -eps_tol 1e-3"
         print cmd
         rval = os.system(cmd)
         assert rval == 0
 
-    if argv.plot:
-        from pyx import graph
+    if not argv.plot:
+        return
 
-        assert argv.plot.endswith(".pdf")
+    from pyx import graph
 
-        s = open("evec.bin").read()
-        sz = 8*2**r
-        if len(s)==sz+8:
-            s = s[8:]
-        elif len(s)==sz+16:
-            s = s[16:]
-        else:
-            assert 0
-        vec0 = numpy.fromstring(s, dtype=">d")
+    assert argv.plot.endswith(".pdf")
+
+    s = open("evec.bin").read()
+    sz = 8*2**r
+    if len(s)==sz+8:
+        s = s[8:]
+    elif len(s)==sz+16:
+        s = s[16:]
+    else:
+        assert 0, (len(s)- sz)
+    vec0 = numpy.fromstring(s, dtype=">d")
+    
+    r0, r1 = vec0.min(), vec0.max()
+    if abs(r0)>abs(r1):
+        vec0 = -vec0
         
-        r0, r1 = vec0.min(), vec0.max()
-        if abs(r0)>abs(r1):
-            vec0 = -vec0
-            
-        r0, r1 = vec0.min(), vec0.max()
-        if r0 < 0.:
-            vec0 += -r0 + 1e-9
+    r0, r1 = vec0.min(), vec0.max()
+    if r0 < 0.:
+        vec0 += -r0 + 1e-9
 
-        assert excite is None
+    assert excite is None
 
-        print "building U.."
-        gz, n = Gz.shape
-        U = []
-        for i, v in enumerate(genidx((2,)*r)):
-            v = array2(v)
-            syndrome = dot2(Gz, Rx.transpose(), v)
-            value = gz - 2*syndrome.sum()
-            #print shortstr(dot2(Rx.transpose(), v)), value
-            U.append(value)
+    print "building U.."
+    gz, n = Gz.shape
+    U = []
+    for i, v in enumerate(genidx((2,)*r)):
+        v = array2(v)
+        syndrome = dot2(Gz, Rx.transpose(), v)
+        value = gz - 2*syndrome.sum()
+        #print shortstr(dot2(Rx.transpose(), v)), value
+        U.append(value)
 
-        xdata = U
-        ydata = list(vec0)
+#    #U1 = list(U)
+#    x0 = max(U)
+#    delta = argv.get("delta", 2.0)
+#    done = False
+#    while not done:
+#        done = True
+#        for i, v in enumerate(genidx((2,)*r)):
+#            if U[i] == x0:
+#                continue
+#            v = array2(v)
+#            js = []
+#            for g in Gx:
+#                u = (v + dot2(g, PxtQx))%2
+#                j = eval('0b'+shortstr(u, zero='0'))
+#                js.append(j)
+#            x = max(U[j] for j in js)
+#            if U[i] > x-delta:
+#                U[i] = x-delta # sag
+#                done = False
+#        write('.')
 
-        assert vec0.min() > 0.
+    xdata = U
+    ydata = list(vec0)
 
-        print "graph.."
-        g = graph.graphxy(
-            width=16,
-            x=graph.axis.linear(reverse=True),
-            y=graph.axis.log(min=0.8*vec0.min(), max=1.2*vec0.max()))
-        # either provide lists of the individual coordinates
-        g.plot(graph.data.values(x=xdata, y=ydata))
-        # or provide one list containing the whole points
-        #g.plot(graph.data.points(list(zip(range(10), range(10))), x=1, y=2))
-        g.writePDFfile(argv.plot)
+    assert vec0.min() > 0.
+
+    print "graph.."
+    g = graph.graphxy(
+        width=16,
+        x=graph.axis.linear(reverse=True),
+        y=graph.axis.log(min=0.8*vec0.min(), max=1.2*vec0.max()))
+    # either provide lists of the individual coordinates
+    g.plot(graph.data.values(x=xdata, y=ydata))
+    # or provide one list containing the whole points
+    #g.plot(graph.data.points(list(zip(range(10), range(10))), x=1, y=2))
+    g.writePDFfile(argv.plot)
 
 
 def find_errors(Hx, Lx, Rx):
@@ -1070,31 +989,8 @@ def do_symmetry(Gx, Gz, Hx, Hz):
 
 def main():
 
-    if argv.gcolor:
-        size = argv.get("size", 1)
-        Gx, Gz, Hx = build_gcolor(size)
-        Hz = Hx.copy()
-
-    elif argv.compass:
-        l = argv.get('l', 3)
-        Gx, Gz, Hx, Hz = build_compass(l)
-
-    elif argv.gcolor2:
-        from gcolor import build as build1
-        Gx, Gz, Hx = build1()
-        Hz = Hx.copy()
-
-    elif argv.xy:
-        n = argv.get('n', 4)
-        Gx, Gz, Hx, Hz = build_xy(n)
-
-    elif argv.ising:
-        n = argv.get('n', 4)
-        Gx, Gz, Hx, Hz = build_ising(n)
-
-    else:
-
-        return
+    import models
+    Gx, Gz, Hx, Hz = models.build()
 
     assert not argv.orbiham, "it's called orbigraph now"
 
