@@ -197,8 +197,11 @@ def main():
         if vivj<0: #-1e-10:
             cut.add((i, j))
             w = vec0[i] * vec0[j] * A[i, j]
-            assert w>1e-8
-            weight += w
+            #assert w>1e-8
+            if w<-1e-10:
+                print w,
+            weight += abs(w)
+    print
     print "cut:", len(cut), len(A),
     print 1.*len(A)/len(cut)
     print "weight:", weight
