@@ -399,6 +399,8 @@ def dense(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     else:
         excites = genidx((2,)*len(Tx))
 
+    vec0 = None
+
     for excite in excites:
 
         print "excite:", excite
@@ -445,6 +447,12 @@ def dense(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
         if argv.orbigraph:
             vals, vecs = do_orbigraph(A, U)
             show_eigs(vals)
+
+        #if vec0 is not None:
+        #    Hv = numpy.dot(H, vec0)
+        #    print numpy.dot(vec0, Hv),
+        #    Hv /= numpy.linalg.norm(Hv)
+        #    print numpy.dot(vec0, Hv)
 
         if argv.solve:
             assert N <= 1024

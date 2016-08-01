@@ -58,24 +58,27 @@ def build_gcolor(size):
     return Gx, Gz, Hx
 
 
-def build_compass(l):
+def build_compass(li, lj=None):
 
-    n = l**2
+    if lj is None:
+        lj = li
 
-    keys = [(i, j) for i in range(l) for j in range(l)]
+    n = li*lj
+
+    keys = [(i, j) for i in range(li) for j in range(lj)]
     coords = {}  
     for i, j in keys:
-        for di in range(-l, l+1):
-          for dj in range(-l, l+1):
-            coords[i+di, j+dj] = keys.index(((i+di)%l, (j+dj)%l))
+        for di in range(-li, li+1):
+          for dj in range(-lj, lj+1):
+            coords[i+di, j+dj] = keys.index(((i+di)%li, (j+dj)%lj))
 
     m = n 
     Gx = zeros2(m, n)
     Gz = zeros2(m, n)
 
     idx = 0 
-    for i in range(l):
-      for j in range(l):
+    for i in range(li):
+      for j in range(lj):
         Gx[idx, coords[i, j]] = 1 
         Gx[idx, coords[i, j+1]] = 1 
 
@@ -85,17 +88,17 @@ def build_compass(l):
 
     assert idx == m
 
-    mx = l-1
+    mx = lj-1
     Hx = zeros2(mx, n)
-    for idx in range(l-1):
-      for j in range(l):
-        Hx[idx, coords[j, idx]] = 1
-        Hx[idx, coords[j, idx+1]] = 1
+    for idx in range(mx):
+      for i in range(li):
+        Hx[idx, coords[i, idx]] = 1
+        Hx[idx, coords[i, idx+1]] = 1
 
-    mz = l-1
+    mz = li-1
     Hz = zeros2(mz, n)
-    for idx in range(l-1):
-      for j in range(l):
+    for idx in range(mz):
+      for j in range(lj):
         Hz[idx, coords[idx, j]] = 1
         Hz[idx, coords[idx+1, j]] = 1
 
@@ -274,7 +277,9 @@ def build():
 
     elif argv.compass:
         l = argv.get('l', 3)
-        Gx, Gz, Hx, Hz = build_compass(l)
+        li = argv.get('li', l)
+        lj = argv.get('lj', l)
+        Gx, Gz, Hx, Hz = build_compass(li, lj)
 
     elif argv.gcolor2:
         Gx, Gz, Hx = build_gcolor2()
