@@ -7,6 +7,7 @@ import numpy
 from solve import shortstr, shortstrx, parse, eq2, dot2, zeros2, array2, identity2
 from solve import row_reduce, RowReduction, span, get_reductor
 from solve import u_inverse, find_logops, solve, find_kernel, linear_independant
+from solve import rand2
 
 from lanczos import write
 from code import lstr2
@@ -124,6 +125,18 @@ def build_xy(n):
 
     Hx[:] = 1
     Hz[:] = 1
+
+    return Gx, Gz, Hx, Hz
+
+
+def build_random(n):
+
+    m = n
+    Gx = rand2(m, n, p=0.2)
+    Gz = rand2(m, n, p=0.2)
+
+    Hx = zeros2(0, n)
+    Hz = zeros2(0, n)
 
     return Gx, Gz, Hx, Hz
 
@@ -292,6 +305,10 @@ def build():
     elif argv.ising:
         n = argv.get('n', 4)
         Gx, Gz, Hx, Hz = build_ising(n)
+
+    elif argv.random:
+        n = argv.get('n', 4)
+        Gx, Gz, Hx, Hz = build_random(n)
 
     else:
 

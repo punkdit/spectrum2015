@@ -318,11 +318,11 @@ def main():
     vals, vecs = sparse.linalg.eigsh(H1, k=40, which="LA")
     idx = numpy.argmax(vals)
     print "eigval:", vals[idx]
-    vec0 = vecs[:, idx]
-    if vec0.min() < -1e-4:
-        vec0 *= -1
-    vec0 *= 1./numpy.linalg.norm(vec0)
-    print vec0
+    vec = vecs[:, idx]
+    if vec.min() < -1e-4:
+        vec *= -1
+    vec *= 1./numpy.linalg.norm(vec)
+    print vec
 
     def show(H, v, msg=""):
         Hv = H.dot(v)
@@ -330,81 +330,39 @@ def main():
         print v.dot(Hv),
         print v.dot(Hv)/numpy.linalg.norm(Hv)
 
-#    tz = Tz[0]
-#    tzop = mkzop(Bx, Cx, tz)
-#    sx = Sx[0]
-#    sxop = mkxop(Bx, Cx, sx)
-
     print shortstr(Sx)
 
     def project(H, syndrome):
         for i in range(mx):
-            sign = syndrome[i]
+            #sign = syndrome[i]
+            sign = -1 if i in syndrome else 1
             P = xprojector(Bx, Cx, Sx[i], sign)
             H = P.dot(H.dot(P))
         return H
 
-#    P0 = xprojector(Bx, Cx, Sx[0], -1)
-#    P1 = xprojector(Bx, Cx, Sx[2], -1)
-#
-#    PHP0 = P0.dot(H1.dot(P0))
-#    PHP01 = P1.dot(PHP0.dot(P1))
-
-    PHP0 = project(H1, [-1, 1, 1])
-    PHP01 = project(H1, [-1, 1, -1])
+    PHP0 = project(H1, [0])
+    PHP01 = project(H1, [0, 2])
 
     vals, vecs = sparse.linalg.eigsh(PHP0, k=40, which="LA")
     idx = numpy.argmax(vals)
     print "eigval:", vals[idx]
+    vec0 = vecs[:, idx]
 
     vals, vecs = sparse.linalg.eigsh(PHP01, k=40, which="LA")
     idx = numpy.argmax(vals)
     print "eigval:", vals[idx]
     vec01 = vecs[:, idx]
 
-    tz = mkzop(Bx, Cx, Tz[2])
-    show(PHP0, tz.dot(vec01))
+    cut0 = show_cut(A, vec, vec0)
+    cut01 = show_cut(A, vec, vec01)
+
+    print "intersection:", len(cut0.intersection(cut01))
 
 
-    return
 
-    vec1 = tzop.dot(vec0)
-    print vec1
-
-    Hv1 = H1.dot(vec1)
-    print numpy.dot(vec1, Hv1)
-    Hv1 *= 1./numpy.linalg.norm(Hv1)
-    print numpy.dot(vec1, Hv1)
-
-    H2 = H1
-    syndrome = [1]*mx
-    #syndrome[0] = -1
-    #syndrome[1] = -1
-    for i in range(mx):
-        sign = syndrome[i]
-        P = xprojector(Bx, Cx, Sx[i], sign)
-        H2 = P.dot(H2.dot(P))
-
-    print numpy.dot(vec1, H1.dot(vec1))
-
-    #P = xprojector(Bx, Cx, Lx[0], +1) # no no !!! we already killed Lx
-    #H2 = P.dot(H2.dot(P))
-
-    print "eigsh"
-    vals, vecs = sparse.linalg.eigsh(H2, k=min(len(U)-5, 40), which="LA")
-
-    #print list(vals)
-    idx = numpy.argmax(vals)
-    print "eval:", vals[idx]
-
-    vec = vecs[:, idx]
-
-    print vec
-
-    return
-
+def show_cut(A, vec0, vec):
+    N = len(vec)
     weight = 0.
-
     cut = set()
     for i, j in A:
         assert i!=j
@@ -428,6 +386,7 @@ def main():
     print "weight:", weight
     for i, j in cut:
         assert (j, i) in cut
+    return cut
 
 
 

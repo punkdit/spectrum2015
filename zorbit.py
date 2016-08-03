@@ -487,6 +487,8 @@ def dense(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
             #g.plot(graph.data.points(list(zip(range(10), range(10))), x=1, y=2))
             g.writePDFfile("pic-groundstate.pdf")
 
+            return
+
 
 
 def show_delta(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
@@ -1016,9 +1018,10 @@ def main():
     Lz = find_logops(Gx, Hz)
     #print "Lz:", shortstr(Lz)
 
-    #print Lz.shape, Gx.shape
-    check_commute(Lz, Gx)
-    check_commute(Lz, Hx)
+    if Lz.shape[0]*Lz.shape[1]:
+        print Lz.shape, Gx.shape
+        check_commute(Lz, Gx)
+        check_commute(Lz, Hx)
 
     Px = get_reductor(Hx) # projector onto complement of rowspan of Hx
     Pz = get_reductor(Hz) 
@@ -1028,8 +1031,6 @@ def main():
     Rz = row_reduce(Rz, truncate=True)
     rz = len(Rz)
     print "Rz:", rz
-
-    Tx = find_errors(Hz, Lz, Rz)
 
     n = Gx.shape[1]
     print "Hx:", len(Hx)
@@ -1059,6 +1060,11 @@ def main():
     #print shortstr(dot2(Rz, Rx.transpose()))
 
     offset = argv.offset
+
+    if len(Hz):
+        Tx = find_errors(Hz, Lz, Rz)
+    else:
+        Tx = zeros2(0, n)
 
     if argv.dense:
         dense(**locals())

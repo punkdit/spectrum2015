@@ -1768,7 +1768,7 @@ gauge code Hamiltonian $H$
 
 \subsection{Cheeger inequalities}
 
-In \cite{Friedland2002}, they derive the following cheeger inequality
+In \cite{Friedland2002}, they derive the following Cheeger inequality
 by considering bi-partitions of the graph. We will do the
 same, but using matrix block notation.
 
@@ -1834,6 +1834,37 @@ Recall that we identified the bases of these two Hamiltonian blocks.
 \end{align*}
 
 FAIL
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+\subsection{Perturbation of the Perron vector}
+
+Lemma:
+Let $A$ be non-negative irreducible $n\times n$ matrix.
+Let $v\ne 0$ be a non-negative $n$ vector, and $B = A + \ket{e_i}\bra{v}.$
+Then 
+$$
+\frac{y_i}{x_i} > \frac{y_j}{x_j} \ \ \mbox{for}\ \ j \ne i,
+$$
+where $x, y$ are the Perron eigenvectors of $A, B$ respectively
+\cite{Elsner1982}.
+
+Let $H(t)$ be non-negative irreducible matrix, continuously
+differentiable wrt $t.$
+Let $v(t)$ and $\lambda(t)$ be the Perron eigenvector and value of $H(t)$
+with $\braket{v}{v}=1.$
+Then
+$$
+    \lambda' = \bra{v}H'\ket{v}
+$$
+and
+$$
+    \ket{v'} = -(H-\lambda)^{-1}(H' - \lambda')\ket{v}.
+$$
+where $(H-\lambda)^{-1}$ is the Moore-Penrose inverse of $H-\lambda.$ See \cite{Meyer1988}.
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
