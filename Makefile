@@ -1,7 +1,7 @@
 
 
-out: repr
-	open repr.pdf 
+#out: repr
+#	open repr.pdf 
 
 repr: repr.tex refs.bib
 	pdflatex repr.tex

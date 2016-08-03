@@ -59,7 +59,7 @@ def build_isomorph(Gx):
     return perms
 
 
-def build_orbigraph(H):
+def build_orbigraph(H, syndromes=None):
     from isomorph import from_ham, search
     import networkx as nx
 
@@ -68,22 +68,35 @@ def build_orbigraph(H):
     for i in range(n):
         graph.add_node(i)
 
-    bag0 = from_ham(H)
-    bag1 = from_ham(H)
+    if syndromes is not None:
+        print "syndromes"
+    bag0 = from_ham(H, syndromes)
+    bag1 = from_ham(H, syndromes)
 
     count = 0
+    fs = set()
     for fn in search(bag0, bag1):
+        f = [None]*n
         #print fn
-        write('.')
         for i, j in fn.items():
+            if i>=n:
+                continue
+            assert i<n and j<n
+            f[i] = j
             graph.add_edge(i, j)
+        f = tuple(f)
+        if f in fs:
+            #write('/')
+            continue # <---- continue
+        fs.add(f)
+        write('.')
         count += 1
     print
+    print "isomorphisms:", count
 
     equs = nx.connected_components(graph)
     m = len(equs)
 
-    print "isomorphisms:", count
     print "components:", m
 
     P = numpy.zeros((n, m))
@@ -1105,7 +1118,9 @@ def main():
 
     if n <= 1024 and argv.solve:
         H = numpy.zeros((n, n))
+        syndromes = []
         for i, v in enumerate(verts):
+            syndromes.append(dot2(Gz, v))
             count = dot2(Gz, v).sum()
             Pxv = dot2(Px, v)
             assert count == dot2(Gz, Pxv).sum()
@@ -1125,7 +1140,10 @@ def main():
         show_eigs(vals)
 
         if argv.orbigraph:
-            H1 = build_orbigraph(H)
+            if argv.symplectic:
+                H1 = build_orbigraph(H, syndromes)
+            else:
+                H1 = build_orbigraph(H)
             print "orbigraph:"
             print H1
             vals, vecs = numpy.linalg.eig(H1)

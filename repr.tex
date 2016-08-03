@@ -1041,13 +1041,13 @@ mutually anti-commuting string operators $R_0.$
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-%\subsection{CSS gauge code Hamiltonians}
-\subsection{Representations over the finite field $F_2$}
-
 \def\Cn{\Complex[2^n]}
 \def\Cr{\Complex[2^r]}
-\def\Fn{F_2[n]}
-\def\Fr{F_2[r]}
+\def\Field{\mathcal{F}_2}
+\def\Fn{\Field[n]}
+\def\Fr{\Field[r]}
+
+\subsection{Representations over the finite field $\Field$}
 
 This is a way of ``brute-forcing'' the representations when
 we cannot find a way of writing them down in a closed form expression.
@@ -1056,15 +1056,15 @@ For finite systems this yields an algorithm that is efficiently implementable.
 In this section, and the remainder of this paper,
 we restrict our
 attention to gauge groups formed from terms 
-in $\Pauli^X\cup\Pauli^Z.$
+in $\Pauli_n^X\cup\Pauli_n^Z.$
 We call these \emph{CSS gauge codes.}
-We briefly review the $F_2$ symplectic structure of
+We briefly review the $\Field$ symplectic structure of
 these operators.
 
 Both $\Pauli^X_n$ and $\Pauli^Z_n$ are abelian groups,
 and can be identified with the additive 
 group structure of the $n$ dimensional vector space
-over the finite field of two elements $F_2:$
+over the finite field of two elements $\Field:$
 $$
     \Pauli^X_n \cong \Fn,  \ \ 
     \Pauli^Z_n \cong \Fn. 
@@ -1075,21 +1075,22 @@ We also identify the computational basis of our statespace $\Complex[2^n]$
 with $\Fn$ in the obvious way.
 This has the potential to be very confusing but 
 apart from $X$ and $Z$ subscripts
-we resist the physicist habit of endowing our symbols with decoration that remind us where the
-symbol lives.
+we resist the temptation to
+use any other decorations.
 
-$X$-type operators act on basis vectors using $F_2$ addition:
+$X$-type operators act on basis vectors using $\Field$ addition:
 $$
     g_X \in \Pauli^X_n \cong \Fn, \ \ g_X : v \longmapsto g_X + v
 $$
 
-$Z$-type operators act on basis vectors using $F_2$ inner product:
+$Z$-type operators act on basis vectors using $\Field$ inner product:
 $$
     g_Z \in \Pauli^Z_n \cong \Fn, \ \ g_Z : v \longmapsto g_Z v^\top
 $$
-This is an $F_2$ scalar, just zero or one. We think of this
+This is an $\Field$ scalar, just zero or one. We think of this
 as a ``syndrome''.
-Our $\Fn$ vectors come as row vectors by default, so a product $u v^\top$ of
+Our $\Field$ vectors come as row vectors by default,
+so a product $u v^\top$ of
 two $\Fn$ vectors is a scalar.
 
 It doesn't make sense to add an $X$-type operator and
@@ -1101,7 +1102,7 @@ but it does make sense to take the inner product:
 $$
     g_Z g_X^\top = g_X g_Z^\top.
 $$
-This is an $F_2$ scalar which gives the commutator of the 
+This is an $\Field$ scalar which gives the commutator of the 
 two operators.
 
 We wish to use this language to decompose a CSS gauge group $G.$
@@ -1130,17 +1131,28 @@ in the following table:
 \includegraphics[]{pic-symplectic.pdf}
 \end{center}
 
-Note that we consider each of these blocks 
+The solid rectangles indicate operators that
+span the $X$ and $Z$ parts of the gauge group,
+and the dashed rectangles indicate operators that
+do not live inside the guage group.
+
+We consider each of these blocks 
 $L_X, L_Z, S_X, T_Z, T_X, S_Z, R_X, R_Z$
-as either a set of $\Fn$ vectors or as an $F_2$ matrix
+as either a set of $\Fn$ vectors or as an 
+$\Field$-\emph{matrix}
 with $n$ columns.
 For example, we write $u\in R_X$ to mean $u$ is in
 the set $R_X$. 
-Given $v\in \Fr$ then $u = R_X v^\top$ is
+Given $v\in \Fr$ then $u = v R_X$ is
 a generic vector in the rowspace of $R_X.$
-We call the rowspace of an $F_2$
-matrix $M$ the \emph{span} and denote 
+
+We call the rowspace of an $\Field$-matrix
+$M$ the \emph{span} and denote 
 it as $\Span{M}.$
+The kernel of $M$ is defined as
+$$
+    \Ker(M) = \{ v^\top | M v^\top = 0 \}.
+$$
 
 We first find the stabilizers $S_Z$.
 These are built out of $\Fn$ vectors from the span of $G_Z$
@@ -1149,12 +1161,14 @@ that commute with the rows of $G_X:$
     \Span{S_Z} &= \{\  vG_Z \ |\  v G_Z G_X^\top = 0, \ \ v \in F_2^{|G_Z|}\ \} \\
                &= \{\  vG_Z \ |\  v^\top \in \Ker(G_X G_Z^\top)  \ \}.
 \end{align*}
-And similarly for $S_X.$
+The generators (rows of $S_Z$) can be extracted
+from the span by row reduction.
+We swap the role of $X$ and $Z$ to find $S_X.$
 
 Once we have the stabilizers, in order to
 complete the above table as a presentation
 of the Pauli group we need to solve the
-following $F_2$ block matrix equation:
+following $\Field$ block matrix equation:
 %All of this can be summarized in the block matrix equation:
 $$
 \left( \begin{array}{l}
@@ -1172,18 +1186,25 @@ R_Z
 I.
 $$
 %And once again we have a presentation of the Pauli group.
+with the restriction that the rows of
+$R_X$ lie in the span of $G_X$ and
+the rows of $L_X$ do not. Similarly
+for $R_Z$ and $L_Z.$
 This is a non-linear system of 16 equations and so it
 is not obvious how to proceed, but it turns out a
-systematic way can be found which we outline below.
+systematic way can be found.
 
 To find the reduced gauge group $R_X$ we project the gauge
 group generators onto the orthogonal complement of $S_X.$
-Such a projector is given by
+Such a projector is an $n\times n$
+matrix given by
 $$
-    P_X := I + A^\top S_X
+    P_X = I + A^\top S_X
 $$
 where the matrix $A$ is the $m_X\times n$ matrix consisting of
 the leading 1's in a row-reduction of $S_X.$
+Once again the rows of $R_X$ can be
+extracted from a row-reduction of $G_X P_X.$
 We find $R_Z$ in a similar way.
 
 The logical operators $L_Z$ 
@@ -1199,10 +1220,11 @@ to the linear system:
 \end{align*}
 \emph{and on it goes...}
 
-We call this array of eight $F_2$
+We call this array of eight $\Field$
 valued matrices 
 an $(L,S,T,R)$-decomposition of the gauge group.
-In general this will not be unique.
+In general this will not be unique for
+any given gauge group.
 
 \subsubsection{The Hamiltonian}
 
@@ -1229,7 +1251,7 @@ $$
 with $u, v \in \Fn$ makes sense.
 We will make further use of this below,
 by writing computations in vector
-spaces over $F_2$ inside the Dirac brakets.
+spaces over $\Field$ inside the Dirac brakets.
 
 Returning to the code $(L,S,T,R)$-decomposition
 above,
@@ -1361,11 +1383,11 @@ $$
     \mbox{syndrome}(u) = G_Z u^\top
 $$
 for $u\in \Fn.$
-This is an $F_2$ vector that has one component for
+This is an $\Field$ vector that has one component for
 each row of $G_Z.$
 Writing $|G_Z|$ for the number of these rows, and 
 using a \emph{weight} function $w$ that just counts
-the number of non-zero entries in any $F_2$ vector
+the number of non-zero entries in any $\Field$ vector
 we have the following contributions to
 the Hamiltonian:
 $$
@@ -1422,7 +1444,7 @@ H_{t_X,t_Z} = &\sum_{\substack{v\in\Fr\\g_X\in G_X } }
     \bigr) \ \ket{v}\bra{v}.
 \end{align*}
 Here we use $\eta$ to send 
-$t_Zg_X^\top$ which is an $F_2$ value
+$t_Zg_X^\top$ which is an $\Field$ value
 to the multiplicative subgroup $\{\pm1\}$
 of $\Complex:$
 $$
@@ -1441,7 +1463,7 @@ In summary, we have the
 complete representation
 theory for $CSS$ gauge code Hamiltonians.
 It is a remarkable fact that this involves such
-a close interplay with $F_2$ linear algebra.
+a close interplay with $\Field$ linear algebra.
 
 \subsubsection{Self-dual codes}
 

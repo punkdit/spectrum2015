@@ -125,6 +125,8 @@ class Bag(object):
         self.deps = None # map point -> list of points
         self.attrs = dict(attrs)
         self.points = points
+        for i, point in enumerate(points):
+            assert point.idx == i
 
     def __len__(self):
         return len(self.points)
@@ -275,7 +277,9 @@ def from_sparse_ham(n, H):
     return bag
 
 
-def from_ham(H):
+def from_ham(H, syndromes=None):
+    if syndromes is not None:
+        return from_ham_syndromes(H, syndromes) # <------ return
     n = len(H)
     points = []
     for i in range(n):
@@ -289,6 +293,34 @@ def from_ham(H):
             points[i].nbd.append(points[j])
     bag = Bag(points)
     return bag
+
+
+def from_ham_syndromes(H, syndromes):
+    n = len(H)
+    assert len(syndromes)==n
+    m = len(syndromes[0])
+    points = []
+    for i in range(n):
+        p = Point('(%s)'%H[i, i], i)
+        points.append(p)
+    checks = []
+    for i in range(m):
+        c = Point('c', n+i)
+        checks.append(c)
+    for i in range(n):
+      for j in range(n):
+        if i==j:
+            continue
+        if H[i, j]:
+            points[i].nbd.append(points[j])
+      for j in range(m):
+        if syndromes[i][j]:
+            points[i].nbd.append(checks[j])
+            checks[j].nbd.append(points[i])
+    bag = Bag(points+checks)
+    return bag
+
+
 
 
 def get_perm(m, n, fn):

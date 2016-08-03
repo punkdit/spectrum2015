@@ -649,7 +649,7 @@ class RowReduction(object):
 def get_reductor(H):
     """
         Construct a projector P onto the complement of the rowspace of H.
-        Multiply with P on the right: u = dot2(v, P).
+        Multiply with P on the left: u = dot2(P, v).
     """
     H = row_reduce(H, truncate=True)
 
