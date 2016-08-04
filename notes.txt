@@ -1,5 +1,8 @@
 
 
+stan.physics.usyd.edu.au:spectrum2015$ ./zorbit.py gcolor solve orbigraph symplectic > orbigraph.gcolor.out &
+
+
 ./ex3 -load /import/stan1/sburton/evec.gs.2.bin -eps_largest_real -eps_nev 2 -eps_ncv 3 -eps_type arnoldi -info -eps_monitor -eps_tol 1e-4 > ex3.gs.4.out &
 
 

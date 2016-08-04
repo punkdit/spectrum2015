@@ -1,0 +1,204 @@
+
+%\documentclass[12pt,notitlepage,aps,pra,longbibliography,nofootinbib,tightenlines]{revtex4}
+%\documentclass[12pt,notitlepage,longbibliography,nofootinbib,tightenlines]{revtex4-1}
+
+\documentclass[12pt]{article}
+
+%\documentclass[12pt,a4]{revtex4}
+%\documentclass[12pt]{article}
+%\documentclass[11pt, twocolumn]{article}
+
+%\usepackage{epsf}
+\usepackage{amsmath}
+\usepackage{color}
+\usepackage{natbib}
+%\usepackage{cite}
+\usepackage{fullpage} % uses 20 percent less pages.
+
+\usepackage{framed}
+
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{amsthm}
+%\RequirePackage{algorithmic}
+%\RequirePackage{algorithm}
+%\RequirePackage{theorem}
+%\RequirePackage{eucal}
+\RequirePackage{color}
+\RequirePackage{xcolor}
+\RequirePackage{url}
+\RequirePackage{mdwlist}
+
+\RequirePackage[all]{xy}
+\CompileMatrices
+\RequirePackage{hyperref}
+\RequirePackage{graphicx}
+%\RequirePackage[dvips]{geometry}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+%\renewenvironment{framed}[1][\hsize]{%
+%\def\FrameCommand{{\color{red}\vrule width 3pt}\hspace{0pt}\fboxsep=\FrameSep\colorbox{yellow}}%
+%\MakeFramed{\hsize#1\advance\hsize-\width\FrameRestore}}
+%{\endMakeFramed}
+
+%\renewenvironment{framed}[1][\hsize]{%
+%\def\FrameCommand{{\color{red}\vrule width 3pt}\hspace{0pt}\fboxsep=\FrameSep\colorbox{yellow}}%
+%\MakeFramed{\hsize0.8\linewidth\advance\hsize-\width\FrameRestore}}
+%{\endMakeFramed}
+
+\renewenvironment{framed}[1][\hsize]{%
+\def\FrameCommand{{\color{black}\vrule width 3pt}\hspace{0pt}\fboxsep=\FrameSep\colorbox{lightgray}}%
+\MakeFramed{\hsize0.8\linewidth\advance\hsize-\width\FrameRestore}}
+{\endMakeFramed}
+
+
+\begin{document}
+
+\title{Notes on Hecke Algebras}
+
+\author{Simon Burton}
+%\affiliation{Centre for Engineered Quantum Systems, School of Physics, The University of Sydney}
+
+\date{\today}
+
+%\begin{abstract}
+%\end{abstract}
+
+\maketitle
+
+%\begin{abstract}
+%\end{abstract}
+
+%\newpage
+%\tableofcontents
+%\newpage
+
+% CUT HERE
+
+\def\Complex{\mathbb{C}}
+\def\C{\mathbb{C}}
+\def\R{\mathbb{R}}
+\def\Z{\mathbb{Z}}
+%\def\Ham{\mathcal{H}} % meh..
+\def\Ham{H} 
+\def\Pauli{\mathcal{P}}
+\def\Spec{\mbox{Spec}}
+\def\Proveit{{\it (Proof??)}}
+\def\GL{\mathrm{GL}}
+\def\half{\frac{1}{2}}
+\def\Stab{S}
+\def\Field{\mathcal{F}}
+\def\Defn#1{\underline{#1}}
+
+\newcommand{\ket}[1]{|{#1}\rangle}
+\newcommand{\expect}[1]{\langle{#1}\rangle}
+\newcommand{\bra}[1]{\langle{#1}|}
+\newcommand{\ketbra}[2]{\ket{#1}\!\bra{#2}}
+\newcommand{\braket}[2]{\langle{#1}|{#2}\rangle}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+%\section{Representations}
+%
+%\subsection{Motivating examples}
+
+A \Defn{Coxeter group}
+has generators $\{s_1, .. s_n \}$
+with relations
+\begin{align*}
+    s_i^2 &= 1 \ \ \mbox{for}\ i=1,..,n\\
+    (s_i s_j)^{m(i,j)} &= 1\ \ \mbox{for}\ i,j=1,..,n.
+\end{align*}
+where $m(i,j)\in\{2,3,4,6\}.$
+See \cite{Garrett1997}, \cite{Baez2010}.
+A \Defn{dihedral group}
+is a Coxeter group with two generators.
+
+The \Defn{Dynkin diagram} (or Coxeter diagram)
+associated to a Coxeter group is an undirected graph
+with vertices $1,..,n$ and edges $(i,j)$ when $m(i,j)\ge 3.$
+The edges are labelled with the value $m(i,j)$.
+
+The \Defn{Hecke algebra} associated with a Dynkin diagram $D$
+and $q\ne 0$ 
+is the associative algebra $H(D,q)$ with
+generators $\sigma_i,\ i=1,..,n$ and relations
+\begin{align*}
+\sigma_i^2 &= (q-1)\sigma_i + q \\
+\sigma_i \sigma_j &= \sigma_j \sigma_i \ \mbox{if}\ m(i,j)=2 \\
+\sigma_i \sigma_j \sigma_i &= \sigma_j \sigma_i \sigma_j \ \mbox{if}\ m(i,j)=3 \\
+(\sigma_i \sigma_j)^2 &= (\sigma_j \sigma_i)^2 \ \mbox{if}\ m(i,j)=4 \\
+(\sigma_i \sigma_j)^3 &= (\sigma_j \sigma_i)^3 \ \mbox{if}\ m(i,j)=6.
+\end{align*}
+Note that for $m(i,j)=3$ this gives a Yang-Baxter equation and this
+explains the connection to knot-theory in such cases (these are the $A_k$ Dynkin diagrams.)
+
+We can factorize the first relation as
+$$
+    (\sigma_i - q)(\sigma_i + 1) = 0, \ \ i=1,..,n.
+$$
+
+The $n$-qubit (real) \Defn{Pauli group} is defined with
+$2n$ generators $\{X_i, Z_i\}_{i=1,..,n}$
+and relations
+\begin{align*}
+    X_i^2 = 1,       \ Z_i^2 = 1,\ \ i=1,..,n\\
+    (X_i X_j)^2 = 1, \ (Z_i Z_j)^2 = 1,\ \ i,j=1,..,n\\
+    (X_i Z_j)^2 = 1, \ (X_i Z_i)^4 = 1, \ i\ne j,\ i,j=1,..,n.
+\end{align*}
+It follows that this group is an example of a Coxeter group,
+but building a Hecke algebra as above will not yield a 
+Yang-Baxter equation.
+
+
+Given a group $G$ and subgroups $H, K$ a
+\Defn{double coset}
+is the set $HgK=\{hgk | h\in H, k\in K\}.$
+The set of double cosets is written $H\backslash G/K.$
+
+%We have an equivelance relation on $G$ given by
+%$$
+%    g \sim g' \mbox{if} 
+%$$
+%
+%Each double coset $HgK$ is an equivelance class
+
+The group $H\times K$ acts on $G:$ 
+$$
+    (h, k) : g \mapsto hgk^{-1}.
+$$
+And the orbits of this action are the double cosets $HgK.$
+
+We can define a \Defn{double coset graph} as follows.
+Let $G$ be a group, and $H$ a subgroup of $G.$
+Choose $a\in G$ with $a^2\in H.$
+We define a graph $\Gamma$
+with vertices and edges as
+\begin{align*}
+    \mbox{V}(\Gamma) &= \{ Hg | g\in G\} \\
+    \mbox{E}(\Gamma) &= \{ \{Hx, Hy\} | xy^{-1}\in G\}.
+\end{align*}
+Then $G$ acts on this graph by right multiplication.
+This action is vertex-transitive with vertex stabiliser
+$G_H = \{g \in G : Hg = H\} = H$ itself, which acts
+transitively on the neighbours $Hah$ (for $h \in H$) of $H$.
+Thus $\Gamma$ is arc-transitive \cite{Sabidussi1964}.
+
+
+\cite{Kassel2010}
+exercise 4.2.3: The Hecke algebra of $\GL_n(\Field_q).$
+
+
+\bibliography{refs}{}
+\bibliographystyle{abbrv}
+
+
+\end{document}
+
+

@@ -1,13 +1,21 @@
 
+all: repr.pdf hecke.pdf
 
 #out: repr
 #	open repr.pdf 
 
-repr: repr.tex refs.bib
+repr.pdf: repr.tex refs.bib
 	pdflatex repr.tex
 	bibtex repr
 	pdflatex repr.tex
 	pdflatex repr.tex
+
+
+hecke.pdf: hecke.tex refs.bib
+	pdflatex hecke.tex
+	bibtex hecke
+	pdflatex hecke.tex
+	pdflatex hecke.tex
 
 
 notes: notes.tex refs.bib
