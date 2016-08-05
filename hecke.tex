@@ -16,6 +16,7 @@
 \usepackage{fullpage} % uses 20 percent less pages.
 
 \usepackage{framed}
+\usepackage{tikz-cd}
 
 \RequirePackage{amsmath}
 \RequirePackage{amssymb}
@@ -56,7 +57,7 @@
 
 \begin{document}
 
-\title{Notes on Hecke Algebras}
+\title{Notes on Hecke algebras and more}
 
 \author{Simon Burton}
 %\affiliation{Centre for Engineered Quantum Systems, School of Physics, The University of Sydney}
@@ -88,7 +89,8 @@
 \def\Proveit{{\it (Proof??)}}
 \def\GL{\mathrm{GL}}
 \def\half{\frac{1}{2}}
-\def\Stab{S}
+\def\Im{\mbox{im}}
+\def\Ker{\mbox{ker}}
 \def\Field{\mathcal{F}}
 \def\Defn#1{\underline{#1}}
 
@@ -104,9 +106,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-%\section{Representations}
-%
-%\subsection{Motivating examples}
+\section{Hecke Algebras}
 
 A \Defn{Coxeter group}
 has generators $\{s_1, .. s_n \}$
@@ -182,17 +182,146 @@ We define a graph $\Gamma$
 with vertices and edges as
 \begin{align*}
     \mbox{V}(\Gamma) &= \{ Hg | g\in G\} \\
-    \mbox{E}(\Gamma) &= \{ \{Hx, Hy\} | xy^{-1}\in G\}.
+    \mbox{E}(\Gamma) &= \{ \{Hx, Hy\} | xy^{-1}\in HaH\}.
 \end{align*}
 Then $G$ acts on this graph by right multiplication.
 This action is vertex-transitive with vertex stabiliser
-$G_H = \{g \in G : Hg = H\} = H$ itself, which acts
+$$
+G_H = \{g \in G | Hg = H\} = H
+$$
+which acts
 transitively on the neighbours $Hah$ (for $h \in H$) of $H$.
 Thus $\Gamma$ is arc-transitive \cite{Sabidussi1964}.
 
 
 \cite{Kassel2010}
 exercise 4.2.3: The Hecke algebra of $\GL_n(\Field_q).$
+
+%
+% Bruhat decomposition:
+% http://mathoverflow.net/questions/15438/a-slick-proof-of-the-bruhat-decomposition-for-gl-nk
+%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+\section{Discrete differential geometry}
+
+Regge calculus aka Discrete exterior calculus.
+Applications to building space-time geometry out of
+quantum entanglement structures: \cite{Cao2016}.
+Constructing a Ricci flow on a simplicial geometry: \cite{Miller2014}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+\section{Higher structures}
+
+% http://chocolatshalba.ch/files/texlive/texmf-dist/doc/latex/tikz-cd/tikz-cd-doc.pdf
+
+A \Defn{groupoid} is a category where every morphism is invertible.
+
+Given a group $G$ acting on a set $X$
+the \Defn{weak quotient} $X//G$
+is the groupoid with objects $X$ and morphisms
+\[\begin{tikzcd} x \arrow{r}{g} & gx \end{tikzcd} \]
+
+The groupoid $G//G$ has morphisms that look like
+\[\begin{tikzcd} g \arrow{r}{h} & hg \end{tikzcd} \]
+for $g, h\in G.$
+This also has a monoidal structure; given two
+morphisms
+\[\begin{tikzcd}[row sep=small]
+g_1 \arrow{r}{h_1} & h_1g_1 \\
+g_2 \arrow{r}{h_2} & h_2g_2
+\end{tikzcd} \]
+we form
+\[\begin{tikzcd}[row sep=large, column sep = large]
+g_2 g_1 \arrow{r}{h_2 g_2 h_1 g_2^{-1}} & h_2 g_2 h_1 g_1 
+\end{tikzcd} \]
+The monoidal product has an inverse: 
+each morphism 
+$$h:g\to hg$$ 
+has inverse 
+$$g^{-1}hg : g^{-1}\to (hg)^{-1}.$$
+This makes $G//G$ into a strict 2-Group \cite{Roberts2007}.
+
+\def\bdy{\partial}
+
+Changing notation now, we take as our group a vector space $m,$
+then for $v,v'\in m$ we have the morphism
+\[\begin{tikzcd}[column sep = large]
+v \arrow{r}{v'-v} & v'. \end{tikzcd} \]
+We can extend this idea to a 2-groupoid as follows.
+%strict symmetric monoidal 3-groupoid ?
+Given a linear operator $\bdy$
+\[\begin{tikzcd} 0 \arrow{r} & m_2 \arrow{r}{\bdy} & m_1 \arrow{r} & 0 \end{tikzcd} \]
+is a groupoid with objects $m_1$ and
+for $v_1, v_1'\in m_1$ with $v_1'-v_1 \in \Im(\bdy)$
+we have morphisms
+\[\begin{tikzcd}[column sep = large]
+v_1 \arrow{r}{v_2} & v_1'. \end{tikzcd} \]
+with $\bdy v_2=v_1'-v_1.$
+Given two such morphisms $v_2, v'_2$ with $\bdy v_2=\bdy v_2'=v_1'-v_1$ 
+we get a 2-morphism $u_2=v_2'-v_2\in\Ker(\bdy)$:
+$$
+\begin{tikzcd}[column sep = small, row sep = tiny]
+\ \arrow{rr}[]{v_2} \arrow{rr}[name=U,below]{} & \ & \   \\
+v_1         & \ \ \ \ {}_{u_2}              & v_1' \\
+\ \arrow{rr}[below]{v_2'} \arrow{rr}[name=D]{}  &  \     & \   \\
+\arrow[Rightarrow,to path=(U) -- (D),left]{}
+\end{tikzcd}
+$$
+
+Bumping up a dimension we get to
+\[\begin{tikzcd} 0 \arrow{r} & m_3 \arrow{r}{\bdy_3} & m_2 \arrow{r}{\bdy_2} & m_1 \arrow{r} & 0 \end{tikzcd} \]
+and now if we have 2-morphisms $u_2, u'_2: v_2 \to v'_2 $
+such that $u'_2-u_2\in \Im(\bdy_3)$
+we have a 3-morphism $u_3:u_2\to u'_2$ 
+given by an element $u_3\in m_3$ such that $\bdy(u_3)=u'_2-u_2:$
+$$
+\begin{tikzcd}[column sep = tiny, row sep = tiny]
+\ \arrow{rrr}[]{v_2} \arrow{rrr}[pos=0.3,name=U,below]{} \arrow{rrr}[pos=0.7,name=UU,below]{} & \ & \ &\  \\
+v_1         & {}_{u_2} \ \ \ \ \ \overset{u_3}{\Rrightarrow} & {}_{u'_2}    & v_1' \\
+\ \arrow{rrr}[below]{v_2'} \arrow{rrr}[pos=0.3,name=D]{} \arrow{rrr}[pos=0.7,name=DD]{}   &  \   &\  & \   \\
+\arrow[Rightarrow,to path=(U) -- (D),left]{}
+\arrow[Rightarrow,to path=(UU) -- (DD),left]{}
+\end{tikzcd}
+$$
+% another globular pic:
+% http://tex.stackexchange.com/questions/157089/drawing-diagrams-of-higher-categories-with-tikz
+
+%$$
+%\begin{tikzcd}[column sep = small, row sep = tiny]
+%\ \arrow{rrr}[]{v_2} \arrow{rrr}[pos=0.2,name=U,below]{} \arrow{rrr}[pos=0.8,name=UU,below]{} & \ & \ &\  \\
+%v_1         & {}_{u_2} \arrow{r}{u_3}     & {}_{u'_2}    & v_1' \\
+%\ \arrow{rrr}[below]{v_2'} \arrow{rrr}[pos=0.2,name=D]{} \arrow{rrr}[pos=0.8,name=DD]{}   &  \   &\  & \   \\
+%\arrow[Rightarrow,to path=(U) -- (D),left]{}
+%\arrow[Rightarrow,to path=(UU) -- (DD),left]{}
+%\end{tikzcd}
+%$$
+
+
+
+
+%\begin{tikzcd}[column sep = huge]
+%A \arrow{r}[name=U,below]{} & B \\
+%B \arrow{r}[name=D]{} & C \\
+%\arrow[Rightarrow,to path=(U) -- (D)]{}
+%\end{tikzcd}
+%
+%\begin{tikzcd}
+%A \arrow[bend left=50]{r}[name=U,below]{}
+%\arrow[bend right=50]{r}[name=D]{}
+%& B
+%\arrow[Rightarrow,to path=(U) -- (D)]{}
+%\end{tikzcd}
+
 
 
 \bibliography{refs}{}
