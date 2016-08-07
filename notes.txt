@@ -1,4 +1,36 @@
 
+5/8/16
+======
+
+plenty of symmetry even in random codes:
+simon@bucket ~/home/github/spectrum2015 $ ./zorbit.py random solve orbigraph n=8 |egrep "isomorphism|span"
+span: 128
+isomorphisms: 8
+simon@bucket ~/home/github/spectrum2015 $ ./zorbit.py random solve orbigraph n=8 |egrep "isomorphism|span"
+span: 64
+isomorphisms: 1
+simon@bucket ~/home/github/spectrum2015 $ ./zorbit.py random solve orbigraph n=8 |egrep "isomorphism|span"
+span: 256
+isomorphisms: 96
+simon@bucket ~/home/github/spectrum2015 $ ./zorbit.py random solve orbigraph n=8 |egrep "isomorphism|span"
+span: 32
+isomorphisms: 2
+simon@bucket ~/home/github/spectrum2015 $ ./zorbit.py random solve orbigraph n=10 |egrep "isomorphism|span"
+span: 128
+isomorphisms: 2
+simon@bucket ~/home/github/spectrum2015 $ ./zorbit.py random solve orbigraph n=10 |egrep "isomorphism|span"
+span: 128
+isomorphisms: 1
+simon@bucket ~/home/github/spectrum2015 $ ./zorbit.py random solve orbigraph n=10 |egrep "isomorphism|span"
+span: 512
+isomorphisms: 2
+
+
+
+
+
+
+======
 
 stan.physics.usyd.edu.au:spectrum2015$ ./zorbit.py gcolor solve orbigraph symplectic > orbigraph.gcolor.out &
 

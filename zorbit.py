@@ -9,7 +9,9 @@ from scipy.sparse.linalg import eigs, eigsh
 from solve import shortstr, shortstrx, parse, eq2, dot2, zeros2, array2, identity2
 from solve import row_reduce, RowReduction, span, get_reductor
 from solve import u_inverse, find_logops, solve, find_kernel, linear_independant
+from solve import System, Unknown, pseudo_inverse
 
+from isomorph import Tanner, search, from_sparse_ham, search_recursive, Backtrack, from_ham
 from lanczos import write, show_eigs
 from code import lstr2
 
@@ -41,7 +43,6 @@ def check_commute(A, B):
 
 
 def build_isomorph(Gx):
-    from isomorph import Tanner, search
     bag0 = Tanner.build(Gx)
     bag1 = Tanner.build(Gx)
     m, n = Gx.shape
@@ -60,18 +61,18 @@ def build_isomorph(Gx):
 
 
 def build_orbigraph(H, syndromes=None):
-    from isomorph import from_ham, search
     import networkx as nx
+
+    if syndromes is not None:
+        return build_orbigraph_syndromes(H, syndromes)
 
     n = len(H)
     graph = nx.Graph()
     for i in range(n):
         graph.add_node(i)
 
-    if syndromes is not None:
-        print "syndromes"
-    bag0 = from_ham(H, syndromes)
-    bag1 = from_ham(H, syndromes)
+    bag0 = from_ham(H)
+    bag1 = from_ham(H)
 
     count = 0
     fs = set()
@@ -90,6 +91,57 @@ def build_orbigraph(H, syndromes=None):
             continue # <---- continue
         fs.add(f)
         write('.')
+        count += 1
+    print
+    print "isomorphisms:", count
+
+    equs = nx.connected_components(graph)
+    m = len(equs)
+
+    print "components:", m
+
+    P = numpy.zeros((n, m))
+    Q = numpy.zeros((m, n))
+    for i, equ in enumerate(equs):
+        for j in equ:
+            P[j, i] = 1
+        Q[i, j] = 1
+
+    #print shortstr(P)
+    #print shortstr(Q)
+
+    H = numpy.dot(Q, numpy.dot(H, P))
+    return H
+
+
+def build_orbigraph_syndromes(H, syndromes):
+    import networkx as nx
+
+    print "build_orbigraph_syndromes"
+
+    n = len(H)
+    graph = nx.Graph()
+    for i in range(n):
+        graph.add_node(i)
+
+    bag00 = from_ham(H)
+    bag11 = from_ham(H)
+
+    count = 0
+    for f0 in search(bag00, bag11):
+
+        bag0 = from_ham(H, syndromes)
+        bag1 = from_ham(H, syndromes)
+
+        try:
+            for f1 in search(bag0, bag1, fn=dict(f0)):
+                write('.')
+                break
+        except Backtrack:
+            continue
+
+        for i, j in f0.items():
+            graph.add_edge(i, j)
         count += 1
     print
     print "isomorphisms:", count
@@ -156,7 +208,6 @@ def sparse_orbigraph_nx(n, H):
 
 
 def sparse_orbigraph(n, H):
-    from isomorph import from_sparse_ham, search
     import networkx as nx
 
     graph = nx.Graph()
@@ -966,7 +1017,6 @@ def get_perm(fn):
 
 def do_symmetry(Gx, Gz, Hx, Hz):
 
-    from isomorph import Tanner, search, search_recursive
     bag0 = Tanner.build(Gx, Gz)
     bag1 = Tanner.build(Gx, Gz)
 
@@ -1009,6 +1059,33 @@ def do_symmetry(Gx, Gz, Hx, Hz):
     print
 
 
+def do_chainmap(Gx, Gz):
+
+    print "do_chainmap"
+
+    gx, n = Gx.shape
+    gz, n = Gz.shape
+
+    Qx = Unknown(gx, gx)
+    Qz = Unknown(gz, gz)
+    P = Unknown(n, n)
+    
+    system = System(Qx, P, Qz)
+
+    system.append(dot2(Qz, Gz), dot2(Gz, P))
+    system.append(dot2(Qx, Gx), dot2(Gx, P))
+
+    kern = system.kernel()
+    print "kernel:", len(kern)
+
+    T = system.solve()
+    Qx, P, Qz = T
+
+    # zero !
+    #print shortstrx(Qx, P, Qz)
+
+
+
 
 def main():
 
@@ -1016,6 +1093,9 @@ def main():
     Gx, Gz, Hx, Hz = models.build()
 
     assert not argv.orbiham, "it's called orbigraph now"
+
+    if argv.chainmap:
+        do_chainmap(Gx, Gz)
 
     if argv.symmetry:
         do_symmetry(Gx, Gz, Hx, Hz)
@@ -1093,6 +1173,11 @@ def main():
 
     if argv.slepc:
         slepc(**locals())
+        return
+
+    if argv.orbigraph:
+        from linear import orbigraph
+        orbigraph(**locals())
         return
 
     v0 = None
