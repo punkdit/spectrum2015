@@ -6,6 +6,8 @@ import numpy
 from scipy import sparse
 from scipy.sparse.linalg import eigs, eigsh
 
+import networkx as nx
+
 from solve import shortstr, shortstrx, parse, eq2, dot2, zeros2, array2, identity2
 from solve import row_reduce, RowReduction, span, get_reductor
 from solve import u_inverse, find_logops, solve, find_kernel, linear_independant
@@ -14,6 +16,7 @@ from solve import System, Unknown, pseudo_inverse
 import isomorph
 from lanczos import write, show_eigs
 from code import lstr2
+
 
 
 def genidx(shape):
@@ -199,7 +202,7 @@ def find_isos(Gz, Rx):
         rows = '\n'.join(rows)
         assert rows == normal
 
-        s = P.transpose().tostring()
+        s = P.tostring()
         if s not in found:
             found.add(s)
             Ps.append(P)
@@ -212,6 +215,52 @@ def find_isos(Gz, Rx):
     return Ps, found
 
 
+def search_isos(Gz, Rx):
+
+    RR = dot2(Gz, Rx.transpose())
+    rows = [shortstr(r) for r in RR]
+    uniq = list(set(rows))
+    uniq.sort(reverse=True)
+    idxs = [rows.index(row) for row in uniq]
+    G = RR[idxs,:]
+    normal = [shortstr(row) for row in G]
+    normal.sort()
+    normal = '\n'.join(normal)
+    for P in search(G):
+        GP = dot2(G, P.transpose())
+        rows = [shortstr(row) for row in GP]
+        rows.sort()
+        rows = '\n'.join(rows)
+        assert rows == normal
+
+        yield P
+
+
+def find_rowperm(A, B):
+    "find permutation matrix Q such that A = Q B"
+    assert A.shape == B.shape
+    m, n = A.shape
+    Q = zeros2(m, m)
+    arows = [a.tostring() for a in A]
+    brows = [b.tostring() for b in B]
+    for i, row in enumerate(brows):
+        if row not in arows:
+            return None
+        j = arows.index(row)
+        arows[j] = ''
+        Q[j, i] = 1
+    assert eq2(A, dot2(Q, B))
+    assert eq2(dot2(Q, Q.transpose()), identity2(m))
+    return Q
+
+def find_rowmap(A, B):
+    "find Q such that A = Q B "
+    Qt = solve(B.transpose(), A.transpose())
+    Q = Qt.transpose()
+    assert eq2(A, dot2(Q, B))
+    return Q
+
+
 def orbigraph(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
 
     r, n = Rx.shape
@@ -220,11 +269,6 @@ def orbigraph(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     gz = len(Gz)
     RR = dot2(Gz, Rx.transpose())
     PxtQx = dot2(Pxt, Qx)
-
-    Ps, found = find_isos(Gz, Rx)
-
-    if not argv.check:
-        return
 
     H = {}
     A = {}
@@ -252,11 +296,57 @@ def orbigraph(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
             H[i, j] = H.get((i, j), 0) + 1
             A[i, j] = A.get((i, j), 0) + 1
 
-    print len(H)
+    print "H.nnz =", len(H)
     #return
+
+    GPR = dot2(Gx, Pxt, Rz.transpose())
+
+    if 1:
+        count = 0
+        for P in search_isos(Gz, Rx):
+            fn = {}
+            for i, v in enumerate(vectors):
+                v1 = dot2(P.transpose(), v)
+                j = lookup[v1.tostring()]
+                fn[i] = j
+            #print fn
+
+            Q = find_rowperm(GPR, dot2(GPR, P)) # works for compass model
+            if Q is None:
+                write("/Q0")
+                continue
+            Q = find_rowmap(GPR, dot2(GPR, P)) # not good enough for compass model, find invertible ??
+            if Q is None:
+                write("/Q1")
+                continue
+            Q = find_rowmap(dot2(GPR, P), GPR) # not good enough for compass model, find invertible ??
+            if Q is None:
+                write("/Q2")
+                continue
+    
+            for (i, j) in H.keys():
+                i1, j1 = fn[i], fn[j]
+                if H.get((i1, j1)) is None or H[i, j] != H[i1, j1]:
+                    write("/H")
+                    break
+            else:
+                write('.')
+                count += 1
+    
+        print "count:", count
+    
+        return
+
+    #Ps, found = find_isos(Gz, Rx)
 
     bag0 = isomorph.from_sparse_ham(N, H)
     bag1 = isomorph.from_sparse_ham(N, H)
+
+    graph = nx.Graph()
+    for i in range(n):
+        graph.add_node(i)
+
+
 
     count = 0
     for fn in isomorph.search(bag0, bag1):
@@ -269,41 +359,54 @@ def orbigraph(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
             idx = fn[j]
             v1 = vectors[idx]
             #print shortstr(v0), "->", shortstr(v1)
-            P[:, i] = v1
+            P[i, :] = v1
             v0[i] = 0
 
-        assert P.tostring() in found
+        #assert P.tostring() in found
+
+        accept = True
 
         for i, v0 in enumerate(vectors):
-            v1 = dot2(P, v0)
+            v1 = dot2(v0, P)
             j = fn[i]
             if not eq2(v1, vectors[j]):
                 write('/')
+                accept = False
                 break
             assert shortstr(vectors[j])==shortstr(v1)
-        else:
+
+        if not accept:
+            continue
+
+        Q = find_rowperm(RR, dot2(RR, P.transpose()))
+        assert Q is not None
+        print
+        #print shortstrx(Q)
+        #print shortstrx(P, RR, dot2(RR, P.transpose()))
+        print shortstrx(P, GPR, dot2(GPR, P))
+        print
+        #Q = find_rowperm(GPR, dot2(GPR, P)) # works for compass model !
+        Q = find_rowmap(GPR, dot2(GPR, P))
+        assert Q is not None
+        print shortstr(Q) # hmm would be nice to have invertible Q here......???
+        if Q is None:
+            write("/Q")
+            accept = False
+
+        if accept:
             count += 1
             write('.')
-
-        print
-        print shortstrx(P, RR, dot2(RR, P))
-        print
+            for i, j in fn.items():
+                graph.add_edge(i, j)
 
     print
-    print "count:", count
 
-#    size = 1
-#    for j in range(r):
-#        size *= 2**r - 2**j
-#    print "|GL_%d(F_2)| = %d"%(r, size)
-#
-#    size = 1
-#    for j in range(1, r):
-#        size *= 2**j
-#    size = size*size
-#    for j in range(1, r+1):
-#        size *= j
-#    print "|BWB| =", size
+    equs = nx.connected_components(graph)
+    m = len(equs)
+
+    print "isomorphisms:", count
+    print "orbits:", m
+
 
 
 
@@ -360,9 +463,8 @@ def main():
     else:
         Tx = zeros2(0, n)
 
-    if argv.orbigraph:
-        orbigraph(**locals())
-        return
+
+    orbigraph(**locals())
 
 
 
