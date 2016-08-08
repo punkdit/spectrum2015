@@ -303,7 +303,9 @@ def orbigraph(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
 
     if 1:
         count = 0
+        total = 0
         for P in search_isos(Gz, Rx):
+            total += 1
             fn = {}
             for i, v in enumerate(vectors):
                 v1 = dot2(P.transpose(), v)
@@ -333,7 +335,9 @@ def orbigraph(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
                 write('.')
                 count += 1
     
+        print
         print "count:", count
+        print "total:", total
     
         return
 
