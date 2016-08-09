@@ -1,4 +1,32 @@
 
+8/8/16
+======
+
+
+
+GPR = dot2(Gx, Pxt, Rz.transpose())
+for P in search_isos(Gz, Rx):
+
+./linear.py compass l=4
+Q = find_rowperm(GPR, dot2(GPR, P))   <-- filters exactly the P's that work
+count: 128
+total: 1152
+
+./linear.py gcolor
+Q = find_rowperm(GPR, dot2(GPR, P))  <-- too restrictive (not necessary)
+count: 12     <-- why is this less than |S_4|=24 the code autos ?
+total: 720
+orbits: 24
+
+./linear.py xy n=10
+count: 4
+total: 200
+orbits: 100
+
+./linear.py xy n=10 isos
+Q = find_rowperm(GPR, dot2(GPR, P))  <-- not sufficient ! (some of these P's do not even preserve Hamiltonian)
+count: 4
+total: 28800
 
 
 

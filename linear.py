@@ -301,7 +301,7 @@ def orbigraph(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
 
     GPR = dot2(Gx, Pxt, Rz.transpose())
 
-    if 1:
+    if argv.isos:
         count = 0
         total = 0
         for P in search_isos(Gz, Rx):
@@ -350,11 +350,11 @@ def orbigraph(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     for i in range(n):
         graph.add_node(i)
 
-
-
     count = 0
+    total = 0
     for fn in isomorph.search(bag0, bag1):
 
+        total += 1
         P = zeros2(r, r)
         v0 = zeros2(r)
         for i in range(r):
@@ -384,15 +384,19 @@ def orbigraph(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
 
         Q = find_rowperm(RR, dot2(RR, P.transpose()))
         assert Q is not None
-        print
+        #print
         #print shortstrx(Q)
         #print shortstrx(P, RR, dot2(RR, P.transpose()))
-        print shortstrx(P, GPR, dot2(GPR, P))
-        print
-        #Q = find_rowperm(GPR, dot2(GPR, P)) # works for compass model !
+        #print shortstrx(P, GPR, dot2(GPR, P))
+        #print
+        Q = find_rowperm(GPR, dot2(GPR, P)) # works for compass model !
+        if Q is None:
+            write("/Q0")
+            accept = False
+
         Q = find_rowmap(GPR, dot2(GPR, P))
         assert Q is not None
-        print shortstr(Q) # hmm would be nice to have invertible Q here......???
+        #print shortstr(Q) # hmm would be nice to have invertible Q here......???
         if Q is None:
             write("/Q")
             accept = False
@@ -408,7 +412,8 @@ def orbigraph(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     equs = nx.connected_components(graph)
     m = len(equs)
 
-    print "isomorphisms:", count
+    print "count:", count
+    print "total:", total
     print "orbits:", m
 
 
