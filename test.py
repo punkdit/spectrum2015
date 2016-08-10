@@ -6,6 +6,10 @@ import numpy
 from numpy import linalg as la
 
 from code import texstr
+from lanczos import show_eigs
+
+from argv import Argv
+argv = Argv()
 
 
 I = numpy.array([[1, 0], [0, 1.]])
@@ -71,6 +75,9 @@ def test_gcolor():
             # from k+1 to k
             A[k, k+1] = 3*(6-k)
     
+    if argv.transpose():
+        A = A.transpose()
+
     print A # not hermitian! not normal !
     #print texstr(A)
 
@@ -107,6 +114,35 @@ def test_gcolor():
     
         B[2, 2] += 1
 
+
+def test_lie():
+
+    # This computes energy of the groundstate of the n=15 gauge color code
+
+    n = argv.get("n", 7)
+
+    A = numpy.zeros((n, n))
+
+    m = 1
+    
+    for k in range(n):
+        A[k, k] = m*(n-1-2*k)
+        if k>0:
+            # from k-1 to k
+            A[k, k-1] = m*k
+        if k<n-1:
+            # from k+1 to k
+            A[k, k+1] = m*(n-1-k)
+
+    assert abs(A.trace()) < 1e-10, A.trace()
+
+    print A # not hermitian! not normal !
+    #print texstr(A)
+
+    r2 = 2**0.5
+    vals, vecs = la.eig(A)
+    print "eigs/(2**0.5):"
+    show_eigs(vals / r2)
 
 
 def test_compass():
@@ -213,11 +249,10 @@ def test_circulant():
     print list(vals)
 
 
-from argv import Argv
-argv = Argv()
-
 if argv.gcolor:
     test_gcolor()
+elif argv.lie:
+    test_lie()
 elif argv.compass:
     test_compass()
 elif argv.orbits:
