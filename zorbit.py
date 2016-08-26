@@ -1175,10 +1175,10 @@ def main():
         slepc(**locals())
         return
 
-    if argv.orbigraph:
-        from linear import orbigraph
-        orbigraph(**locals())
-        return
+#    if argv.orbigraph:
+#        from linear import orbigraph
+#        orbigraph(**locals())
+#        return
 
     v0 = None
 
@@ -1201,6 +1201,21 @@ def main():
     mz = len(Gz)
     n = len(verts)
 
+    if argv.lie:
+        U = []
+        for i, v in enumerate(verts):
+            count = dot2(Gz, v).sum()
+            Pxv = dot2(Px, v)
+            assert count == dot2(Gz, Pxv).sum()
+            U.append(mz - 2*count)
+        uniq = list(set(U))
+        uniq.sort(reverse=True)
+        s = ', '.join("%d(%d)"%(val, U.count(val)) for val in uniq)
+        print s
+        print "sum:", sum(U)
+        return
+        
+
     if n <= 1024 and argv.solve:
         H = numpy.zeros((n, n))
         syndromes = []
@@ -1219,6 +1234,7 @@ def main():
         if argv.showham:
             s = lstr2(H, 0).replace(',  ', ' ')
             s = s.replace(' 0', ' .')
+            s = s.replace(', -', '-')
             print s
     
         vals, vecs = numpy.linalg.eigh(H)

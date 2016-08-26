@@ -20,12 +20,7 @@ This is representations of sl_2.
 """
 
 EPSILON = 1e-10
-
-I = numpy.array([[1, 0], [0, 1.]])
-H = numpy.array([[1, 0], [0, -1.]]) # diagonal
-X = numpy.array([[0, 1], [0, 0.]]) # raising
-Y = numpy.array([[0, 0], [1, 0]]) # lowering
-
+r2 = 2**0.5
 
 def is_square(A):
     return len(A.shape)==2 and A.shape[0] == A.shape[1]
@@ -58,6 +53,18 @@ def tensor(A, B):
     a, b = A.shape[0], B.shape[0]
     C = kron(A, eye(b)) + kron(eye(a), B)
     return C
+
+def tensorx(items):
+    A = items[0]
+    for B in items[1:]:
+        A = tensor(A, B)
+    return A
+
+
+I = numpy.array([[1, 0], [0, 1.]])
+H = numpy.array([[1, 0], [0, -1.]]) # diagonal
+X = numpy.array([[0, 1], [0, 0.]]) # raising
+Y = numpy.array([[0, 0], [1, 0]]) # lowering
 
 
 class Repr(object):
@@ -140,7 +147,6 @@ def build_orbigraph(A):
     bag1 = from_ham(A)
 
     count = 0
-    fs = set()
     for fn in search(bag0, bag1):
         f = [None]*n
         #print fn
@@ -150,12 +156,7 @@ def build_orbigraph(A):
             assert i<n and j<n
             f[i] = j
             graph.add_edge(i, j)
-        f = tuple(f)
-        if f in fs:
-            #write('/')
-            continue # <---- continue
-        fs.add(f)
-        #write('.')
+        write('.')
         count += 1
     print
     print "isomorphisms:", count
@@ -180,6 +181,59 @@ def build_orbigraph(A):
 
 
 def main():
+    n = 6
+
+    from qupy.dense import Gate, Qu
+    I, X, Z = Gate.I, Gate.X, Gate.Z
+    from operator import mul
+
+    A = Qu((2,2)*n, 'ud'*6)
+    for i in range(n):
+        items = [I]*n
+        items[i] = X
+        A += reduce(mul, items)
+        
+        items = [I]*n
+        items[i] = Z
+        A += reduce(mul, items)
+        
+    A = A.flat()
+    print A.shape
+
+    A = A.v.real
+    A.shape = (2**n, 2**n)
+    print [A[i,i] for i in range(2**n)]
+    
+
+#    A = numpy.zeros((2**n, 2**n))
+#    for i in range(n):
+#    
+#        items = [I]*n
+#        items[i] = H
+#        A += tensorx(items)
+#    
+#        items = [I]*n
+#        items[i] = X
+#        A += tensorx(items)
+#
+#        items = [I]*n
+#        items[i] = Y
+#        A += tensorx(items)
+
+    #A -= 60 * numpy.eye(2**n)
+    
+    vals, vecs = la.eig(A)
+    show_eigs(vals/r2)
+
+    A = build_orbigraph(A)
+    idxs = range(len(A))
+    idxs.sort(key = lambda i : A[i, i])
+    A = A[idxs, :]
+    A = A[:, idxs]
+    
+    print A
+    return
+
 
     n = argv.get("n", 7)
 
@@ -199,13 +253,12 @@ def main():
     rep = s2 ** 6
     print rep
 
-#    rep = sym(6)+5*sym(4)+9*sym(2)+5*sym(0)
+    rep = sym(6)+5*sym(4)+9*sym(2)+5*sym(0)
 
     A = rep.H + rep.X + rep.Y
     print A
     vals, vecs = la.eig(A)
 
-    r2 = 2**0.5
     show_eigs(vals/r2)
 
     A = build_orbigraph(A)

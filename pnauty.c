@@ -28,6 +28,8 @@ init_graph(PyObject *self, PyObject *args)
 
     options.writeautoms = TRUE;
     options.defaultptn = FALSE;
+    //options.outfile = stdout; // write automorphisms here
+    options.outfile = fopen("pnauty.out", "w");
 
     /* Initialise sparse graph structure. */
 
@@ -145,7 +147,7 @@ search(PyObject *self, PyObject *args)
     }
 
     //printf("Generators\n");
-    options.writeautoms = FALSE;
+    options.writeautoms = TRUE;
     sparsenauty(&sg, lab, ptn, orbits, &options, &stats, NULL);
 
     PyObject *p_orbits;
@@ -160,6 +162,7 @@ search(PyObject *self, PyObject *args)
     printf("pnauty.search: Automorphism group size = ");
     writegroupsize(stdout, stats.grpsize1, stats.grpsize2);
     printf("\n");
+    fflush(options.outfile);
 
 //    Py_INCREF(Py_None);
 //    return Py_None;

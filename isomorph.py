@@ -94,7 +94,7 @@ class Point(object):
     colour = property(get_colour, set_colour)
 
     def get_desc(self, depth=1, source=None):
-        assert self.nbd
+        assert self.nbd is not None
         assert depth>=0
         assert depth<=1
         #_desc = self._desc.get(depth)
