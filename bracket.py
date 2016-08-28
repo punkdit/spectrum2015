@@ -39,6 +39,7 @@ zero = 0
 class Operator(object):
     def __init__(self, elems={}):
         self.elems = dict(elems) # map (i, j) -> value
+        self.support = set(elems.keys())
         rows = {} # map i -> list of cols [j..]
         cols = {} # map j -> list of rows [i..]
         for (i, j) in elems.keys():
@@ -211,9 +212,11 @@ class Operator(object):
         return Operator(elems)
 
     def dot(self, other):
+        keys = self.support.intersection(other.support)
         value = 0
-        for key, v in self.elems.items():
-            value += v * other.elems.get(key, 0)
+        #for key, v in self.elems.items():
+        for key in keys:
+            value += self.elems[key] * other.elems[key]
         return value
 
     def norm(self):
@@ -332,6 +335,8 @@ def main():
         if not new:
             break
         ops.extend(new)
+
+    print "ops:", len(ops)
 
 
 from argv import Argv
