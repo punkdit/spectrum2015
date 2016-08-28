@@ -312,9 +312,27 @@ def build():
 
     else:
 
-        return
+        assert 0, "no model found"
 
     return Gx, Gz, Hx, Hz
+
+
+def build_reduced():
+
+    Gx, Gz, Hx, Hz = build()
+
+    Px = get_reductor(Hx) # projector onto complement of rowspan of Hx
+    Pz = get_reductor(Hz)
+    Rz = [dot2(Pz, g) for g in Gz]
+    Rz = array2(Rz)
+    Rz = row_reduce(Rz, truncate=True)
+
+    Rx = [dot2(Px, g) for g in Gx]
+    Rx = array2(Rx)
+    Rx = row_reduce(Rx, truncate=True)
+
+    return Rx, Rz
+
 
 
 
