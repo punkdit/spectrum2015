@@ -258,6 +258,9 @@ def test():
     assert ZX + X == 2*U
     assert ZX - X == -2*L
 
+    assert Z.bracket(U) == 2*U
+    assert Z.bracket(L) == -2*L
+
     I = Operator({(0, 0):1, (1, 1):1})
     XX = X.tensor(X)
     ZZ = Z.tensor(Z)
@@ -297,16 +300,53 @@ def test():
 
 def main():
 
-    Rx, Rz = models.build_reduced()
-
-    print shortstr(Rx)
+    #Rx, Rz = models.build_reduced()
+    #print shortstr(Rx)
 
     #Rx = [Operator.xop(u) for u in Rx]
-    Ru = [Operator.uop(u) for u in Rx]
-    Rl = [Operator.lop(u) for u in Rx]
-    Rz = [Operator.zop(u) for u in Rz]
+    #Ru = [Operator.uop(u) for u in Rx]
+    #Rl = [Operator.lop(u) for u in Rx]
+    #Rz = [Operator.zop(u) for u in Rz]
 
-    ops = Ru + Rl + Rz
+    Ru = [Operator.uop([1,0]), Operator.uop([0,1])]
+    Rl = [Operator.lop([1,0]), Operator.lop([0,1])]
+
+    ZZ = Operator.zop([1,1])
+    ZI = Operator.zop([1,0])
+    UI, IU = Ru
+    LI, IL = Rl
+
+    I = Operator({(0,0):1, (1,1):1})
+    U = Operator({(0, 1):1})
+    L = Operator({(1, 0):1})
+
+    assert UI == U.tensor(I)
+
+    B = ZI.bracket(UI)
+    print UI
+    print B
+    print B.dot(UI)
+
+    B = ZZ.bracket(UI - IU)
+    print UI+IU
+    print B
+    print B.dot(UI+IU)
+
+    return
+
+    for A in Ru+Rl:
+        for z in Rz:
+            B = z.bracket(A)
+            r = B.dot(A)
+            #assert B.support == A.support
+            #print B.norm(),
+            print len(B.support.intersection(A.support)),
+        print
+
+    #search(Ru + Rl + Rz)
+
+
+def search(ops):
     found = set(ops)
 
     pairs = [(A, B) for A in ops for B in ops]

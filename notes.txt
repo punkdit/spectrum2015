@@ -1,4 +1,27 @@
 
+28/8/16
+=======
+
+time ./bracket.py xy n=5
+no pyx module found
+OK
+.11..
+..111
+...11
+....1
+new: 138 new: 26 pairs: 312
+new: 148 new: 56 pairs: 2128
+new: 886 new: 262 pairs: 24628
+new: 7895 new: 793 pairs: 282308
+new: 49906 new: 975 pairs: 1120275
+new: 86363 new: 0 pairs: 0
+ops: 2124
+
+real8m5.709s
+user8m4.943s
+system0m0.549s
+
+
 26/8/16
 =======
 
