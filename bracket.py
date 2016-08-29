@@ -36,20 +36,13 @@ zero = 0
 
 
 
-class Operator(object):
+class Vector(object):
     def __init__(self, elems={}):
         self.elems = dict(elems) # map (i, j) -> value
         self.support = set(elems.keys())
-        rows = {} # map i -> list of cols [j..]
-        cols = {} # map j -> list of rows [i..]
-        for (i, j) in elems.keys():
-            rows.setdefault(i, []).append(j)
-            cols.setdefault(j, []).append(i)
-        self.rows = rows
-        self.cols = cols
 
     def __str__(self):
-        return "Operator(%s)"%(self.elems)
+        return "%s(%s)"%(self.__class__.__name__, self.elems)
     __repr__ = __str__
 
     def __len__(self):
@@ -79,7 +72,7 @@ class Operator(object):
             value = self.elems.get(key, zero) + other.elems.get(key, zero)
             if value != zero:
                 elems[key] = value
-        return Operator(elems)
+        return self.__class__(elems)
 
     def __sub__(self, other):
         keys = set(self.elems.keys()+other.elems.keys())
@@ -88,19 +81,88 @@ class Operator(object):
             value = self.elems.get(key, zero) - other.elems.get(key, zero)
             if value != zero:
                 elems[key] = value
-        return Operator(elems)
+        return self.__class__(elems)
 
     def __rmul__(self, r):
         elems = {}
         for key, value in self.elems.items():
             value = r*value
             elems[key] = value
-        return Operator(elems)
+        return self.__class__(elems)
 
     def __neg__(self):
         return (-1)*self
 
+    def reduce(self):
+        values = [abs(v) for v in self.elems.values()]
+        values = list(set(values))
+        if not values:
+            return self
+        factor = reduce(gcd, values)
+        elems = {}
+        for key, value in self.elems.items():
+            elems[key] = value // factor
+        return self.__class__(elems)
+
+    def dot(self, other):
+        keys = self.support.intersection(other.support)
+        value = 0
+        #for key, v in self.elems.items():
+        for key in keys:
+            value += self.elems[key] * other.elems[key]
+        return value
+
+    def norm(self):
+        value = 0
+        for key, v in self.elems.items():
+            value += v * v
+        return value**0.5
+
+    def eigval(A, B):
+        "return val such that B == val*A, or None"
+        assert len(A)
+        #if A.support != B.support:
+        #    return None
+        keys = iter(A.support)
+        key = keys.next()
+        while A.elems[key] == 0:
+            key = keys.next()
+        a, b = A.elems[key], B.elems.get(key, 0)
+        assert b % a == 0
+        val = b//a
+        if val*A != B:
+            return None
+        return val
+
+
+
+class Operator(Vector):
+    def __init__(self, elems={}):
+        Vector.__init__(self, elems)
+        rows = {} # map i -> list of cols [j..]
+        cols = {} # map j -> list of rows [i..]
+        for (i, j) in elems.keys():
+            rows.setdefault(i, []).append(j)
+            cols.setdefault(j, []).append(i)
+        self.rows = rows # output space
+        self.cols = cols # input space
+
+    def __call__(self, v):
+        if not isinstance(v, Vector):
+            raise TypeError
+        elems = {}
+        for i in self.rows.keys():
+            elems[i] = 0
+        for (i, j), a in self.elems.items():
+            elems[i] += a*v.elems.get(j, 0)
+        for key in list(elems.keys()):
+            if elems[key] == 0:
+                del elems[key]
+        return Vector(elems)
+
     def __mul__(self, other):
+        if not isinstance(other, Operator):
+            raise TypeError
         elems = {}
         # elems[i,j] = sum_k self[i,k] * other[k,j]
         rows = self.rows
@@ -116,7 +178,7 @@ class Operator(object):
                         del elems[i, j]
         return Operator(elems)
 
-    def promote(self):
+    def _promote(self):
         # use tuples for row and col indexes 
         keys = self.elems.keys()
         if not keys:
@@ -133,13 +195,45 @@ class Operator(object):
         return Operator(elems)
 
     def tensor(self, other):
-        self = self.promote()
-        other = other.promote()
+        self = self._promote()
+        other = other._promote()
         elems = {}
         _elems = other.elems
         for a, v in self.elems.items():
             for b, u in _elems.items():
                 elems[(a[0]+b[0], a[1]+b[1])] = v*u
+        return Operator(elems)
+
+    def lietensor(self, other):
+        self = self._promote()
+        other = other._promote()
+        elems = {}
+        _elems = other.elems
+
+        for v in self.cols.keys():
+          for w in other.cols.keys():
+            vw = v + w # tuple!
+            for Xv in self.cols[v]:
+                #  key = [ output   , input  ]
+                key = (Xv+w, vw)
+                value = elems.get(key, 0) + self.elems[Xv, v]
+                elems[key] = value
+                if value == 0:
+                    del elems[key]
+
+            for Xw in other.cols[w]:
+                #  key = [ output   , input  ]
+                key = (v+Xw, vw)
+                value = elems.get(key, 0) + other.elems[Xw, w]
+                elems[key] = value
+                if value == 0:
+                    del elems[key]
+        return Operator(elems)
+
+    def dual(self):
+        elems = {}
+        for (i, j), v in self.elems.items():
+            elems[j, i] = -v
         return Operator(elems)
 
     def bracket(self, other):
@@ -200,31 +294,6 @@ class Operator(object):
             elems[idx, idx] = z
         return cls(elems)
 
-    def reduce(self):
-        values = [abs(v) for v in self.elems.values()]
-        values = list(set(values))
-        if not values:
-            return self
-        factor = reduce(gcd, values)
-        elems = {}
-        for key, value in self.elems.items():
-            elems[key] = value // factor
-        return Operator(elems)
-
-    def dot(self, other):
-        keys = self.support.intersection(other.support)
-        value = 0
-        #for key, v in self.elems.items():
-        for key in keys:
-            value += self.elems[key] * other.elems[key]
-        return value
-
-    def norm(self):
-        value = 0
-        for key, v in self.elems.items():
-            value += v * v
-        return value**0.5
-
 
 def shrink(ops, A):
     changed = True
@@ -248,9 +317,19 @@ def test():
     U = Operator({(0, 1):1})
     L = Operator({(1, 0):1})
     X = Operator({(1, 0):1, (0, 1):1})
-    assert X == U+L
     Z = Operator({(0, 0):1, (1, 1):-1})
+
+    assert X == U+L
     ZX = Z*X
+
+    a = Vector({0 : 1})
+    b = Vector({1 : 1})
+    ZERO = Vector()
+    assert U(a) == ZERO
+    assert U(b) == a
+    assert X(a) == b
+    assert Z(a) == a
+    assert Z(b) == -b, (Z(b), -b)
 
     assert Z.bracket(X) == 2*ZX
     assert ZX.bracket(X) == 2*Z
@@ -295,10 +374,58 @@ def test():
     assert shrink([XX, ], XX + ZI) == ZI
     assert shrink([XX, ], 2*XX - ZI) == -ZI
 
+
+    assert X.lietensor(X) == X.tensor(I) + I.tensor(X)
+    assert X.lietensor(Z) == X.tensor(I) + I.tensor(Z)
+    assert Z.lietensor(X) == Z.tensor(I) + I.tensor(X)
+
     print "OK"
 
 
+class Rep(object):
+    def __init__(self, ops):
+        self.ops = list(ops)
+
+
+class sl(Rep):
+    def __init__(self, n):
+        ops = []
+        Rep.__init__(self, ops)
+
+
 def main():
+
+    n = argv.get("n", 2)
+
+    h = []
+    assert n>1
+    for i in range(n-1):
+        op = Operator({(i, i) : 1, (i+1, i+1) : -1})
+        h.append(op)
+
+    basis = [Vector({i:1}) for i in range(n)]
+    for e in basis:
+        print e,
+        for H in h:
+            #print H, H(e), ',',
+            print e.eigval(H(e)),
+        print
+
+    if argv.adjoint:
+        ops = []
+        for i in range(n):
+            for j in range(n):
+                if i==j:
+                    continue
+                ops.append(Operator({(i, j) : 1}))
+
+        for X in ops:
+            for H in h:
+                print X.eigval(H.bracket(X)),
+            print
+
+
+def test_1():
 
     #Rx, Rz = models.build_reduced()
     #print shortstr(Rx)
