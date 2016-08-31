@@ -33,6 +33,15 @@ zero = 0
 #assert primes(6) == [2,3]
 
 
+def genpow(idxs, n):
+    if n==0:
+        yield ()
+    else:
+        for idx in idxs:
+            for tail in genpow(idxs, n-1):
+                yield (idx,)+tail
+
+
 
 class Space(object):
     "Finite dimensional vector space"
@@ -50,32 +59,27 @@ class Space(object):
 
     def __init__(self, idxs):
         if type(idxs) in (int, long):
-            idxs = [(i,) for i in range(idxs)]
+            idxs = range(idxs)
         self.n = len(idxs)
-        #self.idxs = list(idxs)
-        self.idxs = [tuple(idx) for idx in idxs]
+        self.idxs = list(idxs)
+        self.factors = [self]
 
     def __str__(self):
         return "Space(%s)"%(self.idxs,)
     __repr__ = __str__
 
-    def __len__(self):
-        return self.n
-
-    def __getitem__(self, i):
-        return self.idxs[i]
+#    def __len__(self):
+#        return 1
+#
+#    def __getitem__(self, i):
+#        return [self][i]
 
     def __add__(self, other):
-        idxs = [(0,)+idx for idx in self] + [(1,)+idx for idx in other]
-        assert len(set(idxs))==len(idxs)
+        idxs = [(0,idx) for idx in self.idxs] + [(1,idx) for idx in other.idxs]
         return Space(idxs)
 
     def __mul__(self, other):
-        idxs = []
-        for idx in self:
-          for jdx in other:
-            idxs.append(idx+jdx)
-        return Space(idxs)
+        return TensorSpace(self, other)
 
     def dual(self):
         return self # ???
@@ -89,24 +93,33 @@ class Space(object):
     def __pow__(self, n):
         if n==0:
             return self.zero
-        space = self
-        while n>1:
-            space = self*space
-            n -= 1
+        idxs = [idx for idx in genpow(self.idxs, n)]
+        space = Space(idxs)
         return space
 
     def identity(self):
         elems = {}
         for i in self.idxs:
-            elems[i,i] = 1
+            elems[i, i] = 1
         return Operator(elems, self)
 
     def basis(self, i=None):
         if i is None:
-            return [Vector({idx : 1}, self) for idx in self]
+            return [Vector({idx : 1}, self) for idx in self.idxs]
         return Vector({self[i] : 1}, self)
 
 Space.zero = Space(0)
+
+
+class TensorSpace(Space):
+    def __init__(self, a, b):
+        idxs = []
+        for idx in a.idxs:
+            for jdx in b.idxs:
+                idxs.append((idx, jdx))
+        self.factors = a, b
+        Space.__init__(self, idxs)
+
 
 
 class Vector(object):
