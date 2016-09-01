@@ -6,7 +6,7 @@ from fractions import gcd
 #import numpy
 
 import networkx as nx
-from solve import get_reductor, array2, row_reduce, dot2, shortstr, zeros2
+from solve import get_reductor, array2, row_reduce, dot2, shortstr, zeros2, shortstrx
 
 import models
 from models import genidx
@@ -61,6 +61,7 @@ class Space(object):
         if type(idxs) in (int, long):
             idxs = range(idxs)
         self.idxs = list(idxs)
+        self.elements = set(idxs)
         if factors is None:
             factors = [self]
         self.factors = factors
@@ -111,7 +112,7 @@ class Space(object):
         return Vector({self[i] : 1}, self)
 
     def contains(self, idx):
-        return idx in self.idxs
+        return idx in self.elements
 
 
 Space.zero = Space(0)
@@ -761,9 +762,12 @@ def test():
     print "OK"
 
 
-def main():
+def test_pauli():
+    """
+        We build sl_{2**n) using pauli operators
+    """
 
-    n = 3
+    n = argv.get("n", 3)
     space = Space(2)**n
     xop, zop, eop = Operator.xop, Operator.zop, Operator.eop
 
@@ -810,8 +814,34 @@ def main():
         assert op == (2**n)*op1
 
     v = Vector({(0,)*n : 1}, space)
-    for op in pos:
-        print op(v)
+    for op in neg:
+        assert op(v) == Vector.zero
+    #for op in pos:
+    #    print op(v)
+
+
+def main():
+
+    xop, zop, eop = Operator.xop, Operator.zop, Operator.eop
+
+    Rx, Rz = models.build_reduced()
+    n = Rx.shape[1]
+
+    print shortstrx(Rx, Rz)
+
+    ops = []
+    for r in Rx:
+        op = xop(r)
+        ops.append(op)
+
+    for r in Rz:
+        op = zop(r)
+        ops.append(op)
+
+    found = set(ops)
+    for A in ops:
+        for B in ops:
+            C = A.bracket(B)
 
 
 
@@ -822,7 +852,13 @@ argv = Argv()
 if __name__ == "__main__":
 
     test()
-    main()
+
+    if argv.profile:
+        import cProfile as profile
+        profile.run("main()")
+
+    else:
+        main()
 
 
 
