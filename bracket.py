@@ -57,12 +57,13 @@ class Space(object):
 #            cls._cache[idxs] = ob
 #        return ob
 
-    def __init__(self, idxs):
+    def __init__(self, idxs, factors=None):
         if type(idxs) in (int, long):
             idxs = range(idxs)
-        self.n = len(idxs)
         self.idxs = list(idxs)
-        self.factors = [self]
+        if factors is None:
+            factors = [self]
+        self.factors = factors
 
     def __str__(self):
         return "Space(%s)"%(self.idxs,)
@@ -102,12 +103,16 @@ class Space(object):
         elems = {}
         for i in self.idxs:
             elems[i, i] = 1
-        return Operator(elems, self)
+        return Operator(elems, self*self.dual())
 
     def basis(self, i=None):
         if i is None:
             return [Vector({idx : 1}, self) for idx in self.idxs]
         return Vector({self[i] : 1}, self)
+
+    def contains(self, idx):
+        return idx in self.idxs
+
 
 Space.zero = Space(0)
 
@@ -118,8 +123,7 @@ class TensorSpace(Space):
         for idx in a.idxs:
             for jdx in b.idxs:
                 idxs.append((idx, jdx))
-        self.factors = a, b
-        Space.__init__(self, idxs)
+        Space.__init__(self, idxs, [a, b])
 
 
 class Hom(object):
@@ -131,14 +135,23 @@ class Hom(object):
 
 
 class Vector(object):
-    def __init__(self, elems={}, space=None):
+    def __init__(self, elems={}, space=None, name=""):
         assert space is None or isinstance(space, Space), repr(space)
         self.elems = dict(elems) # map (i, j) -> value
+        for key in elems.keys():
+            assert space.contains(key), "%s not in %s" % (key, space)
         self.support = set(elems.keys())
         self.space = space
+        self.name = name
+
+    def check(self):
+        for idx in self.elems:
+            if not self.space.contains(idx):
+                print "%s not in %s" % (idx, self.space)
+                assert 0
 
     def __str__(self):
-        return "%s(%s)"%(self.__class__.__name__, self.elems)
+        return self.name or "%s(%s)"%(self.__class__.__name__, self.elems)
     __repr__ = __str__
 
     def __len__(self):
@@ -234,26 +247,23 @@ class Vector(object):
             return None
         return val
 
-    def check(self):
-        for idx in self.elems:
-            if idx not in self.space:
-                print "%s not in %s" % (idx, self.space)
-                assert 0
-
 Vector.zero = Vector({}, Space.zero)
 
 
 class Operator(Vector):
-    def __init__(self, elems={}, space=None):
+    def __init__(self, elems={}, space=None, name=""):
         assert space is None or isinstance(space, Space), repr(space)
         #_space = space*space.dual() # as a vector, i live here
-        assert len(space)==2
-        Vector.__init__(self, elems, space)
+        assert len(space)==2, space
+        Vector.__init__(self, elems, space, name)
         src = space[1].dual()
         tgt = space[0]
         rows = {} # map i -> list of cols [j..]
         cols = {} # map j -> list of rows [i..]
         for (i, j) in elems.keys():
+            assert space.contains((i, j))
+            assert src.contains(j)
+            assert tgt.contains(i)
             rows.setdefault(i, []).append(j)
             cols.setdefault(j, []).append(i)
         self.rows = rows # output space
@@ -283,6 +293,7 @@ class Operator(Vector):
         # elems[i,j] = sum_k self[i,k] * other[k,j]
         rows = self.rows
         #cols = other.cols
+        src, tgt = self.src, self.tgt
         for i, ks in rows.items():
             for k in ks:
                 a = self.elems[i, k]
@@ -292,55 +303,36 @@ class Operator(Vector):
                         elems[i, j] = value
                     else:
                         del elems[i, j]
-        return Operator(elems, self.tgt * other.src.dual())
-
-#    def _promote(self):
-#        # use tuples for row and col indexes 
-#        keys = self.elems.keys()
-#        if not keys:
-#            return self
-#        (i, j) = keys[0]
-#        assert type(i)==type(j)
-#        if type(i) is tuple:
-#            return self
-#        elems = {}
-#        for (i, j), value in self.elems.items():
-#            i = (i,)
-#            j = (j,)
-#            elems[i, j] = value
-#        return Operator(elems, self.ispace)
+        return Operator(elems, self.tgt * other.src.dual(), "(%s)(%s)"%(self.name, other.name) if self.name and other.name else "")
 
     def tensor(self, other):
         elems = {}
         _elems = other.elems
         for a, v in self.elems.items():
             for b, u in _elems.items():
-                elems[(a[0]+b[0], a[1]+b[1])] = v*u
+                elems[((a[0], b[0]), (a[1], b[1]))] = v*u
         space = self.space * other.space
+        #print elems
         return Operator(elems, space)
 
     def directsum(self, other):
-        self = self._promote()
-        other = other._promote()
         elems = {}
         for (i, j), v in self.elems.items():
-            elems[(0,)+i, (0,)+j] = v
-        for (i, j), v in other.elems.items():
-            key = (1,)+i, (1,)+j
-            assert elems.get(key) is None, "doh!"
+            key = (0, i), (0, j)
             elems[key] = v
-        space = self.space + other.space
+        for (i, j), v in other.elems.items():
+            key = (1, i), (1, j)
+            elems[key] = v
+        space = (self.space[0] + other.space[0]) * (self.space[1] + other.space[1])
         return Operator(elems, space)
 
     def lietensor(self, other):
-        IA = self.ispace.identity()
-        IB = other.ispace.identity()
+        IA = self.space[0].identity()
+        IB = other.space[0].identity()
         assert self*IA == self, (IA, self)
         assert other*IB == other
         return self.tensor(IB) + IA.tensor(other)
 
-        self = self._promote()
-        other = other._promote()
         elems = {}
         _elems = other.elems
 
@@ -368,7 +360,8 @@ class Operator(Vector):
         elems = {}
         for (i, j), v in self.elems.items():
             elems[j, i] = -v
-        return Operator(elems, self.ispace.dual())
+        space = self.space[1] * self.space[0].dual()
+        return Operator(elems, space)
 
     def bracket(self, other):
         return self*other - other*self
@@ -384,7 +377,20 @@ class Operator(Vector):
                     jdx[i] = 1-jdx[i]
             jdx = tuple(jdx)
             elems[idx, jdx] = 1
-        return cls(elems, Space(2)**n)
+        space = Space(2)**n
+        return cls(elems, space*space.dual(), "xop%s"%(u,))
+    
+    @classmethod
+    def eop(cls, u, v):
+        "make operator: |u><v|"
+        n = len(u)
+        assert n==len(v)
+        space = Space(2)**n
+        u, v = tuple(u), tuple(v)
+        assert space.contains(u)
+        assert space.contains(v)
+        elems = {(u, v):1}
+        return cls(elems, space*space.dual(), "|%s><%s|"%(u, v))
     
     @classmethod
     def uop(cls, u):
@@ -399,7 +405,8 @@ class Operator(Vector):
             jdx = tuple(jdx)
             if idx<jdx:
                 elems[idx, jdx] = 1 # UPPER operator
-        return cls(elems, Space(2)**n)
+        space = Space(2)**n
+        return cls(elems, space*space.dual())
     
     @classmethod
     def lop(cls, u):
@@ -414,7 +421,8 @@ class Operator(Vector):
             jdx = tuple(jdx)
             if idx>jdx:
                 elems[idx, jdx] = 1 # UPPER operator
-        return cls(elems, Space(2)**n)
+        space = Space(2)**n
+        return cls(elems, space*space.dual())
     
     @classmethod    
     def zop(cls, u):
@@ -426,9 +434,10 @@ class Operator(Vector):
                 if ii and idx[i]:
                     z *= -1
             elems[idx, idx] = z
-        return cls(elems, Space(2)**n)
+        space = Space(2)**n
+        return cls(elems, space*space.dual(), "zop%s"%(u,))
 
-Operator.zero = Operator({}, Space.zero)
+Operator.zero = Operator({}, Space.zero*Space.zero.dual())
 
 
 def shrink(ops, A): # bit of a HACK
@@ -457,9 +466,9 @@ class Rep(object):
         self.mh = mh 
         self.hops = ops[:mh]
         self.eops = ops[mh:]
-        space = ops[0].ispace
+        space = ops[0].space[0]
         for op in ops:
-            assert op.ispace == space
+            assert op.space[0] == space
             op.check()
         self.space = space
 
@@ -534,9 +543,9 @@ class Sl(Rep):
         assert n>1
         space = Space(n)
         print space
-        print space*space
+        space2 = space*space.dual()
         for i in range(n-1):
-            op = Operator({(i, i) : 1, (i+1, i+1) : -1}, space)._promote()
+            op = Operator({(i, i) : 1, (i+1, i+1) : -1}, space2)
             op.check()
             ops.append(op)
         mh = len(ops)
@@ -545,7 +554,7 @@ class Sl(Rep):
             for j in range(n):
                 if i==j:
                     continue
-                op = Operator({(i, j) : 1}, space)._promote()
+                op = Operator({(i, j) : 1}, space2)
                 ops.append(op)
                 op.check()
     
@@ -553,7 +562,7 @@ class Sl(Rep):
         assert len(ops) == n**2-1
 
 
-def main():
+def test_sl():
 
     n = argv.get("n", 3)
 
@@ -568,13 +577,11 @@ def main():
     #print sl.isomorphic(sl + sl, verbose=True)
 
     rep = sl + sl
-    for op in rep.ops:
-        assert op.space is not None
+    #rep = sl * sl
 
-#    basis = [Vector({i:1}) for i in range(n)]
     for op in rep.hops:
         print op
-        assert op.ispace == rep.space
+        assert op.space[0] == rep.space
     print rep.space
     for e in rep.space.basis():
         print e,
@@ -669,23 +676,24 @@ def search(ops):
 
     print "ops:", len(ops)
 
+
 def test():
 
     space = Space(2)
-    U = Operator({(0, 1):1}, space)._promote()
-    L = Operator({(1, 0):1}, space)._promote()
-    X = Operator({(1, 0):1, (0, 1):1}, space)._promote()
-    Z = Operator({(0, 0):1, (1, 1):-1}, space)._promote()
+    space2 = space * space.dual()
+    U = Operator({(0, 1):1}, space2)
+    L = Operator({(1, 0):1}, space2)
+    X = Operator({(1, 0):1, (0, 1):1}, space2)
+    Z = Operator({(0, 0):1, (1, 1):-1}, space2)
 
-    assert U.ispace == space
-    assert (U+L).ispace == space
+    assert U.space[0] == space
+    assert (U+L).space[0] == space
     assert X == U+L
     ZX = Z*X
 
-    a = Vector({(0,) : 1}, space)
-    b = Vector({(1,) : 1}, space)
-    ZERO = Vector({}, space)
-    assert U(a) == ZERO
+    a = Vector({0 : 1}, space)
+    b = Vector({1 : 1}, space)
+    assert U(a) == Vector.zero
     assert U(b) == a
     assert X(a) == b
     assert Z(a) == a
@@ -705,28 +713,33 @@ def test():
     ZZ = Z.tensor(Z)
     ZI = Z.tensor(I)
 
-    ZERO = Operator({}, space)
-    assert XX.bracket(ZZ) == ZERO
-    assert XX.bracket(ZI) != ZERO
+    assert XX.bracket(ZZ) == Operator.zero
+    assert XX.bracket(ZI) != Operator.zero
     assert XX.bracket(ZI) == 2*XX*ZI
 
-    assert Operator.xop([0]).ispace == space
-    assert Operator.xop([0]) == I
-    assert I.tensor(I).ispace == (space*space)
-    assert I.tensor(I) == (space*space).identity()
+#    assert Operator.xop([0]).space[0] == space
+#    assert Operator.xop([0]) == I
+#    assert I.tensor(I).space[0] == (space*space)
+#    assert I.tensor(I) == (space*space).identity()
 
-    assert Operator.xop([0,0]) == I.tensor(I)
-    assert Operator.xop([0,1]) == I.tensor(X)
-    assert Operator.xop([1,0]) == X.tensor(I)
-    assert Operator.xop([1,1]) == X.tensor(X)
+    xop = Operator.xop
+    zop = Operator.zop
 
-    assert Operator.zop([0,0]) == I.tensor(I)
-    assert Operator.zop([1,0]) == Z.tensor(I)
-    assert Operator.zop([0,1]) == I.tensor(Z)
-    assert Operator.zop([1,1]) == Z.tensor(Z)
+    assert xop([0,0]) == I.tensor(I)
+    assert xop([0,1]) == I.tensor(X)
+    assert xop([1,0]) == X.tensor(I)
+    assert xop([1,1]) == X.tensor(X)
 
-    assert Operator.xop([0,1,1]) == I.tensor(X.tensor(X))
-    assert Operator.zop([1,0,1]) == Z.tensor(I.tensor(Z))
+    assert zop([0,0]) == I.tensor(I)
+    assert zop([1,0]) == Z.tensor(I)
+    assert zop([0,1]) == I.tensor(Z)
+    assert zop([1,1]) == Z.tensor(Z)
+
+#    assert xop([0,1,1]) == I.tensor(X.tensor(X)) # FAILS ASSOC
+#    assert zop([1,0,1]) == Z.tensor(I.tensor(Z)) # FAILS ASSOC
+    assert xop([0,1,1]) * xop([1,1,0]) == xop([1,0,1])
+    assert xop([0,1,1]) * zop([1,0,0]) == zop([1,0,0]) * xop([0,1,1])
+    assert xop([0,1,1]) * zop([1,1,0]) == -zop([1,1,0]) * xop([0,1,1])
 
     UIU = Operator.uop([1,0,1])
     LIL = Operator.lop([1,0,1])
@@ -735,7 +748,7 @@ def test():
     assert (5*XX).reduce() == XX
     assert (5*ZI).reduce() == ZI
 
-    assert shrink([XX, ZI], XX + ZI) == ZERO
+    assert shrink([XX, ZI], XX + ZI) == Operator.zero
     assert shrink([XX, ], XX + ZI) == ZI
     assert shrink([XX, ], 2*XX - ZI) == -ZI
 
@@ -746,6 +759,59 @@ def test():
     #print Space(5).identity()
 
     print "OK"
+
+
+def main():
+
+    n = 3
+    space = Space(2)**n
+    xop, zop, eop = Operator.xop, Operator.zop, Operator.eop
+
+    ops = []
+    pos, neg = [], []
+    for u in genidx((2,)*n):
+      for v in genidx((2,)*n):
+        if u==v:
+            continue
+        op = eop(u, v) # |u><v|
+        #print op
+        ops.append(op)
+        if v < u:
+            pos.append(op)
+        else:
+            neg.append(op)
+
+    h = [zop(u) for u in genidx((2,)*n) if sum(u)]
+
+    assert len(h) + len(ops) == (2**n)*(2**n)-1
+
+    basis = []
+    for u in genidx((2,)*n):
+      for v in genidx((2,)*n):
+        if sum(u)==sum(v)==0:
+            continue
+        op = xop(u) * zop(v)
+        basis.append(op)
+    assert len(basis) == (2**n)*(2**n)-1
+
+    for op1 in ops:
+        #print op1
+        op = None
+        for op2 in basis:
+            r = op1.dot(op2)
+            if r:
+                #print r, op2
+                if op is None:
+                    op = r*op2
+                else:
+                    op = op + r*op2
+            #print "op = ", op
+        #print
+        assert op == (2**n)*op1
+
+    v = Vector({(0,)*n : 1}, space)
+    for op in pos:
+        print op(v)
 
 
 
