@@ -46,16 +46,16 @@ def genpow(idxs, n):
 class Space(object):
     "Finite dimensional vector space"
 
-    _cache = {}
-    def __new__(cls, idxs):
-        if type(idxs) in (int, long):
-            ob = cls._cache.get(idxs)
-            if ob is not None:
-                return ob
-        ob = object.__new__(cls, idxs)
-        if type(idxs) in (int, long):
-            cls._cache[idxs] = ob
-        return ob
+#    _cache = {}
+#    def __new__(cls, idxs):
+#        if type(idxs) in (int, long):
+#            ob = cls._cache.get(idxs)
+#            if ob is not None:
+#                return ob
+#        ob = object.__new__(cls, idxs)
+#        if type(idxs) in (int, long):
+#            cls._cache[idxs] = ob
+#        return ob
 
     def __init__(self, idxs):
         if type(idxs) in (int, long):
@@ -68,11 +68,12 @@ class Space(object):
         return "Space(%s)"%(self.idxs,)
     __repr__ = __str__
 
-#    def __len__(self):
-#        return 1
-#
-#    def __getitem__(self, i):
-#        return [self][i]
+    # Expose tensor product structure in __len__ and __getitem__
+    def __len__(self):
+        return len(self.factors)
+
+    def __getitem__(self, i):
+        return self.factors[i]
 
     def __add__(self, other):
         idxs = [(0,idx) for idx in self.idxs] + [(1,idx) for idx in other.idxs]
@@ -121,6 +122,13 @@ class TensorSpace(Space):
         Space.__init__(self, idxs)
 
 
+class Hom(object):
+    def __init__(self, src, tgt, f):
+        """ f is a dict mapping src.idxs to tgt.idxs""" 
+        self.src = src
+        self.tgt = tgt
+        self.f = f
+
 
 class Vector(object):
     def __init__(self, elems={}, space=None):
@@ -128,7 +136,6 @@ class Vector(object):
         self.elems = dict(elems) # map (i, j) -> value
         self.support = set(elems.keys())
         self.space = space
-        self.ispace = space # HACK
 
     def __str__(self):
         return "%s(%s)"%(self.__class__.__name__, self.elems)
@@ -163,7 +170,7 @@ class Vector(object):
             value = self.elems.get(key, zero) + other.elems.get(key, zero)
             if value != zero:
                 elems[key] = value
-        return self.__class__(elems, self.ispace)
+        return self.__class__(elems, self.space)
 
     def __sub__(self, other):
         assert self.space == other.space or not other or not self
@@ -173,14 +180,14 @@ class Vector(object):
             value = self.elems.get(key, zero) - other.elems.get(key, zero)
             if value != zero:
                 elems[key] = value
-        return self.__class__(elems, self.ispace)
+        return self.__class__(elems, self.space)
 
     def __rmul__(self, r):
         elems = {}
         for key, value in self.elems.items():
             value = r*value
             elems[key] = value
-        return self.__class__(elems, self.ispace)
+        return self.__class__(elems, self.space)
 
     def __neg__(self):
         return (-1)*self
@@ -194,7 +201,7 @@ class Vector(object):
         elems = {}
         for key, value in self.elems.items():
             elems[key] = value // factor
-        return self.__class__(elems, self.ispace)
+        return self.__class__(elems, self.space)
 
     def dot(self, other):
         assert self.space == other.space or not self or not other
@@ -239,8 +246,11 @@ Vector.zero = Vector({}, Space.zero)
 class Operator(Vector):
     def __init__(self, elems={}, space=None):
         assert space is None or isinstance(space, Space), repr(space)
-        _space = space*space.dual() # as a vector, i live here
-        Vector.__init__(self, elems, _space)
+        #_space = space*space.dual() # as a vector, i live here
+        assert len(space)==2
+        Vector.__init__(self, elems, space)
+        src = space[1].dual()
+        tgt = space[0]
         rows = {} # map i -> list of cols [j..]
         cols = {} # map j -> list of rows [i..]
         for (i, j) in elems.keys():
@@ -248,12 +258,13 @@ class Operator(Vector):
             cols.setdefault(j, []).append(i)
         self.rows = rows # output space
         self.cols = cols # input space
-        self.ispace = space
+        self.tgt = tgt # output
+        self.src = src # input
 
     def __call__(self, v):
         if not isinstance(v, Vector):
             raise TypeError
-        assert v.space == self.ispace or not v
+        assert v.space == self.src or not v
         elems = {}
         for i in self.rows.keys():
             elems[i] = 0
@@ -262,12 +273,12 @@ class Operator(Vector):
         for key in list(elems.keys()):
             if elems[key] == 0:
                 del elems[key]
-        return Vector(elems, v.space)
+        return Vector(elems, self.tgt)
 
     def __mul__(self, other):
         if not isinstance(other, Operator):
             raise TypeError
-        assert self.ispace == other.ispace
+        assert self.src == other.tgt
         elems = {}
         # elems[i,j] = sum_k self[i,k] * other[k,j]
         rows = self.rows
@@ -281,34 +292,32 @@ class Operator(Vector):
                         elems[i, j] = value
                     else:
                         del elems[i, j]
-        return Operator(elems, self.ispace)
+        return Operator(elems, self.tgt * other.src.dual())
 
-    def _promote(self):
-        # use tuples for row and col indexes 
-        keys = self.elems.keys()
-        if not keys:
-            return self
-        (i, j) = keys[0]
-        assert type(i)==type(j)
-        if type(i) is tuple:
-            return self
-        elems = {}
-        for (i, j), value in self.elems.items():
-            i = (i,)
-            j = (j,)
-            elems[i, j] = value
-        return Operator(elems, self.ispace)
+#    def _promote(self):
+#        # use tuples for row and col indexes 
+#        keys = self.elems.keys()
+#        if not keys:
+#            return self
+#        (i, j) = keys[0]
+#        assert type(i)==type(j)
+#        if type(i) is tuple:
+#            return self
+#        elems = {}
+#        for (i, j), value in self.elems.items():
+#            i = (i,)
+#            j = (j,)
+#            elems[i, j] = value
+#        return Operator(elems, self.ispace)
 
     def tensor(self, other):
-        self = self._promote()
-        other = other._promote()
         elems = {}
         _elems = other.elems
         for a, v in self.elems.items():
             for b, u in _elems.items():
                 elems[(a[0]+b[0], a[1]+b[1])] = v*u
-        ispace = self.ispace * other.ispace
-        return Operator(elems, ispace)
+        space = self.space * other.space
+        return Operator(elems, space)
 
     def directsum(self, other):
         self = self._promote()
@@ -320,8 +329,8 @@ class Operator(Vector):
             key = (1,)+i, (1,)+j
             assert elems.get(key) is None, "doh!"
             elems[key] = v
-        ispace = self.space + other.space
-        return Operator(elems, ispace)
+        space = self.space + other.space
+        return Operator(elems, space)
 
     def lietensor(self, other):
         IA = self.ispace.identity()
