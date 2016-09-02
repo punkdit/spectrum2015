@@ -61,7 +61,7 @@ class Space(object):
         if type(idxs) in (int, long):
             idxs = range(idxs)
         self.idxs = list(idxs)
-        self.elements = set(idxs)
+        self.elems = set(idxs)
         if factors is None:
             factors = [self]
         self.factors = factors
@@ -112,7 +112,7 @@ class Space(object):
         return Vector({self[i] : 1}, self)
 
     def contains(self, idx):
-        return idx in self.elements
+        return idx in self.elems
 
 
 Space.zero = Space(0)
@@ -461,7 +461,7 @@ def shrink(ops, A): # bit of a HACK
 
 class Rep(object):
     def __init__(self, ops, mh):
-        "first mh elements of ops form basis for Cartan subalgebra"
+        "first mh elems of ops form basis for Cartan subalgebra"
         assert 0<=mh<len(ops)
         self.ops = list(ops)
         self.mh = mh 
@@ -820,6 +820,63 @@ def test_pauli():
     #    print op(v)
 
 
+class LISet(object):
+    "linear independent set, row-reduced"
+    def __init__(self, space, ops):
+        self.space = space
+        self.ops = []
+        self.idxs = {} # map idx -> op
+        for op in ops:
+            assert op.space == space
+            self.add(op)
+
+    def add(self, op):
+        if op == Operator.zero:
+            return
+        #print "add", op
+        for idx in self.space.idxs:
+            a = op.elems.get(idx)
+            if a is None or a==0:
+                continue
+            op1 = self.idxs.get(idx)
+            if op1 is None:
+                if a < 0:
+                    op = -op
+                self.idxs[idx] = op
+                self.ops.append(op) # slightly redundant
+                break
+            b = op1.elems[idx]
+            assert b > 0
+            if a < 0:
+                op = -op
+                a = -a
+            c = a*b / gcd(a, b)
+            assert c%a == 0
+            assert c%b == 0
+            if c>a:
+                op = (c//a)*op
+            else:
+                assert c==a
+            assert op.elems[idx] == c, (op.elems[idx] , c)
+            if c>b:
+                op1 = (c//b)*op1
+            else:
+                assert c==b
+            assert op1.elems[idx] == c, (op1.elems[idx] , c)
+            op = op - op1 # row reduce op
+            assert op.elems.get(idx, 0) == 0, op.elems.get(idx,0)
+            if op == Operator.zero:
+                break
+
+    def __len__(self):
+        return len(self.idxs)
+
+    def __getitem__(self, i):
+        return self.ops[i]
+
+
+
+
 def main():
 
     xop, zop, eop = Operator.xop, Operator.zop, Operator.eop
@@ -838,10 +895,21 @@ def main():
         op = zop(r)
         ops.append(op)
 
-    found = set(ops)
-    for A in ops:
-        for B in ops:
+    space = op.space
+    li = LISet(space, ops)
+
+    while 1:
+        sz = len(li)
+        print sz
+        items = list(li)
+        for A in items:
+          for B in items:
+            if A==B:
+                continue
             C = A.bracket(B)
+            li.add(C)
+        if len(li)==sz:
+            break
 
 
 
