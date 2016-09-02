@@ -14,7 +14,35 @@ from isomorph import write
 import models
 from models import genidx
 
-zero = 0
+
+def bracket(a, b):
+    a, b = a.copy(), b.copy()
+    assert len(a)==len(b)
+    assert len(a)%2==0
+    n = len(a)//2
+    a.shape = (n, 2)
+    b.shape = (n, 2)
+    #print a
+    #print b
+    b = b[:, [1, 0]]
+    #print b
+    c = a*b
+    return c.sum() % 2
+
+
+def mkop(xop, zop):
+    if xop is None:
+        xop = zeros2(len(zop))
+    if zop is None:
+        zop = zeros2(len(xop))
+    xop, zop = xop.view(), zop.view()
+    n = len(xop)
+    xop.shape = 1,n
+    zop.shape = 1,n
+    op = numpy.concatenate((xop, zop))
+    op = op.transpose().copy()
+    op.shape = (2*n,)
+    return op
 
 
 def test_model():
@@ -34,6 +62,33 @@ def test_model():
     n = Rx.shape[1]
 
     print shortstrx(Rx, Rz)
+
+    ops = []
+    for rx in Gx:
+        ops.append(mkop(rx, None))
+    for rz in Gz:
+        ops.append(mkop(None, rz))
+
+    bracket(mkop(rx,None), mkop(None, rz))
+
+    found = set(op.tostring() for op in ops)
+    while 1:
+        new = []
+        for a in ops:
+          for b in ops:
+            if bracket(a, b):
+                c = (a+b)%2
+                s = c.tostring()
+                if s not in found:
+                    found.add(s)
+                    new.append(c)
+        if not new:
+            break
+        ops.extend(new)
+        print len(ops)
+    print len(ops)
+
+    return
 
     r, n = Rx.shape
     N = 2**r
@@ -85,8 +140,6 @@ from argv import Argv
 argv = Argv()
 
 if __name__ == "__main__":
-
-    test()
 
     if argv.profile:
         import cProfile as profile
