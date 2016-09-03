@@ -14,6 +14,9 @@ from isomorph import write
 import models
 from models import genidx
 
+"""
+Find the closure of the gauge operators under bracket.
+"""
 
 def bracket(a, b):
     a, b = a.copy(), b.copy()
@@ -30,6 +33,13 @@ def bracket(a, b):
     return c.sum() % 2
 
 
+def is_zop(a):
+    a = a.copy()
+    a.shape = (len(a)//2, 2)
+    assert a.sum()
+    return a[:, 0].sum() == 0
+
+
 def mkop(xop, zop):
     if xop is None:
         xop = zeros2(len(zop))
@@ -43,6 +53,28 @@ def mkop(xop, zop):
     op = op.transpose().copy()
     op.shape = (2*n,)
     return op
+
+
+def closure(ops):
+    #found = set(op.tostring() for op in ops)
+    found = set(op.tostring() for op in ops)
+    pairs = [(a, b) for a in ops for b in ops if not numpy.allclose(a, b)]
+    while 1:
+        new = []
+        for a, b in pairs:
+            if bracket(a, b):
+                c = (a+b)%2
+                s = c.tostring()
+                if s not in found:
+                    found.add(s)
+                    new.append(c)
+        if not new:
+            break
+        pairs = [(a, b) for a in ops+new for b in new if not numpy.allclose(a, b)]
+        ops.extend(new)
+        if argv.verbose:
+            print len(ops)
+    return ops
 
 
 def test_model():
@@ -61,32 +93,60 @@ def test_model():
 
     n = Rx.shape[1]
 
-    print shortstrx(Rx, Rz)
+    #print shortstrx(Rx, Rz)
+    print "r =", len(Rx)
 
     ops = []
+    found = set()
     for rx in Gx:
-        ops.append(mkop(rx, None))
+        rx = dot2(Px, rx)
+        rx = mkop(rx, None)
+        s = rx.tostring()
+        if s not in found:
+            found.add(s)
+            ops.append(rx)
+
+    cartan = []
     for rz in Gz:
-        ops.append(mkop(None, rz))
+        rz = dot2(Pz, rz)
+        rz = mkop(None, rz)
+        s = rz.tostring()
+        if s not in found:
+            found.add(s)
+            ops.append(rz)
+            cartan.append(rz)
 
-    bracket(mkop(rx,None), mkop(None, rz))
+    ops = closure(ops)
+    print "size:", len(ops)
+    cartan = [op for op in ops if is_zop(op)]
+    print "cartan:", len(cartan)
 
-    found = set(op.tostring() for op in ops)
-    while 1:
-        new = []
-        for a in ops:
-          for b in ops:
-            if bracket(a, b):
-                c = (a+b)%2
-                s = c.tostring()
-                if s not in found:
-                    found.add(s)
-                    new.append(c)
-        if not new:
-            break
-        ops.extend(new)
-        print len(ops)
-    print len(ops)
+    lookup = {}
+    for i, op in enumerate(ops):
+        lookup[op.tostring()] = i
+
+    n = len(ops)
+    H = []
+    for z in cartan:
+        A = zeros2(n, n)
+        for i, op in enumerate(ops):
+            if is_zop(op):
+                continue
+            c = bracket(z, op)
+            if c==0:
+                continue
+            op1 = (z+op)%2
+            j = lookup[op1.tostring()]
+            print "%s->%s" % (i, j),
+            A[j, i] = 1
+        print
+        #print shortstr(A)
+        #print
+        H.append(A)
+    
+    for A in H:
+      for B in H:
+        assert numpy.allclose(numpy.dot(A, B), numpy.dot(B, A))
 
     return
 

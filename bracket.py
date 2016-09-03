@@ -788,6 +788,17 @@ class LISet(object):
     def __getitem__(self, i):
         return self.ops[i]
 
+    def components(self, op):
+        idxs = []
+        for idx in self.space.idxs:
+            a = op.elems.get(idx)
+            if a is None or a==0:
+                #xs.append(0)
+                continue
+            op1 = self.idxs.get(idx)
+            idxs.append(idx)
+        return idxs
+
     def add(self, op):
         if op == Operator.zero:
             return
@@ -904,6 +915,7 @@ def test_model():
     space2 = space*space.dual()
 
     ops = []
+    cartan = []
 
     # zops
     for gz in Gz:
@@ -911,7 +923,10 @@ def test_model():
         for i, v in enumerate(basis):
             bit = dot2(gz, Rx.transpose(), v)
             elems[(i, i)] = 1 - 2*bit # send 0,1 -> +1,-1
-        ops.append(Operator(elems, space2))
+        op = Operator(elems, space2)
+        ops.append(op)
+        cartan.append(op)
+    mh = len(cartan)
 
     # xops
     for gx in Gx:
@@ -927,7 +942,17 @@ def test_model():
     print "ops:", len(ops)
     print ops[0]
 
-    closure(ops)
+    li = closure(ops)
+
+    for Z in cartan:
+
+        for X in li:
+
+            X1 = Z.bracket(X)
+
+            idxs = li.components(X1)
+
+        break
 
 
 

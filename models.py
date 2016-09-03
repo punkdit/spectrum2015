@@ -141,6 +141,22 @@ def build_random(n):
     return Gx, Gz, Hx, Hz
 
 
+def build_pauli(n):
+
+    m = 2**n
+    Gx = zeros2(m, n)
+    Gz = zeros2(m, n)
+    for i, idx in enumerate(genidx((2,)*n)):
+        for j in idx:
+            Gx[i,j] = 1
+            Gz[i,j] = 1
+
+    Hx = zeros2(0, n)
+    Hz = zeros2(0, n)
+
+    return Gx, Gz, Hx, Hz
+
+
 def build_ising(n):
 
     m = n
@@ -309,6 +325,10 @@ def build():
     elif argv.random:
         n = argv.get('n', 4)
         Gx, Gz, Hx, Hz = build_random(n)
+
+    elif argv.pauli:
+        n = argv.get('n', 2)
+        Gx, Gz, Hx, Hz = build_pauli(n)
 
     else:
 

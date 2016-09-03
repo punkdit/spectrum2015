@@ -1,4 +1,53 @@
 
+3/9/16
+======
+
+# This is sl_4
+time ./symplectic.py test_model pauli
+r = 2
+size: 15
+cartan: 3
+
+0->6 1->8 6->0 7->14 8->1 9->13 13->9 14->7
+0->7 2->10 6->14 7->0 10->2 11->12 12->11 14->6
+1->9 2->11 8->13 9->1 10->12 11->2 12->10 13->8
+
+In the pauli basis, each of the cartan operators 
+act as swaps (square to 1) and since this group is
+abelian it must be isomorphic to a power of Z_2.
+
+So we have a permutation rep of this group, and the
+invarient subspaces will be spanned by the roots of the
+lie algebra. (Not sure about this: there are some
+factors of 2 left out.)
+
+
+2/9/16
+======
+
+Take closure of the operators in H_{0,0} under bracket.
+As a group these operators form a group with order 2**(2r+1),
+or 2**(2r) without the phase subgroup.
+
+./symplectic.py test_model gcolor2
+r = 18
+378 # <--- size
+    # == 2*3*3*3*7
+cartan: 42
+
+./symplectic.py test_model gcolor
+r = 6
+18 # <--- size, this is sl_2 tensored 6 times.
+cartan: 6
+
+./symplectic.py test_model compass
+r = 4
+255  # <--- size
+     # this is all of sl_16
+cartan: 15
+
+
+
 
 
 28/8/16
