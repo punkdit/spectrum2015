@@ -4,12 +4,15 @@ import sys, os
 from fractions import gcd
 
 import numpy
+from numpy import concatenate
 
 import networkx as nx
 
 from solve import get_reductor, array2, row_reduce, dot2, shortstr, zeros2, shortstrx, eq2
-from solve import u_inverse, find_kernel, find_logops
+from solve import u_inverse, find_kernel, find_logops, identity2, solve
 from isomorph import write
+from zorbit import check_conjugate, check_commute
+from zorbit import find_errors
 
 import models
 from models import genidx
@@ -78,33 +81,139 @@ def closure(ops):
     return ops
 
 
+def check_sy(Lx, Hx, Tx, Rx, Lz, Hz, Tz, Rz, **kw):
+
+    check_conjugate(Lx, Lz)
+    check_commute  (Lx, Hz)
+    check_commute  (Lx, Tz)
+    check_commute  (Lx, Rz)
+
+    check_commute  (Hx, Lz)
+    check_conjugate(Hx, Tz)
+    check_commute  (Hx, Hz)
+    check_commute  (Hx, Rz)
+
+    check_commute  (Tx, Lz)
+    check_commute  (Tx, Tz)
+    check_conjugate(Tx, Hz)
+    check_commute  (Tx, Rz)
+
+    check_commute  (Rx, Lz)
+    check_commute  (Rx, Hz)
+    check_commute  (Rx, Tz)
+    check_conjugate(Rx, Rz)
+
+
+def find_errors(Hx, Lx):
+    "find inverse of Hx commuting with Lx"
+    
+    # find Tz
+    n = Hx.shape[1]
+
+    Lx = row_reduce(Lx, truncate=True)
+    k = len(Lx)
+    mx = len(Hx)
+    assert k+mx <= n 
+
+    U = zeros2(mx+k, n)
+    U[:mx] = Hx 
+    U[mx:mx+k] = Lx 
+
+    B = zeros2(mx+k, mx)
+    B[:mx] = identity2(mx)
+
+    #print shortstrx(U, B)
+    #print
+
+    Tz_t = solve(U, B)
+    assert Tz_t is not None, "no solution"
+    Tz = Tz_t.transpose()
+    assert len(Tz) == mx
+
+    check_conjugate(Hx, Tz)
+    check_commute(Lx, Tz)
+
+    return Tz
+
+
 def test_model():
 
     Gx, Gz, Hx, Hz = models.build()
+    n = Hx.shape[1]
+
+    check_commute(Hx, Hz)
+
+    # Lz = find_logops( Hx            , Hz            )
+    #      find_logops( ............. , ............. )
+    #                 ( commutes with , orthogonal to )
+    #                 ( ............. , ............. )
 
     Lz = find_logops(Gx, Hz)
-    Lx = find_logops(Gz, Hx)
 
-    #Px = get_reductor(numpy.concatenate((Lx, Hx)))
-    #Pz = get_reductor(numpy.concatenate((Lz, Hz)))
+    # Tz = find_errors( Hx            , Lx            )
+    #      find_errors( ............. , ............. )
+    #                 ( conjugate to  , commutes with )
+    #                 ( ............. , ............. )
+
+    Lx = find_errors(Lz, Gz) # invert Lz, commuting with Gz
+
+    check_commute  (Lx, Gz)
+    check_commute  (Lx, Hz)
+    check_conjugate(Lx, Lz)
+    check_commute  (Lz, Gx)
+    check_commute  (Lz, Hx)
+
+    #Px = get_reductor(concatenate((Lx, Hx)))
+    #Pz = get_reductor(concatenate((Lz, Hz)))
     Px = get_reductor(Hx)
     Pz = get_reductor(Hz)
-    Pxt = Px.transpose()
-    Pzt = Pz.transpose()
+
+    # Lx | Lz
+    # Hx | ?
+    # ?  | Hz
+    # ?  | ?
+    #Rz = find_logops(concatenate((Lx, Hx)), Hz)
+    Rz = dot2(Gz, Pz.transpose())
+    Rz = row_reduce(Rz, truncate=True)
+
+    check_commute  (Rz, Lx)
+    check_commute  (Rz, Hx)
 
     Rx = dot2(Gx, Px.transpose())
     Rx = row_reduce(Rx, truncate=True)
 
-    Rz = dot2(Gz, Pz.transpose())
-    Rz = row_reduce(Rz, truncate=True)
+    check_commute  (Rx, Lz)
+    check_commute  (Rx, Hz)
+
+    # Lx | Lz
+    # Hx | ?
+    # ?  | Hz
+    # Rx'| Rz'
+
+    Tz = find_errors(Hx, concatenate((Lx, Rx)))
+    Tx = find_errors(Hz, concatenate((Lz, Rz, Tz)))
+
+    assert len((concatenate((Lx, Hx, Tx, Rx)))) == n
+    assert len((concatenate((Lz, Hz, Tz, Rz)))) == n
+    assert len(row_reduce(concatenate((Lx, Hx, Tx, Rx)))) == n
+    assert len(row_reduce(concatenate((Lz, Hz, Tz, Rz)))) == n
+
+    check_commute  (Rz, Tx)
+
+    Rx = find_errors(Rz, concatenate((Lz, Hz, Tz)))
+
+    check_conjugate(Rx, Rz)
+    check_commute  (Rx, Hz)
+    check_commute  (Rx, Tz)
+    check_commute  (Rx, Lz)
 
     Rxt = Rx.transpose()
     Rzt = Rz.transpose()
 
-    #print shortstrx(dot2(Gz, Rxt), dot2(Gz, Pz, Rxt))
+    Pxt = Px.transpose()
+    Pzt = Pz.transpose()
 
-    assert dot2(Hx, Rzt).sum() == 0
-    assert dot2(Hz, Rxt).sum() == 0
+    check_sy(Lx, Hx, Tx, Rx, Lz, Hz, Tz, Rz)
 
 #    for gx in Gx:
 #        gx1 = dot2(gx, Pxt)
@@ -118,19 +227,6 @@ def test_model():
     assert eq2(dot2(Rx, Pz), Rx)
     assert eq2(dot2(Rz, Px), Rz)
 
-    #return
-
-    Qx = u_inverse(Rx) # a.k.a Rz.transpose()
-    PxtQx = dot2(Pxt, Qx)
-
-    Qz = u_inverse(Rz) # a.k.a Rx.transpose()
-    PztQz = dot2(Pzt, Qz)
-
-    assert eq2(dot2(Gz, Qz), dot2(Gz, Pzt, Qz))
-    assert eq2(dot2(Gx, Qx), dot2(Gx, Pxt, Qx))
-
-    #print shortstrx(Rz, Qz)
-
     r, n = Rx.shape
 
     #print shortstrx(Rx, Rz)
@@ -140,9 +236,9 @@ def test_model():
     found = set()
     for gx in Gx:
         #rx = dot2(Px, gx)
-        #rx = dot2(gx, PxtQx)
-        rx = dot2(gx, Qx)
-        print rx, dot2(gx, PxtQx)
+        #rx = dot2(gx, PxtRzt)
+        rx = dot2(gx, Rzt)
+        #print rx, dot2(gx, PxtRzt)
         assert rx.sum()
         rx = mkop(rx, None)
         s = rx.tostring()
@@ -154,8 +250,8 @@ def test_model():
     cartan = []
     for gz in Gz:
         #rz = dot2(Pz, gz)
-        #rz = dot2(gz, PztQz)
-        rz = dot2(gz, Qz) # fail
+        #rz = dot2(gz, PztRxt)
+        rz = dot2(gz, Rxt) # fail
         assert rz.sum()
         rz = mkop(None, rz)
         s = rz.tostring()
@@ -217,9 +313,8 @@ def test_model():
     N = 2**r
     gz = len(Gz)
 
-    Qx = u_inverse(Rx)
     RR = dot2(Gz, Rx.transpose())
-    PxtQx = dot2(Px.transpose(), Qx)
+    PxtRzt = dot2(Px.transpose(), Rzt)
 
     if N<=1024:
         H = numpy.zeros((N, N))
@@ -248,7 +343,7 @@ def test_model():
     for gx in Gx:
         elems = {}
         for i, v in enumerate(basis):
-            u = (v+dot2(gx, PxtQx))%2
+            u = (v+dot2(gx, PxtRzt))%2
             j = lookup[u.tostring()]
             elems[j, i] = 1
         for (i, j) in elems:

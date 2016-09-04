@@ -751,6 +751,33 @@ def find_logops(Hx, Hz, check=False, verbose=False):
     return Lz
 
 
+"""
+def orthogonal(A):
+    A = row_reduce(A, truncate=True)
+    m, n = A.shape
+    B = zeros2(n-m, n)
+    i, j = 0, 0
+    for row in A:
+        while row[i] == 0:
+            B[j, i] = 1
+            i += 1
+            j += 1
+        else:
+            i += 1
+    while j<n-m:
+        B[j, i] = 1
+        i += 1
+        j += 1
+#    print "orthogonal"
+#    print shortstrx(A)
+#    print
+#    print shortstrx(B)
+    AB = numpy.concatenate((A, B))
+    assert len(row_reduce(AB, truncate=True))==n
+    return B
+"""
+
+
 def pseudo_inverse(A, check=False):
     m, n = A.shape
     if m*n == 0:

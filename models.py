@@ -297,7 +297,10 @@ def build_gcolor2():
 
 
 
-def build():
+def build(name=""):
+
+    if name:
+        setattr(argv, "name", True) # hack this
 
     if argv.gcolor:
         size = argv.get("size", 1)
