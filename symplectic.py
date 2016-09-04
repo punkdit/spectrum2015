@@ -126,6 +126,11 @@ def test_model():
         lookup[op.tostring()] = i
 
     n = len(ops)
+
+    graph = nx.Graph()
+    for i in range(n):
+        graph.add_node(i)
+
     H = []
     for z in cartan:
         A = zeros2(n, n)
@@ -139,6 +144,7 @@ def test_model():
             j = lookup[op1.tostring()]
             print "%s->%s" % (i, j),
             A[j, i] = 1
+            graph.add_edge(j, i)
         print
         #print shortstr(A)
         #print
@@ -147,6 +153,12 @@ def test_model():
     for A in H:
       for B in H:
         assert numpy.allclose(numpy.dot(A, B), numpy.dot(B, A))
+
+    equs = nx.connected_components(graph)
+    print "orbits:", len(equs)
+    for equ in equs:
+        print len(equ),
+    print
 
     return
 

@@ -1,3 +1,27 @@
+4/9/16
+======
+
+./symplectic.py test_model pauli
+r = 2
+size: 15
+cartan: 3
+0->6 1->8 6->0 7->14 8->1 9->13 13->9 14->7
+0->7 2->10 6->14 7->0 10->2 11->12 12->11 14->6
+1->9 2->11 8->13 9->1 10->12 11->2 12->10 13->8
+orbits: 6
+4 4 4 1 1 1
+3 non-trivial orbits
+* 4 irreps
+= 12 off-diagonal E_ij entries
+
+
+./symplectic.py test_model compass |tail -2
+orbits: 30
+16 16 16 16 16 16 16 16 16 16 16 16 16 16 16 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+
+15 non-trivial orbits
+* 16 irreps = 15*16 = number off-diagonal entries
+
 
 3/9/16
 ======
