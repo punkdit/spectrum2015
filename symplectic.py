@@ -7,8 +7,8 @@ import numpy
 
 import networkx as nx
 
-from solve import get_reductor, array2, row_reduce, dot2, shortstr, zeros2, shortstrx
-from solve import u_inverse
+from solve import get_reductor, array2, row_reduce, dot2, shortstr, zeros2, shortstrx, eq2
+from solve import u_inverse, find_kernel, find_logops
 from isomorph import write
 
 import models
@@ -56,6 +56,7 @@ def mkop(xop, zop):
 
 
 def closure(ops):
+    "take closure under bracket operation (up to factor of 2)"
     #found = set(op.tostring() for op in ops)
     found = set(op.tostring() for op in ops)
     pairs = [(a, b) for a in ops for b in ops if not numpy.allclose(a, b)]
@@ -81,34 +82,81 @@ def test_model():
 
     Gx, Gz, Hx, Hz = models.build()
 
-    Px = get_reductor(Hx) # projector onto complement of rowspan of Hx
-    Pz = get_reductor(Hz)
-    Rz = [dot2(Pz, g) for g in Gz] 
-    Rz = array2(Rz)
-    Rz = row_reduce(Rz, truncate=True)
+    Lz = find_logops(Gx, Hz)
+    Lx = find_logops(Gz, Hx)
 
-    Rx = [dot2(Px, g) for g in Gx] 
-    Rx = array2(Rx)
+    #Px = get_reductor(numpy.concatenate((Lx, Hx)))
+    #Pz = get_reductor(numpy.concatenate((Lz, Hz)))
+    Px = get_reductor(Hx)
+    Pz = get_reductor(Hz)
+    Pxt = Px.transpose()
+    Pzt = Pz.transpose()
+
+    Rx = dot2(Gx, Px.transpose())
     Rx = row_reduce(Rx, truncate=True)
 
-    n = Rx.shape[1]
+    Rz = dot2(Gz, Pz.transpose())
+    Rz = row_reduce(Rz, truncate=True)
+
+    Rxt = Rx.transpose()
+    Rzt = Rz.transpose()
+
+    #print shortstrx(dot2(Gz, Rxt), dot2(Gz, Pz, Rxt))
+
+    assert dot2(Hx, Rzt).sum() == 0
+    assert dot2(Hz, Rxt).sum() == 0
+
+#    for gx in Gx:
+#        gx1 = dot2(gx, Pxt)
+#        print dot2(gx, Rzt), dot2(gx1, Rzt), dot2((gx+gx1)%2, Rzt)
+
+    assert eq2(dot2(Gz, Rxt), dot2(Gz, Pzt, Rxt))
+    assert eq2(dot2(Gx, Rzt), dot2(Gx, Pxt, Rzt))
+
+#    print shortstrx(dot2(Rx, Pz), Rx)
+
+    assert eq2(dot2(Rx, Pz), Rx)
+    assert eq2(dot2(Rz, Px), Rz)
+
+    #return
+
+    Qx = u_inverse(Rx) # a.k.a Rz.transpose()
+    PxtQx = dot2(Pxt, Qx)
+
+    Qz = u_inverse(Rz) # a.k.a Rx.transpose()
+    PztQz = dot2(Pzt, Qz)
+
+    assert eq2(dot2(Gz, Qz), dot2(Gz, Pzt, Qz))
+    assert eq2(dot2(Gx, Qx), dot2(Gx, Pxt, Qx))
+
+    #print shortstrx(Rz, Qz)
+
+    r, n = Rx.shape
 
     #print shortstrx(Rx, Rz)
     print "r =", len(Rx)
 
     ops = []
     found = set()
-    for rx in Gx:
-        rx = dot2(Px, rx)
+    for gx in Gx:
+        #rx = dot2(Px, gx)
+        #rx = dot2(gx, PxtQx)
+        rx = dot2(gx, Qx)
+        print rx, dot2(gx, PxtQx)
+        assert rx.sum()
         rx = mkop(rx, None)
         s = rx.tostring()
         if s not in found:
             found.add(s)
             ops.append(rx)
 
+    print
     cartan = []
-    for rz in Gz:
-        rz = dot2(Pz, rz)
+    for gz in Gz:
+        #rz = dot2(Pz, gz)
+        #rz = dot2(gz, PztQz)
+        rz = dot2(gz, Qz) # fail
+        assert rz.sum()
         rz = mkop(None, rz)
         s = rz.tostring()
         if s not in found:
@@ -125,15 +173,15 @@ def test_model():
     for i, op in enumerate(ops):
         lookup[op.tostring()] = i
 
-    n = len(ops)
+    N = len(ops)
 
     graph = nx.Graph()
-    for i in range(n):
+    for i in range(N):
         graph.add_node(i)
 
     H = []
     for z in cartan:
-        A = zeros2(n, n)
+        A = zeros2(N, N)
         for i, op in enumerate(ops):
             if is_zop(op):
                 continue
@@ -142,10 +190,10 @@ def test_model():
                 continue
             op1 = (z+op)%2
             j = lookup[op1.tostring()]
-            print "%s->%s" % (i, j),
+            #print "%s->%s" % (i, j),
             A[j, i] = 1
             graph.add_edge(j, i)
-        print
+        #print
         #print shortstr(A)
         #print
         H.append(A)
@@ -159,6 +207,9 @@ def test_model():
     for equ in equs:
         print len(equ),
     print
+
+    #for irrep in genidx((2,)*r):
+    #    print "irrep:", irrep
 
     return
 

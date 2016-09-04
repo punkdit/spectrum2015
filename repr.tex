@@ -113,6 +113,8 @@ Some numerics and intuition provided.
 \newcommand{\ketbra}[2]{\ket{#1}\!\bra{#2}}
 \newcommand{\braket}[2]{\langle{#1}|{#2}\rangle}
 
+\newcommand{\todo}[1]{\textcolor{red}{#1}}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -1309,6 +1311,7 @@ a trivial action.
 In $\Fn$ this
 corresponds to additive action of the zero vector.
 
+\newcommand{\pluseq}{\mathrel{+}=}
 States $u\in\Span{R_X}$ can be built from a
 vector matrix product
 $$
@@ -1317,7 +1320,7 @@ $$
 with $v\in\Fr.$
 Since $R_X R_Z^\top = I$
 we can write $v = u R_Z^\top.$
-For each $g_X\in G_X$ these act as
+Each $g_X\in G_X$ acts on $u$ to give
 \begin{align*}
     u_1 &= (u + g_X) \ \mbox{mod}\  S_X \\
         &= (u + g_X) P_X \\
@@ -1328,46 +1331,21 @@ writing $u_1 = v_1 R_X$ we then have
     v_1 &= (v R_X + g_X) P_X R_Z^\top \\
         &= v + g_X P_X R_Z^\top.
 \end{align*}
-
+\todo{XXX explain that \todo{$P_X R_Z^\top = R_Z^\top$} etc. XXX}
 So we have that working in the computational
 basis, the action of the $X$ part of the
 gauge group in the $t=0,0$ irrep is to send
-$v\in R_X$ to 
-$v + g_X P_X R_Z^\top.$
-
-%In the computational basis, the Hamiltonian
-%is a $2^n\times 2^n$ element matrix which
-%we can index using a pair of $\Fn$ vectors.
-%Here we use a function notation for this:
-%\begin{align*}
-%    H : \Fn \times \Fn &\to \Complex
-%        %(u, v) &\mapsto H(u, v).
-%\end{align*}
-%Each irrep of the gauge group 
-%will then be acting on a subspace of 
-%$\Cn$ spanned by basis vectors 
-%
-%$$
-%    \Cn \cong \Complex[\Fn]
-%$$
-
-%Lets record this in our Hamiltonian block $H_{0,0}$
-%by indexing the matrix components with a function notation. 
-%The Hamiltonian takes a pair of
-%basis vectors and produces a complex number:
-%$H_{0,0} : \Fr\times\Fr \to \Complex.$
-
-\newcommand{\pluseq}{\mathrel{+}=}
-
-We have the following contributions from the
+%$v\in R_X$ to 
+$v\in \Fr$ to $v + g_X P_X R_Z^\top.$
+In summary, we have the following contributions from the
 $G_X$ terms of the Hamiltonian:
 $$
 %    H_{0,0}(v, v+g_X P_X R_Z^\top) \ne 0,\ \ \mbox{for}\ g_X\in G_X, v\in \Fr
     \bra{v} H_{0,0} \ket{v+g_X P_X R_Z^\top} 
         \pluseq 1,\ \ \mbox{for}\ g_X\in G_X, v\in \Fr
 $$
-Where we use the $\pluseq$ notation
-because there may be other ``contributions'' to the
+where we use the $\pluseq$ notation
+because there may be other contributions to the
 same component.
 These terms will always be off
 the diagonal unless $g_X$ is a stabilizer.
