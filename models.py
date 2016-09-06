@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys, os
+from random import seed
 
 import numpy
 
@@ -301,6 +302,11 @@ def build(name=""):
 
     if name:
         setattr(argv, "name", True) # hack this
+
+    _seed = argv.get("seed")
+    if _seed is not None:
+        numpy.random.seed(_seed)
+        seed(_seed)
 
     if argv.gcolor:
         size = argv.get("size", 1)

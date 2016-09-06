@@ -265,7 +265,7 @@ def lu_decompose(A, verbose=False):
     return L, U
         
 
-def row_reduce(H, truncate=False, inplace=False, check=False, debug=False):
+def row_reduce(H, truncate=True, inplace=False, check=False, debug=False):
     """Remove zero rows if truncate=True
     """
 

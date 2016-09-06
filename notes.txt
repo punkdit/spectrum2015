@@ -1,3 +1,32 @@
+
+6/9/16
+======
+
+example of |non-trivial orbits| != |cartan|
+
+./symplectic.py test_model xy n=12
+r = 10
+size: 132
+cartan: 12
+orbits: 42
+4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 1 1 1 1 1 1 1 1 1 1 1 1
+trivial: 12 non-trivial 30
+
+
+5/9/16
+======
+
+looks like |non-trivial orbits| = |cartan|
+
+
+./symplectic.py test_model gcolor2
+r = 18
+orbits: 84
+8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+trivial: 42 non-trivial 42
+
+
+
 4/9/16
 ======
 
@@ -18,7 +47,6 @@ orbits: 6
 ./symplectic.py test_model compass |tail -2
 orbits: 30
 16 16 16 16 16 16 16 16 16 16 16 16 16 16 16 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-
 15 non-trivial orbits
 * 16 irreps = 15*16 = number off-diagonal entries
 

@@ -110,10 +110,17 @@ def find_errors(Hx, Lx):
     # find Tz
     n = Hx.shape[1]
 
-    Lx = row_reduce(Lx, truncate=True)
+    #print "find_errors:"
+    #print shortstrx(Hx, Lx)
+    #print
+    Lx = row_reduce(Lx)
     k = len(Lx)
     mx = len(Hx)
-    assert k+mx <= n 
+
+    HL = row_reduce(concatenate((Lx, Hx)))
+    #print shortstrx(Lx, Hx, HL)
+    assert len(HL) == mx+k
+    assert k+mx <= n, (k, mx, n)
 
     U = zeros2(mx+k, n)
     U[:mx] = Hx 
@@ -142,6 +149,13 @@ def test_model():
     n = Hx.shape[1]
 
     check_commute(Hx, Hz)
+    check_commute(Gx, Hz)
+    check_commute(Hx, Gz)
+
+    #Px = get_reductor(concatenate((Lx, Hx)))
+    #Pz = get_reductor(concatenate((Lz, Hz)))
+    Px = get_reductor(Hx)
+    Pz = get_reductor(Hz)
 
     # Lz = find_logops( Hx            , Hz            )
     #      find_logops( ............. , ............. )
@@ -149,6 +163,16 @@ def test_model():
     #                 ( ............. , ............. )
 
     Lz = find_logops(Gx, Hz)
+
+    if 0:
+        PGz = get_reductor(Gz)
+        Lz = dot2(Lz, PGz.transpose())
+        Lz = row_reduce(Lz)
+    
+        print shortstrx(Lz, Gz, Hz)
+
+    assert len(row_reduce(concatenate((Lz, Hz))))==len(Lz)+len(Hz)
+    assert len(row_reduce(concatenate((Lz, Gz))))==len(Lz)+len(row_reduce(Gz))
 
     # Tz = find_errors( Hx            , Lx            )
     #      find_errors( ............. , ............. )
@@ -163,10 +187,6 @@ def test_model():
     check_commute  (Lz, Gx)
     check_commute  (Lz, Hx)
 
-    #Px = get_reductor(concatenate((Lx, Hx)))
-    #Pz = get_reductor(concatenate((Lz, Hz)))
-    Px = get_reductor(Hx)
-    Pz = get_reductor(Hz)
 
     # Lx | Lz
     # Hx | ?
@@ -174,13 +194,13 @@ def test_model():
     # ?  | ?
     #Rz = find_logops(concatenate((Lx, Hx)), Hz)
     Rz = dot2(Gz, Pz.transpose())
-    Rz = row_reduce(Rz, truncate=True)
+    Rz = row_reduce(Rz)
 
     check_commute  (Rz, Lx)
     check_commute  (Rz, Hx)
 
     Rx = dot2(Gx, Px.transpose())
-    Rx = row_reduce(Rx, truncate=True)
+    Rx = row_reduce(Rx)
 
     check_commute  (Rx, Lz)
     check_commute  (Rx, Hz)
@@ -227,6 +247,8 @@ def test_model():
     assert eq2(dot2(Rx, Pz), Rx)
     assert eq2(dot2(Rz, Px), Rz)
 
+    assert len(find_kernel(dot2(Gz, Rx.transpose())))==0
+
     r, n = Rx.shape
 
     #print shortstrx(Rx, Rz)
@@ -251,7 +273,7 @@ def test_model():
     for gz in Gz:
         #rz = dot2(Pz, gz)
         #rz = dot2(gz, PztRxt)
-        rz = dot2(gz, Rxt) # fail
+        rz = dot2(gz, Rxt)
         assert rz.sum()
         rz = mkop(None, rz)
         s = rz.tostring()
@@ -260,16 +282,33 @@ def test_model():
             ops.append(rz)
             cartan.append(rz)
 
+    #for op in ops:
+    #    print op
+
     ops = closure(ops)
-    print "size:", len(ops)
+    print "algebra dimension:", len(ops)
     cartan = [op for op in ops if is_zop(op)]
-    print "cartan:", len(cartan)
+    print "cartan dimension:", len(cartan)
 
     lookup = {}
     for i, op in enumerate(ops):
         lookup[op.tostring()] = i
 
     N = len(ops)
+
+    graph = nx.Graph()
+    for i in range(N):
+        graph.add_node(i)
+    for i, A in enumerate(ops):
+      for j, B in enumerate(ops):
+        if bracket(A, B)==0:
+            continue
+        C = (A+B)%2
+        k = lookup[C.tostring()]
+        graph.add_edge(i, k)
+        graph.add_edge(j, k)
+    equs = nx.connected_components(graph)
+    print "ideals:", len(equs), [len(equ) for equ in equs]
 
     graph = nx.Graph()
     for i in range(N):
@@ -299,10 +338,9 @@ def test_model():
         assert numpy.allclose(numpy.dot(A, B), numpy.dot(B, A))
 
     equs = nx.connected_components(graph)
-    print "orbits:", len(equs)
-    for equ in equs:
-        print len(equ),
-    print
+    print "orbits:", len(equs), [len(equ) for equ in equs]
+    trivial = len([equ for equ in equs if len(equ)==1])
+    print "trivial:", trivial, "non-trivial", len(equs)-trivial
 
     #for irrep in genidx((2,)*r):
     #    print "irrep:", irrep
