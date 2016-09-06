@@ -39,3 +39,6 @@ pnauty.so: pnauty.c
 	gcc -g -shared -I/usr/include/python2.7 -o pnauty.so -O3 -march=i686 pnauty.c nauty/nauty.a -lefence -lpython2.7
 
 
+cbracket.so: cbracket.c
+	gcc -g -shared -I/usr/include/python2.7 -o cbracket.so -O3 -march=i686 cbracket.c -lpython2.7
+

@@ -21,7 +21,11 @@ from models import genidx
 Find the closure of the gauge operators under bracket.
 """
 
+import cbracket
+
 def bracket(a, b):
+    return cbracket.bracket(a.tostring(), b.tostring())
+    #c1 = cbracket.bracket(a.tostring(), b.tostring())
     a, b = a.copy(), b.copy()
     assert len(a)==len(b)
     assert len(a)%2==0
@@ -33,7 +37,9 @@ def bracket(a, b):
     b = b[:, [1, 0]]
     #print b
     c = a*b
-    return c.sum() % 2
+    c = c.sum() % 2
+    #assert c==c1
+    return c
 
 
 def is_zop(a):
@@ -76,6 +82,30 @@ def closure(ops):
             break
         pairs = [(a, b) for a in ops+new for b in new if a.tostring()!=b.tostring()]
         ops.extend(new)
+        if argv.verbose:
+            print len(ops)
+    return ops
+
+
+def closure(ops):
+    "take closure under bracket operation (up to factor of 2)"
+    #found = set(op.tostring() for op in ops)
+    found = set(op.tostring() for op in ops)
+    new = ops
+    while 1:
+        _new = []
+        for a in ops:
+          for b in new:
+            if bracket(a, b):
+                c = (a+b)%2
+                s = c.tostring()
+                if s not in found:
+                    found.add(s)
+                    _new.append(c)
+        if not _new:
+            break
+        ops.extend(_new)
+        new = _new
         if argv.verbose:
             print len(ops)
     return ops
@@ -171,8 +201,9 @@ def test_model():
     
         print shortstrx(Lz, Gz, Hz)
 
-    assert len(row_reduce(concatenate((Lz, Hz))))==len(Lz)+len(Hz)
-    assert len(row_reduce(concatenate((Lz, Gz))))==len(Lz)+len(row_reduce(Gz))
+    if len(Lz):
+        assert len(row_reduce(concatenate((Lz, Hz))))==len(Lz)+len(Hz)
+        assert len(row_reduce(concatenate((Lz, Gz))))==len(Lz)+len(row_reduce(Gz))
 
     # Tz = find_errors( Hx            , Lx            )
     #      find_errors( ............. , ............. )
@@ -290,7 +321,8 @@ def test_model():
     cartan = [op for op in ops if is_zop(op)]
     print "cartan dimension:", len(cartan)
 
-    return
+    if argv.stop1:
+        return
 
     lookup = {}
     for i, op in enumerate(ops):
@@ -311,6 +343,9 @@ def test_model():
         graph.add_edge(j, k)
     equs = nx.connected_components(graph)
     print "ideals:", len(equs), [len(equ) for equ in equs]
+
+    if argv.stop2:
+        return
 
     graph = nx.Graph()
     for i in range(N):
