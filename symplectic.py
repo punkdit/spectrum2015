@@ -323,19 +323,21 @@ def test_model():
     #for op in ops:
     #    print op
 
-    #ops = closure(ops)
-    #print "algebra dimension:", len(ops)
+    if argv.closure:
+        ops = closure(ops)
+        print "algebra dimension:", len(ops)
 
-    remain = list(gops)
-    while remain:
-        print "remain:", len(remain)
-        op = remain.pop(0)
-        ideal = find_ideal([op], ops)
-        print "ideal:", len(ideal)
-        ideal = set(op.tostring() for op in ideal)
-        remain = [op for op in remain if not op.tostring() in ideal]
+    if argv.ideals:
+        remain = list(gops)
+        while remain:
+            print "remain:", len(remain)
+            op = remain.pop(0)
+            ideal = find_ideal([op], ops)
+            print "ideal:", len(ideal)
+            ideal = set(op.tostring() for op in ideal)
+            remain = [op for op in remain if not op.tostring() in ideal]
 
-    return
+        return
 
     cartan = [op for op in ops if is_zop(op)]
     print "cartan dimension:", len(cartan)
