@@ -66,30 +66,6 @@ def mkop(xop, zop):
 
 def closure(ops):
     "take closure under bracket operation (up to factor of 2)"
-    #found = set(op.tostring() for op in ops)
-    found = set(op.tostring() for op in ops)
-    pairs = [(a, b) for a in ops for b in ops if a.tostring()!=b.tostring()]
-    while 1:
-        new = []
-        for a, b in pairs:
-            if bracket(a, b):
-                c = (a+b)%2
-                s = c.tostring()
-                if s not in found:
-                    found.add(s)
-                    new.append(c)
-        if not new:
-            break
-        pairs = [(a, b) for a in ops+new for b in new if a.tostring()!=b.tostring()]
-        ops.extend(new)
-        if argv.verbose:
-            print len(ops)
-    return ops
-
-
-def closure(ops):
-    "take closure under bracket operation (up to factor of 2)"
-    #found = set(op.tostring() for op in ops)
     found = set(op.tostring() for op in ops)
     new = ops
     while 1:
@@ -107,7 +83,7 @@ def closure(ops):
         ops.extend(_new)
         new = _new
         if argv.verbose:
-            print len(ops)
+            print len(ops);sys.stdout.flush()
     return ops
 
 
