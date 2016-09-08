@@ -22,10 +22,11 @@ Find the closure of the gauge operators under bracket.
 """
 
 import cbracket
+cbracket = cbracket.bracket
 
 def bracket(a, b):
-    return cbracket.bracket(a.tostring(), b.tostring())
-    #c1 = cbracket.bracket(a.tostring(), b.tostring())
+    #return cbracket(a.tostring(), b.tostring())
+    c1 = cbracket(a.tostring(), b.tostring())
     a, b = a.copy(), b.copy()
     assert len(a)==len(b)
     assert len(a)%2==0
@@ -38,7 +39,7 @@ def bracket(a, b):
     #print b
     c = a*b
     c = c.sum() % 2
-    #assert c==c1
+    assert c==c1
     return c
 
 
@@ -71,20 +72,29 @@ def closure(ops):
     new = ops
     while 1:
         _new = []
+        N = len(ops)
+        count = 0
         for a in ops:
+          _a = a.tostring()
+          count += 1
+          #if (count*256/N)%16==0:
+          #write("&")
           for b in new:
-            if bracket(a, b):
+            #if bracket(a, b):
+            if cbracket(_a, b.tostring()):
                 c = (a+b)%2
                 s = c.tostring()
                 if s not in found:
                     found.add(s)
                     _new.append(c)
+                    if len(found)%256==1:
+                        write(len(found))
         if not _new:
             break
         ops.extend(_new)
         new = _new
         if argv.verbose:
-            print len(ops),
+            print "/ ----- /", len(ops)
             sys.stdout.flush()
 #    if argv.verbose:
 #        print ;sys.stdout.flush()

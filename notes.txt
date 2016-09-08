@@ -1,6 +1,36 @@
 
+8/9/16
+======
+
+time ./symplectic.py test_model compass ideals verbose stop1 l=4
+r = 9
+
+remain: 16
+ideal: 130816 == 511 * 256
+
+
 6/9/16
 ======
+
+** Direct sums of lie algebras corresponds to tensor products of the representation. **
+
+** Non-degenerate killing form == semisimple **
+
+time ./symplectic.py test_model gcolor stop1 size=2 verbose
+guage ops: 80
+qubits: 65
+stabs: 16
+Lattice(3:65, 2:128, 1:80, 0:16)
+r = 32
+algebra dimension: 12282
+cartan dimension: 250
+ideals: 6 [4095, 4095, 1023, 1023, 1023, 1023]
+
+
+
+stan.physics.usyd.edu.au:spectrum2015$ i686-linux-gnu-gcc -O1 -pthread -fno-strict-aliasing -g -fwrapv -Wall -Wstrict-prototypes -fPIC -I/usr/include/python2.7 -I/suphys/sburton/include/python2.7 -c cbracket.c -o cbracket.o
+stan.physics.usyd.edu.au:spectrum2015$ i686-linux-gnu-gcc -pthread -shared -Wl,-Bsymbolic-functions -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -g -fwrapv -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security cbracket.o -o cbracket.so
+
 
 example of |non-trivial orbits| != |cartan|
 
@@ -11,6 +41,14 @@ cartan: 12
 orbits: 42
 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 1 1 1 1 1 1 1 1 1 1 1 1
 trivial: 12 non-trivial 30
+
+
+time ./symplectic.py test_model gcolor2
+r = 18
+algebra dimension: 378
+cartan dimension: 42
+subalgebras: 6 [63, 63, 63, 63, 63, 63]
+
 
 
 5/9/16
@@ -64,7 +102,7 @@ cartan: 3
 0->7 2->10 6->14 7->0 10->2 11->12 12->11 14->6
 1->9 2->11 8->13 9->1 10->12 11->2 12->10 13->8
 
-In the pauli basis, each of the cartan operators 
+In the computational basis, each of the cartan operators 
 act as swaps (square to 1) and since this group is
 abelian it must be isomorphic to a power of Z_2.
 
