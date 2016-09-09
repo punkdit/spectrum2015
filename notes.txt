@@ -6,7 +6,9 @@ time ./symplectic.py test_model compass ideals verbose stop1 l=4
 r = 9
 
 remain: 16
-ideal: 130816 == 511 * 256
+algebra dimension: 130816
+cartan dimension: 256
+
 
 
 6/9/16

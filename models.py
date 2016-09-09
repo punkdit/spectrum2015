@@ -301,7 +301,7 @@ def build_gcolor2():
 def build(name=""):
 
     if name:
-        setattr(argv, "name", True) # hack this
+        setattr(argv, name, True) # hack this
 
     _seed = argv.get("seed")
     if _seed is not None:
