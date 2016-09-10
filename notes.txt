@@ -1,3 +1,10 @@
+9/9/16
+======
+
+time ./gauge.py size=1.5 name=pic-gcolor-15.pdf
+time ./gauge.py size=1 transparency=0.4 name=pic-gcolor-1.pdf
+time ./gauge.py size=2 transparency=0.4 name=pic-gcolor-2.pdf
+
 
 8/9/16
 ======

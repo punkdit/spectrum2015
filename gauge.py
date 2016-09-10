@@ -15,8 +15,21 @@ lred = rgb(1., 0.4, 0.4)
 lgreen = rgb(0.4, 0.8, 0.2)
 colors = [red, green, blue, yellow]
 
+north = [text.halign.boxcenter, text.valign.top]
+northeast = [text.halign.boxright, text.valign.top]
+northwest = [text.halign.boxleft, text.valign.top]
+south = [text.halign.boxcenter, text.valign.bottom]
+southeast = [text.halign.boxright, text.valign.bottom]
+southwest = [text.halign.boxleft, text.valign.bottom]
+east = [text.halign.boxright, text.valign.middle]
+west = [text.halign.boxleft, text.valign.middle]
+center = [text.halign.boxcenter, text.valign.middle]
+
+
+
     
 from lanczos import write
+from solve import shortstrx
 
 from argv import Argv
 argv = Argv()
@@ -102,7 +115,7 @@ class Cell(object):
     cellmap = {}
     def __init__(self, idxs, coords, deco=[]):
         idxs = list(idxs)
-        self.idxs = idxs
+        self.idxs = idxs # qubit support
         key = list(idxs)
         key.sort()
         key = tuple(key)
@@ -119,6 +132,9 @@ class Cell(object):
         self.coords = coords
         self.bdy = [] # boundary
         self.cobdy = [] # co-boundary
+
+    def __str__(self):
+        return "%s%s" % (self.__class__.__name__, tuple(self.idxs))
 
     @classmethod
     def get(cls, *idxs):
@@ -147,12 +163,15 @@ class Cell(object):
 
 class Vertex(Cell):
     dim = 0
-    radius = 0.20
+    radius = 0.08
     def render(self, c, deco=[]):
         ps = [self.tran(*coord) for coord in self.coords]
         assert len(ps)==1
         x, y = ps[0]
         c.fill(path.circle(x, y, self.radius), deco+self.deco)
+
+        if argv.debug:
+            c.text(x-0.2, y-0.4, "%s"%self.idxs[0], northeast)
 
 
 class Edge(Cell):
@@ -174,8 +193,8 @@ class Face(Cell):
         ps = [path.moveto(*cs[0])]+[path.lineto(*p) for p in cs[1:]]+[path.closepath()]
         c.fill(path.path(*ps), deco+self.deco)
         for x, y in cs:
-            c.fill(path.circle(x, y, Vertex.radius), deco)
-        c.stroke(path.path(*ps), deco)
+            c.fill(path.circle(x, y, Vertex.radius)) #, deco)
+        c.stroke(path.path(*ps)) #, deco)
 
 
 class Body(Cell):
@@ -183,13 +202,50 @@ class Body(Cell):
 
 
 
+def mark_stabs(Hx, marks={}):
+    COLORS = 4
+
+    mx, n = Hx.shape
+
+    print shortstrx(Hx)
+
+    from pyfinder.expr import Sort, Function, Theory, Constant
+    from pyfinder.solver3 import Solver
+
+    color = Sort("color", 4)
+
+    sorts = [color]
+    funcs = [Function("c%d"%i, [], color) for i in range(mx)]
+    exprs = []
+    for i in range(mx):
+        if i in marks:
+            c = marks[i]
+            c = Constant(c, color)
+            exprs.append(funcs[i]() == c)
+        else:
+            for j in range(i+1, mx):
+                if (Hx[i]*Hx[j]).sum():
+                    e = funcs[i]() != funcs[j]()
+                    exprs.append(e)
+
+    theory = Theory(exprs)
+    solver = Solver(theory, sorts, funcs)
+    for position in solver.solve(max_count=1, verbose=False):
+        for i, idx in enumerate(position):
+            marks[i] = idx
+    return marks
+
+
+
 def main():
 
     size = argv.get("size", 3)
     if size==1.5:
-        Gx, Gz, Hx, Hz = models.build("gcolor2")
+        name = "gcolor2"
     else:
-        Gx, Gz, Hx, Hz = models.build("gcolor")
+        name = "gcolor"
+
+    Gx, Gz, Hx, Hz = models.build(name)
 
     gx, n = Gx.shape
 
@@ -204,6 +260,15 @@ def main():
     face_idxs = []
     bulk_idxs = []
     items = [corner_idxs, edge_idxs, face_idxs, bulk_idxs]
+
+#    if name == "gcolor2" and 0:
+#        corner_idxs.extend([0, 14, 18, 38])
+#        edge_idxs.extend([1,4,9,3,8,13,15,16,17,19,33,37])
+#        face_idxs.extend([2,5,6,7,10,11,12])
+#        face_idxs.extend([i+19 for i in [1,4,9,3,8,13,15,16,17]])
+#        bulk_idxs.extend([i+19 for i in [2,5,6,7,10,11,12]])
+#        assert len(corner_idxs+edge_idxs+face_idxs+bulk_idxs)==n
+#
 
     for i in range(n):
         w = Hx[:, i].sum()
@@ -237,7 +302,7 @@ def main():
     coords = {} # map qubit -> (x, y, z)
 
     # corners of a simplex:
-    R = 5.
+    R = 3.
     cs = [
         (R, R, R),
         (R, -R, -R),
@@ -275,8 +340,36 @@ def main():
         key = tuple(corner_idxs[k] for k in key)
         cfaces[key] = []
     assert len(cfaces)==FACES
-    for i in face_idxs:
 
+    if name == "gcolor2":
+      for i in face_idxs:
+        j = i-19
+        c3 = corner_idxs[-1]
+        if 0<i<18:
+            cidxs = (0, 14, 18)
+        elif j in (1, 4, 9):
+            cidxs = (0, 14, c3)
+        elif j in (3, 8, 13):
+            cidxs = (0, 18, c3)
+        elif j in (15, 16, 17):
+            cidxs = (14, 18, c3)
+        else:
+            assert 0, i
+
+        c0, c1, c2 = cidxs
+        cfaces[tuple(cidxs)].append(i)
+        eidxss = [cedges[c0, c1], cedges[c0,c2], cedges[c1,c2]] # edges
+        djs = [distance(graph, i, eidxs) for eidxs in eidxss]
+
+        cs = [coords[dj[1]] for dj in djs]
+        ds = [dj[0] for dj in djs]
+        d = 2*(ds[0]+ds[1]+ds[2])
+        coord = conv3((ds[1]+ds[2])/d, (ds[0]+ds[2])/d, (ds[0]+ds[1])/d, *cs)
+        coords[i] = coord
+
+
+    else:
+      for i in face_idxs:
         # find three closest corners
         djs = [distance(graph, i, j) for j in corner_idxs]
         djs.sort()
@@ -297,7 +390,7 @@ def main():
         coord = conv3((ds[1]+ds[2])/d, (ds[0]+ds[2])/d, (ds[0]+ds[1])/d, *cs)
         coords[i] = coord
 
-    print "cfaces:", cfaces
+    #print "cfaces:", cfaces
     for i in bulk_idxs:
         djs = [distance(graph, i, face) for face in cfaces.values()]
         cs = [coords[dj[1]] for dj in djs]
@@ -342,7 +435,7 @@ def main():
         #if None in [coords.get(i) for i in idxs]:
         #    continue
         idxs = orient(graph, idxs)
-        face = Face(idxs, coords, [red])
+        face = Face(idxs, coords) #, [red])
         cells.append(face)
         for ii in range(len(idxs)):
             i = idxs[ii]
@@ -358,12 +451,67 @@ def main():
 
     # --------- mark ---------
 
+    stab_marks = {}
+    ext_mark = {} # map exterior face qubit -> opposite corner mark
     for i, idx in enumerate(corner_idxs):
+
+        h = Hx[:, idx]
+        assert h.sum() == 1 # corner touches one stabilizer
+        j = numpy.where(Hx[:, idx])[0][0]
+        stab_marks[j] = i
+
         vertex = Cell.get(idx)
         face = vertex.cobdy[0].cobdy[0]
         assert len(face.cobdy)==1
         body = face.cobdy[0]
-        body.mark = i
+        body.mark = i # mark corner stabilizer
+
+        for key, idxs in cfaces.items():
+          if idx not in key:
+            for idx1 in idxs:
+                assert ext_mark.get(idx1) is None
+                ext_mark[idx1] = i
+    #print "ext_mark:", ext_mark
+
+    stab_marks = mark_stabs(Hx, stab_marks)
+    print stab_marks
+    for i, mark in stab_marks.items():
+        idxs = numpy.where(Hx[i])[0]
+        body = Cell.get(*idxs)
+        assert body.mark is None or body.mark == mark
+        body.mark = mark
+
+    # Exterior faces get a mark
+    exterior_faces = []
+    interior_faces = []
+    for cell in cells:
+        if cell.dim != 2:
+            continue
+        if len(cell.cobdy)!=1:
+            interior_faces.append(cell)
+            continue
+        exterior_faces.append(cell)
+        mark = None
+        for idx in cell.idxs:
+            m = ext_mark.get(idx)
+            if m is None:
+                continue
+            assert mark is None or m==mark, (mark, m)
+            mark = m
+        cell.mark = mark
+
+    BACK, FRONT = [], []
+    for i, idx in enumerate(corner_idxs):
+        cell = Cell.get(idx)
+        x, y, z = cell.coords[0]
+        # z points away from viewpoint
+        if z < 0.:
+            FRONT.append(i)
+        else:
+            BACK.append(i)
+
+    front_faces = [face for face in exterior_faces if face.mark in BACK]
+    back_faces = [face for face in exterior_faces if face.mark in FRONT]
 
     # -------- render ---------
     
@@ -371,17 +519,37 @@ def main():
     tr = trafo.scale(sx=1, sy=1)
 
     cells.sort(key = lambda cell : -cell.z)
+
+    r = argv.get("transparency", 0.4)
+    deco = [color.transparency(r)]
+    for cell in back_faces:
+        cell.render(c, deco) # + [colors[cell.mark]])
+
+    for cell in interior_faces:
+        cell.render(c, deco)
+
+    for cell in front_faces:
+        #cl = colors[cell.mark]
+        cl = colors[cell.cobdy[0].mark]
+        cell.render(c, deco + [cl])
+
     for cell in cells:
         if not cell.ready:
             continue
+
+        if argv.skeleton:
+            if cell.dim <2:
+                cell.render(c)
+            continue
+
         if cell.dim != 2:
             continue
-            
-        deco = [color.transparency(0.2)]
-        cell.render(c, deco)
 
+    c.text(0, -1.2*R, "$n=%d$"%n, north)
 
-    c.writePDFfile("pic-qubits.pdf")
+    name = argv.get("name", "pic-gcolor.pdf")
+    print "saving", name
+    c.writePDFfile(name)
 
 
 
