@@ -153,9 +153,20 @@ class Cell(object):
         if self not in child.cobdy:
             child.cobdy.append(self)
 
+    R = 3.
+
+    corner_coords = [(R, R, R), (R, -R, -R), (-R, -R, R), (-R, R, -R)]
+    # z points away from viewpoint
+    BACK, FRONT = [0, 2], [1, 3]
     def tran(self, x, y, z):
         return x+0.4*z, y+0.1*z
-        return (x + 0.6*y + 0.6*z), (y + 0.2*z)
+
+    corner_coords = [(0,-R,-R), (R,-R,R), (-R,-R,R), (0,R,0)]
+    BACK, FRONT = [1, 2], [3, 1]
+    def tran(self, x, y, z):
+        return x+0.3*z, y+0.4*z
+
+        #return (x + 0.6*y + 0.6*z), (y + 0.2*z)
     
     def render(self, c):
         pass
@@ -302,14 +313,8 @@ def main():
     coords = {} # map qubit -> (x, y, z)
 
     # corners of a simplex:
-    R = 3.
-    cs = [
-        (R, R, R),
-        (R, -R, -R),
-        (-R, -R, R),
-        (-R, R, -R)]
     for ii, i in enumerate(corner_idxs):
-        coords[i] = cs[ii]
+        coords[i] = Cell.corner_coords[ii]
         
     # map pair of corners to list of edge qubits
     cedges = dict(((i, j), []) for i in corner_idxs for j in corner_idxs if i<j)
@@ -500,18 +505,21 @@ def main():
             mark = m
         cell.mark = mark
 
-    BACK, FRONT = [], []
-    for i, idx in enumerate(corner_idxs):
-        cell = Cell.get(idx)
-        x, y, z = cell.coords[0]
-        # z points away from viewpoint
-        if z < 0.:
-            FRONT.append(i)
-        else:
-            BACK.append(i)
+#    BACK, FRONT = [], []
+#    for i, idx in enumerate(corner_idxs):
+#        cell = Cell.get(idx)
+#        x, y, z = cell.coords[0]
+#        # z points away from viewpoint
+#        if z < 0.:
+#            FRONT.append(i)
+#        else:
+#            BACK.append(i)
+#
+#    assert len(FRONT)==len(BACK)==2, (BACK, FRONT)
+#    print BACK, FRONT
 
-    front_faces = [face for face in exterior_faces if face.mark in BACK]
-    back_faces = [face for face in exterior_faces if face.mark in FRONT]
+    front_faces = [face for face in exterior_faces if face.mark in Cell.BACK]
+    back_faces = [face for face in exterior_faces if face.mark in Cell.FRONT]
 
     # -------- render ---------
     
@@ -545,7 +553,7 @@ def main():
         if cell.dim != 2:
             continue
 
-    c.text(0, -1.2*R, "$n=%d$"%n, north)
+    c.text(0.1*Cell.R, -1.5*Cell.R, "$n=%d$"%n, north)
 
     name = argv.get("name", "pic-gcolor.pdf")
     print "saving", name

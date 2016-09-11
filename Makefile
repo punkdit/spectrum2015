@@ -42,3 +42,9 @@ pnauty.so: pnauty.c
 cbracket.so: cbracket.c
 	gcc -g -shared -I/usr/include/python2.7 -o cbracket.so -O3 -march=i686 cbracket.c -lpython2.7
 
+
+pic:
+	./gauge.py size=1   transparency=0.4 name=pic-gcolor-1.pdf
+	./gauge.py size=1.5 transparency=0.4 name=pic-gcolor-15.pdf
+	./gauge.py size=2   transparency=0.4 name=pic-gcolor-2.pdf
+
