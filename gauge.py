@@ -153,7 +153,7 @@ class Cell(object):
         if self not in child.cobdy:
             child.cobdy.append(self)
 
-    R = 3.
+    R = argv.get("R", 2.5)
 
     corner_coords = [(R, R, R), (R, -R, -R), (-R, -R, R), (-R, R, -R)]
     # z points away from viewpoint
@@ -161,7 +161,7 @@ class Cell(object):
     def tran(self, x, y, z):
         return x+0.4*z, y+0.1*z
 
-    corner_coords = [(0,-R,-R), (R,-R,R), (-R,-R,R), (0,R,0)]
+    corner_coords = [(0,-R,-R), (R,-R,R), (-R,-R,R), (0,0.8*R,0)]
     BACK, FRONT = [1, 2], [3, 1]
     def tran(self, x, y, z):
         return x+0.3*z, y+0.4*z
@@ -404,6 +404,14 @@ def main():
         coord = conv4((ds[1]+ds[2]+ds[3])/d, (ds[0]+ds[2]+ds[3])/d, (ds[0]+ds[1]+ds[3])/d, (ds[0]+ds[1]+ds[2])/d, *cs)
         coords[i] = coord
 
+
+    if name == "gcolor2":
+        _, y0, _ = coords[19]
+        x1, y1, z1 = coords[38]
+        for i in range(19,38):
+            x0, y0, z0 = coords[i-19]
+            #y = -0.5*Cell.R
+            coords[i] = conv(0.3, (x0, y0, z0), (x1, y1, z1))
 
     # ------------------------
     # Build Cells & connect

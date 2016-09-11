@@ -1,3 +1,11 @@
+
+11/9/16
+=======
+
+" Any irreducible representation of a direct sum of Lie algebras can
+be considered as the tensor product of irreducible representations of the
+individual summands . "
+
 9/9/16
 ======
 

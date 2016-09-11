@@ -4,7 +4,7 @@ all: repr.pdf hecke.pdf
 #out: repr
 #	open repr.pdf 
 
-repr.pdf: repr.tex refs.bib
+repr.pdf: repr.tex refs.bib pic-gcolor-1.pdf
 	pdflatex repr.tex
 	bibtex repr
 	pdflatex repr.tex
@@ -44,7 +44,7 @@ cbracket.so: cbracket.c
 
 
 pic:
-	./gauge.py size=1   transparency=0.4 name=pic-gcolor-1.pdf
-	./gauge.py size=1.5 transparency=0.4 name=pic-gcolor-15.pdf
-	./gauge.py size=2   transparency=0.4 name=pic-gcolor-2.pdf
+	./gauge.py size=1   transparency=0.4 R=2.0 name=pic-gcolor-1.pdf
+	./gauge.py size=1.5 transparency=0.5 R=2.5 name=pic-gcolor-15.pdf
+	./gauge.py size=2   transparency=0.4 R=3.0 name=pic-gcolor-2.pdf
 
