@@ -198,14 +198,16 @@ class Edge(Cell):
 class Face(Cell):
     dim = 2
 
-    def render(self, c, deco=[]):
+    def render(self, c, deco=[], edges=True, verts=True):
         cs = [self.tran(*coord) for coord in self.coords]
         assert len(cs)>2
         ps = [path.moveto(*cs[0])]+[path.lineto(*p) for p in cs[1:]]+[path.closepath()]
         c.fill(path.path(*ps), deco+self.deco)
-        for x, y in cs:
-            c.fill(path.circle(x, y, Vertex.radius)) #, deco)
-        c.stroke(path.path(*ps)) #, deco)
+        if verts:
+            for x, y in cs:
+                c.fill(path.circle(x, y, Vertex.radius)) #, deco)
+        if edges:
+            c.stroke(path.path(*ps)) #, deco)
 
 
 class Body(Cell):
@@ -218,7 +220,7 @@ def mark_stabs(Hx, marks={}):
 
     mx, n = Hx.shape
 
-    print shortstrx(Hx)
+    #print shortstrx(Hx)
 
     from pyfinder.expr import Sort, Function, Theory, Constant
     from pyfinder.solver3 import Solver
@@ -248,17 +250,12 @@ def mark_stabs(Hx, marks={}):
 
 
 
-def main():
 
-    size = argv.get("size", 3)
-    if size==1.5:
-        name = "gcolor2"
-    else:
-        name = "gcolor"
-
-    Gx, Gz, Hx, Hz = models.build(name)
+def make(Gx, Gz, Hx, Hz, **kw):
 
     gx, n = Gx.shape
+
+    NAME = "gcolor2" if n==39 else "gcolor"
 
     CORNERS = 4
     EDGES = 6
@@ -272,7 +269,7 @@ def main():
     bulk_idxs = []
     items = [corner_idxs, edge_idxs, face_idxs, bulk_idxs]
 
-#    if name == "gcolor2" and 0:
+#    if NAME == "gcolor2" and 0:
 #        corner_idxs.extend([0, 14, 18, 38])
 #        edge_idxs.extend([1,4,9,3,8,13,15,16,17,19,33,37])
 #        face_idxs.extend([2,5,6,7,10,11,12])
@@ -336,8 +333,9 @@ def main():
             ci0,ci1=ci1,ci0
         cedges[ci0, ci1].append(i)
 
-    print coords
-    print cedges.values()
+    #print coords
+    #print cedges.values()
+
     #match = [corner_idxs[i] for i in [0,1,3]]
     #match.sort()
     cfaces = {}
@@ -346,7 +344,7 @@ def main():
         cfaces[key] = []
     assert len(cfaces)==FACES
 
-    if name == "gcolor2":
+    if NAME == "gcolor2":
       for i in face_idxs:
         j = i-19
         c3 = corner_idxs[-1]
@@ -405,7 +403,7 @@ def main():
         coords[i] = coord
 
 
-    if name == "gcolor2":
+    if NAME == "gcolor2":
         _, y0, _ = coords[19]
         x1, y1, z1 = coords[38]
         for i in range(19,38):
@@ -487,7 +485,7 @@ def main():
     #print "ext_mark:", ext_mark
 
     stab_marks = mark_stabs(Hx, stab_marks)
-    print stab_marks
+    #print stab_marks
     for i, mark in stab_marks.items():
         idxs = numpy.where(Hx[i])[0]
         body = Cell.get(*idxs)
@@ -529,45 +527,96 @@ def main():
     front_faces = [face for face in exterior_faces if face.mark in Cell.BACK]
     back_faces = [face for face in exterior_faces if face.mark in Cell.FRONT]
 
-    # -------- render ---------
+    return Model(locals())
+
+
     
-    c = canvas.canvas()
-    tr = trafo.scale(sx=1, sy=1)
+class Model(object):
+    def __init__(self, attrs):
+        self.__dict__.update(attrs)
+        self.c = canvas.canvas()
+        self.X = 0.
+        self.Y = 0.
 
-    cells.sort(key = lambda cell : -cell.z)
+    def render(self, **kw):
 
-    r = argv.get("transparency", 0.4)
-    deco = [color.transparency(r)]
-    for cell in back_faces:
-        cell.render(c, deco) # + [colors[cell.mark]])
+        c = canvas.canvas()
+        tr = trafo.scale(sx=1, sy=1)
+    
+        cells = self.cells
+        cells.sort(key = lambda cell : -cell.z)
+    
+        deco = [color.transparency(kw.get("transparency", 0.4))]
+    
+        verts = kw.get("verts", False)
+        edges = kw.get("edges", False)
+    
+        for cell in self.back_faces:
+            cell.render(c, deco, verts=verts, edges=edges)
+    
+        for cell in self.interior_faces:
+            cell.render(c, deco, verts=verts, edges=edges)
+    
+        for cell in self.front_faces:
+            #cl = colors[cell.mark]
+            cl = colors[cell.cobdy[0].mark]
+            cell.render(c, deco + [cl], verts=verts, edges=edges)
+    
+        show_idxs = kw.get("show_idxs", [])
+        for idx in show_idxs:
+            cell = Cell.get(idx)
+            cell.render(c)
+    
+        for cell in cells:
+            if not cell.ready:
+                continue
+    
+            if kw.get("skeleton"):
+                if cell.dim <2:
+                    cell.render(c)
+                continue
+    
+            if cell.dim != 2:
+                continue
+    
+        if kw.get("label", False):
+            c.text(0.1*Cell.R, -1.5*Cell.R, "$n=%d$"%self.n, north)
 
-    for cell in interior_faces:
-        cell.render(c, deco)
+        self.c.insert(c, [trafo.translate(self.X, self.Y)])
+        self.X += 2.3 * Cell.R
 
-    for cell in front_faces:
-        #cl = colors[cell.mark]
-        cl = colors[cell.cobdy[0].mark]
-        cell.render(c, deco + [cl])
+    def newline(self):
+        self.X = 0.
+        self.Y -= 2.3 * Cell.R
 
-    for cell in cells:
-        if not cell.ready:
-            continue
-
-        if argv.skeleton:
-            if cell.dim <2:
-                cell.render(c)
-            continue
-
-        if cell.dim != 2:
-            continue
-
-    c.text(0.1*Cell.R, -1.5*Cell.R, "$n=%d$"%n, north)
-
-    name = argv.get("name", "pic-gcolor.pdf")
-    print "saving", name
-    c.writePDFfile(name)
+    def save(self, filename):
+        print "saving", filename
+        self.c.writePDFfile(filename)
+        self.c = canvas.canvas()
+        self.X = 0.
+        self.Y = 0.
 
 
+
+def main():
+
+    size = argv.get("size", 2)
+    transparency = argv.get("transparency", 0.4)
+
+    Gx, Gz, Hx, Hz = models.build("gcolor")
+
+    filename = argv.get("filename", "pic-gcolor.pdf")
+
+    model = make(Gx, Gz, Hx, Hz)
+
+    model.render(
+        transparency=transparency,
+        label=True, verts=True, edges=True,
+    )
+    model.save(filename)
+
+
+    
 
 
 

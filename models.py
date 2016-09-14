@@ -177,6 +177,151 @@ def build_ising(n):
     return Gx, Gz, Hx, Hz
 
 
+def build_test_0():
+
+    m = n = 6
+    Gx = zeros2(m, n)
+    Gz = zeros2(m, n)
+    for i in range(m):
+        Gz[i, i] = 1
+        #Gz[i, (i+1)%n] = 1
+        Gx[i, i] = 1
+
+    Hx = zeros2(0, n)
+    Hz = zeros2(0, n)
+    return Gx, Gz, Hx, Hz
+
+
+def find_stabilizers(Gx, Gz):
+    n = Gx.shape[1]
+    A = dot2(Gx, Gz.transpose())
+    vs = find_kernel(A)
+    vs = list(vs)
+    #print "kernel GxGz^T:", len(vs)
+    Hz = zeros2(len(vs), n)
+    for i, v in enumerate(vs):
+        Hz[i] = dot2(v.transpose(), Gz)  
+    Hz = linear_independant(Hz)
+    return Hz
+
+
+def build_test_1():
+    Gz = parse("""
+    ..11
+    .11.
+    .1.1
+    1.1.
+    11..
+    """)
+    n = Gz.shape[1]
+    Gx = identity2(n)
+    Hz = find_stabilizers(Gx, Gz)
+    Hx = find_stabilizers(Gz, Gx)
+    return Gx, Gz, Hx, Hz
+
+
+def build_test_2():
+    Gz = parse("""
+    .111.
+    ...11
+    11..1
+    1.1..
+    """)
+    n = Gz.shape[1]
+    Gx = identity2(n)
+
+    Hz = find_stabilizers(Gx, Gz)
+    Hx = find_stabilizers(Gz, Gx)
+
+    return Gx, Gz, Hx, Hz
+
+
+def build_test_1():
+    Gx = parse("""
+............11.................11......
+......1....1.............1....1........
+..11.................11................
+....1....1.............1....1..........
+.................11.................11.
+11.................11..................
+.....1....1.............1....1.........
+.......11.................11...........
+...............11.................11...
+    """)
+    Gz = parse("""
+.11.1111...............................
+.........11...11.......................
+...........11...11.....................
+....................11.1111............
+............................11...11....
+..............................11...11..
+...................1..1....1....1....11
+    """)
+    Gx = parse("""
+..............................1.....
+..................1...........1.....
+..................1.................
+..................1.........1.......
+..............................1.....
+..................1.................
+..................1.........1.......
+..................1.................
+............................1.1.....
+    """)
+    Gz = parse("""
+..................1.................
+............................1.......
+..............................1.....
+..................1.................
+............................1.......
+..............................1.....
+..................1.........1.1.....
+    """) # same energetics as previous
+
+    Gx = parse("""
+....1...............................
+..............1.....................
+....1.....1...1.....................
+....1...............................
+..............1.....................
+....1.....1...1.....................
+..........1.........................
+    """)
+    Gz = parse("""
+....1...............................
+....1.....1.........................
+....1.....1.........................
+....1.........1.....................
+..........1...1.....................
+..........1...1.....................
+..............1.....................
+..............1.....................
+..........1...1.....................
+    """)
+
+    Gz = parse("""
+.111.111.
+...1..1.1
+11..1...1
+.111.111.
+...1..1.1
+11..1...1
+1.1.11.1.
+    """)
+
+    n = Gz.shape[1]
+    Gx = identity2(n)
+    idxs = [i for i in range(n) if Gx[:, i].sum()+Gz[:, i].sum()]
+    Gx = Gx[:, idxs]
+    Gz = Gz[:, idxs]
+    Hz = find_stabilizers(Gx, Gz)
+    Hx = find_stabilizers(Gz, Gx)
+    return Gx, Gz, Hx, Hz
+
+
+build_test = build_test_1
+
+
 
 def mkop(n, ops):
     A = zeros2(len(ops), n)
@@ -308,8 +453,13 @@ def build(name=""):
         numpy.random.seed(_seed)
         seed(_seed)
 
-    if argv.gcolor:
-        size = argv.get("size", 1)
+    size = argv.get("size", 1)
+
+    if argv.gcolor2 or (argv.gcolor and size==1.5):
+        Gx, Gz, Hx = build_gcolor2()
+        Hz = Hx.copy()
+
+    elif argv.gcolor:
         Gx, Gz, Hx = build_gcolor(size)
         Hz = Hx.copy()
 
@@ -318,10 +468,6 @@ def build(name=""):
         li = argv.get('li', l)
         lj = argv.get('lj', l)
         Gx, Gz, Hx, Hz = build_compass(li, lj)
-
-    elif argv.gcolor2:
-        Gx, Gz, Hx = build_gcolor2()
-        Hz = Hx.copy()
 
     elif argv.xy:
         n = argv.get('n', 4)
@@ -338,6 +484,9 @@ def build(name=""):
     elif argv.pauli:
         n = argv.get('n', 2)
         Gx, Gz, Hx, Hz = build_pauli(n)
+
+    elif argv.test:
+        Gx, Gz, Hx, Hz = build_test()
 
     else:
 
@@ -363,5 +512,109 @@ def build_reduced():
     return Rx, Rz
 
 
+if __name__ == "__main__":
 
+    Gx, Gz, Hx, Hz = build()
+
+    print shortstrx(Hx, Hz)
+    print
+    print shortstrx(Gx, Gz)
+
+
+
+
+def test_model():
+
+    Gx, Gz, Hx, Hz = models.build()
+    n = Hx.shape[1]
+
+    check_commute(Hx, Hz)
+    check_commute(Gx, Hz)
+    check_commute(Hx, Gz)
+
+    #Px = get_reductor(concatenate((Lx, Hx)))
+    #Pz = get_reductor(concatenate((Lz, Hz)))
+    Px = get_reductor(Hx)
+    Pz = get_reductor(Hz)
+
+    # Lz = find_logops( Hx            , Hz            )
+    #      find_logops( ............. , ............. )
+    #                 ( commutes with , orthogonal to )
+    #                 ( ............. , ............. )
+
+    Lz = find_logops(Gx, Hz)
+    assert Lz.shape[1] == n
+
+    if 0:
+        PGz = get_reductor(Gz)
+        Lz = dot2(Lz, PGz.transpose())
+        Lz = row_reduce(Lz)
+    
+        print shortstrx(Lz, Gz, Hz)
+
+    if len(Lz):
+        print Lz.shape, Hz.shape
+        assert len(row_reduce(concatenate((Lz, Hz))))==len(Lz)+len(Hz)
+        assert len(row_reduce(concatenate((Lz, Gz))))==len(Lz)+len(row_reduce(Gz))
+
+    # Tz = find_errors( Hx            , Lx            )
+    #      find_errors( ............. , ............. )
+    #                 ( conjugate to  , commutes with )
+    #                 ( ............. , ............. )
+
+    Lx = find_errors(Lz, Gz) # invert Lz, commuting with Gz
+
+    check_commute  (Lx, Gz)
+    check_commute  (Lx, Hz)
+    check_conjugate(Lx, Lz)
+    check_commute  (Lz, Gx)
+    check_commute  (Lz, Hx)
+
+
+    # Lx | Lz
+    # Hx | ?
+    # ?  | Hz
+    # ?  | ?
+    #Rz = find_logops(concatenate((Lx, Hx)), Hz)
+    Rz = dot2(Gz, Pz.transpose())
+    Rz = row_reduce(Rz)
+
+    check_commute  (Rz, Lx)
+    check_commute  (Rz, Hx)
+
+    Rx = dot2(Gx, Px.transpose())
+    Rx = row_reduce(Rx)
+
+    check_commute  (Rx, Lz)
+    check_commute  (Rx, Hz)
+
+    # Lx | Lz
+    # Hx | ?
+    # ?  | Hz
+    # Rx'| Rz'
+
+    Tz = find_errors(Hx, concatenate((Lx, Rx)))
+    Tx = find_errors(Hz, concatenate((Lz, Rz, Tz)))
+
+    assert len((concatenate((Lx, Hx, Tx, Rx)))) == n
+    assert len((concatenate((Lz, Hz, Tz, Rz)))) == n
+    assert len(row_reduce(concatenate((Lx, Hx, Tx, Rx)))) == n
+    assert len(row_reduce(concatenate((Lz, Hz, Tz, Rz)))) == n
+
+    check_commute  (Rz, Tx)
+
+    Rx = find_errors(Rz, concatenate((Lz, Hz, Tz)))
+
+    check_conjugate(Rx, Rz)
+    check_commute  (Rx, Hz)
+    check_commute  (Rx, Tz)
+    check_commute  (Rx, Lz)
+
+    Rxt = Rx.transpose()
+    Rzt = Rz.transpose()
+
+    Pxt = Px.transpose()
+    Pzt = Pz.transpose()
+
+    check_sy(Lx, Hx, Tx, Rx, Lz, Hz, Tz, Rz)
 

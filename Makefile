@@ -44,7 +44,7 @@ cbracket.so: cbracket.c
 
 
 pic:
-	./gauge.py size=1   transparency=0.4 R=2.0 name=pic-gcolor-1.pdf
-	./gauge.py size=1.5 transparency=0.5 R=2.5 name=pic-gcolor-15.pdf
-	./gauge.py size=2   transparency=0.4 R=3.0 name=pic-gcolor-2.pdf
+	./gauge.py size=1   transparency=0.4 R=2.0 filename=pic-gcolor-1.pdf
+	./gauge.py size=1.5 transparency=0.5 R=2.5 filename=pic-gcolor-15.pdf
+	./gauge.py size=2   transparency=0.4 R=3.0 filename=pic-gcolor-2.pdf # broken ??
 

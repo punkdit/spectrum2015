@@ -1,10 +1,18 @@
 
+12/9/16
+=======
+
+time ./symplectic.py test_model gcolor size=1.5 render_ideals
+
+
 11/9/16
 =======
 
 " Any irreducible representation of a direct sum of Lie algebras can
 be considered as the tensor product of irreducible representations of the
 individual summands . "
+
+Irreducible because syndromes non-degenerate on H_t.
 
 9/9/16
 ======
@@ -21,7 +29,7 @@ time ./symplectic.py test_model compass ideals verbose stop1 l=4
 r = 9
 
 remain: 16
-algebra dimension: 130816
+algebra dimension: 130816 == 256 * 511
 cartan dimension: 256
 
 

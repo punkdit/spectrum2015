@@ -723,7 +723,7 @@ def find_logops(Hx, Hz, check=False, verbose=False):
     logops = basis
 
     if not logops:
-        shape = Hx.shape[1], 0
+        shape = 0, Hx.shape[1]
         Lz = zeros2(*shape)
         return Lz
 

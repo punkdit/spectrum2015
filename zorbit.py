@@ -1123,19 +1123,19 @@ def main():
     Rz = array2(Rz)
     Rz = row_reduce(Rz, truncate=True)
     rz = len(Rz)
-    print "Rz:", rz
 
     n = Gx.shape[1]
-    print "Hx:", len(Hx)
-    print "Gx:", len(Gx)
-    print "Gz:", len(Gz)
+    print "n =", n
+    print "Lz:", len(Lz)
+    print "Hx:", len(Hx), "Hz:", len(Hz)
+    print "Gx:", len(Gx), "Gz:", len(Gz)
 
     Rx = [dot2(Px, g) for g in Gx]
     Rx = array2(Rx)
 
     Rx = row_reduce(Rx, truncate=True)
     rx = len(Rx)
-    print "Rx:", rx
+    print "Rx:", rx, "Rz:", rz
 
     Qx = u_inverse(Rx)
     Pxt = Px.transpose()

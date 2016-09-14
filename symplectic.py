@@ -17,6 +17,8 @@ from zorbit import find_errors
 import models
 from models import genidx
 
+import gauge
+
 """
 Find the closure of the gauge operators under bracket.
 """
@@ -48,6 +50,23 @@ def is_zop(a):
     a.shape = (len(a)//2, 2)
     assert a.sum()
     return a[:, 0].sum() == 0
+
+
+def get_xop(a):
+    a = a.copy()
+    a.shape = (len(a)//2, 2)
+    assert a[:, 1].sum()==0
+    a = a[:, 0]
+    a.shape = (len(a),)
+    return a
+
+def get_zop(a):
+    a = a.copy()
+    a.shape = (len(a)//2, 2)
+    assert a[:, 0].sum()==0
+    a = a[:, 1]
+    a.shape = (len(a),)
+    return a
 
 
 def mkop(xop, zop):
@@ -214,6 +233,7 @@ def test_model():
     #                 ( ............. , ............. )
 
     Lz = find_logops(Gx, Hz)
+    assert Lz.shape[1] == n
 
     if 0:
         PGz = get_reductor(Gz)
@@ -223,6 +243,7 @@ def test_model():
         print shortstrx(Lz, Gz, Hz)
 
     if len(Lz):
+        print Lz.shape, Hz.shape
         assert len(row_reduce(concatenate((Lz, Hz))))==len(Lz)+len(Hz)
         assert len(row_reduce(concatenate((Lz, Gz))))==len(Lz)+len(row_reduce(Gz))
 
@@ -304,6 +325,7 @@ def test_model():
     r, n = Rx.shape
 
     #print shortstrx(Rx, Rz)
+    print "Gx:", len(Gx)
     print "r =", len(Rx)
 
     ops = []
@@ -322,7 +344,6 @@ def test_model():
             ops.append(rx)
             gops.append(rx)
 
-    print
     cartan = []
     for gz in Gz:
         #rz = dot2(Pz, gz)
@@ -338,28 +359,119 @@ def test_model():
 
     #for op in ops:
     #    print op
+    #print "cartan:", len(cartan)
 
     if argv.closure:
         ops = closure(ops)
         print "algebra dimension:", len(ops)
 
-    if argv.ideals:
+    if argv.render_ideals:
+        model = gauge.make(Gx, Gz, Hx, Hz)
+
+        found = set()
+        i = 0
+        for gx in Gx:
+            #rx = dot2(gx, Rzt)
+            gx = dot2(gx, Pxt)
+            s = gx.tostring()
+            if s in found:
+                continue
+            found.add(s)
+            idxs = numpy.where(gx)[0]
+            model.render(show_idxs=idxs)
+            i += 1
+            if i%6==0:
+                model.newline()
+        model.save("pic-gcolor-gauge.pdf")
+
         remain = list(gops)
+        i = 0
         while remain:
-            print "remain:", len(remain)
+            #print "remain:", len(remain)
             op = remain.pop(0)
             ideal = find_ideal([op], ops)
             print "ideal:", len(ideal)
+            count = 0
+            s_ideal = set(str(op) for op in ideal)
+
+            for op in gops:
+                if str(op) in s_ideal:
+                    rx = get_xop(op)
+                    gx = dot2(rx, Rx)
+                    print "   ", shortstr(gx)
+                    idxs = numpy.where(gx)[0]
+                    model.render(show_idxs=idxs)
+
+            #model.save("pic-ideal-%d.pdf"%i)
+            model.newline()
+            i += 1
+
+            print "count:", len([1 for op in gops if str(op) in s_ideal])
+            print
+            ideal = set(op.tostring() for op in ideal)
+            remain = [op for op in remain if not op.tostring() in ideal]
+        model.save("pic-gcolor-ideals.pdf")
+
+        return
+
+    if argv.ideals:
+        found = set()
+        i = 0
+        for gx in Gx:
+            #rx = dot2(gx, Rzt)
+            gx = dot2(gx, Pxt)
+            s = gx.tostring()
+            if s in found:
+                continue
+            found.add(s)
+
+        nh = 0
+        remain = list(gops)
+        i = 0
+        while remain:
+            #print "remain:", len(remain)
+            op = remain.pop(0)
+            ideal = find_ideal([op], ops)
+            print "ideal:", len(ideal)
+            nh += len([op for op in ideal if is_zop(op)])
+            count = 0
+            s_ideal = set(str(op) for op in ideal)
+
+            gxs = []
+            for gx in Gx:
+                rx = dot2(gx, Rzt)
+                rx = mkop(rx, None)
+                if str(rx) in s_ideal:
+                    #rx = get_xop(op)
+                    #gx = dot2(rx, Rx)
+                    gxs.append(rx)
+            gzs = []
+            for gz in Gz:
+                rz = dot2(gz, Rxt)
+                rz = mkop(rz, None)
+                if str(rz) in s_ideal:
+                    #rz = get_zop(op)
+                    #gz = dot2(rz, Rz)
+                    gzs.append(rz)
+            gxs = array2(gxs)
+            gzs = array2(gzs)
+            print "Gx:"
+            print shortstrx(gxs)
+            print "Gz:"
+            print shortstrx(gzs)
+            A = dot2(gxs, gzs.transpose())
+            #print shortstrx(gxs, gzs, A)
+            print "A.transpose():"
+            print shortstr(A.transpose())
+
             ideal = set(op.tostring() for op in ideal)
             remain = [op for op in remain if not op.tostring() in ideal]
 
+        print "cartan:", nh
         return
 
-    cartan = [op for op in ops if is_zop(op)]
-    print "cartan dimension:", len(cartan)
 
-    if argv.stop1:
-        return
+    return
 
     lookup = {}
     for i, op in enumerate(ops):
@@ -367,19 +479,19 @@ def test_model():
 
     N = len(ops)
 
-    graph = nx.Graph()
-    for i in range(N):
-        graph.add_node(i)
-    for i, A in enumerate(ops):
-      for j, B in enumerate(ops):
-        if bracket(A, B)==0:
-            continue
-        C = (A+B)%2
-        k = lookup[C.tostring()]
-        graph.add_edge(i, k)
-        graph.add_edge(j, k)
-    equs = nx.connected_components(graph)
-    print "ideals:", len(equs), [len(equ) for equ in equs]
+#    graph = nx.Graph()
+#    for i in range(N):
+#        graph.add_node(i)
+#    for i, A in enumerate(ops):
+#      for j, B in enumerate(ops):
+#        if bracket(A, B)==0:
+#            continue
+#        C = (A+B)%2
+#        k = lookup[C.tostring()]
+#        graph.add_edge(i, k)
+#        graph.add_edge(j, k)
+#    equs = nx.connected_components(graph)
+#    print "ideals:", len(equs), [len(equ) for equ in equs]
 
     if argv.stop2:
         return
