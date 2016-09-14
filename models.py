@@ -504,6 +504,59 @@ def build_reduced():
 class Model(object):
     def __init__(self, attrs):
         self.__dict__.update(attrs)
+        self.Qx = self.Rz.transpose() # backwards compat
+
+    def __str__(self):
+        return "Model(Gx: %d, Gz: %d, Lx: %d, Hx: %d, Hz: %d, Rx: %d)" % (
+            len(self.Gx), len(self.Gz), len(self.Lx),
+            len(self.Hx), len(self.Hz), len(self.Rx))
+
+    def build_ham(self):
+        Gx, Gz = self.Gx, self.Gz        
+        Rx, Rz = self.Rx, self.Rz        
+        Hx, Hz = self.Hx, self.Hz        
+        Tx, Tz = self.Tx, self.Tz        
+        gz = len(Gz)
+        r = len(Rx)
+        n = self.n
+        H = numpy.zeros((2**r, 2**r))
+        for i, v in enumerate(genidx((2,)*r)):
+            v = array2(v)
+            syndrome = dot2(Gz, Rx.transpose(), v)
+            value = gz - 2*syndrome.sum()
+            #print shortstr(dot2(Rx.transpose(), v)), value
+            if H is not None:
+                H[i, i] = value
+            #U.append(value)
+
+        Pxt = self.Px.transpose()
+        Qx = Rz.transpose()
+        #print dot2(Rx, Qx)
+        PxtQx = dot2(Pxt, Qx)
+        for i, v in enumerate(genidx((2,)*r)):
+            v = array2(v)
+            #print shortstr(v),
+            for g in Gx:
+                u = (v + dot2(g, PxtQx))%2
+                j = eval('0b'+shortstr(u, zero='0'))
+                H[i, j] += 1
+                #A[i, j] = A.get((i, j), 0) + 1
+        return H
+
+#        H = numpy.zeros((n, n))
+#        syndromes = [] 
+#        for i, v in enumerate(verts):
+#            syndromes.append(dot2(Gz, v))
+#            count = dot2(Gz, v).sum()
+#            Pxv = dot2(Px, v)
+#            assert count == dot2(Gz, Pxv).sum()
+#            H[i, i] = mz - 2*count
+#            for g in Gx:
+#                v1 = (g+v)%2
+#                v1 = dot2(Px, v1)
+#                j = lookup[v1.tostring()]
+#                H[i, j] += 1 
+
 
 
 
@@ -534,7 +587,12 @@ def check_sy(Lx, Hx, Tx, Rx, Lz, Hz, Tz, Rz, **kw):
 def build_model(Gx, Gz, Hx=None, Hz=None):
 
     #Gx, Gz, Hx, Hz = build()
-    n = Hx.shape[1]
+    n = Gx.shape[1]
+
+    if Hx is None:
+        Hx = find_stabilizers(Gz, Gx)
+    if Hz is None:
+        Hz = find_stabilizers(Gx, Gz)
 
     check_commute(Hx, Hz)
     check_commute(Gx, Hz)
@@ -561,7 +619,7 @@ def build_model(Gx, Gz, Hx=None, Hz=None):
         print shortstrx(Lz, Gz, Hz)
 
     if len(Lz):
-        print Lz.shape, Hz.shape
+        #print Lz.shape, Hz.shape
         assert len(row_reduce(concatenate((Lz, Hz))))==len(Lz)+len(Hz)
         assert len(row_reduce(concatenate((Lz, Gz))))==len(Lz)+len(row_reduce(Gz))
 
