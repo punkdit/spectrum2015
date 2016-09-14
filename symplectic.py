@@ -10,9 +10,8 @@ import networkx as nx
 
 from solve import get_reductor, array2, row_reduce, dot2, shortstr, zeros2, shortstrx, eq2
 from solve import u_inverse, find_kernel, find_logops, identity2, solve
+from solve import check_conjugate, check_commute
 from isomorph import write
-from zorbit import check_conjugate, check_commute
-from zorbit import find_errors
 
 import models
 from models import genidx
@@ -151,176 +150,19 @@ def find_ideal(gen, ops=None):
 closure = find_ideal
 
 
-def check_sy(Lx, Hx, Tx, Rx, Lz, Hz, Tz, Rz, **kw):
-
-    check_conjugate(Lx, Lz)
-    check_commute  (Lx, Hz)
-    check_commute  (Lx, Tz)
-    check_commute  (Lx, Rz)
-
-    check_commute  (Hx, Lz)
-    check_conjugate(Hx, Tz)
-    check_commute  (Hx, Hz)
-    check_commute  (Hx, Rz)
-
-    check_commute  (Tx, Lz)
-    check_commute  (Tx, Tz)
-    check_conjugate(Tx, Hz)
-    check_commute  (Tx, Rz)
-
-    check_commute  (Rx, Lz)
-    check_commute  (Rx, Hz)
-    check_commute  (Rx, Tz)
-    check_conjugate(Rx, Rz)
-
-
-def find_errors(Hx, Lx):
-    "find inverse of Hx commuting with Lx"
-    
-    # find Tz
-    n = Hx.shape[1]
-
-    #print "find_errors:"
-    #print shortstrx(Hx, Lx)
-    #print
-    Lx = row_reduce(Lx)
-    k = len(Lx)
-    mx = len(Hx)
-
-    HL = row_reduce(concatenate((Lx, Hx)))
-    #print shortstrx(Lx, Hx, HL)
-    assert len(HL) == mx+k
-    assert k+mx <= n, (k, mx, n)
-
-    U = zeros2(mx+k, n)
-    U[:mx] = Hx 
-    U[mx:mx+k] = Lx 
-
-    B = zeros2(mx+k, mx)
-    B[:mx] = identity2(mx)
-
-    #print shortstrx(U, B)
-    #print
-
-    Tz_t = solve(U, B)
-    assert Tz_t is not None, "no solution"
-    Tz = Tz_t.transpose()
-    assert len(Tz) == mx
-
-    check_conjugate(Hx, Tz)
-    check_commute(Lx, Tz)
-
-    return Tz
-
 
 def test_model():
 
     Gx, Gz, Hx, Hz = models.build()
-    n = Hx.shape[1]
+    model = models.build_model(Gx, Gz, Hx, Hz)
 
-    check_commute(Hx, Hz)
-    check_commute(Gx, Hz)
-    check_commute(Hx, Gz)
-
-    #Px = get_reductor(concatenate((Lx, Hx)))
-    #Pz = get_reductor(concatenate((Lz, Hz)))
-    Px = get_reductor(Hx)
-    Pz = get_reductor(Hz)
-
-    # Lz = find_logops( Hx            , Hz            )
-    #      find_logops( ............. , ............. )
-    #                 ( commutes with , orthogonal to )
-    #                 ( ............. , ............. )
-
-    Lz = find_logops(Gx, Hz)
-    assert Lz.shape[1] == n
-
-    if 0:
-        PGz = get_reductor(Gz)
-        Lz = dot2(Lz, PGz.transpose())
-        Lz = row_reduce(Lz)
-    
-        print shortstrx(Lz, Gz, Hz)
-
-    if len(Lz):
-        print Lz.shape, Hz.shape
-        assert len(row_reduce(concatenate((Lz, Hz))))==len(Lz)+len(Hz)
-        assert len(row_reduce(concatenate((Lz, Gz))))==len(Lz)+len(row_reduce(Gz))
-
-    # Tz = find_errors( Hx            , Lx            )
-    #      find_errors( ............. , ............. )
-    #                 ( conjugate to  , commutes with )
-    #                 ( ............. , ............. )
-
-    Lx = find_errors(Lz, Gz) # invert Lz, commuting with Gz
-
-    check_commute  (Lx, Gz)
-    check_commute  (Lx, Hz)
-    check_conjugate(Lx, Lz)
-    check_commute  (Lz, Gx)
-    check_commute  (Lz, Hx)
-
-
-    # Lx | Lz
-    # Hx | ?
-    # ?  | Hz
-    # ?  | ?
-    #Rz = find_logops(concatenate((Lx, Hx)), Hz)
-    Rz = dot2(Gz, Pz.transpose())
-    Rz = row_reduce(Rz)
-
-    check_commute  (Rz, Lx)
-    check_commute  (Rz, Hx)
-
-    Rx = dot2(Gx, Px.transpose())
-    Rx = row_reduce(Rx)
-
-    check_commute  (Rx, Lz)
-    check_commute  (Rx, Hz)
-
-    # Lx | Lz
-    # Hx | ?
-    # ?  | Hz
-    # Rx'| Rz'
-
-    Tz = find_errors(Hx, concatenate((Lx, Rx)))
-    Tx = find_errors(Hz, concatenate((Lz, Rz, Tz)))
-
-    assert len((concatenate((Lx, Hx, Tx, Rx)))) == n
-    assert len((concatenate((Lz, Hz, Tz, Rz)))) == n
-    assert len(row_reduce(concatenate((Lx, Hx, Tx, Rx)))) == n
-    assert len(row_reduce(concatenate((Lz, Hz, Tz, Rz)))) == n
-
-    check_commute  (Rz, Tx)
-
-    Rx = find_errors(Rz, concatenate((Lz, Hz, Tz)))
-
-    check_conjugate(Rx, Rz)
-    check_commute  (Rx, Hz)
-    check_commute  (Rx, Tz)
-    check_commute  (Rx, Lz)
-
+    Rx, Rz = model.Rx, model.Rz
     Rxt = Rx.transpose()
     Rzt = Rz.transpose()
 
+    Px, Pz = model.Px, model.Pz
     Pxt = Px.transpose()
     Pzt = Pz.transpose()
-
-    check_sy(Lx, Hx, Tx, Rx, Lz, Hz, Tz, Rz)
-
-#    for gx in Gx:
-#        gx1 = dot2(gx, Pxt)
-#        print dot2(gx, Rzt), dot2(gx1, Rzt), dot2((gx+gx1)%2, Rzt)
-
-    assert eq2(dot2(Gz, Rxt), dot2(Gz, Pzt, Rxt))
-    assert eq2(dot2(Gx, Rzt), dot2(Gx, Pxt, Rzt))
-
-#    print shortstrx(dot2(Rx, Pz), Rx)
-
-    assert eq2(dot2(Rx, Pz), Rx)
-    assert eq2(dot2(Rz, Px), Rz)
-
-    assert len(find_kernel(dot2(Gz, Rx.transpose())))==0
 
     r, n = Rx.shape
 

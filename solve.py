@@ -5,7 +5,7 @@ from random import random, randint, shuffle, seed
 
 import numpy
 import numpy.random as ra
-from numpy import dot
+from numpy import dot, concatenate
 
 
 def array2(items):
@@ -749,6 +749,75 @@ def find_logops(Hx, Hz, check=False, verbose=False):
         print shortstr(Lz)
 
     return Lz
+
+
+def find_stabilizers(Gx, Gz):
+    n = Gx.shape[1]
+    A = dot2(Gx, Gz.transpose())
+    vs = find_kernel(A)
+    vs = list(vs)
+    #print "kernel GxGz^T:", len(vs)
+    Hz = zeros2(len(vs), n)
+    for i, v in enumerate(vs):
+        Hz[i] = dot2(v.transpose(), Gz)  
+    Hz = linear_independant(Hz)
+    return Hz
+
+
+def find_errors(Hx, Lx, Rx=None):
+    "find inverse of Hx commuting with Lx"
+
+    if Rx is not None:
+        Lx = concatenate((Lx, Rx))
+
+    # find Tz
+    n = Hx.shape[1]
+
+    Lx = row_reduce(Lx)
+    k = len(Lx)
+    mx = len(Hx)
+
+    HL = row_reduce(concatenate((Lx, Hx)))
+    assert len(HL) == mx+k
+    assert k+mx <= n, (k, mx, n)
+
+    U = zeros2(mx+k, n)
+    U[:mx] = Hx
+    U[mx:mx+k] = Lx
+
+    B = zeros2(mx+k, mx)
+    B[:mx] = identity2(mx)
+
+    Tz_t = solve(U, B)
+    assert Tz_t is not None, "no solution"
+    Tz = Tz_t.transpose()
+    assert len(Tz) == mx
+
+    check_conjugate(Hx, Tz)
+    check_commute(Lx, Tz)
+
+    return Tz
+
+
+
+
+
+def check_conjugate(A, B):
+    if A is None or B is None:
+        return
+    assert A.shape == B.shape
+    I = numpy.identity(A.shape[0], dtype=numpy.int32)
+    assert eq2(dot2(A, B.transpose()), I)
+
+
+def check_commute(A, B):
+    if A is None or B is None:
+        return
+    C = dot2(A, B.transpose())
+    assert C.sum() == 0, "\n%s"%shortstr(C)
+
+
+
 
 
 """

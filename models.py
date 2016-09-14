@@ -4,11 +4,12 @@ import sys, os
 from random import seed
 
 import numpy
+from numpy import concatenate
 
 from solve import shortstr, shortstrx, parse, eq2, dot2, zeros2, array2, identity2
 from solve import row_reduce, RowReduction, span, get_reductor
 from solve import u_inverse, find_logops, solve, find_kernel, linear_independant
-from solve import rand2
+from solve import rand2, find_stabilizers, find_errors
 
 from lanczos import write
 from code import lstr2
@@ -190,19 +191,6 @@ def build_test_0():
     Hx = zeros2(0, n)
     Hz = zeros2(0, n)
     return Gx, Gz, Hx, Hz
-
-
-def find_stabilizers(Gx, Gz):
-    n = Gx.shape[1]
-    A = dot2(Gx, Gz.transpose())
-    vs = find_kernel(A)
-    vs = list(vs)
-    #print "kernel GxGz^T:", len(vs)
-    Hz = zeros2(len(vs), n)
-    for i, v in enumerate(vs):
-        Hz[i] = dot2(v.transpose(), Gz)  
-    Hz = linear_independant(Hz)
-    return Hz
 
 
 def build_test_1():
@@ -512,20 +500,40 @@ def build_reduced():
     return Rx, Rz
 
 
-if __name__ == "__main__":
 
-    Gx, Gz, Hx, Hz = build()
-
-    print shortstrx(Hx, Hz)
-    print
-    print shortstrx(Gx, Gz)
+class Model(object):
+    def __init__(self, attrs):
+        self.__dict__.update(attrs)
 
 
 
+def check_sy(Lx, Hx, Tx, Rx, Lz, Hz, Tz, Rz, **kw):
 
-def test_model():
+    check_conjugate(Lx, Lz)
+    check_commute  (Lx, Hz)
+    check_commute  (Lx, Tz)
+    check_commute  (Lx, Rz)
 
-    Gx, Gz, Hx, Hz = models.build()
+    check_commute  (Hx, Lz)
+    check_conjugate(Hx, Tz)
+    check_commute  (Hx, Hz)
+    check_commute  (Hx, Rz)
+
+    check_commute  (Tx, Lz)
+    check_commute  (Tx, Tz)
+    check_conjugate(Tx, Hz)
+    check_commute  (Tx, Rz)
+
+    check_commute  (Rx, Lz)
+    check_commute  (Rx, Hz)
+    check_commute  (Rx, Tz)
+    check_conjugate(Rx, Rz)
+
+
+
+def build_model(Gx, Gz, Hx=None, Hz=None):
+
+    #Gx, Gz, Hx, Hz = build()
     n = Hx.shape[1]
 
     check_commute(Hx, Hz)
@@ -617,4 +625,30 @@ def test_model():
     Pzt = Pz.transpose()
 
     check_sy(Lx, Hx, Tx, Rx, Lz, Hz, Tz, Rz)
+
+    assert eq2(dot2(Gz, Rxt), dot2(Gz, Pzt, Rxt))
+    assert eq2(dot2(Gx, Rzt), dot2(Gx, Pxt, Rzt))
+
+#    print shortstrx(dot2(Rx, Pz), Rx)
+
+    assert eq2(dot2(Rx, Pz), Rx) 
+    assert eq2(dot2(Rz, Px), Rz) 
+
+    assert len(find_kernel(dot2(Gz, Rx.transpose())))==0
+
+    model = Model(locals())
+    return model
+
+
+
+if __name__ == "__main__":
+
+    Gx, Gz, Hx, Hz = build()
+
+    model = build_model(Gx, Gz, Hx, Hz)
+
+    print shortstrx(Hx, Hz)
+    print
+    print shortstrx(Gx, Gz)
+
 

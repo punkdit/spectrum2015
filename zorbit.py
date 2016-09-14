@@ -10,6 +10,7 @@ from solve import shortstr, shortstrx, parse, eq2, dot2, zeros2, array2, identit
 from solve import row_reduce, RowReduction, span, get_reductor
 from solve import u_inverse, find_logops, solve, find_kernel, linear_independant
 from solve import System, Unknown, pseudo_inverse
+from solve import find_errors, find_stabilizers, check_commute
 
 from isomorph import Tanner, search, from_sparse_ham, search_recursive, Backtrack, from_ham
 from lanczos import write, show_eigs
@@ -23,22 +24,6 @@ def genidx(shape):
         for idx in range(shape[0]):
             for _idx in genidx(shape[1:]):
                 yield (idx,)+_idx
-
-
-def check_conjugate(A, B):
-    if A is None or B is None:
-        return
-    assert A.shape == B.shape
-    I = numpy.identity(A.shape[0], dtype=numpy.int32)
-    assert eq2(dot2(A, B.transpose()), I)
-
-
-def check_commute(A, B):
-    if A is None or B is None:
-        return
-    C = dot2(A, B.transpose())
-    assert C.sum() == 0, "\n%s"%shortstr(C)
-
 
 
 
@@ -964,47 +949,6 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     g.writePDFfile(argv.plot)
 
 
-def find_errors(Hx, Lx, Rx):
-    
-    # find Tz
-    n = Hx.shape[1]
-
-    k = len(Lx)
-    r = len(Rx)
-    mx = len(Hx)
-    assert k+r+mx <= n
-    #mz = n - (k+r+mx)
-
-    U = zeros2(mx+k+r, n)
-    U[:mx] = Hx 
-    U[mx:mx+k] = Lx 
-    U[mx+k:mx+k+r] = Rx 
-    B = zeros2(mx+k+r, mx)
-    B[:mx] = identity2(mx)
-
-    Tz_t = solve(U, B)
-    Tz = Tz_t.transpose()
-    assert len(Tz) == mx
-
-    check_conjugate(Hx, Tz)
-    check_commute(Lx, Tz)
-    check_commute(Rx, Tz)
-
-    return Tz
-
-    
-def find_stabs(Gx, Gz):
-    n = Gx.shape[1]
-    A = dot2(Gx, Gz.transpose())
-    vs = find_kernel(A)
-    vs = list(vs)
-    #print "kernel GxGz^T:", len(vs)
-    Hz = zeros2(len(vs), n)
-    for i, v in enumerate(vs):
-        Hz[i] = dot2(v.transpose(), Gz)  
-    Hz = linear_independant(Hz)
-    return Hz    
-
 
 def get_perm(fn):
     n = len(fn)
@@ -1106,7 +1050,7 @@ def main():
         print "Hz:"
         for i, h in enumerate(Hz):
             print i, shortstr(h), h.sum()
-    #print shortstr(find_stabs(Gx, Gz))
+    #print shortstr(find_stabilizers(Gx, Gz))
 
     Lz = find_logops(Gx, Hz)
     #print "Lz:", shortstr(Lz)
