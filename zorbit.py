@@ -441,10 +441,12 @@ def dense(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     RR = dot2(Gz, Rx.transpose())
     PxtQx = dot2(Pxt, Qx)
 
-    if argv.excite:
+    excite = argv.excite
+    if excite is None:
+        excite = kw.get("excite")
 
-        excites = [argv.excite]
-
+    if excite:
+        excites = [excite]
     else:
         excites = genidx((2,)*len(Tx))
 
@@ -762,7 +764,7 @@ def getnum(v):
 def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
 
     name = argv.get("name", "ex3.tmp.c")
-    print "slepc", name
+    #print "slepc", name
 
     r = len(Rx)
     n = 2**r
@@ -784,6 +786,9 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     mz = len(Gz)
     t = None
     excite = argv.excite
+    if excite is None:
+        excite = kw.get("excite")
+
     if excite is not None:
         print "excite:", excite
         if type(excite) is tuple:
@@ -792,9 +797,9 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
                 t = (t + Tx[excite[i]])%2
         else:
             t = Tx[excite]
-        print "t:", shortstr(t)
+        #print "t:", shortstr(t)
         Gzt = dot2(Gz, t)
-        print "Gzt:", shortstr(Gzt)
+        #print "Gzt:", shortstr(Gzt)
 
     RR = dot2(Gz, Rx.transpose())
 
@@ -862,7 +867,7 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     stem = name[:-2]
     cmd = cmd.replace("MATCH", stem)
 
-    print cmd
+    #print cmd
     rval = os.system(cmd)
     assert rval == 0
 

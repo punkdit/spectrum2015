@@ -511,7 +511,7 @@ class Model(object):
             len(self.Gx), len(self.Gz), len(self.Lx),
             len(self.Hx), len(self.Hz), len(self.Rx))
 
-    def build_ham(self):
+    def build_ham(self, excite=None):
         Gx, Gz = self.Gx, self.Gz        
         Rx, Rz = self.Rx, self.Rz        
         Hx, Hz = self.Hx, self.Hz        
@@ -519,10 +519,29 @@ class Model(object):
         gz = len(Gz)
         r = len(Rx)
         n = self.n
+
+        if type(excite) is int:
+            _excite = [0]*len(Tx)
+            _excite[excite] = 1
+            excite = tuple(_excite)
+
+        if excite is not None:
+            assert len(excite)==len(Tx)
+    
+            t = zeros2(n)
+            for i, ex in enumerate(excite):
+                if ex:
+                    t = (t + Tx[i])%2
+            #print "t:", shortstr(t)
+            Gzt = dot2(Gz, t)
+
+        else:
+            Gzt = 0
+
         H = numpy.zeros((2**r, 2**r))
         for i, v in enumerate(genidx((2,)*r)):
             v = array2(v)
-            syndrome = dot2(Gz, Rx.transpose(), v)
+            syndrome = (dot2(Gz, Rx.transpose(), v) + Gzt)%2
             value = gz - 2*syndrome.sum()
             #print shortstr(dot2(Rx.transpose(), v)), value
             if H is not None:

@@ -1,4 +1,129 @@
 
+16/9/16
+=======
+
+Here we decompose reduced gauge group, we get the same
+as before but without the stabilizers on the sub-codes.
+
+time ./gcolor.py test_1 size=2 
+guage ops: 80
+qubits: 65
+stabs: 16
+Lattice(3:65, 2:128, 1:80, 0:16)
+Model(Gx: 80, Gz: 80, Lx: 1, Hx: 16, Hz: 16, Rx: 32)
+
+Model(Gx: 14, Gz: 14, Lx: 59, Hx: 0, Hz: 0, Rx: 6)
+(64, 64)
+vals: [18.052875114275892, 12.990945708566935, 10.944551482612107] gap: 5.06192940571
+
+Model(Gx: 14, Gz: 14, Lx: 59, Hx: 0, Hz: 0, Rx: 6) # <---- no stabilizers
+(64, 64)
+vals: [18.052875114275889, 12.990945708566926, 10.944551482612113] gap: 5.06192940571
+
+Model(Gx: 13, Gz: 13, Lx: 60, Hx: 0, Hz: 0, Rx: 5)
+(32, 32)
+vals: [16.992568921823885, 11.373828578997692, 9.0089892016058837] gap: 5.61874034283
+
+Model(Gx: 13, Gz: 13, Lx: 60, Hx: 0, Hz: 0, Rx: 5)
+(32, 32)
+vals: [16.992568921823885, 11.373828578997692, 9.0089892016058819] gap: 5.61874034283
+
+Model(Gx: 13, Gz: 13, Lx: 60, Hx: 0, Hz: 0, Rx: 5)
+(32, 32)
+vals: [16.992568921823892, 11.373828578997696, 9.0089892016058855] gap: 5.61874034283
+
+Model(Gx: 13, Gz: 13, Lx: 60, Hx: 0, Hz: 0, Rx: 5)
+(32, 32)
+vals: [16.992568921823885, 11.373828578997697, 9.0089892016058855] gap: 5.61874034283
+eval: 104.076025916
+gap: 5.06192940571
+eval_2: 99.0140965101
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+here we look at two different reps of sl_2:
+
+>>> import numpy
+>>> X=numpy.array([[0.,2,0],[1,0,1],[0,2,0]])
+>>> Z=numpy.array([[2.,0,0],[0,0,0],[0,0,-2]])
+>>> H=X+Z
+>>> print H
+[[ 2.  2.  0.]
+ [ 1.  0.  1.]
+ [ 0.  2. -2.]]
+>>> vals,vecs = numpy.lin
+numpy.linalg     numpy.linspace(  
+>>> vals,vecs = numpy.linalg.eig(H)
+>>> vals
+array([  2.82842712e+00,   1.22334851e-16,  -2.82842712e+00])
+>>> list(vals)
+[2.8284271247461903, 1.2233485098957046e-16, -2.8284271247461898]
+
+>>> X1=numpy.array([[0.,1],[1,0]])
+>>> Z1=numpy.array([[1.,0],[0.,-1]])
+>>> H1=X1+Z1
+>>> H1
+array([[ 1.,  1.],
+       [ 1., -1.]])
+>>> vals,vecs = numpy.linalg.eig(H1)
+>>> list(vals)
+[1.4142135623730951, -1.4142135623730951]
+>>> 
+
+
+15/9/16
+=======
+
+Gauge operators of one type (a bi-color) generate
+half of the stabilizers: those corresponding to the two colors 
+of the gauge op.
+
+
+$ time ./gcolor.py test size=2
+guage ops: 80
+qubits: 65
+stabs: 16
+Lattice(3:65, 2:128, 1:80, 0:16)
+Model(Gx: 80, Gz: 80, Lx: 1, Hx: 16, Hz: 16, Rx: 32)
+
+Model(Gx: 14, Gz: 14, Lx: 43, Hx: 8, Hz: 8, Rx: 6)
+[18.052875, 12.990946] gap: 5.061929
+
+Model(Gx: 13, Gz: 13, Lx: 44, Hx: 8, Hz: 8, Rx: 5)
+[16.992569, 11.373829] gap: 5.61874
+
+Model(Gx: 13, Gz: 13, Lx: 44, Hx: 8, Hz: 8, Rx: 5)
+[16.992569, 11.373829] gap: 5.61874
+eval: 104.076026
+gap: 5.061929
+eval_2: 99.014097
+
+
+$ time ./gcolor.py test size=3
+guage ops: 214
+qubits: 175
+stabs: 40
+Lattice(3:175, 2:348, 1:214, 0:40)
+Model(Gx: 214, Gz: 214, Lx: 1, Hx: 40, Hz: 40, Rx: 94)
+
+Model(Gx: 39, Gz: 39, Lx: 116, Hx: 20, Hz: 20, Rx: 19)
+[48.219094, 45.272162] gap: 2.946932
+
+Model(Gx: 34, Gz: 34, Lx: 121, Hx: 20, Hz: 20, Rx: 14)
+[42.689847, 38.442742] gap: 4.247105
+
+Model(Gx: 34, Gz: 34, Lx: 121, Hx: 20, Hz: 20, Rx: 14)
+[42.689847, 38.442742] gap: 4.247105
+eval: 267.197576
+gap: 2.946932
+eval_2: 264.250644
+
+real8m50m38.452s
+
+
+
 12/9/16
 =======
 
