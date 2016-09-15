@@ -801,6 +801,10 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
         Gzt = dot2(Gz, t)
         #print "Gzt:", shortstr(Gzt)
 
+    weights = kw.get("weights")
+    if weights is not None:
+        assert len(weights)==len(Gx)
+
     RR = dot2(Gz, Rx.transpose())
 
     PxtQx = dot2(Pxt, Qx)
@@ -837,9 +841,16 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     else:
         code.append("if(k>cutoff) continue; // <-------- continue")
     code.append("py[v] += pxv * (%d - 2*k);" % mz)
-    for gx in uniq_gxs:
-        s = '+'.join(['pxv']*gxs.count(gx))
-        code.append("py[v^%s] += %s;" % (gx, s))
+
+    if weights is None:
+        for gx in uniq_gxs:
+            s = '+'.join(['pxv']*gxs.count(gx))
+            code.append("py[v^%s] += %s;" % (gx, s))
+    else:
+        gxs = [getnum(dot2(gx, PxtQx)) for gx in Gx]
+        for i, gx in enumerate(gxs):
+            code.append("py[v^%s] += %s*pxv;" % (gx, weights[i]))
+
     code.end()
     code.end()
 

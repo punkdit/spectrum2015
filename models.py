@@ -511,7 +511,7 @@ class Model(object):
             len(self.Gx), len(self.Gz), len(self.Lx),
             len(self.Hx), len(self.Hz), len(self.Rx))
 
-    def build_ham(self, excite=None):
+    def build_ham(self, excite=None, weights=None):
         Gx, Gz = self.Gx, self.Gz        
         Rx, Rz = self.Rx, self.Rz        
         Hx, Hz = self.Hx, self.Hz        
@@ -538,6 +538,10 @@ class Model(object):
         else:
             Gzt = 0
 
+        if weights is None:
+            weights = [1.]*len(Gx)
+        assert len(weights) == len(Gx), len(weights)
+
         H = numpy.zeros((2**r, 2**r))
         for i, v in enumerate(genidx((2,)*r)):
             v = array2(v)
@@ -555,11 +559,18 @@ class Model(object):
         for i, v in enumerate(genidx((2,)*r)):
             v = array2(v)
             #print shortstr(v),
-            for g in Gx:
+            #for g in Gx:
+            for j, g in enumerate(Gx):
                 u = (v + dot2(g, PxtQx))%2
-                j = eval('0b'+shortstr(u, zero='0'))
-                H[i, j] += 1
-                #A[i, j] = A.get((i, j), 0) + 1
+                k = eval('0b'+shortstr(u, zero='0'))
+                H[i, k] += weights[j]
+                #A[i, k] = A.get((i, k), 0) + 1
+
+        for j, g in enumerate(Gx):
+            u = dot2(g, PxtQx)
+            k = '0b'+shortstr(u, zero='0')
+            #print k, weights[j]
+
         return H
 
 #        H = numpy.zeros((n, n))
