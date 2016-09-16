@@ -6,14 +6,15 @@ import numpy
 
 from pyx import canvas, path, deco, trafo, style, text, color, unit, epsfile, deformer
 rgb = color.rgb
-rgbfromhexstring = color.rgbfromhexstring
+rgbhex = color.rgbfromhexstring
 red, green, blue, yellow = (rgb.red,
-    rgbfromhexstring("#008000"),
+    rgbhex("#008000"),
     rgb.blue, rgb(0.75, 0.75, 0))
 blue = rgb(0., 0., 0.8)
 lred = rgb(1., 0.4, 0.4)
 lgreen = rgb(0.4, 0.8, 0.2)
 colors = [red, green, blue, yellow]
+
 
 north = [text.halign.boxcenter, text.valign.top]
 northeast = [text.halign.boxright, text.valign.top]
@@ -61,7 +62,7 @@ def distance(graph, src, tgt):
         d += 1
 
     items = list(bdy.intersection(tgt))
-    assert len(items)==1
+    #assert len(items)==1
     return 1.*d, items[0]
 
 
@@ -162,7 +163,7 @@ class Cell(object):
         return x+0.4*z, y+0.1*z
 
     corner_coords = [(0,-R,-R), (R,-R,R), (-R,-R,R), (0,0.8*R,0)]
-    BACK, FRONT = [1, 2], [3, 1]
+    BACK, FRONT = [1, 2], [3, 0]
     def tran(self, x, y, z):
         return x+0.3*z, y+0.4*z
 
@@ -209,6 +210,48 @@ class Face(Cell):
         if edges:
             c.stroke(path.path(*ps)) #, deco)
 
+#    def birender(self, c, deco1=[], deco2=[], edges=True, verts=True):
+#        cs = [self.tran(*coord) for coord in self.coords]
+#        assert len(cs) in [4, 6]
+#        if len(cs)==4:
+#            cs1 = [cs[i] for i in [0, 2, 1, 3]]
+#            cs2 = [cs[i] for i in [0, 2, 3, 1]]
+#        if len(cs)==6:
+#            cs1 = [cs[i] for i in [0, 3, 4, 1, 2, 5]]
+#            cs2 = [cs[i] for i in [0, 3, 2, 5, 4, 1]]
+#        
+#        ps = [path.moveto(*cs[0])]+[path.lineto(*p) for p in cs[1:]]+[path.closepath()]
+#        if verts:
+#            for x, y in cs:
+#                c.fill(path.circle(x, y, Vertex.radius)) #, deco)
+#        if edges:
+#            c.stroke(path.path(*ps), [style.linejoin.round])
+#
+#        for (cs, deco) in [(cs1, deco1), (cs2, deco2)]:
+#            ps = [path.moveto(*cs[0])]+[path.lineto(*p) for p in cs[1:]]+[path.closepath()]
+#            c.fill(path.path(*ps), deco+self.deco)
+
+    def birender(self, c, deco1=[], deco2=[], edges=True, verts=True):
+        cs = [self.tran(*coord) for coord in self.coords]
+        n = len(cs)
+        c0 = (sum(c[0] for c in cs)/n, sum(c[1] for c in cs)/n)
+
+        deco = deco1
+        for (i, deco) in [(0, deco1), (1, deco2)]:
+            while i < len(cs):
+                cs1 = [c0, cs[i], cs[(i+1)%n]]
+                ps = [path.moveto(*cs1[0])]+[path.lineto(*p) for p in cs1[1:]]+[path.closepath()]
+                c.fill(path.path(*ps), deco+self.deco)
+                i += 2
+
+        ps = [path.moveto(*cs[0])]+[path.lineto(*p) for p in cs[1:]]+[path.closepath()]
+        if verts:
+            for x, y in cs:
+                c.fill(path.circle(x, y, 0.7*Vertex.radius)) #, deco)
+        if edges:
+            c.stroke(path.path(*ps), [style.linejoin.round])
+
+
 
 class Body(Cell):
     dim = 3
@@ -216,6 +259,8 @@ class Body(Cell):
 
 
 def mark_stabs(Hx, marks={}):
+
+    marks = dict(marks)
     COLORS = 4
 
     mx, n = Hx.shape
@@ -243,9 +288,12 @@ def mark_stabs(Hx, marks={}):
 
     theory = Theory(exprs)
     solver = Solver(theory, sorts, funcs)
+    print "marks:", marks
     for position in solver.solve(max_count=1, verbose=False):
         for i, idx in enumerate(position):
+            assert marks.get(i) in (None, idx)
             marks[i] = idx
+    print "marks:", marks
     return marks
 
 
@@ -278,19 +326,25 @@ def make(Gx, Gz, Hx, Hz, **kw):
 #        assert len(corner_idxs+edge_idxs+face_idxs+bulk_idxs)==n
 #
 
+    print "graph..."
+
     for i in range(n):
         w = Hx[:, i].sum()
         assert 1<=w<=4
         items[w-1].append(i)
 
     assert len(corner_idxs)==CORNERS
-    
+
+    # Find edges between qubits
+    # This is defined by two gauge operators intersecting.
     graph = dict((i, []) for i in range(n)) # map qubit -> nbd
-    for g1 in Gx:
-      for g2 in Gx:
-        if str(g1)==str(g2):
+
+    GG = numpy.dot(Gx, Gx.transpose())
+    idxs, jdxs = numpy.where(GG)
+    for i, j in zip(idxs, jdxs):
+        if i==j:
             continue
-        g = g1*g2
+        g = Gx[i]*Gx[j]
         for i in numpy.where(g)[0]:
           for j in numpy.where(g)[0]:
             if i==j:
@@ -303,9 +357,12 @@ def make(Gx, Gz, Hx, Hz, **kw):
     #print graph
     for i in range(n):
         assert len(graph[i])==CORNERS or i in corner_idxs and len(graph[i])==3
+
     
     # ---------------------------------------
     # Coordinatize qubits
+
+    print "coordinates..."
 
     coords = {} # map qubit -> (x, y, z)
 
@@ -462,6 +519,8 @@ def make(Gx, Gz, Hx, Hz, **kw):
 
     # --------- mark ---------
 
+    print "colors..."
+
     stab_marks = {}
     ext_mark = {} # map exterior face qubit -> opposite corner mark
     for i, idx in enumerate(corner_idxs):
@@ -495,11 +554,16 @@ def make(Gx, Gz, Hx, Hz, **kw):
     # Exterior faces get a mark
     exterior_faces = []
     interior_faces = []
+    front_faces = []
+    back_faces = []
     for cell in cells:
         if cell.dim != 2:
             continue
         if len(cell.cobdy)!=1:
             interior_faces.append(cell)
+            mark = [c.mark for c in cell.cobdy]
+            mark.sort()
+            cell.mark = tuple(mark)
             continue
         exterior_faces.append(cell)
         mark = None
@@ -509,23 +573,28 @@ def make(Gx, Gz, Hx, Hz, **kw):
                 continue
             assert mark is None or m==mark, (mark, m)
             mark = m
-        cell.mark = mark
 
-#    BACK, FRONT = [], []
-#    for i, idx in enumerate(corner_idxs):
-#        cell = Cell.get(idx)
-#        x, y, z = cell.coords[0]
-#        # z points away from viewpoint
-#        if z < 0.:
-#            FRONT.append(i)
-#        else:
-#            BACK.append(i)
-#
-#    assert len(FRONT)==len(BACK)==2, (BACK, FRONT)
-#    print BACK, FRONT
+        assert mark is not None
+        cell.ext_mark = mark
 
-    front_faces = [face for face in exterior_faces if face.mark in Cell.BACK]
-    back_faces = [face for face in exterior_faces if face.mark in Cell.FRONT]
+        if cell.ext_mark in Cell.BACK:
+            front_faces.append(cell)
+        elif cell.ext_mark in Cell.FRONT:
+            back_faces.append(cell)
+        else:
+            assert 0, mark
+
+        if mark == cell.cobdy[0].mark:
+            print "BUG "*5
+        mark = [mark, cell.cobdy[0].mark]
+        mark.sort()
+        cell.mark = tuple(mark)
+
+
+    #front_faces = [face for face in exterior_faces if face.mark in Cell.BACK]
+    #back_faces = [face for face in exterior_faces if face.mark in Cell.FRONT]
+
+    print "done."
 
     return Model(locals())
 
@@ -546,17 +615,20 @@ class Model(object):
         cells = self.cells
         cells.sort(key = lambda cell : -cell.z)
     
-        deco = [color.transparency(kw.get("transparency", 0.4))]
+        #deco = [color.transparency(kw.get("transparency", 0.4))]
     
         verts = kw.get("verts", False)
         edges = kw.get("edges", False)
     
-        for cell in self.back_faces:
-            cell.render(c, deco, verts=verts, edges=edges)
+        # much brighter without these guys!
+        #for cell in self.back_faces:
+        #    cell.render(c, deco, verts=verts, edges=edges)
     
+        deco = [color.transparency(0.4)]
         for cell in self.interior_faces:
             cell.render(c, deco, verts=verts, edges=edges)
     
+        deco = [color.transparency(0.4)]
         for cell in self.front_faces:
             #cl = colors[cell.mark]
             cl = colors[cell.cobdy[0].mark]
@@ -567,20 +639,43 @@ class Model(object):
             cell = Cell.get(idx)
             cell.render(c)
     
-        for cell in cells:
-            if not cell.ready:
-                continue
-    
-            if kw.get("skeleton"):
-                if cell.dim <2:
-                    cell.render(c)
-                continue
-    
-            if cell.dim != 2:
-                continue
-    
         if kw.get("label", False):
             c.text(0.1*Cell.R, -1.5*Cell.R, "$n=%d$"%self.n, north)
+
+        self.c.insert(c, [trafo.translate(self.X, self.Y)])
+        self.X += 2.3 * Cell.R
+
+    def render_ideal(self, **kw):
+
+        c = canvas.canvas()
+        tr = trafo.scale(sx=1, sy=1)
+    
+        cells = self.cells
+        cells.sort(key = lambda cell : -cell.z)
+    
+        verts = kw.get("verts", False)
+        edges = kw.get("edges", False)
+
+        faces = [cell for cell in cells if cell.dim==2]
+            
+        deco = [color.transparency(0.6)]
+        for cell in self.back_faces:
+            cell.render(c, deco, verts=verts, edges=edges)
+
+        deco = []
+        #colors = [rgbhex("bf3f3f"), rgbhex("7fbf7f"), rgbhex("3f3fa5"), rgbhex("dfdf7f")]
+        colors = [rgb(0.9,0.1,0.1), green, blue, rgb(0.9,0.9,0)]
+        for cell in faces:
+            #print cell.mark
+            if cell.mark != (0,3) and cell.mark != (1,2):
+                continue
+            #cell.render(c, deco, verts=verts, edges=edges)
+            deco1 = [colors[cell.mark[0]]]+deco
+            deco2 = [colors[cell.mark[1]]]+deco
+            cell.birender(c, deco1, deco2, verts=True, edges=edges)
+    
+        if kw.get("label", False):
+            c.text(0.1*Cell.R, -1.5*Cell.R, label, north)
 
         self.c.insert(c, [trafo.translate(self.X, self.Y)])
         self.X += 2.3 * Cell.R
@@ -609,10 +704,11 @@ def main():
 
     model = make(Gx, Gz, Hx, Hz)
 
-    model.render(
-        transparency=transparency,
-        label=True, verts=True, edges=True,
-    )
+    if argv.ideal:
+        model.render_ideal(transparency=transparency, label="", verts=False, edges=True,)
+    else:
+        model.render( transparency=transparency, label=True, verts=True, edges=True,)
+
     model.save(filename)
 
 
