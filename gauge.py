@@ -199,11 +199,13 @@ class Edge(Cell):
 class Face(Cell):
     dim = 2
 
-    def render(self, c, deco=[], edges=True, verts=True):
+    def render(self, c, deco=[], edges=True, verts=True, face=True):
         cs = [self.tran(*coord) for coord in self.coords]
         assert len(cs)>2
         ps = [path.moveto(*cs[0])]+[path.lineto(*p) for p in cs[1:]]+[path.closepath()]
-        c.fill(path.path(*ps), deco+self.deco)
+
+        if face:
+            c.fill(path.path(*ps), deco+self.deco)
         if verts:
             for x, y in cs:
                 c.fill(path.circle(x, y, Vertex.radius)) #, deco)
@@ -621,14 +623,16 @@ class Model(object):
         edges = kw.get("edges", False)
     
         # much brighter without these guys!
-        #for cell in self.back_faces:
-        #    cell.render(c, deco, verts=verts, edges=edges)
+        deco = [color.transparency(0.4)]
+        for cell in self.back_faces:
+            cell.render(c, deco, verts=verts, edges=edges, face=False)
     
         deco = [color.transparency(0.4)]
         for cell in self.interior_faces:
             cell.render(c, deco, verts=verts, edges=edges)
     
-        deco = [color.transparency(0.4)]
+        colors = [rgbhex("ff1e1e"), rgbhex("3ee53e"), rgbhex("011fff"), rgbhex("fdff57"), ]
+        deco = [color.transparency(0.3)]
         for cell in self.front_faces:
             #cl = colors[cell.mark]
             cl = colors[cell.cobdy[0].mark]
@@ -658,13 +662,14 @@ class Model(object):
 
         faces = [cell for cell in cells if cell.dim==2]
             
-        deco = [color.transparency(0.6)]
+        deco = [rgbhex("e1d9e0")]
+            #color.transparency(0.8)]
         for cell in self.back_faces:
             cell.render(c, deco, verts=verts, edges=edges)
 
         deco = []
         #colors = [rgbhex("bf3f3f"), rgbhex("7fbf7f"), rgbhex("3f3fa5"), rgbhex("dfdf7f")]
-        colors = [rgb(0.9,0.1,0.1), green, blue, rgb(0.9,0.9,0)]
+        colors = [rgbhex("ff1e1e"), rgbhex("3ee53e"), rgbhex("011fff"), rgbhex("fdff57"), ]
         for cell in faces:
             #print cell.mark
             if cell.mark != (0,3) and cell.mark != (1,2):
