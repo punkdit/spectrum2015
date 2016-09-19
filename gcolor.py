@@ -91,10 +91,21 @@ def test():
 
     weights = weights1 = None
     k = argv.k
-    if k is not None:
+    if type(k) is tuple:
+        ks = k
+        weights = [1.]*ng
+        weights = numpy.array([1.]*ng)
+        hs = Hx[ks, :]
+        print "stabilizer weights:", hs.sum(axis=1)
+        h = Hx[ks, :].sum(axis=0) % 2
+        print "stabilizer weight:", h.sum()
+        for k in ks:
+            weights *= (1-2*A[k])
+    elif k is not None:
         weights = 1-2*A[k]
         print "stabilizer:", Hx[k].sum()
-    #print "weights:", weights
+
+    print "weights:", weights
 
     for equ in equs:
       for flag in [0, 1]:
@@ -123,7 +134,7 @@ def test():
     
             H = model.build_ham(excite=excite1, weights=weights1)
 
-            if r1<6:
+            if r1<6 and argv.showham:
                 idxs = range(2**r1)
                 idxs.sort(key = lambda i : -H[i,i])
                 print idxs
