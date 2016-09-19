@@ -13,13 +13,14 @@ from networkx.algorithms import bipartite
 from solve import get_reductor, array2, row_reduce, dot2, shortstr, zeros2, shortstrx, eq2
 from solve import u_inverse, find_kernel, find_logops, identity2, solve
 from solve import check_conjugate, check_commute
+from code import lstr2
 from lanczos import write, show_eigs
 
 import models
 from models import genidx
 
 
-def test_1():
+def test():
 
     Gx, Gz, Hx, Hz = models.build("gcolor")
     model = models.build_model(Gx, Gz, Hx, Hz)
@@ -116,9 +117,33 @@ def test_1():
 #            excite1 = solve(model.Hx.transpose(), h)
 #            print "solve:", excite1
 
-        if len(model.Rx)<12 and not argv.slepc:
+        r1 = len(model.Rx)
+
+        if r1<12 and not argv.slepc:
     
             H = model.build_ham(excite=excite1, weights=weights1)
+
+            if r1<6:
+                idxs = range(2**r1)
+                idxs.sort(key = lambda i : -H[i,i])
+                print idxs
+                idxs = [0, 1, 2, 3, 4, 5, 6, 7]
+                idxs = [0, 1, 3, 7, 2, 4, 6, 5]
+                idxs = [0, 1, 3, 7, 2, 6, 4, 5]
+                H = H[idxs, :]
+                H = H[:, idxs]
+                s = lstr2(H, 0)
+                #s = s.replace(' ', '')
+                s = s.replace(',', ' ')
+                s = s.replace('0', ' ')
+                print s
+
+                #from sympy import Matrix
+                #A = Matrix(H)
+                #print A
+                #print A.eigenvals()
+                return
+
             vals, vecs = numpy.linalg.eig(H)
             vals = list(vals)
             vals.sort(reverse=True)
