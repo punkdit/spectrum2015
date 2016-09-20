@@ -22,10 +22,14 @@ from models import genidx
 
 def test():
 
+    verbose = argv.verbose
+
     Gx, Gz, Hx, Hz = models.build("gcolor")
     model = models.build_model(Gx, Gz, Hx, Hz)
-    print model
-    print
+    if argv.verbose:
+        print model
+        print
+
     #print shortstrx(Hx)
 
     if 0:
@@ -74,14 +78,7 @@ def test():
 
     assert dot2(model.Hx, Pxt).sum() == 0
 
-    total = 0.
-    gap = None
-
-    excite = argv.excite
-    argv.excite = None
     mx = len(Hx)
-    if excite is not None:
-        assert 0<=excite<mx
 
     A = solve(concatenate((Hx, Rx)).transpose(), Gx.transpose())
     #print "A:"
@@ -89,25 +86,43 @@ def test():
     assert A.shape == (mx+r, ng)
     assert len(A[0]) == len(Gx)
 
-    weights = weights1 = None
-    k = argv.k
-    if type(k) is tuple:
-        ks = k
-        weights = [1.]*ng
+    if argv.enum:
+
+      #weightss = [weights]
+      def weightss():
+        for idxs in genidx((2,)*mx):
+            weights = numpy.array([1.]*ng)
+            print idxs,
+            for i, idx in enumerate(idxs):
+                if idx:
+                    weights *= (1-2*A[i])
+            yield weights
+      weightss = weightss()
+
+    else:
+    
         weights = numpy.array([1.]*ng)
-        hs = Hx[ks, :]
-        print "stabilizer weights:", hs.sum(axis=1)
-        h = Hx[ks, :].sum(axis=0) % 2
-        print "stabilizer weight:", h.sum()
-        for k in ks:
-            weights *= (1-2*A[k])
-    elif k is not None:
-        weights = 1-2*A[k]
-        print "stabilizer:", Hx[k].sum()
+        k = argv.k
+        if type(k) is tuple:
+            ks = k
+            hs = Hx[ks, :]
+            print "stabilizer weights:", hs.sum(axis=1)
+            h = Hx[ks, :].sum(axis=0) % 2
+            print "stabilizer weight:", h.sum()
+            for k in ks:
+                weights *= (1-2*A[k])
+        elif k is not None:
+            weights = 1-2*A[k]
+            print "stabilizer:", Hx[k].sum()
+        if verbose:
+            print "weights:", list(weights)
+        weightss = [weights]
 
-    print "weights:", weights
+    for weights in weightss:
+     total = 0.
+     gap = None
 
-    for equ in equs:
+     for equ in equs:
       for flag in [0, 1]:
         GIx = [PGx[i] for i in equ if color[i] == flag]
         if weights is not None:
@@ -119,68 +134,47 @@ def test():
 
         #print shortstrx(GIx, GIz)
         model = models.build_model(GIx, GIz)
-        print model
-
-        excite1 = None
-
-#        if excite is not None:
-#            h = Hx[excite]
-#            excite1 = solve(model.Hx.transpose(), h)
-#            print "solve:", excite1
+        if verbose:
+            print model
 
         r1 = len(model.Rx)
 
         if r1<12 and not argv.slepc:
     
-            H = model.build_ham(excite=excite1, weights=weights1)
+            H = model.build_ham(weights=weights1)
 
-            if r1<6 and argv.showham:
-                idxs = range(2**r1)
-                idxs.sort(key = lambda i : -H[i,i])
-                print idxs
-                idxs = [0, 1, 2, 3, 4, 5, 6, 7]
-                idxs = [0, 1, 3, 7, 2, 4, 6, 5]
-                idxs = [0, 1, 3, 7, 2, 6, 4, 5]
-                H = H[idxs, :]
-                H = H[:, idxs]
-                s = lstr2(H, 0)
-                #s = s.replace(' ', '')
-                s = s.replace(',', ' ')
-                s = s.replace('0', ' ')
-                print s
-
-                #from sympy import Matrix
-                #A = Matrix(H)
-                #print A
-                #print A.eigenvals()
-                return
-
-            vals, vecs = numpy.linalg.eig(H)
+            vals, vecs = numpy.linalg.eigh(H)
             vals = list(vals)
             vals.sort(reverse=True)
 
         else:
-            vals = do_slepc(model, excite=excite1, weights=weights1)
+            vals = do_slepc(model, weights=weights1)
 
         _gap = vals[0]-vals[1]
-        print "vals:", vals[:5], "gap:", _gap
+        if verbose:
+            print "vals:", vals[:5], "gap:", _gap
         gap = _gap if gap is None or _gap<gap else gap
         total += vals[0]
 
         #return
 
-    print "eval:", total
-    print "gap:", gap
-    print "eval_2:", total-gap
+     print "eval:", total,
+     if verbose:
+        print "gap:", gap,
+        print "eval_2:", total-gap
+     else:
+        print
+     sys.stdout.flush()
 
 
-def do_slepc(model, excite=None, weights=None):
+
+def do_slepc(model, weights=None):
     from zorbit import slepc
 
     name = "ex3.tmp"
     os.unlink(name)
 
-    slepc(excite=excite, weights=weights, **model.__dict__)
+    slepc(weights=weights, **model.__dict__)
 
     #subprocess.check_output(args, *, stdin=None, stderr=None, shell=False, universal_newlines=False)
 
