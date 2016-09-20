@@ -17,6 +17,17 @@ Lattice(3:65, 2:128, 1:80, 0:16)
 (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1) eval: 99.1679803186
 (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0) eval: 102.382483285
 (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1) eval: 100.70415144
+...
+
+Fails to be monotonic:
+
+./parselog.py gcolor2.stabilizer.log 
+((0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1), 94.0096555855)
+((0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1), 94.0499279492)
+Traceback (most recent call last):
+  File "./parselog.py", line 40, in <module>
+    assert 0, (i, j)
+AssertionError: (41, 57)
 
 
 
