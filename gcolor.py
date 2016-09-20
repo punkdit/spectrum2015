@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import sys, os
+os.environ['OMP_NUM_THREADS'] = '1'
+
 import subprocess
 from fractions import gcd
 
