@@ -94,10 +94,13 @@ def test():
       def weightss():
         for idxs in genidx((2,)*mx):
             weights = numpy.array([1.]*ng)
-            print idxs,
+            h = zeros2(n)
             for i, idx in enumerate(idxs):
                 if idx:
                     weights *= (1-2*A[i])
+                    h += Hx[i]
+            h %= 2
+            print "%3d"%h.sum(), '--', idxs, '--',
             yield weights
       weightss = weightss()
 
@@ -160,7 +163,7 @@ def test():
 
         #return
 
-     print "eval:", total,
+     print total,
      if verbose:
         print "gap:", gap,
         print "eval_2:", total-gap
