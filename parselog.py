@@ -10,7 +10,10 @@ rows = []
 
 for line in f:
     line = line.strip()
-    idxs, val = line.split(" eval: ")
+    TOK = " eval: "
+    if TOK not in line:
+        continue
+    idxs, val = line.split(TOK)
     idxs = eval(idxs)
     val = float(val)
 
