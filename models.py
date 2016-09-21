@@ -559,7 +559,7 @@ class Model(object):
             len(self.Lx), len(self.Gx), len(self.Gz), 
             len(self.Hx), len(self.Hz), len(self.Rx))
 
-    def build_ham(self, excite=None, weights=None):
+    def build_ham(self, excite=None, weights=None, Jx=1., Jz=1.):
         Gx, Gz = self.Gx, self.Gz        
         Rx, Rz = self.Rx, self.Rz        
         Hx, Hz = self.Hx, self.Hz        
@@ -596,8 +596,7 @@ class Model(object):
             syndrome = (dot2(Gz, Rx.transpose(), v) + Gzt)%2
             value = gz - 2*syndrome.sum()
             #print shortstr(dot2(Rx.transpose(), v)), value
-            if H is not None:
-                H[i, i] = value
+            H[i, i] = Jz*value
             #U.append(value)
 
         Pxt = self.Px.transpose()
@@ -611,7 +610,7 @@ class Model(object):
             for j, g in enumerate(Gx):
                 u = (v + dot2(g, PxtQx))%2
                 k = eval('0b'+shortstr(u, zero='0'))
-                H[i, k] += weights[j]
+                H[i, k] += Jx*weights[j]
                 #A[i, k] = A.get((i, k), 0) + 1
 
         return H
@@ -657,9 +656,11 @@ def check_sy(Lx, Hx, Tx, Rx, Lz, Hz, Tz, Rz, **kw):
 
 
 
-def build_model(Gx, Gz, Hx=None, Hz=None):
+def build_model(Gx=None, Gz=None, Hx=None, Hz=None):
 
-    #Gx, Gz, Hx, Hz = build()
+    if Gx is None:
+        Gx, Gz, Hx, Hz = build()
+
     n = Gx.shape[1]
 
     if Hx is None:

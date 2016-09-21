@@ -10,14 +10,17 @@ rows = []
 
 for line in f:
     line = line.strip()
-    TOK = " eval: "
+    TOK = " -- "
     if TOK not in line:
         continue
-    idxs, val = line.split(TOK)
+    flds = line.split(TOK)
+    assert len(flds) == 3
+    weight, idxs, val = flds
+    weight = int(weight)
     idxs = eval(idxs)
     val = float(val)
 
-    rows.append((idxs, val))
+    rows.append((weight, idxs, val))
 
 EPSILON = 1e-8
 n = len(rows)
@@ -34,13 +37,13 @@ def lt(idxs, jdxs):
 for i in range(n):
   for j in range(i+1, n):
 
-    if lt(rows[i][0], rows[j][0]):
-        if rows[i][1] < rows[j][1]-EPSILON:
+    if lt(rows[i][1], rows[j][1]):
+        if rows[i][2] < rows[j][2]-EPSILON:
             print "%6d"%i, rows[i]
             print "%6d"%j, rows[j]
             print
             #assert 0, (i, j)
-            assert sum(rows[i][0])>1
+            assert sum(rows[i][1])>1
 
 
 

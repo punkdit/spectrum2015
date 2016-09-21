@@ -1,4 +1,7 @@
 
+./spectrum.py main compass N=30 l=4
+
+
 20/9/16
 =======
 
@@ -29,6 +32,7 @@ Traceback (most recent call last):
     assert 0, (i, j)
 AssertionError: (41, 57)
 
+Even including stabilizer weight: fails to be monotonic.
 
 
 17/9/16
