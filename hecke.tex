@@ -220,6 +220,147 @@ Constructing a Ricci flow on a simplicial geometry: \cite{Miller2014}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
+\section{ADE classification}
+
+Singularities:
+\begin{align*}
+A_k:f(x)   &= x^{k+1}, \ \ k\ge 1;\\
+D_k:f(x,y) &= x^2y + y^{k-1},\ \  k\ge 4;\\
+E_6:f(x,y) &= x^3 + y^4;\\
+E_7:f(x,y) &= x^3 + xy^3;\\
+E_8:f(x,y) &= x^3 + y^5.
+\end{align*}
+
+Platonic solid symmetry:
+$E_6:$ tetrahedral, $E_7:$ cube (octahedral), $E_8:$ icosahedron (dodecahedron.)
+
+Another trinity: Real, Complex, Quaternionic.
+
+$ADE$ Dynkin diagrams are the simply laced diagrams: 
+
+\begin{center}
+  \begin{tikzpicture}[scale=.4]
+    \draw (-1,0) node[anchor=east]  {$A_k$};
+    \foreach \x in {0,...,5}
+    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
+    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
+    \foreach \y in {1.15,...,4.15}
+    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
+  \end{tikzpicture}
+\end{center}
+
+%\begin{center}
+%  \begin{tikzpicture}[scale=.4]
+%    \draw (-1,0) node[anchor=east]  {$B_k$};
+%    \foreach \x in {0,...,4}
+%    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
+%    \draw[xshift=5 cm,thick,fill=black] (5 cm, 0) circle (.3 cm);
+%    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
+%    \foreach \y in {1.15,...,3.15}
+%    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
+%    \draw[thick] (8.3 cm, .1 cm) -- +(1.4 cm,0);
+%    \draw[thick] (8.3 cm, -.1 cm) -- +(1.4 cm,0);
+%  \end{tikzpicture}
+%\end{center}
+
+%\begin{center}
+%  \begin{tikzpicture}[scale=.4]
+%    \draw (-1,0) node[anchor=east]  {$C_k$};
+%    \foreach \x in {0,...,4}
+%    \draw[xshift=\x cm,thick,fill=black] (\x cm,0) circle (.3cm);
+%    \draw[xshift=5 cm,thick] (5 cm, 0) circle (.3 cm);
+%    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
+%    \foreach \y in {1.15,...,3.15}
+%    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
+%    \draw[thick] (8.3 cm, .1 cm) -- +(1.4 cm,0);
+%    \draw[thick] (8.3 cm, -.1 cm) -- +(1.4 cm,0);
+%  \end{tikzpicture}
+%\end{center}
+
+\begin{center}
+  \begin{tikzpicture}[scale=.4]
+    \draw (-1,0) node[anchor=east]  {$D_k$};
+    \foreach \x in {0,...,4}
+    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
+    \draw[xshift=8 cm,thick] (30: 17 mm) circle (.3cm);
+    \draw[xshift=8 cm,thick] (-30: 17 mm) circle (.3cm);
+    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
+    \foreach \y in {1.15,...,3.15}
+    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
+    \draw[xshift=8 cm,thick] (30: 3 mm) -- (30: 14 mm);
+    \draw[xshift=8 cm,thick] (-30: 3 mm) -- (-30: 14 mm);
+  \end{tikzpicture}
+\end{center}
+
+%\begin{center}
+%  \begin{tikzpicture}[scale=.4]
+%    \draw (-1,0) node[anchor=east]  {$G_2$};
+%    \draw[thick] (0 ,0) circle (.3 cm);
+%    \draw[thick,fill=black] (2 cm,0) circle (.3 cm);
+%    \draw[thick] (30: 3mm) -- +(1.5 cm, 0);
+%    \draw[thick] (0: 3 mm) -- +(1.4 cm, 0);
+%    \draw[thick] (-30: 3 mm) -- +(1.5 cm, 0);
+%  \end{tikzpicture}
+%\end{center}
+
+%\begin{center}
+%  \begin{tikzpicture}[scale=.4]
+%    \draw (-3,0) node[anchor=east]  {$F_4$};
+%    \draw[thick] (-2 cm ,0) circle (.3 cm);
+%    \draw[thick] (0 ,0) circle (.3 cm);
+%    \draw[thick,fill=black] (2 cm,0) circle (.3 cm);
+%    \draw[thick,fill=black] (4 cm,0) circle (.3 cm);
+%    \draw[thick] (15: 3mm) -- +(1.5 cm, 0);
+%    \draw[xshift=-2 cm,thick] (0: 3 mm) -- +(1.4 cm, 0);
+%    \draw[thick] (-15: 3 mm) -- +(1.5 cm, 0);
+%    \draw[xshift=2 cm,thick] (0: 3 mm) -- +(1.4 cm, 0);
+%  \end{tikzpicture}
+%\end{center}
+
+\begin{center}
+  \begin{tikzpicture}[scale=.4]
+    \draw (-1,1) node[anchor=east]  {$E_6$};
+    \foreach \x in {0,...,4}
+    \draw[thick,xshift=\x cm] (\x cm,0) circle (3 mm);
+    \foreach \y in {0,...,3}
+    \draw[thick,xshift=\y cm] (\y cm,0) ++(.3 cm, 0) -- +(14 mm,0);
+    \draw[thick] (4 cm,2 cm) circle (3 mm);
+    \draw[thick] (4 cm, 3mm) -- +(0, 1.4 cm);
+  \end{tikzpicture}
+\end{center}
+
+\begin{center}
+  \begin{tikzpicture}[scale=.4]
+    \draw (-1,1) node[anchor=east]  {$E_7$};
+    \foreach \x in {0,...,5}
+    \draw[thick,xshift=\x cm] (\x cm,0) circle (3 mm);
+    \foreach \y in {0,...,4}
+    \draw[thick,xshift=\y cm] (\y cm,0) ++(.3 cm, 0) -- +(14 mm,0);
+    \draw[thick] (4 cm,2 cm) circle (3 mm);
+    \draw[thick] (4 cm, 3mm) -- +(0, 1.4 cm);
+  \end{tikzpicture}
+\end{center}
+
+\begin{center}
+  \begin{tikzpicture}[scale=.4]
+    \draw (-1,1) node[anchor=east]  {$E_8$};
+    \foreach \x in {0,...,6}
+    \draw[thick,xshift=\x cm] (\x cm,0) circle (3 mm);
+    \foreach \y in {0,...,5}
+    \draw[thick,xshift=\y cm] (\y cm,0) ++(.3 cm, 0) -- +(14 mm,0);
+    \draw[thick] (4 cm,2 cm) circle (3 mm);
+    \draw[thick] (4 cm, 3mm) -- +(0, 1.4 cm);
+  \end{tikzpicture}
+\end{center}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
 \section{Higher structures}
 
 % http://chocolatshalba.ch/files/texlive/texmf-dist/doc/latex/tikz-cd/tikz-cd-doc.pdf
@@ -321,6 +462,36 @@ $$
 %& B
 %\arrow[Rightarrow,to path=(U) -- (D)]{}
 %\end{tikzcd}
+
+\subsection{Monads}
+
+A \emph{monad} on a category $\C$ is an endofunctor $T:\C\to \C$
+and two natural transformations,
+a unit $\eta:1_\C\to T$ and a multiplication $\mu:T^2\to T.$
+
+\[
+\begin{tikzcd}
+T^3 \arrow{r}{T\mu} \arrow[swap]{d}{\mu T} & T^2 \arrow{d}{\mu} & 
+T \arrow{r}{\eta T}\arrow{dr}{=} & T^2 \arrow{d}{\mu} & \arrow[swap]{l}{T\eta}\arrow{dl}{=} T \\
+T^2 \arrow{r}{\mu} & T & 
+& T & 
+\end{tikzcd}
+\]
+
+%\[
+%\begin{tikzcd}
+%A \arrow{r}{f} \arrow[swap]{dr}{g\circ f} & B \arrow{d}{g} \\
+%& C
+%\end{tikzcd}
+%\]
+
+See \cite{Mac1978}, \cite{Jacobs2012}.
+
+The distribution monad relies on the self-distributivity of convexity.
+See \cite{Jacobs2012} section 5.1.3.
+
+
+
 
 
 
