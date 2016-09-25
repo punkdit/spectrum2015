@@ -1,5 +1,6 @@
 
 
+
 Verified on stan that single stabilizer frustration holds second eigval:
 ...
  64942 ((1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0), 87.0323019209)
@@ -63,6 +64,7 @@ Model(Lx/z: 36, Gx: 9, Gz: 7, Hx: 0, Hz: 0, Rx/z: 3)
 
 exactly solvable ?
 
+./gauge.py gcolor size=1.5 ideal R=3 filename=pic-gcolor-ideal.pdf
 
 16/9/16
 =======

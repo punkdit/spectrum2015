@@ -831,16 +831,16 @@ which can be subsumed into the gauge code as operators $\pm I.$
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-\subsubsection{The $XY$-model}
-
-The $XY$-model lives on a one dimensional chain of $n$ qubits.
-We write the gauge group generators as
-$$
-    G_0 = \{ X_i X_{i+1}, Z_i Z_{i+1} \ \mbox{for}\ i=1,...,n \}
-$$
-with periodic boundary conditions.
-
-This example shares features of both the previous and the next examples.
+%\subsubsection{The $XY$-model}
+%
+%The $XY$-model lives on a one dimensional chain of $n$ qubits.
+%We write the gauge group generators as
+%$$
+%    G_0 = \{ X_i X_{i+1}, Z_i Z_{i+1} \ \mbox{for}\ i=1,...,n \}
+%$$
+%with periodic boundary conditions.
+%
+%This example shares features of both the previous and the next examples.
 
 
 
@@ -1141,12 +1141,16 @@ do not live inside the guage group.
 We consider each of these blocks 
 $L_X, L_Z, S_X, T_Z, T_X, S_Z, R_X, R_Z$
 as either a set of $\Fn$ vectors or as an 
-$\Field$-\emph{matrix}
-with $n$ columns.
+$\Field$ vector space operator.
 For example, we write $u\in R_X$ to mean $u$ is in
 the set $R_X$. 
+%As an $r\times n$ matrix this operator is
+%$$
+%    R_X : \Field[n] \to \Field[r]
+%$$
 Given $v\in \Fr$ then $u = v R_X$ is
 a generic vector in the rowspace of $R_X.$
+
 
 We call the rowspace of an $\Field$-matrix
 $M$ the \emph{span} and denote 
