@@ -202,41 +202,7 @@ exercise 4.2.3: The Hecke algebra of $\GL_n(\Field_q).$
 % http://mathoverflow.net/questions/15438/a-slick-proof-of-the-bruhat-decomposition-for-gl-nk
 %
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-
-\section{Discrete differential geometry}
-
-Regge calculus aka Discrete exterior calculus.
-Applications to building space-time geometry out of
-quantum entanglement structures: \cite{Cao2016}.
-Constructing a Ricci flow on a simplicial geometry: \cite{Miller2014}.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-
-\section{ADE classification}
-
-Singularities:
-\begin{align*}
-A_k:f(x)   &= x^{k+1}, \ \ k\ge 1;\\
-D_k:f(x,y) &= x^2y + y^{k-1},\ \  k\ge 4;\\
-E_6:f(x,y) &= x^3 + y^4;\\
-E_7:f(x,y) &= x^3 + xy^3;\\
-E_8:f(x,y) &= x^3 + y^5.
-\end{align*}
-
-Platonic solid symmetry:
-$E_6:$ tetrahedral, $E_7:$ cube (octahedral), $E_8:$ icosahedron (dodecahedron.)
-
-Another trinity: Real, Complex, Quaternionic.
-
-$ADE$ Dynkin diagrams are the simply laced diagrams: 
+\subsection{Dynkin diagrams}
 
 \begin{center}
   \begin{tikzpicture}[scale=.4]
@@ -249,33 +215,33 @@ $ADE$ Dynkin diagrams are the simply laced diagrams:
   \end{tikzpicture}
 \end{center}
 
-%\begin{center}
-%  \begin{tikzpicture}[scale=.4]
-%    \draw (-1,0) node[anchor=east]  {$B_k$};
-%    \foreach \x in {0,...,4}
-%    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
-%    \draw[xshift=5 cm,thick,fill=black] (5 cm, 0) circle (.3 cm);
-%    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
-%    \foreach \y in {1.15,...,3.15}
-%    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
-%    \draw[thick] (8.3 cm, .1 cm) -- +(1.4 cm,0);
-%    \draw[thick] (8.3 cm, -.1 cm) -- +(1.4 cm,0);
-%  \end{tikzpicture}
-%\end{center}
+\begin{center}
+  \begin{tikzpicture}[scale=.4]
+    \draw (-1,0) node[anchor=east]  {$B_k$};
+    \foreach \x in {0,...,4}
+    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
+    \draw[xshift=5 cm,thick,fill=black] (5 cm, 0) circle (.3 cm);
+    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
+    \foreach \y in {1.15,...,3.15}
+    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
+    \draw[thick] (8.3 cm, .1 cm) -- +(1.4 cm,0);
+    \draw[thick] (8.3 cm, -.1 cm) -- +(1.4 cm,0);
+  \end{tikzpicture}
+\end{center}
 
-%\begin{center}
-%  \begin{tikzpicture}[scale=.4]
-%    \draw (-1,0) node[anchor=east]  {$C_k$};
-%    \foreach \x in {0,...,4}
-%    \draw[xshift=\x cm,thick,fill=black] (\x cm,0) circle (.3cm);
-%    \draw[xshift=5 cm,thick] (5 cm, 0) circle (.3 cm);
-%    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
-%    \foreach \y in {1.15,...,3.15}
-%    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
-%    \draw[thick] (8.3 cm, .1 cm) -- +(1.4 cm,0);
-%    \draw[thick] (8.3 cm, -.1 cm) -- +(1.4 cm,0);
-%  \end{tikzpicture}
-%\end{center}
+\begin{center}
+  \begin{tikzpicture}[scale=.4]
+    \draw (-1,0) node[anchor=east]  {$C_k$};
+    \foreach \x in {0,...,4}
+    \draw[xshift=\x cm,thick,fill=black] (\x cm,0) circle (.3cm);
+    \draw[xshift=5 cm,thick] (5 cm, 0) circle (.3 cm);
+    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
+    \foreach \y in {1.15,...,3.15}
+    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
+    \draw[thick] (8.3 cm, .1 cm) -- +(1.4 cm,0);
+    \draw[thick] (8.3 cm, -.1 cm) -- +(1.4 cm,0);
+  \end{tikzpicture}
+\end{center}
 
 \begin{center}
   \begin{tikzpicture}[scale=.4]
@@ -292,30 +258,30 @@ $ADE$ Dynkin diagrams are the simply laced diagrams:
   \end{tikzpicture}
 \end{center}
 
-%\begin{center}
-%  \begin{tikzpicture}[scale=.4]
-%    \draw (-1,0) node[anchor=east]  {$G_2$};
-%    \draw[thick] (0 ,0) circle (.3 cm);
-%    \draw[thick,fill=black] (2 cm,0) circle (.3 cm);
-%    \draw[thick] (30: 3mm) -- +(1.5 cm, 0);
-%    \draw[thick] (0: 3 mm) -- +(1.4 cm, 0);
-%    \draw[thick] (-30: 3 mm) -- +(1.5 cm, 0);
-%  \end{tikzpicture}
-%\end{center}
+\begin{center}
+  \begin{tikzpicture}[scale=.4]
+    \draw (-1,0) node[anchor=east]  {$G_2$};
+    \draw[thick] (0 ,0) circle (.3 cm);
+    \draw[thick,fill=black] (2 cm,0) circle (.3 cm);
+    \draw[thick] (30: 3mm) -- +(1.5 cm, 0);
+    \draw[thick] (0: 3 mm) -- +(1.4 cm, 0);
+    \draw[thick] (-30: 3 mm) -- +(1.5 cm, 0);
+  \end{tikzpicture}
+\end{center}
 
-%\begin{center}
-%  \begin{tikzpicture}[scale=.4]
-%    \draw (-3,0) node[anchor=east]  {$F_4$};
-%    \draw[thick] (-2 cm ,0) circle (.3 cm);
-%    \draw[thick] (0 ,0) circle (.3 cm);
-%    \draw[thick,fill=black] (2 cm,0) circle (.3 cm);
-%    \draw[thick,fill=black] (4 cm,0) circle (.3 cm);
-%    \draw[thick] (15: 3mm) -- +(1.5 cm, 0);
-%    \draw[xshift=-2 cm,thick] (0: 3 mm) -- +(1.4 cm, 0);
-%    \draw[thick] (-15: 3 mm) -- +(1.5 cm, 0);
-%    \draw[xshift=2 cm,thick] (0: 3 mm) -- +(1.4 cm, 0);
-%  \end{tikzpicture}
-%\end{center}
+\begin{center}
+  \begin{tikzpicture}[scale=.4]
+    \draw (-3,0) node[anchor=east]  {$F_4$};
+    \draw[thick] (-2 cm ,0) circle (.3 cm);
+    \draw[thick] (0 ,0) circle (.3 cm);
+    \draw[thick,fill=black] (2 cm,0) circle (.3 cm);
+    \draw[thick,fill=black] (4 cm,0) circle (.3 cm);
+    \draw[thick] (15: 3mm) -- +(1.5 cm, 0);
+    \draw[xshift=-2 cm,thick] (0: 3 mm) -- +(1.4 cm, 0);
+    \draw[thick] (-15: 3 mm) -- +(1.5 cm, 0);
+    \draw[xshift=2 cm,thick] (0: 3 mm) -- +(1.4 cm, 0);
+  \end{tikzpicture}
+\end{center}
 
 \begin{center}
   \begin{tikzpicture}[scale=.4]
@@ -353,6 +319,46 @@ $ADE$ Dynkin diagrams are the simply laced diagrams:
   \end{tikzpicture}
 \end{center}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+\section{Discrete differential geometry}
+
+Regge calculus aka Discrete exterior calculus.
+Applications to building space-time geometry out of
+quantum entanglement structures: \cite{Cao2016}.
+Constructing a Ricci flow on a simplicial geometry: \cite{Miller2014}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+\section{ADE classification}
+
+Singularities:
+\begin{align*}
+A_k:f(x)   &= x^{k+1}, \ \ k\ge 1;\\
+D_k:f(x,y) &= x^2y + y^{k-1},\ \  k\ge 4;\\
+E_6:f(x,y) &= x^3 + y^4;\\
+E_7:f(x,y) &= x^3 + xy^3;\\
+E_8:f(x,y) &= x^3 + y^5.
+\end{align*}
+
+Platonic solid symmetry:
+$E_6:$ tetrahedral, $E_7:$ cube (octahedral), $E_8:$ icosahedron (dodecahedron.)
+
+Another trinity: Real, Complex, Quaternionic.
+
+The $ADE$ Dynkin diagrams are the simply laced diagrams (single edges only.)
+
+% http://blogs.ams.org/visualinsight/2016/05/01/involutes-of-a-cubical-parabola/
+
+% https://en.wikipedia.org/wiki/Catastrophe_theory#Elementary_catastrophes
 
 
 
