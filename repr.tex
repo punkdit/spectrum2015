@@ -115,6 +115,7 @@ Some numerics and intuition provided.
 
 \newcommand{\todo}[1]{\textcolor{red}{#1}}
 
+\def\smbox#1{\ \ \mbox{#1}\ \ }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -1161,26 +1162,24 @@ will be split into $X$ and $Z$ type
 operators $T_X$ and $T_Z$ and
 finally the logical operators
 $L_X$ and $L_Z.$
-
 We summarize all of these sets
 in the following table:
 \begin{center}
 \includegraphics[]{pic-symplectic.pdf}
 \end{center}
-
 The solid rectangles indicate operators that
 span the $X$ and $Z$ parts of the gauge group,
 and the dashed rectangles indicate operators that
 do not live inside the guage group.
 
 We consider each of these blocks 
-$L_X, L_Z, S_X, T_Z, T_X, S_Z, R_X, R_Z$
-as well as $G_X,G_Z.$
-Each of these blocks can be thought of as 
-either a set of $\Fn$ vectors (the rows) or as an 
+$L_X, L_Z, S_X, T_Z, T_X, S_Z, R_X, R_Z,$
+as well as $G_X,G_Z,$
+%Each of these blocks can be thought of as 
+as either a set of $\Fnd$ vectors (the rows) or as an 
 $\Field$-linear operator.
-For example, we write $u\in R_X$ to mean $u$ is in
-the set $R_X$.
+For example, we write $u\in R_X$ to mean $u$ is 
+a row of the matrix $R_X$.
 %As an $r\times n$ matrix this operator is
 %$$
 %    R_X : \Field^n] \to \Field^r]
@@ -1224,37 +1223,126 @@ subject to the restriction that the rows of
 $R_X$ lie in the span of $G_X$ and
 the rows of $L_X$ do not.
 Similarly for $R_Z$ and $L_Z.$
-This is a set of 16 equations, quadratic in the unknown variables,
-and so it is not obvious how to proceed but it turns out a
+This set of 16 equations is quadratic in the unknown variables
+and so it is not obvious how to proceed, but it turns out a
 systematic way can be found.
 
-To find the reduced gauge group $R_X$ we project the gauge
-group generators onto the orthogonal complement of $S_X.$
-Such a projector is an $n\times n$
+We begin by finding $L_Z.$
+These operators satisfy the following \emph{homology} condition:
+$$
+    l_Z \in L_Z \smbox{is given by} l_Z^\top \in \Ker(G_X) \smbox{mod} \Span{S_Z}.
+$$
+In other words, $L_Z$ is formed from a basis for the kernel of $G_X$ 
+row-reduced using $S_Z.$
+To be more specific %about this operation of mod $\Span{S_Z}$
+we take any direct sum decomposition
+$$\Fnd = \Span{S_Z} \oplus V$$
+then the operation of mod $\Span{S_Z}$ is the
+projection onto $V.$
+We can explicitly write such a 
+projector as the $n\times n$
 matrix given by
 $$
-    P_X = I + A^\top S_X
+    P_Z = I + A^\top S_Z
 $$
-where the matrix $A$ is the $m_X\times n$ matrix consisting of
-the leading 1's in a row-reduction of $S_X.$
-Then $R_X$ is found as a row-reduction of $G_X P_X.$
-We find $R_Z$ in a similar way.
+where the matrix $A$ is the $m_Z\times n$ matrix consisting of
+the leading 1's in any row-reduction of $S_Z.$
+We define $P_X$ similarly for the operation of mod $\Span{S_X}.$
 
-The logical operators $L_Z$ 
-span the kernel of $G_X$ intersected with the complement
-of the span of $H_Z.$
+To find $L_X$ we solve the following $\Field$-linear
+system:
+%\begin{align*}
+%    L_Z L_X^\top &= I, \\
+%    G_Z L_X^\top &= 0.
+%\end{align*}
+$$
+\left( \begin{array}{l}
+L_Z\\
+G_Z\\
+\end{array} \right)
+L_X^\top = 
+\left( \begin{array}{l}
+I\\
+0
+\end{array} \right)
+$$
 
-The error operators $T_X$ are found as the solution
-to the linear system:
-\begin{align*}
-    H_Z T_X^\top &= I \\
-    L_Z T_X^\top &= 0 \\
-    R_Z T_X^\top &= 0
-\end{align*}
-\emph{and on it goes...}
+The reduced gauge group matrix $R_X$
+is found as a row-reduction of $G_X P_X.$
+We cannot merely set $R_Z$ to be $G_Z P_Z$ 
+because we also require $R_X R_Z^\top = I.$
+Instead we define the auxiliary matrix
+$\widetilde{R}_Z$ to be a row-reduction of  $G_Z P_Z.$
 
-We call this array of eight $\Field$
-valued matrices 
+The error operators $T_X$ are then found as the solution
+to the $\Field$-linear system:
+%\begin{align*}
+%    S_Z T_X^\top &= I,\\
+%    L_Z T_X^\top &= 0,\\
+%    \widetilde{R}_Z T_X^\top &= 0.
+%\end{align*}
+$$
+\left( \begin{array}{l}
+L_Z\\
+S_Z\\
+\widetilde{R}_Z
+\end{array} \right)
+T_X^\top = 
+\left( \begin{array}{l}
+0\\
+I\\
+0
+\end{array} \right)
+$$
+And then the operators $T_Z$ solve the $\Field$-linear system:
+%\begin{align*}
+%    S_X T_Z^\top &= I,\\
+%    T_X T_Z^\top &= 0,\\
+%    L_X T_Z^\top &= 0,\\
+%    R_X T_Z^\top &= 0.
+%\end{align*}
+$$
+\left( \begin{array}{l}
+L_X\\
+S_X\\
+T_X\\
+R_X
+\end{array} \right)
+T_Z^\top = 
+\left( \begin{array}{l}
+0\\
+I\\
+0\\
+0
+\end{array} \right)
+$$
+Finally at this point $R_Z$ is given as the solution to
+%\begin{align*}
+%    R_X R_Z^\top &= I,\\
+%    L_X R_Z^\top &= 0,\\
+%    S_X R_Z^\top &= 0,\\
+%    T_X R_Z^\top &= 0.
+%\end{align*}
+$$
+\left( \begin{array}{l}
+L_X\\
+S_X\\
+T_X\\
+R_X
+\end{array} \right)
+R_Z^\top = 
+\left( \begin{array}{l}
+0\\
+0\\
+0\\
+I
+\end{array} \right)
+$$
+Note that $R_Z$ and $\widetilde{R}_Z$ have identicle span 
+and so we have $R_Z T_X^\top = 0.$
+
+We call this array of eight $\Field$-linear 
+matrices
 an $(L,S,T,R)$-decomposition of the gauge group.
 In general this will not be unique for
 any given gauge group.
@@ -1337,7 +1425,7 @@ $$
 
 We now wish to understand the action of the
 gauge group on each of its irreps.
-Starting with the $t_X=0, t_Z=0$ irrep,
+Starting with the $t_X,t_Z=0,0$ irrep,
 this is where each of the stabilizers has
 a trivial action. 
 In $\Fn$ this
@@ -1354,26 +1442,26 @@ Since $R_X R_Z^\top = I$
 we can write $v = u R_Z^\top.$
 Each $g_X\in G_X$ acts on $u$ to give
 \begin{align*}
-    u_1 &= (u + g_X) \ \mbox{mod}\  S_X \\
+    u_1 &= (u + g_X) \ \mbox{mod}\ \Span{S_X} \\
         &= (u + g_X) P_X \\
         &= (v R_X + g_X) P_X.
 \end{align*}
 writing $u_1 = v_1 R_X$ we then have
 \begin{align*}
     v_1 &= (v R_X + g_X) P_X R_Z^\top \\
-        &= v + g_X P_X R_Z^\top.
+        &= v + g_X R_Z^\top.
 \end{align*}
-\todo{XXX explain that \todo{$P_X R_Z^\top = R_Z^\top$} etc. XXX}
+%\todo{XXX explain that \todo{$P_X R_Z^\top = R_Z^\top$} etc. XXX}
 So we have that working in the computational
 basis, the action of the $X$ part of the
-gauge group in the $t=0,0$ irrep is to send
+gauge group in the $t_X,t_Z=0,0$ irrep is to send
 %$v\in R_X$ to 
-$v\in \Frd$ to $v + g_X P_X R_Z^\top.$
+$v\in \Frd$ to $v + g_X R_Z^\top.$
 In summary, we have the following contributions from the
 $G_X$ terms of the Hamiltonian:
 $$
-%    H_{0,0}(v, v+g_X P_X R_Z^\top) \ne 0,\ \ \mbox{for}\ g_X\in G_X, v\in \Frd
-    \bra{v} H_{0,0} \ket{v+g_X P_X R_Z^\top} 
+%    H_{0,0}(v, v+g_X  R_Z^\top) \ne 0,\ \ \mbox{for}\ g_X\in G_X, v\in \Frd
+    \bra{v} H_{0,0} \ket{v+g_X  R_Z^\top} 
         \pluseq 1,\ \ \mbox{for}\ g_X\in G_X, v\in \Frd
 $$
 where we use the $\pluseq$ notation
@@ -1409,29 +1497,26 @@ Adding up all of the above we
 have in summary,
 $$
 H_{0,0} = \sum_{\substack{v\in\Frd\\g_X\in G_X } }
-  \ket{v+g_X P_X R_Z^\top}\bra{v} 
+  \ket{v+g_X  R_Z^\top}\bra{v} 
   + \sum_{v\in\Frd} \bigl(|G_Z| - 2w(G_Z R_X^\top v^\top)
     \bigr) \ \ket{v}\bra{v}.
 $$
 
-Now we turn to ...
 For any $t_X\in \Span{T_X}$ the Hamiltonian block $H_{t_X,0}$
 has components indexed by basis vectors:
 $$
     u = v R_X + t_X
 $$
-
-... this means that the $G_X$ gauge terms
+this means that the $G_X$ gauge terms
 have the same effect on $H_{t_X,0}$
 as $H_{0,0}$ and only the diagonal has changed:
 $$
 H_{t_X,0} = \sum_{\substack{v\in\Frd\\g_X\in G_X } }
-  \ket{v+g_X P_X R_Z^\top}\bra{v} 
+  \ket{v+g_X  R_Z^\top}\bra{v} 
   + \sum_{v\in\Frd} \bigl(
     |G_Z| - 2w(G_Z R_X^\top v^\top + G_Z t_X^\top)
     \bigr) \ \ket{v}\bra{v}.
 $$
-
 Writing the difference explicitly:
 $$
     H_{0,0} - H_{t_X,0} = 
@@ -1440,14 +1525,12 @@ $$
     -w(G_Z R_X^\top v^\top)
     \bigr) \ \ket{v}\bra{v}.
 $$
-
-Although we won't need this below,
-here is the general form of
-the Hamiltonian block for completeness:
+The general form of
+each the Hamiltonian block is:
 \begin{align*}
 H_{t_X,t_Z} = &\sum_{\substack{v\in\Frd\\g_X\in G_X } }
     \eta(t_Z g_X^\top)
-  \ \ket{v+g_X P_X R_Z^\top}\bra{v} \\
+  \ \ket{v+g_X  R_Z^\top}\bra{v} \\
   &+ \sum_{v\in\Frd} \bigl(
     |G_Z| - 2w(G_Z R_X^\top v^\top + G_Z t_X^\top)
     \bigr) \ \ket{v}\bra{v}.
@@ -1479,7 +1562,7 @@ We make the following definitions.
 A CSS gauge code is \emph{self-dual} when the $X$ and $Z$ type
 gauge generators are equal: $$G_X = G_Z.$$
 
-The $XY$-model is an example of a self-dual code.
+%The $XY$-model is an example of a self-dual code.
 A CSS gauge code is \emph{weakly self-dual}
 when there is a permutation $P$ on the set of $n$ qubits
 that induces equality of the gauge generators:
@@ -2032,7 +2115,6 @@ the eigenspaces of $\Ham$.
 %operators.
 
 \def\auto{A}
-\def\smbox#1{\ \ \mbox{#1}\ \ }
 The set of all such graph automorphisms 
 form a group $\auto$.
 We now define a new matrix $\Ham//\auto$
