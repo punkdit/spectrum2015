@@ -1046,8 +1046,19 @@ mutually anti-commuting string operators $R_0.$
 \def\Cn{\Complex[2^n]}
 \def\Cr{\Complex[2^r]}
 \def\Field{\mathcal{F}_2}
-\def\Fn{\Field[n]}
-\def\Fr{\Field[r]}
+%\def\Fn{\Field[n]}
+%\def\Fr{\Field[r]}
+\def\Fn{\Field^n}
+\def\Fm{\Field^m}
+\def\Fr{\Field^r}
+\def\Fnd{\Field^{n*}}
+\def\Fmd{\Field^{m*}}
+\def\Frd{\Field^{r*}}
+
+\def\Im{\mathrm{im}}
+\def\Ker{\mathrm{ker}}
+%\def\Span#1{\mathrm{span}(#1)}
+\def\Span#1{\langle #1 \rangle}
 
 \subsection{Representations over the finite field $\Field$}
 
@@ -1074,27 +1085,40 @@ $$
 we do this in the obvious way by sending $X_i$ to the basis vector with
 $1$ in the $i-$th entry, and similarly for each $Z_i$. 
 We also identify the computational basis of our statespace $\Complex[2^n]$
-with $\Fn$ in the obvious way.
-This has the potential to be very confusing but 
-apart from $X$ and $Z$ subscripts
-we resist the temptation to
-use any other decorations.
+with $\Fn$ in the obvious way:
+$$
+\Complex[2^n] \cong \Complex[\Fn].
+$$
+This has the potential to be very confusing, and
+so where appropriate we use $X$ and $Z$ subscripts.
+%apart from occasionally
+%we resist the temptation to
+%use any other decorations.
 
-$X$-type operators act on basis vectors using $\Field$ addition:
+$X$-type operators act on the $\Complex[\Fn]$
+basis vectors using $\Field$ addition:
 $$
     g_X \in \Pauli^X_n \cong \Fn, \ \ g_X : v \longmapsto g_X + v
 $$
 
-$Z$-type operators act on basis vectors using $\Field$ inner product:
+$Z$-type operators act on the
+$\Complex[\Fn]$ basis vectors using $\Field$ inner product:
 $$
-    g_Z \in \Pauli^Z_n \cong \Fn, \ \ g_Z : v \longmapsto g_Z v^\top
+    g_Z \in \Pauli^Z_n \cong \Fn, \ \ g_Z : v^\top \longmapsto g_Z v^\top
 $$
 This is an $\Field$ scalar, just zero or one. We think of this
 as a ``syndrome''.
-Our $\Field$ vectors come as row vectors by default,
-so a product $u v^\top$ of
-two $\Fn$ vectors is a scalar.
-
+This suggests that actually these $Z$-type operators
+live in the dual vector space $\Field^{n*}.$
+Because of the underlying symmetry
+(and notational confusion)
+between the $X$ and $Z$-type operators,
+we make the convenction that by default
+all our $\Field$ vectors come as row vectors (ie. dual vectors).
+This means we use the transpose operator $^\top$ to
+indicate a primal (column) vector.
+%so a product $u v^\top$ of
+%two $\Fn$ vectors is a scalar.
 It doesn't make sense to add an $X$-type operator and
 a $Z$-type operator:
 $$
@@ -1106,6 +1130,21 @@ $$
 $$
 This is an $\Field$ scalar which gives the commutator of the 
 two operators.
+
+A $\Field$-linear operator such as
+$ A : \Fn \to \Fm $
+acts on the left as $ u^\top \mapsto A u^\top.$
+It also acts on dual vectors as
+$ A : \Fmd \to \Fnd $
+which corresponds to acting on the right: $v \mapsto vA.$ 
+We call the rowspace of 
+$A$ the \emph{span} and denote 
+it as 
+$$\Span{A} = \{ vA | v \in \Fmd \}$$
+The kernel of $A$ is defined as
+$$
+    \Ker(A) = \{ u^\top | u^\top \in \Fn,\ \  A u^\top = 0 \}.
+$$
 
 We wish to use this language to decompose a CSS gauge group $G.$
 First we write the gauge group generators in terms of
@@ -1125,10 +1164,6 @@ $L_X$ and $L_Z.$
 
 We summarize all of these sets
 in the following table:
-\def\Im{\mathrm{im}}
-\def\Ker{\mathrm{ker}}
-%\def\Span#1{\mathrm{span}(#1)}
-\def\Span#1{\langle #1 \rangle}
 \begin{center}
 \includegraphics[]{pic-symplectic.pdf}
 \end{center}
@@ -1140,41 +1175,34 @@ do not live inside the guage group.
 
 We consider each of these blocks 
 $L_X, L_Z, S_X, T_Z, T_X, S_Z, R_X, R_Z$
-as either a set of $\Fn$ vectors or as an 
-$\Field$ vector space operator.
+as well as $G_X,G_Z.$
+Each of these blocks can be thought of as 
+either a set of $\Fn$ vectors (the rows) or as an 
+$\Field$-linear operator.
 For example, we write $u\in R_X$ to mean $u$ is in
-the set $R_X$. 
+the set $R_X$.
 %As an $r\times n$ matrix this operator is
 %$$
-%    R_X : \Field[n] \to \Field[r]
+%    R_X : \Field^n] \to \Field^r]
 %$$
-Given $v\in \Fr$ then $u = v R_X$ is
-a generic vector in the rowspace of $R_X.$
-
-
-We call the rowspace of an $\Field$-matrix
-$M$ the \emph{span} and denote 
-it as $\Span{M}.$
-The kernel of $M$ is defined as
-$$
-    \Ker(M) = \{ v^\top | M v^\top = 0 \}.
-$$
+%Given $v\in \Fr$ then $u = v R_X$ is
+%a generic vector in the rowspace of $R_X.$
 
 We first find the stabilizers $S_Z$.
-These are built out of $\Fn$ vectors from the span of $G_Z$
+These are built out of $\Fnd$ vectors from the span of $G_Z$
 that commute with the rows of $G_X:$
 \begin{align*}
-    \Span{S_Z} &= \{\  vG_Z \ |\  v G_Z G_X^\top = 0, \ \ v \in F_2^{|G_Z|}\ \} \\
+    \Span{S_Z} &= \{\  vG_Z \ |\  v G_Z G_X^\top = 0, \ \ v \in F_2^{|G_Z|*}\ \} \\
                &= \{\  vG_Z \ |\  v^\top \in \Ker(G_X G_Z^\top)  \ \}.
 \end{align*}
-The generators (rows of $S_Z$) can be extracted
-from the span by row reduction.
+The generators (rows of $S_Z$) are then extracted
+from this span by row reduction.
 We swap the role of $X$ and $Z$ to find $S_X.$
 
 Once we have the stabilizers, in order to
 complete the above table as a presentation
-of the Pauli group we need to solve the
-following $\Field$ block matrix equation:
+of the Pauli group we solve the
+following $\Field$ block matrix equation,
 %All of this can be summarized in the block matrix equation:
 $$
 \left( \begin{array}{l}
@@ -1189,15 +1217,15 @@ T_Z\\
 S_Z\\
 R_Z
 \end{array} \right)^\top =
-I.
+I,
 $$
 %And once again we have a presentation of the Pauli group.
-with the restriction that the rows of
+subject to the restriction that the rows of
 $R_X$ lie in the span of $G_X$ and
-the rows of $L_X$ do not. Similarly
-for $R_Z$ and $L_Z.$
-This is a non-linear system of 16 equations and so it
-is not obvious how to proceed, but it turns out a
+the rows of $L_X$ do not.
+Similarly for $R_Z$ and $L_Z.$
+This is a set of 16 equations, quadratic in the unknown variables,
+and so it is not obvious how to proceed but it turns out a
 systematic way can be found.
 
 To find the reduced gauge group $R_X$ we project the gauge
@@ -1242,44 +1270,44 @@ using $2^n$ ``points''
 as basis vectors.
 Working in the computational basis,
 we do indeed have $2^n$ such points; 
-these are the elements of $\Fn.$
+these are the elements of $\Fnd.$
 And so we make the identification
 $$
-    \Complex[2^n] \cong \Complex[\Fn].
+    \Complex[2^n] \cong \Complex[\Fnd].
 $$
 In other words, we are labelling 
-our basis vectors with elements of $\Fn$
+our basis vectors with elements of $\Fnd$
 and therefore such notation as
 $$
     \bra{u} H \ket{v}
 $$
-with $u, v \in \Fn$ makes sense.
+with $u, v \in \Fnd$ makes sense.
 We will make further use of this below,
-by writing computations in vector
-spaces over $\Field$ inside the Dirac brakets.
+by writing  $\Field$-vector space 
+computations inside the Dirac brakets.
 
 Returning to the code $(L,S,T,R)$-decomposition
 above,
-given $t\in T$ such that $t = t_X t_Z$
+given the Pauli operator $t\in T$ such that $t = t_X t_Z$ (in $\Pauli_n$)
 we get a basis for the irrep $\rho_t$:
 $$
-    \{ \ket{v R_X + t_X} \ \mbox{such that}\  v \in \Fr \}.
+    \{ \ket{v R_X + t_X} \ \mbox{such that}\  v \in \Frd \}.
 $$
 In other words,
 the basis of the irrep $\rho_t$ is 
-an affine subspace of $\Fn.$
+an affine subspace of $\Fnd.$
 Each such affine subspace is indexed by an
-element of $\Fr$ and
+element of $\Frd$ and
 all of these are
 translates of each other,
 so we make the following identification:
 $$
-\Complex[\{vR_X+t_X\}_{v\in\Fr}]
-\cong \Complex[\Fr].
+\Complex[\{vR_X+t_X\}_{v\in\Frd}]
+\cong \Complex[\Frd].
 $$
 This will allow us to write the components
 of each block $H_t$ of the Hamiltonian
-as $\bra{u}H_t\ket{v}$ for $u,v\in\Fr.$
+as $\bra{u}H_t\ket{v}$ for $u,v\in\Frd.$
 We make this identification of affine subspaces
 not out of laziness but because it will
 help us to compare each of
@@ -1289,31 +1317,31 @@ the Hamiltonian blocks $H_t$ below.
 \noindent{\bf Important:}
 The computational basis identifies
 basis vectors of $\Complex[2^n]$
-with elements of a finite vector space $\Fn$:
+with elements of a finite vector space $\Fnd$:
 $$
-    \Complex[2^n] \cong \Complex[\Fn].
+    \Complex[2^n] \cong \Complex[\Fnd].
 $$
 The $(L,S,T,R)$-decomposition naturally
-splits $\Fn$ into $2^{m_Z+k}$ affine subspaces:
+splits $\Fnd$ into $2^{m_Z+k}$ affine subspaces:
 $$
-    \{ v R_X + t_X + l_X \}_{v\in\Fr}
+    \{ v R_X + t_X + l_X \}_{v\in\Frd}
 $$
 for each $t_X \in \Span{T_X}, l_X \in \Span{L_X}.$
 Each such affine subspace forms a basis
 for the irreducible blocks $H_{t_X,t_Z}$ of $H$,
-and can be naturally identified with $\Fr:$
+and can be naturally identified with $\Frd:$
 $$
-    H_{t_X,t_Z} : \Complex[\Fr] \to \Complex[\Fr].
+    H_{t_X,t_Z} : \Complex[\Frd] \to \Complex[\Frd].
 $$
 \end{framed}
 
 We now wish to understand the action of the
 gauge group on each of its irreps.
-Starting with the $t=0$ irrep,
+Starting with the $t_X=0, t_Z=0$ irrep,
 this is where each of the stabilizers has
 a trivial action. 
 In $\Fn$ this
-corresponds to additive action of the zero vector.
+corresponds to the additive action of the zero vector.
 
 \newcommand{\pluseq}{\mathrel{+}=}
 States $u\in\Span{R_X}$ can be built from a
@@ -1321,7 +1349,7 @@ vector matrix product
 $$
     u = v R_X
 $$
-with $v\in\Fr.$
+with $v\in\Frd.$
 Since $R_X R_Z^\top = I$
 we can write $v = u R_Z^\top.$
 Each $g_X\in G_X$ acts on $u$ to give
@@ -1340,13 +1368,13 @@ So we have that working in the computational
 basis, the action of the $X$ part of the
 gauge group in the $t=0,0$ irrep is to send
 %$v\in R_X$ to 
-$v\in \Fr$ to $v + g_X P_X R_Z^\top.$
+$v\in \Frd$ to $v + g_X P_X R_Z^\top.$
 In summary, we have the following contributions from the
 $G_X$ terms of the Hamiltonian:
 $$
-%    H_{0,0}(v, v+g_X P_X R_Z^\top) \ne 0,\ \ \mbox{for}\ g_X\in G_X, v\in \Fr
+%    H_{0,0}(v, v+g_X P_X R_Z^\top) \ne 0,\ \ \mbox{for}\ g_X\in G_X, v\in \Frd
     \bra{v} H_{0,0} \ket{v+g_X P_X R_Z^\top} 
-        \pluseq 1,\ \ \mbox{for}\ g_X\in G_X, v\in \Fr
+        \pluseq 1,\ \ \mbox{for}\ g_X\in G_X, v\in \Frd
 $$
 where we use the $\pluseq$ notation
 because there may be other contributions to the
@@ -1363,7 +1391,7 @@ that depends on the \emph{syndrome} vector:
 $$
     \mbox{syndrome}(u) = G_Z u^\top
 $$
-for $u\in \Fn.$
+for $u^\top \in \Fn.$
 This is an $\Field$ vector that has one component for
 each row of $G_Z.$
 Writing $|G_Z|$ for the number of these rows, and 
@@ -1375,14 +1403,14 @@ $$
     \bra{v} H_{0,0} \ket{v} 
         \pluseq |G_Z| - 2w(G_Z R_X^\top v^\top),
 $$
-for $v\in \Fr.$
+for $v\in \Frd.$
 
 Adding up all of the above we
 have in summary,
 $$
-H_{0,0} = \sum_{\substack{v\in\Fr\\g_X\in G_X } }
+H_{0,0} = \sum_{\substack{v\in\Frd\\g_X\in G_X } }
   \ket{v+g_X P_X R_Z^\top}\bra{v} 
-  + \sum_{v\in\Fr} \bigl(|G_Z| - 2w(G_Z R_X^\top v^\top)
+  + \sum_{v\in\Frd} \bigl(|G_Z| - 2w(G_Z R_X^\top v^\top)
     \bigr) \ \ket{v}\bra{v}.
 $$
 
@@ -1397,9 +1425,9 @@ $$
 have the same effect on $H_{t_X,0}$
 as $H_{0,0}$ and only the diagonal has changed:
 $$
-H_{t_X,0} = \sum_{\substack{v\in\Fr\\g_X\in G_X } }
+H_{t_X,0} = \sum_{\substack{v\in\Frd\\g_X\in G_X } }
   \ket{v+g_X P_X R_Z^\top}\bra{v} 
-  + \sum_{v\in\Fr} \bigl(
+  + \sum_{v\in\Frd} \bigl(
     |G_Z| - 2w(G_Z R_X^\top v^\top + G_Z t_X^\top)
     \bigr) \ \ket{v}\bra{v}.
 $$
@@ -1407,7 +1435,7 @@ $$
 Writing the difference explicitly:
 $$
     H_{0,0} - H_{t_X,0} = 
-  \sum_{v\in\Fr} 2\bigl(
+  \sum_{v\in\Frd} 2\bigl(
     w(G_Z R_X^\top v^\top + G_Z t_X^\top)
     -w(G_Z R_X^\top v^\top)
     \bigr) \ \ket{v}\bra{v}.
@@ -1417,10 +1445,10 @@ Although we won't need this below,
 here is the general form of
 the Hamiltonian block for completeness:
 \begin{align*}
-H_{t_X,t_Z} = &\sum_{\substack{v\in\Fr\\g_X\in G_X } }
+H_{t_X,t_Z} = &\sum_{\substack{v\in\Frd\\g_X\in G_X } }
     \eta(t_Z g_X^\top)
   \ \ket{v+g_X P_X R_Z^\top}\bra{v} \\
-  &+ \sum_{v\in\Fr} \bigl(
+  &+ \sum_{v\in\Frd} \bigl(
     |G_Z| - 2w(G_Z R_X^\top v^\top + G_Z t_X^\top)
     \bigr) \ \ket{v}\bra{v}.
 \end{align*}
@@ -1440,11 +1468,10 @@ of $S_X^\top.$
 The $t_Z\in\Span{T_Z}$ selects which
 $X$ type stabilizers act as $-1$ in this irrep.
 
-In summary, we have the
-complete representation
+In summary, we have the complete representation
 theory for $CSS$ gauge code Hamiltonians.
-It is a remarkable fact that this involves such
-a close interplay with $\Field$ linear algebra.
+%It is a remarkable fact that this involves such
+%a close interplay with $\Field$ linear algebra.
 
 \subsubsection{Self-dual codes}
 
@@ -1887,7 +1914,7 @@ Recall that we identified the bases of these two Hamiltonian blocks.
 \begin{align*}
     \lambda_1 - \lambda_2 &\le \bra{v_1}H_{0,0}\ket{v_1} - \bra{v_1}H_{t_X,0}\ket{v_1}  \\
             &= \bra{v_1}(H_{0,0} - H_{t_X,0})\ket{v_1}  \\
-    &= \sum_{v\in\Fr} 2\bigl(w(G_Z R_X^\top v^\top + G_Z t_X^\top) -w(G_Z R_X^\top v^\top)\bigr) 
+    &= \sum_{v\in\Frd} 2\bigl(w(G_Z R_X^\top v^\top + G_Z t_X^\top) -w(G_Z R_X^\top v^\top)\bigr) 
     |\braket{v}{v_1}|^2.
 \end{align*}
 
