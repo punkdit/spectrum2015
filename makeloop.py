@@ -3,17 +3,20 @@
 import os, sys
 import time
 
-TIME = None
+t = TIME = None
 
 while 1:
 
 
 
-    flds = os.stat(sys.argv[1])
-
-    t = flds.st_mtime
-    if TIME is None:
-        TIME = t
+    try:
+        flds = os.stat(sys.argv[1])
+    
+        t = flds.st_mtime
+        if TIME is None:
+            TIME = t
+    except OSError:
+        pass
 
     if t > TIME:
         rval = os.system("make")

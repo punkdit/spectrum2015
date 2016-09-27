@@ -70,22 +70,37 @@
 \maketitle
 
 \begin{abstract}
-Highly frustrated systems tend to be gapless. Or are they?
-Even beyond the lattice symmetries of the spin model,
-these things have an extensive number of integrals of motion, 
-which are called \emph{stabilizers} in the code literature.
-This extensive growth of symmetry
-makes the representation theory interesting.
-In exploring the spectra we specialize to ``CSS'' models,
-and exploit the Perron-Frobenius theory.
-Even though there is strong evidence that the 2d
-compass model is gapless, 
-%we provide the first rigorous proof of this.
-there is no rigorous proof of this. We provide some
-heuristics as to why this is so.
-Finally, we conjecture the excitations in
-the gauge color code model are gapped.
-Some numerics and intuition provided.
+%    Highly frustrated systems tend to be gapless. Or are they?
+%    Even beyond the lattice symmetries of the spin model,
+%    these things have an extensive number of integrals of motion, 
+%    which are called \emph{stabilizers} in the code literature.
+%    This extensive growth of symmetry
+%    makes the representation theory interesting.
+%    In exploring the spectra we specialize to ``CSS'' models,
+%    and exploit the Perron-Frobenius theory.
+%    Even though there is strong evidence that the 2d
+%    compass model is gapless, 
+%    %we provide the first rigorous proof of this.
+%    there is no rigorous proof of this. We provide some
+%    heuristics as to why this is so.
+%    Finally, we conjecture the excitations in
+%    the gauge color code model are gapped.
+%    Some numerics and intuition provided.
+What is an operator? From the perspective of a quantum code these are the
+things that we use to diagnose errors and perform error correction. We can
+also interpret these operators as the terms of Hamiltonian, whose
+groundspace corresponds to the energetically protected codespace.
+From the mathematical perspective we examine three different motions of
+representation theories from these operators, with the view to extracting
+spectral information about Hamiltonian. Group theory representations give
+the block diagonalisation of the Hamiltonian as labeled by stablisors. The
+coarser tool of Perron-Frobenius theory gives information about the
+spectral layout of these blocks in the case of CSS gauge codes. At the
+finest level, the operators in each of these blocks form a semisimple Lie
+algebra and ideals in this algebra correspond to tensor product of
+representations. This allows us to perform exact diagonalisation on some
+large instances of the gauge colour code Hamiltonian. These numerics
+support the conjecture that these Hamiltonian are gapped.
 \end{abstract}
 
 \newpage
@@ -682,7 +697,7 @@ is a unitary transformation that sends
 physical qubits to encoded qubits.
 
 
-\subsection{The Hamiltonian}
+\subsubsection{The Hamiltonian}
 
 The Hamiltonian of interest is 
 an operator $\Ham:\Complex[2^n]\to\Complex[2^n]$:
@@ -723,6 +738,11 @@ to each operator $g\in G_0,$
 \end{align*}
 In other words, using weights does not change the block structure of $\Ham.$
 
+In the following sections we will forget the distinction 
+between $g$ and $\rho_{\mathrm{pauli}}(g)$,
+so terms such as $Z$ and $X$ can be understood
+as the corresponding Pauli linear operators.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -730,10 +750,8 @@ In other words, using weights does not change the block structure of $\Ham.$
 
 \subsection{Applications}
 
-In the following applications we will make the identification
-between $g$ and $\rho_{pauli}(g)$.
-So terms such as $Z$ and $X$ are understood
-to be the corresponding Pauli linear operators.
+We now apply the tools built so far in order
+to demonstrate their effectiveness. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -806,10 +824,10 @@ spin transformation of the compass model
 which also results in an $(l-1)\times(l-1)$ lattice
 of spins and identical Hamiltonian up to some signs.
 
-Note that the form of each of the Hamiltonian blocks $H_t$
-comes from another gauge code.
-In this case it has some non-local operators, as well as $\pm 1$ factors
-which can be subsumed into the gauge code as operators $\pm I.$
+%Note that the form of each of the Hamiltonian blocks $H_t$
+%comes from another gauge code.
+%In this case it has some non-local operators, as well as $\pm 1$ factors
+%which can be subsumed into the gauge code as operators $\pm I.$
 
 %We have the following important fact which we will prove in section \ref{spectra} below:
 %\begin{framed}
@@ -1061,7 +1079,8 @@ mutually anti-commuting string operators $R_0.$
 %\def\Span#1{\mathrm{span}(#1)}
 \def\Span#1{\langle #1 \rangle}
 
-\subsection{Representations over the finite field $\Field$}
+%\subsection{Representations over the finite field $\Field$}
+\subsection{$\Field$-linear representations}
 
 This is a way of ``brute-forcing'' the representations when
 we cannot find a way of writing them down in a closed form expression.
@@ -1555,6 +1574,64 @@ In summary, we have the complete representation
 theory for $CSS$ gauge code Hamiltonians.
 %It is a remarkable fact that this involves such
 %a close interplay with $\Field$ linear algebra.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+\subsection{Lie algebra representations}
+
+
+\def\lie{\mathfrak{g}}
+
+We now turn to a finer notion of representation theory,
+being the representation theory of semi-simple Lie algebras.
+
+Recall \cite{Fulton2013} that an abstract 
+%(finite-dimensional)
+\emph{Lie algebra} $\lie$ is 
+a vector space with a bracket operation:
+$$
+    [\ ,\  ] : \lie \times \lie \to \lie
+$$
+such that $[A,B] = -[B,A]$ and
+$[A,[B,C]+[B,[C,A]]+[C,[A,B]]=0.$
+%Representations of the Lie algebra $\mathfrak{sl}_2(\Complex)$, see
+%\cite{Fulton2013} chapter 11.
+
+A \emph{representation} of a Lie algebra $\lie$
+on a vector space $V$ 
+is a linear map
+$$
+    \rho : \lie \to \GL(V)
+$$
+that sends the abstract bracket to the concrete one:
+$$
+    \rho([A, B]) = \rho(A)\rho(B) - \rho(B)\rho(A).
+$$
+%Once again $\rho_{\mathrm{pauli}}$ furnishes us with
+%a 
+
+A Lie algebra requires us to ``forget'' about
+multiplication of operators, and only allow taking brackets (and linear
+combinations.)
+This is not as crazy as it may seem.
+The fundamental calculation in the theory of
+quantum stabilizer codes is actually a Lie
+algebra calculation. Consider a state $\ket{\psi}$
+that is stabilized by some operator $s\in S:$
+$$
+    s\ket{\psi} = \ket{\psi},
+$$
+We wish to understand the effect of an error operator $t\in T$
+on our state $\ket{\psi}$, where we have $st = -ts:$
+$$
+    st\ket{\psi} = ts\ket{\psi} + [s, t]\ket{\psi} = -ts\ket{\psi} = -t\ket{\psi},
+$$
+which shows that $t\ket{\psi}$ is a $-1$ eigenvalue of $s.$
+The key point here is that nowhere did we need to multiply (compose) two operators,
+it was all done using the bracket.
+
+\subsection{Applications}
 
 \subsubsection{Self-dual codes}
 
@@ -2381,8 +2458,6 @@ $\lambda_2 = 9\sqrt{2} + 3\sqrt{10} \cong 22.21475504.$
 So the gap for this Hamiltonian  is 
 $$\lambda_1 - \lambda_2 = 9\sqrt{2} - 3\sqrt{10} \cong 3.24108908.$$
 
-Representations of the Lie algebra $\mathfrak{sl}_2(\Complex)$, see
-\cite{Fulton2013} chapter 11.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2474,25 +2549,25 @@ We expect generic local hamiltonians to be gapless \cite{Movassagh2016}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-\section{Outlook}
-
-There's a growing zoo of these systems and little is known
-about their energetics, in particular if they are gapped or
-not as the size increases.
-
-A family of topological subsystem codes,
-from the code perspective  \cite{Bombin2010,Bombin2014,Suchara2011},
-from the cond-mat (integrals of motion!) perspective:
-\cite{Kargarian2010,Bombin2009}
-Topological subsystem Codes: \cite{Suchara2011}
-Structure of 2D Topological Stabilizer Codes: \cite{Bombin2014}
-Gauge color codes, gauge fixing: \cite{Bombin2015}
-Gauge color codes, single shot: \cite{Bombin2015single}
-
-A generalization of this is the 
-monomial formalism \cite{Van2011}. 
-These operators also form a group and would
-have a corresponding representation theory.
+%\section{Outlook}
+%
+%There's a growing zoo of these systems and little is known
+%about their energetics, in particular if they are gapped or
+%not as the size increases.
+%
+%A family of topological subsystem codes,
+%from the code perspective  \cite{Bombin2010,Bombin2014,Suchara2011},
+%from the cond-mat (integrals of motion!) perspective:
+%\cite{Kargarian2010,Bombin2009}
+%Topological subsystem Codes: \cite{Suchara2011}
+%Structure of 2D Topological Stabilizer Codes: \cite{Bombin2014}
+%Gauge color codes, gauge fixing: \cite{Bombin2015}
+%Gauge color codes, single shot: \cite{Bombin2015single}
+%
+%A generalization of this is the 
+%monomial formalism \cite{Van2011}. 
+%These operators also form a group and would
+%have a corresponding representation theory.
 
 
 %% CUT HERE
@@ -2505,6 +2580,8 @@ have a corresponding representation theory.
 
 \bibliography{refs}{}
 \bibliographystyle{abbrv}
+
+% journal: Foundations of Computational Mathematics
 
 
 \end{document}

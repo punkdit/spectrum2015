@@ -295,16 +295,18 @@ def test_model():
                     #rz = get_zop(op)
                     #gz = dot2(rz, Rz)
                     gzs.append(rz)
-            gxs = array2(gxs)
-            gzs = array2(gzs)
-            print "Gx:"
-            print shortstrx(gxs)
-            print "Gz:"
-            print shortstrx(gzs)
-            A = dot2(gxs, gzs.transpose())
-            #print shortstrx(gxs, gzs, A)
-            print "A.transpose():"
-            print shortstr(A.transpose())
+
+            if argv.show:
+                gxs = array2(gxs)
+                gzs = array2(gzs)
+                print "Gx:"
+                print shortstrx(gxs)
+                print "Gz:"
+                print shortstrx(gzs)
+                A = dot2(gxs, gzs.transpose())
+                #print shortstrx(gxs, gzs, A)
+                print "A.transpose():"
+                print shortstr(A.transpose())
 
             ideal = set(op.tostring() for op in ideal)
             remain = [op for op in remain if not op.tostring() in ideal]
