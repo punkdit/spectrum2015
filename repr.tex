@@ -86,21 +86,29 @@
 %    Finally, we conjecture the excitations in
 %    the gauge color code model are gapped.
 %    Some numerics and intuition provided.
-What is an operator? From the perspective of a quantum code these are the
-things that we use to diagnose errors and perform error correction. We can
-also interpret these operators as the terms of Hamiltonian, whose
+What is an operator?
+From the perspective of a quantum code these are the
+things that we use to diagnose errors and perform error correction.
+We can also interpret these operators as the terms of a Hamiltonian, whose
 groundspace corresponds to the energetically protected codespace.
-From the mathematical perspective we examine three different motions of
-representation theories from these operators, with the view to extracting
-spectral information about Hamiltonian. Group theory representations give
-the block diagonalisation of the Hamiltonian as labeled by stablisors. The
-coarser tool of Perron-Frobenius theory gives information about the
-spectral layout of these blocks in the case of CSS gauge codes. At the
-finest level, the operators in each of these blocks form a semisimple Lie
-algebra and ideals in this algebra correspond to tensor product of
-representations. This allows us to perform exact diagonalisation on some
-large instances of the gauge colour code Hamiltonian. These numerics
-support the conjecture that these Hamiltonians are gapped.
+In the case of mutually commuting operators we can easily diagonalize the
+Hamiltonian, but for gauge (subsystem) codes this does not hold.
+From the mathematical perspective we examine three different notions of
+representation theory, with a view to extracting
+spectral information about the Hamiltonian.
+Group theory representations give
+a block diagonalisation of the Hamiltonian as labeled by stabilizer eigenvalues.
+The coarser tool of Perron-Frobenius theory gives information about the
+spectral layout of these blocks in the case of CSS gauge codes.
+At the finest level, the operators in each of these blocks form a semisimple Lie
+algebra and ideals in this algebra correspond to tensor products of
+representations. 
+Using all of these tools we 
+perform exact diagonalisation on some
+large instances of the 3-dimensional gauge color code Hamiltonian.
+These numerics support the conjecture that these models are gapped,
+which in turn lends weight to the possibility that these may
+be self-correcting quantum memories.
 \end{abstract}
 
 \newpage
@@ -141,16 +149,16 @@ support the conjecture that these Hamiltonians are gapped.
 
 \subsection{Motivating examples}
 
-There's at least one version of mathematical wisdom that would
-have us perform our linear algebra without choosing a basis.
-Any basis, or preferred subspace, should only come from the
-operators at hand, as eigenspaces or reducible subspaces.
-But by the time we have discovered these all the fun is over.
-Here we are interested in 
-thinking of the Hamiltonian as a matrix of transition
-amplitudes that describe a dynamical processes. 
-Experimental implementations of such schemes
-often do come with a basis.
+%There's at least one version of mathematical wisdom that would
+%have us perform our linear algebra without choosing a basis.
+%Any basis, or preferred subspace, should only come from the
+%operators at hand, as eigenspaces or reducible subspaces.
+%But by the time we have discovered these all the fun is over.
+%Here we are interested in 
+%thinking of the Hamiltonian as a matrix of transition
+%amplitudes that describe a dynamical processes. 
+%Experimental implementations of such schemes
+%often do come with a basis.
 
 %The above Hamiltonian operates on a two dimensional state space.
 We start our journey considering a two-dimensional state space.
@@ -603,7 +611,7 @@ $$
 $$
 
 %Finally, there are $2^m$ many $2^r$-dimensional irreps $\rho_t$
-%which are labelled by $t\in T$ and defined as
+%which are labeled by $t\in T$ and defined as
 %$$
 %    %\rho_t(h)=\pm I^{\otimes 2^r}\ \mbox{for}\ h\in \Stab_0,
 %    %\rho_t(h)= [t,h] = th^{-1}th^{-1} = \pm I^{\otimes 2^r}\ \mbox{for}\ h\in \Stab_0,
@@ -750,8 +758,11 @@ as the corresponding Pauli linear operators.
 
 \subsection{Applications}
 
-We now apply the tools built so far in order
-to demonstrate their effectiveness. 
+We now use the tools built so far
+to analyse two examples of gauge code Hamiltonians.
+The above procedure is not entirely automatic,
+it relies on extracting the isomorphism $\phi$,
+but when this can be made to work it works surprisingly well.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -1102,7 +1113,7 @@ $$
     \Pauli^X_n \cong \Fn,  \ \ 
     \Pauli^Z_n \cong \Fn. 
 $$
-we do this in the obvious way by sending $X_i$ to the basis vector with
+We do this in the obvious way by sending $X_i$ to the basis vector with
 $1$ in the $i-$th entry, and similarly for each $Z_i$. 
 We also identify the computational basis of our statespace $\Complex[2^n]$
 with $\Fn$ in the obvious way:
@@ -1139,6 +1150,7 @@ This means we use the transpose operator $^\top$ to
 indicate a primal (column) vector.
 %so a product $u v^\top$ of
 %two $\Fn$ vectors is a scalar.
+
 It doesn't make sense to add an $X$-type operator and
 a $Z$-type operator:
 $$
@@ -1382,7 +1394,7 @@ And so we make the identification
 $$
     \Complex[2^n] \cong \Complex[\Fnd].
 $$
-In other words, we are labelling 
+In other words, we are labeling 
 our basis vectors with elements of $\Fnd$
 and therefore such notation as
 $$
@@ -1650,6 +1662,10 @@ Notice that we do not include $I$ in these algebras as
 this is associated to the multiplicative (group) structure
 of the operators, and moreover we never need consider Hamiltonians
 with such terms as these just shift the spectrum by a constant.
+Notice also that if we try to build a larger Lie algebra
+from taking iterated brackets of
+the n-qubit operators $\{X_i, Z_i\}$ we still only get
+a direct sum of $n$ copies of $sl_2(\Complex).$
 
 An \emph{ideal} of a Lie algebra $\lie$
 is a Lie subalgebra $\lieh\subset\lie$ that ``eats''
@@ -1674,7 +1690,7 @@ We also have a ready made \emph{Cartan subalgebra} of $\lie_{t_X,t_Z}.$
 This is the algebra $\lieh_{t_X,t_Z}$ generated by the $Z-$type terms of $H_{t_X,t_Z}.$
 The \emph{weight spaces} are the simultaneous eigenspaces
 of the operators in the Cartan subalgebra. These
-eigenspaces are labelled by what we called syndromes previously,
+eigenspaces are labeled by what we called syndromes previously,
 and these are all one dimensional because the kernel of $R_Z$ is trivial.
 Therefore the representation of 
 $\lie_{t_X,t_Z}$ on $\Complex[\Frd]$ is irreducible.
@@ -1763,7 +1779,7 @@ except for the corner vertices which are adjacent to three other vertices.
 
 Here we show some instances of this construction,
 along with the colors of the unobscured balls.
-Each instance is labelled by the number of vertices $n$.
+Each instance is labeled by the number of vertices $n$.
 \begin{center}
 \includegraphics{pic-gcolor-1.pdf}\ \ \ \ \ \ \ \ \ \ \ 
 \includegraphics{pic-gcolor-15.pdf}
@@ -1822,6 +1838,8 @@ It follows that $\lie_{t_X,t_Z}$
 is the direct sum of 6 disjoint ideals,
 and specifically, that each Hamiltonian term in $H_{t_X,t_Z}$
 lies in a single one of these ideals.
+This result is crucial for obtaining the exact
+diagonalization numerical results below.
 
 %Colexes are discussed in \cite{Bombin2007exact}.
 %The (bare) logical operators are derived in \cite{Bombin2015single} proposition 23.
@@ -1842,10 +1860,10 @@ lies in a single one of these ideals.
 \section{Spectra}
 \label{spectra}
 
-We begin this section with a motivating example,
-and then turn to the application of
-Perron-Frobenius theory to
-CSS gauge code Hamiltonians.
+%We begin this section with a motivating example,
+%and then turn to the application of
+%Perron-Frobenius theory to
+%CSS gauge code Hamiltonians.
 
 \subsection{Perron-Frobenius structure theory}
 
@@ -1888,17 +1906,16 @@ This suggests the following definition.
 We define a graph $\Gamma$ with vertices the $2^n$ computational
 basis elements, and edges:
 $$
-    \ket{v} \mapsto g_X \ket{v}, \smbox{for all} v\in\Fn, g_X\in G_X.
+    \ket{v} \mapsto g_X \ket{v}, \smbox{for all} v\in\Fnd, g_X\in G_X.
 $$
 These are undirected edges because $g_X^2 = I.$
 We also add weighted loops corresponding to the $Z$-type gauge operators:
 $$
-    \ket{v} \mapsto \sum_{g_Z\in G_Z} g_Z \ket{v}, \smbox{for all} v\in\Fn.
+    \ket{v} \mapsto \sum_{g_Z\in G_Z} g_Z \ket{v}, \smbox{for all} v\in\Fnd.
 $$
 In this way we can consider $H$ and $\Gamma$ interchangeably,
 as either a matrix or a graph.
-For example,
-an irreducible matrix is one whose corresponding graph is connected.
+An irreducible matrix is one whose corresponding graph is connected.
 Using the $\Field$-linear $(L,S,T,R)$-decomposition of the gauge group
 we then have the following:
 \begin{framed}
@@ -1913,7 +1930,11 @@ $$
         \Gamma_{t_X}.
 $$
 \end{framed}
-
+A basis for each $\Gamma_{t_X}$ is given by a coset
+of $G_X$ in $\Fnd:$
+$$
+    \{ v S_X + u R_X + t_X \}_{v\in \Field^{m_X*}, u\in\Frd}.
+$$
 
 %See \cite{Baez2012}
 %We return to the investigation of Hamiltonians
@@ -1923,8 +1944,8 @@ $$
 %raising and lowering operators, and the diagonal
 %terms measure the energy of each level.
 
-The off-diagonal entries of $H$ are all positive,
-if we use a spectral shift operator, a constant multiple of the identity $+cI$,
+The off-diagonal entries of $H$ are all positive.
+If we use a spectral shift operator, a constant multiple of the identity $+cI$,
 we find that $H+cI$ is a non-negative matrix. 
 We call such a matrix \emph{Perron-Frobenius.}
 %Now we invoke the Peron-Frobenius theorem.
@@ -1998,7 +2019,6 @@ groundspace of $H$.
 The next goal is to search for
 the second eigenvalue of $H$,
 $\lambda_2(H).$
-
 Using a basis change and the
 above equation for $H_{t_X,0}$
 we have
@@ -2115,20 +2135,51 @@ There are two main points to make about these numerics.
 The first is that the gap of the compass model 
 is decreasing much faster than the gap in the gauge color model.
 In fact, there is strong evidence \cite{Dorier2005} 
-that the gap tends to zero as the lattice size grows.
+that the gap of the compass model
+tends to zero as the lattice size grows.
 The second point to make
 is that the gap always corresponds to frustrating
 the stabilizer (generator) of largest weight. 
 This is a crucial connection to make because the
 stabilizers of the compass model grow with the linear
-size of the model,
+size of the model\footnote{Note the similar
+behaviour of the 1-dimensional $XY$-model and transverse field ising model.},
 while those of the gauge color model
 do not need to grow beyond a constant bound.
 This would suggest that if this is the mechanism for
 gapless behaviour that the gauge color model may
 be gapped.
 
-\subsection{The double well model is gapless}
+\subsection{Cheeger cuts}
+
+In this final section
+we give some heuristic
+arguments for how the
+size of stabilizers is
+related to the gap of
+the code. 
+Unfortunately,
+this does not lead to 
+definitive conclusions;
+it appears that new
+ideas are required.
+
+The Perron-Frobenius structure theory places
+strong constraints on the first and second
+eigenvectors of $\Gamma_{t_X}:$
+the first eigenvector has all positive entries,
+%and the second eigenvector does not.
+and therefore all vectors orthogonal to the first
+eigenvector will have both positive and negative entries.
+In general, the set of edges of $\Gamma_{t_X}$ where
+such a vector changes sign we call a Cheeger cut.
+(We ignore the possibility that this vector
+may have zero entries.)
+The Cheeger cut associated to the second eigenvector
+is particularly important, and we next show an
+example of how this cut relates to the gap.
+
+\subsubsection{The double well model is gapless}
 
 We consider a linear graph Hamiltonian
 with a ``double-well'' potential.
@@ -2186,7 +2237,7 @@ $$
 $$
 and write $\ket{v_1} = 
 \ket{v_A}\oplus\ket{v_B}$
-and write the Hamiltonian with this
+as well as Hamiltonian with this
 decomposition as
 $$
 H = 
@@ -2220,7 +2271,7 @@ tends to zero we are done.
 This term involves the 
 dynamical coupling between the
 groundstate wavefunction along
-the ``cut'' between $A$ and $B$.
+the cut between $A$ and $B$.
 To succeed we must find such a cut where
 the wavefunction is small. In general
 this appears to be quite difficult,
@@ -2229,410 +2280,473 @@ numerics show that not only is the
 wavefunction small away from potential wells
 but it is exponentially small.
 
-In summary, we note the important
-features of this model.
-The groundstate wavefunction has all
-positive components, which implies
-that the size of the gap is controlled
-by the ``weight'' of a cut.
-Also, we are hinting at the role
-of symmetry as these cuts will
-turn out to be reflection lines
-under certain symmetries of the models
-we consider.
+%In summary, we note the important
+%features of this model.
+%The groundstate wavefunction has all
+%positive components, which implies
+%that the size of the gap is controlled
+%by the ``weight'' of a cut.
+%Also, we are hinting at the role
+%of symmetry as these cuts will
+%turn out to be reflection lines
+%under certain symmetries of the models
+%we consider.
 
 
-\subsection{The gap}
+\subsubsection{The cut and symmetry}
 
-The following fact would appear to be true under certain conditions,
-but is not at all true for example when $T$ is trivial.
-\begin{framed}
-\noindent{\bf Proto-fact:}
-
-For a sufficiently ``well-behaved''
-weakly self-dual
-gauge code Hamiltonian $H$
-\begin{align*}
-\lambda_2(\Ham) 
-    &= \min_{t_X\ne 0} \lambda_1(\Ham_{t_X,0})\\
-    &= \min_{t_Z\ne 0} \lambda_1(\Ham_{0,t_Z}).
-\end{align*}
-\end{framed}
-
-\subsection{Cheeger inequalities}
-
-In \cite{Friedland2002}, they derive the following Cheeger inequality
-by considering bi-partitions of the graph. We will do the
-same, but using matrix block notation.
-
-Let $v_2$ be a second eigenvector, $ \Ham v_2 = \lambda_2 v_2 $ 
-and $||v_2||=1$.
-We bi-partition the space 
-so that $v_2$ has (vector) blocks:
+We now study 
+the cut associated to the second eigenvector of a 
+weakly self-dual gauge Hamiltonian $H,$
+and relate this to the stabilizers of the code.
+The key realization is that $\Gamma_{t_X}$ is like
+the double well potential above,
+but now we have $2^{m_X}$ such wells,
+that is, one for every $s_X\in \Span{S_X}.$
+This is clear from examining the basis vectors for $\Gamma_{t_X}.$
+These are 
 $$
-v_2 = \left( \begin{array}{l}
-x\\
-y\end{array} \right)\quad
+    v S_X + u R_X + t_X, \smbox{where} v\in \Field^{m_X*}, u\in\Frd
 $$
-with $x\ge 0$ and $y\le 0,$ component-wise.
-Let the blocks of $\Ham$ under the same partition be:
-$$
-\Ham = \left( \begin{array}{ll}
-A&C\\
-C^\top&B\end{array} \right).\quad
-$$
-If we denote $\lambda_1(A)$ as the top eigenvalue of $A$ and
-$\lambda_1(B)$ as the top eigenvalue of $B$,
-then
-\begin{align*}
-\lambda_2 = v_2^\top \Ham v_2 &= x^\top A x + 2 x^\top C y + y^\top B y \\
-        &\le x^\top A x + y^\top B y\ \le\ ||x||^2 \lambda_1(A) + ||y||^2 \lambda_1(B) \\
-        &\le \mbox{min}(\lambda_1(A), \lambda_1(B))\ \le\ \lambda_1.
-\end{align*}
+and those that satisfy the most $G_Z$ terms are
+precisely those with $u=0.$
 
-Defining the following constant as a maximisation over
-all bi-partitions of $\Ham:$
+We already know this is either the second eigenvector of $H_{0,0}$
+or otherwise the first eigenvector of $H_{t_X,0}$ for some $t_X \ne 0.$
+To relate this to the Perron-Frobenius theory we note the 
+decomposition:
 $$
-    \nu(\Ham) := \max_{A, B}\ \mbox{min}(\lambda_1(A), \lambda_1(B))
+    \Gamma_{t_X} = \bigoplus_{t_Z\in\Span{T_Z}} H_{t_X, t_Z}.
 $$
-the above calculation shows that
-$$
-    \lambda_2 \le \nu(\Ham) \le \lambda_1.
-$$
+This gives the spectral decomposition of each graph $\Gamma_{t_X}$ 
+in terms of ``momenta'' $t_Z.$
 
-To bound $\lambda_2$ from below, we use a variational argument.
-For any unit vector $v$ orthogonal to the top eigenspace of $\Ham$ we
-have $v^\top \Ham v \le \lambda_2.$
+We focus on $\Gamma_0.$
+This must contain the second eigenvector of $H$ by weak self-duality of the code.
+%The matrices $H_{0,t_Z)}$ are Perron-Frobenius (by a change of basis)
+%and so the first eigenvector $v_1(H_{0,t_Z})$ can be taken to be positive.
+$X$ type stabilizers $s_X\in S_X$ act on the $0,t_Z$ irreps in $\Gamma_0$
+by $\pm 1$ according to the commutator $[[s_X, t_Z]].$
+Suppose the second eigenvector of $H$ lives in
+$H_{0,t_Z}$ for $t_Z\ne 0$. 
+Let $s_X\in S_X$ with $[[s_X, t_Z]]=-1.$
+Then we must have an odd number of Cheeger cuts 
+on every $\Gamma_0$ path between $\ket{v}$ and $s_X\ket{v}$ for all basis
+vectors $\ket{v},$ that is, $v\in\Span{S_X}\oplus\Span{R_X}.$
+
+In a similar vein, if the second eigenvector of $H$ lives in $H_{0,0}$
+then we must have an even number of Cheeger cuts 
+on every $\Gamma_0$ path between $\ket{v}$ and $s_X\ket{v}$ for all stabilizers $s_X\in S_X$
+and basis vectors $\ket{v}.$
+
+In summary, the idea is that large stabilizers lead to
+widely separated well potentials and hense gapless behaviour,
+while stabilizers of bounded weight force the cuts to
+appear close to the wells and hense maintain a gap.
+Making these arguments rigorous appears to be difficult.
+
+Finally, we suspect that $H_{0,0}$ will not be gapped in
+the generic case. Numerics show that these stabilizer-less
+Hamiltonians can be constructed with small gap. It appears
+that double well behaviour can still be imitated even without
+stabilizers: merely having a large region of almost-stabilizer
+behaviour (large shallow well) could be enough to send the gap
+to zero.
+
+
+% -------------> >>>>> % We expect generic local hamiltonians to be gapless \cite{Movassagh2016}.
+
+%\subsubsection{The gap}
+%
+%The following fact would appear to be true under certain conditions,
+%but is not at all true for example when $T$ is trivial.
+%\begin{framed}
+%\noindent{\bf Proto-fact:}
+%
+%For a sufficiently ``well-behaved''
+%weakly self-dual
+%gauge code Hamiltonian $H$
+%\begin{align*}
+%\lambda_2(\Ham) 
+%    &= \min_{t_X\ne 0} \lambda_1(\Ham_{t_X,0})\\
+%    &= \min_{t_Z\ne 0} \lambda_1(\Ham_{0,t_Z}).
+%\end{align*}
+%\end{framed}
+
+%\subsection{Cheeger inequalities}
+%
+%In \cite{Friedland2002}, they derive the following Cheeger inequality
+%by considering bi-partitions of the graph. We will do the
+%same, but using matrix block notation.
+%
+%Let $v_2$ be a second eigenvector, $ \Ham v_2 = \lambda_2 v_2 $ 
+%and $||v_2||=1$.
+%We bi-partition the space 
+%so that $v_2$ has (vector) blocks:
+%$$
+%v_2 = \left( \begin{array}{l}
+%x\\
+%y\end{array} \right)\quad
+%$$
+%with $x\ge 0$ and $y\le 0,$ component-wise.
+%Let the blocks of $\Ham$ under the same partition be:
+%$$
+%\Ham = \left( \begin{array}{ll}
+%A&C\\
+%C^\top&B\end{array} \right).\quad
+%$$
+%If we denote $\lambda_1(A)$ as the top eigenvalue of $A$ and
+%$\lambda_1(B)$ as the top eigenvalue of $B$,
+%then
+%\begin{align*}
+%\lambda_2 = v_2^\top \Ham v_2 &= x^\top A x + 2 x^\top C y + y^\top B y \\
+%        &\le x^\top A x + y^\top B y\ \le\ ||x||^2 \lambda_1(A) + ||y||^2 \lambda_1(B) \\
+%        &\le \mbox{min}(\lambda_1(A), \lambda_1(B))\ \le\ \lambda_1.
+%\end{align*}
+%
+%Defining the following constant as a maximisation over
+%all bi-partitions of $\Ham:$
+%$$
+%    \nu(\Ham) := \max_{A, B}\ \mbox{min}(\lambda_1(A), \lambda_1(B))
+%$$
+%the above calculation shows that
+%$$
+%    \lambda_2 \le \nu(\Ham) \le \lambda_1.
+%$$
+%
+%To bound $\lambda_2$ from below, we use a variational argument.
+%For any unit vector $v$ orthogonal to the top eigenspace of $\Ham$ we
+%have $v^\top \Ham v \le \lambda_2.$
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%
+%\subsection{The compass model is gapless}
+%
+%Although there is strong evidence that the gap dissapears as the lattice size
+%$l$ grows, it is still worthwhile considering the exact reasons for this.
+%
+%We use a variational argument to show that $\lambda_1(H_{t_X,0})$
+%is close to $\lambda_1(H_{0,0}).$
+%Given the similarity of the form of these two blocks, we
+%take the ground eigenvector $v_1$ of $H_{0,0}$ and apply it
+%to $H_{t_X,0}$. % where $t_X$ has low weight.
+%Recall that we identified the bases of these two Hamiltonian blocks.
+%\begin{align*}
+%    \lambda_1 - \lambda_2 &\le \bra{v_1}H_{0,0}\ket{v_1} - \bra{v_1}H_{t_X,0}\ket{v_1}  \\
+%            &= \bra{v_1}(H_{0,0} - H_{t_X,0})\ket{v_1}  \\
+%    &= \sum_{v\in\Frd} 2\bigl(w(G_Z R_X^\top v^\top + G_Z t_X^\top) -w(G_Z R_X^\top v^\top)\bigr) 
+%    |\braket{v}{v_1}|^2.
+%\end{align*}
+%
+%FAIL
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%
+%\subsection{Perturbation of the Perron vector}
+%
+%Lemma:
+%Let $A$ be non-negative irreducible $n\times n$ matrix.
+%Let $v\ne 0$ be a non-negative $n$ vector, and $B = A + \ket{e_i}\bra{v}.$
+%Then 
+%$$
+%\frac{y_i}{x_i} > \frac{y_j}{x_j} \ \ \mbox{for}\ \ j \ne i,
+%$$
+%where $x, y$ are the Perron eigenvectors of $A, B$ respectively
+%\cite{Elsner1982}.
+%
+%Let $H(t)$ be non-negative irreducible matrix, continuously
+%differentiable wrt $t.$
+%Let $v(t)$ and $\lambda(t)$ be the Perron eigenvector and value of $H(t)$
+%with $\braket{v}{v}=1.$
+%Then
+%$$
+%    \lambda' = \bra{v}H'\ket{v}
+%$$
+%and
+%$$
+%    \ket{v'} = -(H-\lambda)^{-1}(H' - \lambda')\ket{v}.
+%$$
+%where $(H-\lambda)^{-1}$ is the Moore-Penrose inverse of $H-\lambda.$ See \cite{Meyer1988}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-\subsection{The compass model is gapless}
-
-Although there is strong evidence that the gap dissapears as the lattice size
-$l$ grows, it is still worthwhile considering the exact reasons for this.
-
-We use a variational argument to show that $\lambda_1(H_{t_X,0})$
-is close to $\lambda_1(H_{0,0}).$
-Given the similarity of the form of these two blocks, we
-take the ground eigenvector $v_1$ of $H_{0,0}$ and apply it
-to $H_{t_X,0}$. % where $t_X$ has low weight.
-Recall that we identified the bases of these two Hamiltonian blocks.
-\begin{align*}
-    \lambda_1 - \lambda_2 &\le \bra{v_1}H_{0,0}\ket{v_1} - \bra{v_1}H_{t_X,0}\ket{v_1}  \\
-            &= \bra{v_1}(H_{0,0} - H_{t_X,0})\ket{v_1}  \\
-    &= \sum_{v\in\Frd} 2\bigl(w(G_Z R_X^\top v^\top + G_Z t_X^\top) -w(G_Z R_X^\top v^\top)\bigr) 
-    |\braket{v}{v_1}|^2.
-\end{align*}
-
-FAIL
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\subsection{The orbigraph}
 %
-
-\subsection{Perturbation of the Perron vector}
-
-Lemma:
-Let $A$ be non-negative irreducible $n\times n$ matrix.
-Let $v\ne 0$ be a non-negative $n$ vector, and $B = A + \ket{e_i}\bra{v}.$
-Then 
-$$
-\frac{y_i}{x_i} > \frac{y_j}{x_j} \ \ \mbox{for}\ \ j \ne i,
-$$
-where $x, y$ are the Perron eigenvectors of $A, B$ respectively
-\cite{Elsner1982}.
-
-Let $H(t)$ be non-negative irreducible matrix, continuously
-differentiable wrt $t.$
-Let $v(t)$ and $\lambda(t)$ be the Perron eigenvector and value of $H(t)$
-with $\braket{v}{v}=1.$
-Then
-$$
-    \lambda' = \bra{v}H'\ket{v}
-$$
-and
-$$
-    \ket{v'} = -(H-\lambda)^{-1}(H' - \lambda')\ket{v}.
-$$
-where $(H-\lambda)^{-1}$ is the Moore-Penrose inverse of $H-\lambda.$ See \cite{Meyer1988}.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%A graph automorphism is a permutation matrix $P$
+%such that $P^T \Ham P = \Ham$.
+%Equivalently, $P$ commutes with $\Ham$ and this means it preserves
+%the eigenspaces of $\Ham$.
+%%To show $P$ acts trivially on the groundstate we
+%%need to check that it commutes with the logical
+%%operators.
 %
-
-\subsection{The orbigraph}
-
-A graph automorphism is a permutation matrix $P$
-such that $P^T \Ham P = \Ham$.
-Equivalently, $P$ commutes with $\Ham$ and this means it preserves
-the eigenspaces of $\Ham$.
-%To show $P$ acts trivially on the groundstate we
-%need to check that it commutes with the logical
-%operators.
-
-\def\auto{A}
-The set of all such graph automorphisms 
-form a group $\auto$.
-We now define a new matrix $\Ham//\auto$
-that acts on the vector space with basis consisting
-of the orbits of $\auto.$
-%The groundspace wavefunction is constant
-%on each $\auto-$orbit.
-%The top eigenvalue of $\Ham//\auto$ will be the
-%same as the top eigenvalue of $\Ham.$
-
-The matrix components of $\Ham//\auto$ will be
-$$
-    (\Ham//\auto)_{ij} = |\{ g\in G \smbox{s.t.} gv \in j \}| \smbox{for some}v\in i
-$$
-for each pair of $\auto-$orbits $i$ and $j$.
-In other words, 
-$(\Ham//\auto)_{ij} $ counts the number of gauge group
-elements that sends any particular element $v$ of the 
-$\auto-$orbit $i$ to the $\auto-$orbit $j.$
-
-Here is a simple example. % potential only depends on hamming weight: Jarret
-We take as gauge group 
-$$G = \{XII, IXI, IIX, ZII, IZI, IIZ\}.$$
-The Hamiltonian $H = \sum_{g\in G} g$ has matrix:
-$$
-H = \left(\begin{array}{rrrrrrrr}
- 3 &  1 &  1 &  1 &  0 &  0 &  0 &  0 \cr
-  1 &  1 &  0 &  0 &  1 &  1 &  0 &  0 \cr
-  1 &  0 &  1 &  0 &  1 &  0 &  1 &  0 \cr
-  1 &  0 &  0 &  1 &  0 &  1 &  1 &  0 \cr
-  0 &  1 &  1 &  0 & -1 &  0 &  0 &  1 \cr
-  0 &  1 &  0 &  1 &  0 & -1 &  0 &  1 \cr
-  0 &  0 &  1 &  1 &  0 &  0 & -1 &  1 \cr
-  0 &  0 &  0 &  0 &  1 &  1 &  1 & -3
-\end{array}\right)
-$$
-In this case, the automorphism group is $\auto=S_3,$
-there are four $\auto-$orbits, and
-$$
-H//\auto = \left(\begin{array}{rrrr}
- 3 &  3 &  0 &  0 \cr
-  1 &  1 &  2 &  0 \cr
-  0 &  2 & -1 &  1 \cr
-  0 &  0 &  3 & -3
-\end{array}\right).
-$$
-In this case the automorphism group $\auto$ of the graph
-is the same as the automorphism group $Aut(G)$ of the gauge group,
-but in general it is possible that $Aut(G) < \auto.$
-
-Note that the orbigraph is no longer Hermitian,
-and in general will not even be normal.
-
-We can also write $H//A = QHP$ using the following two matrices for $P$ and $Q:$
-$$
-Q = 
-\left(\begin{array}{rrrrrrrr}
- 1 &  0 &  0 &  0 &  0 &  0 &  0 &  0 \cr
-  0 &  1 &  0 &  0 &  0 &  0 &  0 &  0 \cr
-  0 &  0 &  0 &  0 &  1 &  0 &  0 &  0 \cr
-  0 &  0 &  0 &  0 &  0 &  0 &  0 &  1
-\end{array}\right),\ \ \ 
-P = 
-\left(\begin{array}{rrrr}
- 1 &  0 &  0 &  0 \cr
-  0 &  1 &  0 &  0 \cr
-  0 &  1 &  0 &  0 \cr
-  0 &  1 &  0 &  0 \cr
-  0 &  0 &  1 &  0 \cr
-  0 &  0 &  1 &  0 \cr
-  0 &  0 &  1 &  0 \cr
-  0 &  0 &  0 &  1
-\end{array}\right).
-$$
-The idea is that each column of $P$ sums over an orbit,
-and each row of $Q$ chooses one member of each orbit.
-
-The automorphisms of the gauge group, $Aut(G)$ will induce an
-automorphism of the graph by ...
-In particular, elements of the stabilizer group $\Stab$ induce graph 
-automorphisms by ...
-In general there may be more symmetry in the graph that
-we cannot access via a group automorphism.
-
-See also \cite{Cvetkovic1980} chapter 5.
-
-In general, we will apply this idea to each of the blocks $H_t$.
-From {\bf Fact 2} above, and using the fact that we are
-summing over a trivial representation of $Aut(G)$ we have the following:
-\begin{framed}
-\noindent{\bf Fact 3:}
-
-The orbigraph of $\Ham_{0,0}$ contains the ground eigenvalue of $\Ham_{0,0}.$
-\end{framed}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\def\auto{A}
+%The set of all such graph automorphisms 
+%form a group $\auto$.
+%We now define a new matrix $\Ham//\auto$
+%that acts on the vector space with basis consisting
+%of the orbits of $\auto.$
+%%The groundspace wavefunction is constant
+%%on each $\auto-$orbit.
+%%The top eigenvalue of $\Ham//\auto$ will be the
+%%same as the top eigenvalue of $\Ham.$
 %
-\subsubsection{Compass model}
-For the next example we take the $l=3$ compass model.
-$\Ham_{0,0}$ acts on a 16 dimensional space.
-The order of $A$ is $72$, and we find three $A-$orbits.
-% This time $Aut(G) = A$ ???
-The orbigraph method can be applied in the case
-where the Hamiltonian weights for $X$ and $Z$ are uniform as $w_X$ and $w_Z.$
-We separate the $X$ and $Z$ terms of the orbigraph to show
-how this works:
-$$
-\Ham_{0,0}//\auto = 
-\left(\begin{array}{rrr}
- 0 &  9 &  0 \cr
-  1 &  4 &  4 \cr
-  0 &  6 &  3
-\end{array}\right) + 
-\left(\begin{array}{rrr}
- 9 &  0 &  0 \cr
-  0 &  1 &  0 \cr
-  0 &  0 &  -3
-\end{array}\right)
-=
-\left(\begin{array}{rrr}
- 9 &  9 &  0 \cr
-  1 &  5 &  4 \cr
-  0 &  6 &  0
-\end{array}\right)
-$$
-This can be solved analytically and we find $\lambda_1 = 4+2\sqrt{13} \cong 11.21110255.$
-Keep in mind that the original state space has dimension $2^9=512$ so we
-have come a long way down to 3.
-
-By exact\footnote{Exact in this context means that we do not do any
-perturbative approxiamations to the operator in question.}
-numerical diagonalization
-we get the spectrum of $\Ham_{0,0}$ and note that the orbigraph lifts
-all degeneracy as well as missing some excited eigenspaces:
-\begin{center}
-\begin{tabular}{ c|c|c } 
-$\lambda$ & $\Ham_{0,0}$ degeneracy & $\Ham_{0,0}//A$ degeneracy \\
-\hline
-    11.2111025509 & 1 & 1 \\
-    6.0 & 1 & 1 \\
-    2.0 & 4 &   \\
-    0.0 & 4 &   \\
-    -3.21110255093 & 1 & 1 \\
-    -4.0 & 4 &   \\
-    -6.0 & 1 &   
-\end{tabular}
-\end{center}
-The reason we miss some excited spaces is that they do not contain
-any trivial irrep of $A.$
-Note that we miss the eigenspace with $\lambda = -6$
-even though this is one dimensional. It must contain some other non-trivial
-one dimensional irrep. This cannot happen with the groundspace because
-those eigenvectors are all positive.
-
-If we want to make an orbigraph for these other spaces we would construct
-the orbigraph by
-summing over orbits using different characters of $A$
-(these are \emph{momenta} in the abelian terminology).
-See \cite{Cvetkovic1980} chapter 5 for more details.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%The matrix components of $\Ham//\auto$ will be
+%$$
+%    (\Ham//\auto)_{ij} = |\{ g\in G \smbox{s.t.} gv \in j \}| \smbox{for some}v\in i
+%$$
+%for each pair of $\auto-$orbits $i$ and $j$.
+%In other words, 
+%$(\Ham//\auto)_{ij} $ counts the number of gauge group
+%elements that sends any particular element $v$ of the 
+%$\auto-$orbit $i$ to the $\auto-$orbit $j.$
 %
-\subsubsection{Gauge color code model}
-The Gauge color code \cite{Bombin2015,Bombin2015single}...
-This is a self-dual code...
-The smallest in the ensemble has $n=15$ qubits,
-$G_0$ has $18$ each of X/Z-type gauge operators,
-and $4$ each of X/Z-type stabilizer generators.
-$\Ham_{0,0}$ acts on a 64 dimensional space, and $A$ has
-order 720, and we find 7 orbits:
-$$
-\Ham_{0,0}//\auto = 
-\left(\begin{array}{rrrrrrr}
-18 & 18 &  0 &  0 &  0 &  0 &  0 \cr
-  3 & 12 & 15 &  0 &  0 &  0 &  0 \cr
-  0 &  6 &  6 & 12 &  0 &  0 &  0 \cr
-  0 &  0 &  9 &  0 &  9 &  0 &  0 \cr
-  0 &  0 &  0 & 12 & -6 &  6 &  0 \cr
-  0 &  0 &  0 &  0 & 15 & -12 &  3 \cr
-  0 &  0 &  0 &  0 &  0 & 18 & -18
-\end{array}\right)
-$$
-The eigenvalue equation results in
-the recurrence relation:
-$$
-    \lambda a_k = 3ka_{k-1} + (18-6k)a_k + (18-3k)a_{k+1},
-$$
-which has largest solution 
-$\lambda_1 = 18\sqrt{2} \cong 25.4558441.$
-
-% RP^3 is homeomorphic to the solid ball with antipodal points identified
-% http://math.stackexchange.com/questions/507783/mathbbrp3-is-homeomorphic-to-the-solid-ball-with-antipodal-points-identifi
-% http://topospaces.subwiki.org/wiki/Homology_of_real_projective_space
-
-Numerics give the full spectrum of $\Ham_{0,0}$ and we note that the orbigraph lifts
-all degeneracy as well as preserving every eigenvalue:
-\begin{center}
-\begin{tabular}{ c|c|c } 
-$\lambda$ & $\Ham_{0,0}$ degeneracy & $\Ham_{0,0}//A$ degeneracy \\
-\hline
-    25.4558441227 & 1 & 1 \\
-    16.9705627485 & 6 & 1 \\
-    8.48528137424 & 15 & 1 \\
-    0.0 & 20 & 1 \\
-    -8.48528137424 & 15 & 1 \\
-    -16.9705627485 & 6 & 1 \\
-    -25.4558441227 & 1 & 1 \\
-\end{tabular}
-\end{center}
-
-The second eigenvalue of $H$ comes from a recurrence
-relation in two variables which has solution
-$\lambda_2 = 9\sqrt{2} + 3\sqrt{10} \cong 22.21475504.$
-So the gap for this Hamiltonian  is 
-$$\lambda_1 - \lambda_2 = 9\sqrt{2} - 3\sqrt{10} \cong 3.24108908.$$
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Here is a simple example. % potential only depends on hamming weight: Jarret
+%We take as gauge group 
+%$$G = \{XII, IXI, IIX, ZII, IZI, IIZ\}.$$
+%The Hamiltonian $H = \sum_{g\in G} g$ has matrix:
+%$$
+%H = \left(\begin{array}{rrrrrrrr}
+% 3 &  1 &  1 &  1 &  0 &  0 &  0 &  0 \cr
+%  1 &  1 &  0 &  0 &  1 &  1 &  0 &  0 \cr
+%  1 &  0 &  1 &  0 &  1 &  0 &  1 &  0 \cr
+%  1 &  0 &  0 &  1 &  0 &  1 &  1 &  0 \cr
+%  0 &  1 &  1 &  0 & -1 &  0 &  0 &  1 \cr
+%  0 &  1 &  0 &  1 &  0 & -1 &  0 &  1 \cr
+%  0 &  0 &  1 &  1 &  0 &  0 & -1 &  1 \cr
+%  0 &  0 &  0 &  0 &  1 &  1 &  1 & -3
+%\end{array}\right)
+%$$
+%In this case, the automorphism group is $\auto=S_3,$
+%there are four $\auto-$orbits, and
+%$$
+%H//\auto = \left(\begin{array}{rrrr}
+% 3 &  3 &  0 &  0 \cr
+%  1 &  1 &  2 &  0 \cr
+%  0 &  2 & -1 &  1 \cr
+%  0 &  0 &  3 & -3
+%\end{array}\right).
+%$$
+%In this case the automorphism group $\auto$ of the graph
+%is the same as the automorphism group $Aut(G)$ of the gauge group,
+%but in general it is possible that $Aut(G) < \auto.$
 %
-\subsubsection{A table of orbigraphs}
-
-Here we tabulate some automorphisms of $H_t$
-and resulting orbigraph sizes.
-
-We define a group of symmetries of the code as...
-
-\begin{center}
-\begin{tabular}{ c|c|c|c|c|c|c } 
-model &\ $n$\ &\ $r$\ &\ $t_X$\ & $|A|$ & orbits & Aut(code) \\
-\hline
-    xy & 4 &  2& 0 & 2 & 3 & 8 \\
-       & 5 &  4& 0 & 10 & 4 & 10 \\
-       & 6 &  4& 0 & 72 & 3 & 12 \\
-       & 7 &  6& 0 & 14 & 9 & 14 \\
-       & 8 &  6& 0 & 4608 & 10 & 16 \\
-       & 9 &  8& 0 & 18 & 23 & 18  \\
-       & 10 & 8& 0 & 200 & 10 & 20  \\
-    %   & 11 & & 0 & 22 & 63 & 22  \\
-    %   & 12 & & 0 & 288 & 36 & 24  \\
-\hline
-    compass $l=3$ & 9 & 4 & 0 & 72 & 3 & 36 \\
-                  & 9 & 4 & $t_X$ & 12 & 4 &  \\
-            $l=4$  & 16 & 9  & 0 & 128 & 24 & 64 \\
-                   & 16 & 9  & $t_X$ & 16 & 48 &  \\
-            $l=5$  & 25 & 16 & 0 & 200 & 430 & 100 \\
-                   & 25 & 16 & $t_X$ & 20  & 3418 &  \\
-\hline
-    gauge color & 15 & 6  & 0 & 720 & 7 & 24  \\
-                & 15 & 6  & $t_X$ & 36 & 16 &  \\
-                & 39 & 18 & 0 & 36 & 14400 & 3  \\
-                & 65 & 32 & 0 & ?? & ?? & 4 \\
-\end{tabular}
-\end{center}
-
-From this table it looks like $H_{0,0}$ for the compass model $|A| = 8l^2.$
-
-Note that for large graphs, numerically finding the orbigraph has comparable
-difficulty to just (numerically) solving the original eigenvalue problem.
-
-We use the software library {\tt nauty}\cite{McKay2014} for computing graph automorphisms.
+%Note that the orbigraph is no longer Hermitian,
+%and in general will not even be normal.
+%
+%We can also write $H//A = QHP$ using the following two matrices for $P$ and $Q:$
+%$$
+%Q = 
+%\left(\begin{array}{rrrrrrrr}
+% 1 &  0 &  0 &  0 &  0 &  0 &  0 &  0 \cr
+%  0 &  1 &  0 &  0 &  0 &  0 &  0 &  0 \cr
+%  0 &  0 &  0 &  0 &  1 &  0 &  0 &  0 \cr
+%  0 &  0 &  0 &  0 &  0 &  0 &  0 &  1
+%\end{array}\right),\ \ \ 
+%P = 
+%\left(\begin{array}{rrrr}
+% 1 &  0 &  0 &  0 \cr
+%  0 &  1 &  0 &  0 \cr
+%  0 &  1 &  0 &  0 \cr
+%  0 &  1 &  0 &  0 \cr
+%  0 &  0 &  1 &  0 \cr
+%  0 &  0 &  1 &  0 \cr
+%  0 &  0 &  1 &  0 \cr
+%  0 &  0 &  0 &  1
+%\end{array}\right).
+%$$
+%The idea is that each column of $P$ sums over an orbit,
+%and each row of $Q$ chooses one member of each orbit.
+%
+%The automorphisms of the gauge group, $Aut(G)$ will induce an
+%automorphism of the graph by ...
+%In particular, elements of the stabilizer group $\Stab$ induce graph 
+%automorphisms by ...
+%In general there may be more symmetry in the graph that
+%we cannot access via a group automorphism.
+%
+%See also \cite{Cvetkovic1980} chapter 5.
+%
+%In general, we will apply this idea to each of the blocks $H_t$.
+%From {\bf Fact 2} above, and using the fact that we are
+%summing over a trivial representation of $Aut(G)$ we have the following:
+%\begin{framed}
+%\noindent{\bf Fact 3:}
+%
+%The orbigraph of $\Ham_{0,0}$ contains the ground eigenvalue of $\Ham_{0,0}.$
+%\end{framed}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%\subsubsection{Compass model}
+%For the next example we take the $l=3$ compass model.
+%$\Ham_{0,0}$ acts on a 16 dimensional space.
+%The order of $A$ is $72$, and we find three $A-$orbits.
+%% This time $Aut(G) = A$ ???
+%The orbigraph method can be applied in the case
+%where the Hamiltonian weights for $X$ and $Z$ are uniform as $w_X$ and $w_Z.$
+%We separate the $X$ and $Z$ terms of the orbigraph to show
+%how this works:
+%$$
+%\Ham_{0,0}//\auto = 
+%\left(\begin{array}{rrr}
+% 0 &  9 &  0 \cr
+%  1 &  4 &  4 \cr
+%  0 &  6 &  3
+%\end{array}\right) + 
+%\left(\begin{array}{rrr}
+% 9 &  0 &  0 \cr
+%  0 &  1 &  0 \cr
+%  0 &  0 &  -3
+%\end{array}\right)
+%=
+%\left(\begin{array}{rrr}
+% 9 &  9 &  0 \cr
+%  1 &  5 &  4 \cr
+%  0 &  6 &  0
+%\end{array}\right)
+%$$
+%This can be solved analytically and we find $\lambda_1 = 4+2\sqrt{13} \cong 11.21110255.$
+%Keep in mind that the original state space has dimension $2^9=512$ so we
+%have come a long way down to 3.
+%
+%By exact\footnote{Exact in this context means that we do not do any
+%perturbative approxiamations to the operator in question.}
+%numerical diagonalization
+%we get the spectrum of $\Ham_{0,0}$ and note that the orbigraph lifts
+%all degeneracy as well as missing some excited eigenspaces:
+%\begin{center}
+%\begin{tabular}{ c|c|c } 
+%$\lambda$ & $\Ham_{0,0}$ degeneracy & $\Ham_{0,0}//A$ degeneracy \\
+%\hline
+%    11.2111025509 & 1 & 1 \\
+%    6.0 & 1 & 1 \\
+%    2.0 & 4 &   \\
+%    0.0 & 4 &   \\
+%    -3.21110255093 & 1 & 1 \\
+%    -4.0 & 4 &   \\
+%    -6.0 & 1 &   
+%\end{tabular}
+%\end{center}
+%The reason we miss some excited spaces is that they do not contain
+%any trivial irrep of $A.$
+%Note that we miss the eigenspace with $\lambda = -6$
+%even though this is one dimensional. It must contain some other non-trivial
+%one dimensional irrep. This cannot happen with the groundspace because
+%those eigenvectors are all positive.
+%
+%If we want to make an orbigraph for these other spaces we would construct
+%the orbigraph by
+%summing over orbits using different characters of $A$
+%(these are \emph{momenta} in the abelian terminology).
+%See \cite{Cvetkovic1980} chapter 5 for more details.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%\subsubsection{Gauge color code model}
+%The Gauge color code \cite{Bombin2015,Bombin2015single}...
+%This is a self-dual code...
+%The smallest in the ensemble has $n=15$ qubits,
+%$G_0$ has $18$ each of X/Z-type gauge operators,
+%and $4$ each of X/Z-type stabilizer generators.
+%$\Ham_{0,0}$ acts on a 64 dimensional space, and $A$ has
+%order 720, and we find 7 orbits:
+%$$
+%\Ham_{0,0}//\auto = 
+%\left(\begin{array}{rrrrrrr}
+%18 & 18 &  0 &  0 &  0 &  0 &  0 \cr
+%  3 & 12 & 15 &  0 &  0 &  0 &  0 \cr
+%  0 &  6 &  6 & 12 &  0 &  0 &  0 \cr
+%  0 &  0 &  9 &  0 &  9 &  0 &  0 \cr
+%  0 &  0 &  0 & 12 & -6 &  6 &  0 \cr
+%  0 &  0 &  0 &  0 & 15 & -12 &  3 \cr
+%  0 &  0 &  0 &  0 &  0 & 18 & -18
+%\end{array}\right)
+%$$
+%The eigenvalue equation results in
+%the recurrence relation:
+%$$
+%    \lambda a_k = 3ka_{k-1} + (18-6k)a_k + (18-3k)a_{k+1},
+%$$
+%which has largest solution 
+%$\lambda_1 = 18\sqrt{2} \cong 25.4558441.$
+%
+%% RP^3 is homeomorphic to the solid ball with antipodal points identified
+%% http://math.stackexchange.com/questions/507783/mathbbrp3-is-homeomorphic-to-the-solid-ball-with-antipodal-points-identifi
+%% http://topospaces.subwiki.org/wiki/Homology_of_real_projective_space
+%
+%Numerics give the full spectrum of $\Ham_{0,0}$ and we note that the orbigraph lifts
+%all degeneracy as well as preserving every eigenvalue:
+%\begin{center}
+%\begin{tabular}{ c|c|c } 
+%$\lambda$ & $\Ham_{0,0}$ degeneracy & $\Ham_{0,0}//A$ degeneracy \\
+%\hline
+%    25.4558441227 & 1 & 1 \\
+%    16.9705627485 & 6 & 1 \\
+%    8.48528137424 & 15 & 1 \\
+%    0.0 & 20 & 1 \\
+%    -8.48528137424 & 15 & 1 \\
+%    -16.9705627485 & 6 & 1 \\
+%    -25.4558441227 & 1 & 1 \\
+%\end{tabular}
+%\end{center}
+%
+%The second eigenvalue of $H$ comes from a recurrence
+%relation in two variables which has solution
+%$\lambda_2 = 9\sqrt{2} + 3\sqrt{10} \cong 22.21475504.$
+%So the gap for this Hamiltonian  is 
+%$$\lambda_1 - \lambda_2 = 9\sqrt{2} - 3\sqrt{10} \cong 3.24108908.$$
+%
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%\subsubsection{A table of orbigraphs}
+%
+%Here we tabulate some automorphisms of $H_t$
+%and resulting orbigraph sizes.
+%
+%We define a group of symmetries of the code as...
+%
+%\begin{center}
+%\begin{tabular}{ c|c|c|c|c|c|c } 
+%model &\ $n$\ &\ $r$\ &\ $t_X$\ & $|A|$ & orbits & Aut(code) \\
+%\hline
+%    xy & 4 &  2& 0 & 2 & 3 & 8 \\
+%       & 5 &  4& 0 & 10 & 4 & 10 \\
+%       & 6 &  4& 0 & 72 & 3 & 12 \\
+%       & 7 &  6& 0 & 14 & 9 & 14 \\
+%       & 8 &  6& 0 & 4608 & 10 & 16 \\
+%       & 9 &  8& 0 & 18 & 23 & 18  \\
+%       & 10 & 8& 0 & 200 & 10 & 20  \\
+%    %   & 11 & & 0 & 22 & 63 & 22  \\
+%    %   & 12 & & 0 & 288 & 36 & 24  \\
+%\hline
+%    compass $l=3$ & 9 & 4 & 0 & 72 & 3 & 36 \\
+%                  & 9 & 4 & $t_X$ & 12 & 4 &  \\
+%            $l=4$  & 16 & 9  & 0 & 128 & 24 & 64 \\
+%                   & 16 & 9  & $t_X$ & 16 & 48 &  \\
+%            $l=5$  & 25 & 16 & 0 & 200 & 430 & 100 \\
+%                   & 25 & 16 & $t_X$ & 20  & 3418 &  \\
+%\hline
+%    gauge color & 15 & 6  & 0 & 720 & 7 & 24  \\
+%                & 15 & 6  & $t_X$ & 36 & 16 &  \\
+%                & 39 & 18 & 0 & 36 & 14400 & 3  \\
+%                & 65 & 32 & 0 & ?? & ?? & 4 \\
+%\end{tabular}
+%\end{center}
+%
+%From this table it looks like $H_{0,0}$ for the compass model $|A| = 8l^2.$
+%
+%Note that for large graphs, numerically finding the orbigraph has comparable
+%difficulty to just (numerically) solving the original eigenvalue problem.
+%
+%We use the software library {\tt nauty}\cite{McKay2014} for computing graph automorphisms.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2641,38 +2755,38 @@ We use the software library {\tt nauty}\cite{McKay2014} for computing graph auto
 %
 
 
-\subsection{Discussion}
+%\subsection{Discussion}
 
-In \cite{AlShimary2010}, they 
-build a kind of graph laplacian from a known ground state:
-``This is not a major drawback as there
-are large families of physically relevant states, e.g. the
-Matrix Product States, that are ground states of Hamil-
-tonians which are not known to be gapped or not in two
-or higher dimensions. Such an important example is
-the two-dimensional AKLT model that can support uni-
-versal quantum computation by measurements only, but
-it is not proven yet if it is gapped which would establish
-its fault-tolerance.''
-This Laplacian has the same gap as the Hamiltonian.
+%In \cite{AlShimary2010}, they 
+%build a kind of graph laplacian from a known ground state:
+%``This is not a major drawback as there
+%are large families of physically relevant states, e.g. the
+%Matrix Product States, that are ground states of Hamil-
+%tonians which are not known to be gapped or not in two
+%or higher dimensions. Such an important example is
+%the two-dimensional AKLT model that can support uni-
+%versal quantum computation by measurements only, but
+%it is not proven yet if it is gapped which would establish
+%its fault-tolerance.''
+%This Laplacian has the same gap as the Hamiltonian.
+%
+%It would be nice to connect geometric properties of the
+%graph to spectral gap properties. For example, the spectral gap of
+%the normalized graph laplacian can be bounded from below
+%by the Coarse Ricci curvature \cite{Lin2011}. 
+%Unfortunately, it appears
+%that there are no good connections between the spectrum
+%of the normalized graph laplacian and the spectrum of the adjacency matrix.
+%% http://mathoverflow.net/questions/118870/connection-between-eigenvalues-of-matrix-and-its-laplacian
+%
+%See also \cite{Jarret2014,Jarret2015}. 
+%In \cite{Jarret2015modulus} they
+%write the Hamiltonian as a sum of the
+%the combinatorial graph Laplacian and a (diagonal) potential, 
+%and then employ methods from PDE theory \cite{Andrews2011}.
+%Also: \cite{Baume2016}. % Michaels' Phd thesis
 
-It would be nice to connect geometric properties of the
-graph to spectral gap properties. For example, the spectral gap of
-the normalized graph laplacian can be bounded from below
-by the Coarse Ricci curvature \cite{Lin2011}. 
-Unfortunately, it appears
-that there are no good connections between the spectrum
-of the normalized graph laplacian and the spectrum of the adjacency matrix.
-% http://mathoverflow.net/questions/118870/connection-between-eigenvalues-of-matrix-and-its-laplacian
-
-See also \cite{Jarret2014,Jarret2015}. 
-In \cite{Jarret2015modulus} they
-write the Hamiltonian as a sum of the
-the combinatorial graph Laplacian and a (diagonal) potential, 
-and then employ methods from PDE theory \cite{Andrews2011}.
-Also: \cite{Baume2016}. % Michaels' Phd thesis
-
-We expect generic local hamiltonians to be gapless \cite{Movassagh2016}.
+%We expect generic local hamiltonians to be gapless \cite{Movassagh2016}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
