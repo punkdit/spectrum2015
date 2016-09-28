@@ -9,6 +9,7 @@ cartan: 10
 ./symplectic.py test_model compass ideals l=4
 Gx: 16
 r = 9
+algebra dimension: 130816 == 256 * 511
 ideal: 130816
 cartan: 256
 
