@@ -1,5 +1,5 @@
 
-all: repr.pdf hecke.pdf
+all: repr.pdf hecke.pdf repr-abstract.pdf 
 
 #out: repr
 #	open repr.pdf 
@@ -9,6 +9,12 @@ repr.pdf: repr.tex refs.bib pic-gcolor-1.pdf
 	bibtex repr
 	pdflatex repr.tex
 	pdflatex repr.tex
+
+repr-abstract.pdf: repr-abstract.tex refs.bib 
+	pdflatex repr-abstract.tex
+	bibtex repr-abstract
+	pdflatex repr-abstract.tex
+	pdflatex repr-abstract.tex
 
 
 hecke.pdf: hecke.tex refs.bib
