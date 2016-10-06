@@ -92,7 +92,8 @@
 \def\Im{\mbox{im}}
 \def\Ker{\mbox{ker}}
 \def\Field{\mathcal{F}}
-\def\Defn#1{\underline{#1}}
+%\def\Defn#1{\underline{#1}}
+\def\Defn#1{{\bf #1}}
 
 \newcommand{\ket}[1]{|{#1}\rangle}
 \newcommand{\expect}[1]{\langle{#1}\rangle}
@@ -202,122 +203,163 @@ exercise 4.2.3: The Hecke algebra of $\GL_n(\Field_q).$
 % http://mathoverflow.net/questions/15438/a-slick-proof-of-the-bruhat-decomposition-for-gl-nk
 %
 
-\subsection{Dynkin diagrams}
+\subsection{Incidence geometry}
 
-\begin{center}
-  \begin{tikzpicture}[scale=.4]
-    \draw (-1,0) node[anchor=east]  {$A_k$};
-    \foreach \x in {0,...,5}
-    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
-    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
-    \foreach \y in {1.15,...,4.15}
-    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
-  \end{tikzpicture}
-\end{center}
+This is based on the book \cite{Buekenhout2013}.
+An \Defn{incidence system} is a triple 
+$\Gamma=(X,*,\tau)$ where $X$ is a set of \Defn{elements}
+with a symmetric, reflexive \Defn{incidence relation} $*$
+and $\tau$ is a map $\tau:X\to I$ where $I$ is a set of \Defn{types}
+such that distinct $x,y\in X$ with $x*y$ satisfy $\tau(x)\ne\tau(y).$
+The \Defn{rank} of $\Gamma$ is the cardinality of $I.$
 
-\begin{center}
-  \begin{tikzpicture}[scale=.4]
-    \draw (-1,0) node[anchor=east]  {$B_k$};
-    \foreach \x in {0,...,4}
-    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
-    \draw[xshift=5 cm,thick,fill=black] (5 cm, 0) circle (.3 cm);
-    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
-    \foreach \y in {1.15,...,3.15}
-    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
-    \draw[thick] (8.3 cm, .1 cm) -- +(1.4 cm,0);
-    \draw[thick] (8.3 cm, -.1 cm) -- +(1.4 cm,0);
-  \end{tikzpicture}
-\end{center}
+A \Defn{flag} of $\Gamma$ is a set of mutually incident
+elements of $\Gamma.$
+Flags of type $I$ are called \Defn{chambers.}
 
-\begin{center}
-  \begin{tikzpicture}[scale=.4]
-    \draw (-1,0) node[anchor=east]  {$C_k$};
-    \foreach \x in {0,...,4}
-    \draw[xshift=\x cm,thick,fill=black] (\x cm,0) circle (.3cm);
-    \draw[xshift=5 cm,thick] (5 cm, 0) circle (.3 cm);
-    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
-    \foreach \y in {1.15,...,3.15}
-    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
-    \draw[thick] (8.3 cm, .1 cm) -- +(1.4 cm,0);
-    \draw[thick] (8.3 cm, -.1 cm) -- +(1.4 cm,0);
-  \end{tikzpicture}
-\end{center}
+A \Defn{geometry} is an incidence system where every
+maximal flag is a chamber.
 
-\begin{center}
-  \begin{tikzpicture}[scale=.4]
-    \draw (-1,0) node[anchor=east]  {$D_k$};
-    \foreach \x in {0,...,4}
-    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
-    \draw[xshift=8 cm,thick] (30: 17 mm) circle (.3cm);
-    \draw[xshift=8 cm,thick] (-30: 17 mm) circle (.3cm);
-    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
-    \foreach \y in {1.15,...,3.15}
-    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
-    \draw[xshift=8 cm,thick] (30: 3 mm) -- (30: 14 mm);
-    \draw[xshift=8 cm,thick] (-30: 3 mm) -- (-30: 14 mm);
-  \end{tikzpicture}
-\end{center}
+A geometry is called \Defn{thin} when every
+flag of type $I\setminus {i}$ where $i\in I$
+is contained in exactly two chambers.
 
-\begin{center}
-  \begin{tikzpicture}[scale=.4]
-    \draw (-1,0) node[anchor=east]  {$G_2$};
-    \draw[thick] (0 ,0) circle (.3 cm);
-    \draw[thick,fill=black] (2 cm,0) circle (.3 cm);
-    \draw[thick] (30: 3mm) -- +(1.5 cm, 0);
-    \draw[thick] (0: 3 mm) -- +(1.4 cm, 0);
-    \draw[thick] (-30: 3 mm) -- +(1.5 cm, 0);
-  \end{tikzpicture}
-\end{center}
+% page 8
+A polytope in $\R^n$ is a thin geometry of rank $n$
+(take the surface of the polytope not the interior.)
 
-\begin{center}
-  \begin{tikzpicture}[scale=.4]
-    \draw (-3,0) node[anchor=east]  {$F_4$};
-    \draw[thick] (-2 cm ,0) circle (.3 cm);
-    \draw[thick] (0 ,0) circle (.3 cm);
-    \draw[thick,fill=black] (2 cm,0) circle (.3 cm);
-    \draw[thick,fill=black] (4 cm,0) circle (.3 cm);
-    \draw[thick] (15: 3mm) -- +(1.5 cm, 0);
-    \draw[xshift=-2 cm,thick] (0: 3 mm) -- +(1.4 cm, 0);
-    \draw[thick] (-15: 3 mm) -- +(1.5 cm, 0);
-    \draw[xshift=2 cm,thick] (0: 3 mm) -- +(1.4 cm, 0);
-  \end{tikzpicture}
-\end{center}
+% page 20
+Given a flag $F$ in $\Gamma,$
+the \Defn{residue} $\Gamma_F$ is the 
+subsystem of $\Gamma$ over $I\setminus \tau(F) $
+on the elements $F^{*}\setminus F.$
+In other words, the residue of $F$ is the set of
+elements of $\Gamma$ incident to every element of $F$
+but not contained in $F.$
+For example, given a vertex $x$ of a polyhedron $\Gamma$, the
+residue $\Gamma_x$ is called the \Defn{vertex figure.} 
+This is the subsystem of edges and faces incident on $x.$
 
-\begin{center}
-  \begin{tikzpicture}[scale=.4]
-    \draw (-1,1) node[anchor=east]  {$E_6$};
-    \foreach \x in {0,...,4}
-    \draw[thick,xshift=\x cm] (\x cm,0) circle (3 mm);
-    \foreach \y in {0,...,3}
-    \draw[thick,xshift=\y cm] (\y cm,0) ++(.3 cm, 0) -- +(14 mm,0);
-    \draw[thick] (4 cm,2 cm) circle (3 mm);
-    \draw[thick] (4 cm, 3mm) -- +(0, 1.4 cm);
-  \end{tikzpicture}
-\end{center}
+% 
+% page 73: diagram over I
 
-\begin{center}
-  \begin{tikzpicture}[scale=.4]
-    \draw (-1,1) node[anchor=east]  {$E_7$};
-    \foreach \x in {0,...,5}
-    \draw[thick,xshift=\x cm] (\x cm,0) circle (3 mm);
-    \foreach \y in {0,...,4}
-    \draw[thick,xshift=\y cm] (\y cm,0) ++(.3 cm, 0) -- +(14 mm,0);
-    \draw[thick] (4 cm,2 cm) circle (3 mm);
-    \draw[thick] (4 cm, 3mm) -- +(0, 1.4 cm);
-  \end{tikzpicture}
-\end{center}
 
-\begin{center}
-  \begin{tikzpicture}[scale=.4]
-    \draw (-1,1) node[anchor=east]  {$E_8$};
-    \foreach \x in {0,...,6}
-    \draw[thick,xshift=\x cm] (\x cm,0) circle (3 mm);
-    \foreach \y in {0,...,5}
-    \draw[thick,xshift=\y cm] (\y cm,0) ++(.3 cm, 0) -- +(14 mm,0);
-    \draw[thick] (4 cm,2 cm) circle (3 mm);
-    \draw[thick] (4 cm, 3mm) -- +(0, 1.4 cm);
-  \end{tikzpicture}
-\end{center}
+%\subsection{Dynkin diagrams}
+%
+%\begin{center}
+%  \begin{tikzpicture}[scale=.4]
+%    \draw (-1,0) node[anchor=east]  {$A_k$};
+%    \foreach \x in {0,...,5}
+%    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
+%    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
+%    \foreach \y in {1.15,...,4.15}
+%    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
+%  \end{tikzpicture}
+%\end{center}
+%
+%\begin{center}
+%  \begin{tikzpicture}[scale=.4]
+%    \draw (-1,0) node[anchor=east]  {$B_k$};
+%    \foreach \x in {0,...,4}
+%    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
+%    \draw[xshift=5 cm,thick,fill=black] (5 cm, 0) circle (.3 cm);
+%    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
+%    \foreach \y in {1.15,...,3.15}
+%    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
+%    \draw[thick] (8.3 cm, .1 cm) -- +(1.4 cm,0);
+%    \draw[thick] (8.3 cm, -.1 cm) -- +(1.4 cm,0);
+%  \end{tikzpicture}
+%\end{center}
+%
+%\begin{center}
+%  \begin{tikzpicture}[scale=.4]
+%    \draw (-1,0) node[anchor=east]  {$C_k$};
+%    \foreach \x in {0,...,4}
+%    \draw[xshift=\x cm,thick,fill=black] (\x cm,0) circle (.3cm);
+%    \draw[xshift=5 cm,thick] (5 cm, 0) circle (.3 cm);
+%    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
+%    \foreach \y in {1.15,...,3.15}
+%    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
+%    \draw[thick] (8.3 cm, .1 cm) -- +(1.4 cm,0);
+%    \draw[thick] (8.3 cm, -.1 cm) -- +(1.4 cm,0);
+%  \end{tikzpicture}
+%\end{center}
+%
+%\begin{center}
+%  \begin{tikzpicture}[scale=.4]
+%    \draw (-1,0) node[anchor=east]  {$D_k$};
+%    \foreach \x in {0,...,4}
+%    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
+%    \draw[xshift=8 cm,thick] (30: 17 mm) circle (.3cm);
+%    \draw[xshift=8 cm,thick] (-30: 17 mm) circle (.3cm);
+%    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
+%    \foreach \y in {1.15,...,3.15}
+%    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
+%    \draw[xshift=8 cm,thick] (30: 3 mm) -- (30: 14 mm);
+%    \draw[xshift=8 cm,thick] (-30: 3 mm) -- (-30: 14 mm);
+%  \end{tikzpicture}
+%\end{center}
+%
+%\begin{center}
+%  \begin{tikzpicture}[scale=.4]
+%    \draw (-1,0) node[anchor=east]  {$G_2$};
+%    \draw[thick] (0 ,0) circle (.3 cm);
+%    \draw[thick,fill=black] (2 cm,0) circle (.3 cm);
+%    \draw[thick] (30: 3mm) -- +(1.5 cm, 0);
+%    \draw[thick] (0: 3 mm) -- +(1.4 cm, 0);
+%    \draw[thick] (-30: 3 mm) -- +(1.5 cm, 0);
+%  \end{tikzpicture}
+%\end{center}
+%
+%\begin{center}
+%  \begin{tikzpicture}[scale=.4]
+%    \draw (-3,0) node[anchor=east]  {$F_4$};
+%    \draw[thick] (-2 cm ,0) circle (.3 cm);
+%    \draw[thick] (0 ,0) circle (.3 cm);
+%    \draw[thick,fill=black] (2 cm,0) circle (.3 cm);
+%    \draw[thick,fill=black] (4 cm,0) circle (.3 cm);
+%    \draw[thick] (15: 3mm) -- +(1.5 cm, 0);
+%    \draw[xshift=-2 cm,thick] (0: 3 mm) -- +(1.4 cm, 0);
+%    \draw[thick] (-15: 3 mm) -- +(1.5 cm, 0);
+%    \draw[xshift=2 cm,thick] (0: 3 mm) -- +(1.4 cm, 0);
+%  \end{tikzpicture}
+%\end{center}
+%
+%\begin{center}
+%  \begin{tikzpicture}[scale=.4]
+%    \draw (-1,1) node[anchor=east]  {$E_6$};
+%    \foreach \x in {0,...,4}
+%    \draw[thick,xshift=\x cm] (\x cm,0) circle (3 mm);
+%    \foreach \y in {0,...,3}
+%    \draw[thick,xshift=\y cm] (\y cm,0) ++(.3 cm, 0) -- +(14 mm,0);
+%    \draw[thick] (4 cm,2 cm) circle (3 mm);
+%    \draw[thick] (4 cm, 3mm) -- +(0, 1.4 cm);
+%  \end{tikzpicture}
+%\end{center}
+%
+%\begin{center}
+%  \begin{tikzpicture}[scale=.4]
+%    \draw (-1,1) node[anchor=east]  {$E_7$};
+%    \foreach \x in {0,...,5}
+%    \draw[thick,xshift=\x cm] (\x cm,0) circle (3 mm);
+%    \foreach \y in {0,...,4}
+%    \draw[thick,xshift=\y cm] (\y cm,0) ++(.3 cm, 0) -- +(14 mm,0);
+%    \draw[thick] (4 cm,2 cm) circle (3 mm);
+%    \draw[thick] (4 cm, 3mm) -- +(0, 1.4 cm);
+%  \end{tikzpicture}
+%\end{center}
+%
+%\begin{center}
+%  \begin{tikzpicture}[scale=.4]
+%    \draw (-1,1) node[anchor=east]  {$E_8$};
+%    \foreach \x in {0,...,6}
+%    \draw[thick,xshift=\x cm] (\x cm,0) circle (3 mm);
+%    \foreach \y in {0,...,5}
+%    \draw[thick,xshift=\y cm] (\y cm,0) ++(.3 cm, 0) -- +(14 mm,0);
+%    \draw[thick] (4 cm,2 cm) circle (3 mm);
+%    \draw[thick] (4 cm, 3mm) -- +(0, 1.4 cm);
+%  \end{tikzpicture}
+%\end{center}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

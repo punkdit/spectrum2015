@@ -1,5 +1,5 @@
 
-all: repr.pdf hecke.pdf repr-abstract.pdf 
+all: repr.pdf hecke.pdf 
 
 #out: repr
 #	open repr.pdf 
