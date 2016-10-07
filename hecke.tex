@@ -244,122 +244,122 @@ This is the subsystem of edges and faces incident on $x.$
 % page 73: diagram over I
 
 
-%\subsection{Dynkin diagrams}
-%
-%\begin{center}
-%  \begin{tikzpicture}[scale=.4]
-%    \draw (-1,0) node[anchor=east]  {$A_k$};
-%    \foreach \x in {0,...,5}
-%    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
-%    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
-%    \foreach \y in {1.15,...,4.15}
-%    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
-%  \end{tikzpicture}
-%\end{center}
-%
-%\begin{center}
-%  \begin{tikzpicture}[scale=.4]
-%    \draw (-1,0) node[anchor=east]  {$B_k$};
-%    \foreach \x in {0,...,4}
-%    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
-%    \draw[xshift=5 cm,thick,fill=black] (5 cm, 0) circle (.3 cm);
-%    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
-%    \foreach \y in {1.15,...,3.15}
-%    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
-%    \draw[thick] (8.3 cm, .1 cm) -- +(1.4 cm,0);
-%    \draw[thick] (8.3 cm, -.1 cm) -- +(1.4 cm,0);
-%  \end{tikzpicture}
-%\end{center}
-%
-%\begin{center}
-%  \begin{tikzpicture}[scale=.4]
-%    \draw (-1,0) node[anchor=east]  {$C_k$};
-%    \foreach \x in {0,...,4}
-%    \draw[xshift=\x cm,thick,fill=black] (\x cm,0) circle (.3cm);
-%    \draw[xshift=5 cm,thick] (5 cm, 0) circle (.3 cm);
-%    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
-%    \foreach \y in {1.15,...,3.15}
-%    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
-%    \draw[thick] (8.3 cm, .1 cm) -- +(1.4 cm,0);
-%    \draw[thick] (8.3 cm, -.1 cm) -- +(1.4 cm,0);
-%  \end{tikzpicture}
-%\end{center}
-%
-%\begin{center}
-%  \begin{tikzpicture}[scale=.4]
-%    \draw (-1,0) node[anchor=east]  {$D_k$};
-%    \foreach \x in {0,...,4}
-%    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
-%    \draw[xshift=8 cm,thick] (30: 17 mm) circle (.3cm);
-%    \draw[xshift=8 cm,thick] (-30: 17 mm) circle (.3cm);
-%    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
-%    \foreach \y in {1.15,...,3.15}
-%    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
-%    \draw[xshift=8 cm,thick] (30: 3 mm) -- (30: 14 mm);
-%    \draw[xshift=8 cm,thick] (-30: 3 mm) -- (-30: 14 mm);
-%  \end{tikzpicture}
-%\end{center}
-%
-%\begin{center}
-%  \begin{tikzpicture}[scale=.4]
-%    \draw (-1,0) node[anchor=east]  {$G_2$};
-%    \draw[thick] (0 ,0) circle (.3 cm);
-%    \draw[thick,fill=black] (2 cm,0) circle (.3 cm);
-%    \draw[thick] (30: 3mm) -- +(1.5 cm, 0);
-%    \draw[thick] (0: 3 mm) -- +(1.4 cm, 0);
-%    \draw[thick] (-30: 3 mm) -- +(1.5 cm, 0);
-%  \end{tikzpicture}
-%\end{center}
-%
-%\begin{center}
-%  \begin{tikzpicture}[scale=.4]
-%    \draw (-3,0) node[anchor=east]  {$F_4$};
-%    \draw[thick] (-2 cm ,0) circle (.3 cm);
-%    \draw[thick] (0 ,0) circle (.3 cm);
-%    \draw[thick,fill=black] (2 cm,0) circle (.3 cm);
-%    \draw[thick,fill=black] (4 cm,0) circle (.3 cm);
-%    \draw[thick] (15: 3mm) -- +(1.5 cm, 0);
-%    \draw[xshift=-2 cm,thick] (0: 3 mm) -- +(1.4 cm, 0);
-%    \draw[thick] (-15: 3 mm) -- +(1.5 cm, 0);
-%    \draw[xshift=2 cm,thick] (0: 3 mm) -- +(1.4 cm, 0);
-%  \end{tikzpicture}
-%\end{center}
-%
-%\begin{center}
-%  \begin{tikzpicture}[scale=.4]
-%    \draw (-1,1) node[anchor=east]  {$E_6$};
-%    \foreach \x in {0,...,4}
-%    \draw[thick,xshift=\x cm] (\x cm,0) circle (3 mm);
-%    \foreach \y in {0,...,3}
-%    \draw[thick,xshift=\y cm] (\y cm,0) ++(.3 cm, 0) -- +(14 mm,0);
-%    \draw[thick] (4 cm,2 cm) circle (3 mm);
-%    \draw[thick] (4 cm, 3mm) -- +(0, 1.4 cm);
-%  \end{tikzpicture}
-%\end{center}
-%
-%\begin{center}
-%  \begin{tikzpicture}[scale=.4]
-%    \draw (-1,1) node[anchor=east]  {$E_7$};
-%    \foreach \x in {0,...,5}
-%    \draw[thick,xshift=\x cm] (\x cm,0) circle (3 mm);
-%    \foreach \y in {0,...,4}
-%    \draw[thick,xshift=\y cm] (\y cm,0) ++(.3 cm, 0) -- +(14 mm,0);
-%    \draw[thick] (4 cm,2 cm) circle (3 mm);
-%    \draw[thick] (4 cm, 3mm) -- +(0, 1.4 cm);
-%  \end{tikzpicture}
-%\end{center}
-%
-%\begin{center}
-%  \begin{tikzpicture}[scale=.4]
-%    \draw (-1,1) node[anchor=east]  {$E_8$};
-%    \foreach \x in {0,...,6}
-%    \draw[thick,xshift=\x cm] (\x cm,0) circle (3 mm);
-%    \foreach \y in {0,...,5}
-%    \draw[thick,xshift=\y cm] (\y cm,0) ++(.3 cm, 0) -- +(14 mm,0);
-%    \draw[thick] (4 cm,2 cm) circle (3 mm);
-%    \draw[thick] (4 cm, 3mm) -- +(0, 1.4 cm);
-%  \end{tikzpicture}
-%\end{center}
+\subsection{Dynkin diagrams}
+
+\begin{center}
+  \begin{tikzpicture}[scale=.4]
+    \draw (-1,0) node[anchor=east]  {$A_k$};
+    \foreach \x in {0,...,5}
+    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
+    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
+    \foreach \y in {1.15,...,4.15}
+    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
+  \end{tikzpicture}
+\end{center}
+
+\begin{center}
+  \begin{tikzpicture}[scale=.4]
+    \draw (-1,0) node[anchor=east]  {$B_k$};
+    \foreach \x in {0,...,4}
+    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
+    \draw[xshift=5 cm,thick,fill=black] (5 cm, 0) circle (.3 cm);
+    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
+    \foreach \y in {1.15,...,3.15}
+    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
+    \draw[thick] (8.3 cm, .1 cm) -- +(1.4 cm,0);
+    \draw[thick] (8.3 cm, -.1 cm) -- +(1.4 cm,0);
+  \end{tikzpicture}
+\end{center}
+
+\begin{center}
+  \begin{tikzpicture}[scale=.4]
+    \draw (-1,0) node[anchor=east]  {$C_k$};
+    \foreach \x in {0,...,4}
+    \draw[xshift=\x cm,thick,fill=black] (\x cm,0) circle (.3cm);
+    \draw[xshift=5 cm,thick] (5 cm, 0) circle (.3 cm);
+    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
+    \foreach \y in {1.15,...,3.15}
+    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
+    \draw[thick] (8.3 cm, .1 cm) -- +(1.4 cm,0);
+    \draw[thick] (8.3 cm, -.1 cm) -- +(1.4 cm,0);
+  \end{tikzpicture}
+\end{center}
+
+\begin{center}
+  \begin{tikzpicture}[scale=.4]
+    \draw (-1,0) node[anchor=east]  {$D_k$};
+    \foreach \x in {0,...,4}
+    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
+    \draw[xshift=8 cm,thick] (30: 17 mm) circle (.3cm);
+    \draw[xshift=8 cm,thick] (-30: 17 mm) circle (.3cm);
+    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
+    \foreach \y in {1.15,...,3.15}
+    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
+    \draw[xshift=8 cm,thick] (30: 3 mm) -- (30: 14 mm);
+    \draw[xshift=8 cm,thick] (-30: 3 mm) -- (-30: 14 mm);
+  \end{tikzpicture}
+\end{center}
+
+\begin{center}
+  \begin{tikzpicture}[scale=.4]
+    \draw (-1,0) node[anchor=east]  {$G_2$};
+    \draw[thick] (0 ,0) circle (.3 cm);
+    \draw[thick,fill=black] (2 cm,0) circle (.3 cm);
+    \draw[thick] (30: 3mm) -- +(1.5 cm, 0);
+    \draw[thick] (0: 3 mm) -- +(1.4 cm, 0);
+    \draw[thick] (-30: 3 mm) -- +(1.5 cm, 0);
+  \end{tikzpicture}
+\end{center}
+
+\begin{center}
+  \begin{tikzpicture}[scale=.4]
+    \draw (-3,0) node[anchor=east]  {$F_4$};
+    \draw[thick] (-2 cm ,0) circle (.3 cm);
+    \draw[thick] (0 ,0) circle (.3 cm);
+    \draw[thick,fill=black] (2 cm,0) circle (.3 cm);
+    \draw[thick,fill=black] (4 cm,0) circle (.3 cm);
+    \draw[thick] (15: 3mm) -- +(1.5 cm, 0);
+    \draw[xshift=-2 cm,thick] (0: 3 mm) -- +(1.4 cm, 0);
+    \draw[thick] (-15: 3 mm) -- +(1.5 cm, 0);
+    \draw[xshift=2 cm,thick] (0: 3 mm) -- +(1.4 cm, 0);
+  \end{tikzpicture}
+\end{center}
+
+\begin{center}
+  \begin{tikzpicture}[scale=.4]
+    \draw (-1,1) node[anchor=east]  {$E_6$};
+    \foreach \x in {0,...,4}
+    \draw[thick,xshift=\x cm] (\x cm,0) circle (3 mm);
+    \foreach \y in {0,...,3}
+    \draw[thick,xshift=\y cm] (\y cm,0) ++(.3 cm, 0) -- +(14 mm,0);
+    \draw[thick] (4 cm,2 cm) circle (3 mm);
+    \draw[thick] (4 cm, 3mm) -- +(0, 1.4 cm);
+  \end{tikzpicture}
+\end{center}
+
+\begin{center}
+  \begin{tikzpicture}[scale=.4]
+    \draw (-1,1) node[anchor=east]  {$E_7$};
+    \foreach \x in {0,...,5}
+    \draw[thick,xshift=\x cm] (\x cm,0) circle (3 mm);
+    \foreach \y in {0,...,4}
+    \draw[thick,xshift=\y cm] (\y cm,0) ++(.3 cm, 0) -- +(14 mm,0);
+    \draw[thick] (4 cm,2 cm) circle (3 mm);
+    \draw[thick] (4 cm, 3mm) -- +(0, 1.4 cm);
+  \end{tikzpicture}
+\end{center}
+
+\begin{center}
+  \begin{tikzpicture}[scale=.4]
+    \draw (-1,1) node[anchor=east]  {$E_8$};
+    \foreach \x in {0,...,6}
+    \draw[thick,xshift=\x cm] (\x cm,0) circle (3 mm);
+    \foreach \y in {0,...,5}
+    \draw[thick,xshift=\y cm] (\y cm,0) ++(.3 cm, 0) -- +(14 mm,0);
+    \draw[thick] (4 cm,2 cm) circle (3 mm);
+    \draw[thick] (4 cm, 3mm) -- +(0, 1.4 cm);
+  \end{tikzpicture}
+\end{center}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
