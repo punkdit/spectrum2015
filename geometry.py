@@ -2,6 +2,9 @@
 
 import os, sys
 
+from argv import Argv
+argv = Argv()
+
 
 def all_subsets(n):
 
@@ -76,6 +79,13 @@ class Geometry(object):
             assert len(set(jtems))==len(jtems), "nbd:%s"%nbd # uniq
 
         for i in items:
+          for j in items:
+            try:
+                i==j
+            except ValueError:
+                print "cant compare %r and %r" % (i, j)
+                raise
+        for i in items:
             if i not in nbd[i]:
                 nbd[i].append(i)
             for j in nbd[i]:
@@ -123,15 +133,15 @@ class Geometry(object):
 
     @classmethod
     def polygon(cls, n):
-        verts = ['v%d'%i for i in range(n)]
-        edges = ['e%d'%i for i in range(n)]
+        verts = ['p%d'%i for i in range(n)]
+        edges = ['l%d'%i for i in range(n)]
         incidence = []
         tpmap = {}
         for i in range(n):
             incidence.append((verts[i], edges[i]))
             incidence.append((verts[i], edges[(i+1)%n]))
-            tpmap[verts[i]] = 'v'
-            tpmap[edges[i]] = 'e'
+            tpmap[verts[i]] = 'p'
+            tpmap[edges[i]] = 'l'
         #print incidence
         #print tpmap
         return cls(incidence, tpmap)
@@ -313,69 +323,36 @@ class Geometry(object):
         diagram.sort()
         return diagram
 
-
-#def bicolored_tesellation():
-
-
-
-def test():
-
-    desc = r"""
-
-    a
-    |\ B
-    | \
-   C|  c
-    | /
-    |/ A
-    b
-
-    """
-
-    triangle = Geometry(
-        "aB aC bA bC cB cA".split(), 
-        {'a':'v', 'b':'v', 'c':'v', 'A':'e', 'B':'e', 'C':'e'})
-
-    assert len(triangle.items) == 6
-    #print triangle.flags_type('e') 
-    #print triangle.flags_type('v') 
-
-    #g = triangle.residue(["a"])
-
-    for n in range(2, 7):
-        g = Geometry.polygon(n)
-        assert len(g.items)==2*n
-        assert len(g.maximal_flags())==2*n
-
-        assert len(g.flags_type(['v'])) == n
-        assert len(g.flags_type(['e'])) == n
-        assert len(g.flags_type(['v', 'e'])) == 2*n
-
-    g = Geometry.simplex(2)
-    h = g.residue([(0,), (0,1)])
-    assert len(h.items)==1
-    assert len(g.flags_type([0, 1])) == 6
-
-    for dim in range(4):
-        g = Geometry.simplex(dim)
-        assert len(g.items)==2**(dim+1)-1
-        assert len(g.maximal_flags())==factorial(dim+1)
-
-        h = g.residue([(0,)])
-
-        if dim>0:
-            g.residue([(0,), (0,1)])
-
-    g = Geometry.cube()
-    d = g.get_diagram()
-    assert d == [('e', 'v'), ('f', 'e')] # woo !
-
-    assert Geometry.simplex(4).get_diagram() == [(0, 1), (1, 2), (2, 3)] # A_4 Dynkin diagram !
-
-
-    g = tesellate_3d()
-    print g
-    print g.get_diagram()
+    def is_projective_plane(self):
+        if len(self.types) != 2:
+            return False
+        ptp, ltp = self.types
+        points = self.tplookup[ptp]
+        lines = self.tplookup[ltp]
+        nbd = self.nbd
+        for line in lines:
+            for other in lines:
+                if other is line:
+                    continue
+                ps = set(nbd[line]).intersection(set(nbd[other]))
+                if len(ps)!=1:
+                    #print line
+                    #print other
+                    #print ps
+                    return False
+                p = list(ps)[0]
+                assert self.tpmap[p]==ptp
+        for i in points:
+          for j in points:
+            if i==j:
+                continue
+            ilines = set(nbd[i]).intersection(set(nbd[j]))
+            if len(ilines)!=1:
+                print "L"
+                return False
+            line = list(ilines)[0]
+            assert self.tpmap[line]==ltp
+        return True
 
 
 def genidx(*shape):
@@ -385,6 +362,7 @@ def genidx(*shape):
         for idx in range(shape[0]):
             for _idx in genidx(*shape[1:]):
                 yield (idx,)+_idx
+
 
 def tesellate_3d(n=3):
     "cubic tesselation of 3-torus by n*n*n cubes and verts"
@@ -409,6 +387,160 @@ def tesellate_3d(n=3):
     g = Geometry(incidence, tpmap)
     return g
 
+
+
+def fano():
+    # https://www.maa.org/sites/default/files/pdf/upload_library/22/Ford/Lam305-318.pdf
+    points = range(1, 8)
+    lines = [(1,2,4), (2,3,5), (3,4,6), (4,5,7), (5,6,1), (6,7,2), (7,1,3)]
+    assert len(lines)==7
+    incidence = []
+    tpmap = {}
+    for point in points:
+        tpmap[point] = 'p'
+    for line in lines:
+        tpmap[line] = 'l'
+        for point in line:
+            incidence.append((point, line))
+    g = Geometry(incidence, tpmap)
+    assert g.is_projective_plane()
+    return g
+
+
+def projective(n):
+    # Take n-dim F_2-vector space
+    # points are subspaces of dimension 1
+    # lines are subspaces of dimension 2
+    # etc.
+    from solve import zeros2, enum2, row_reduce, span, shortstr
+
+    def get_key(L):
+        vs = [str(v) for v in span(L) if v.sum()]
+        vs.sort()
+        key = ''.join(vs)
+        return key
+
+    assert n>1
+
+    points = []
+    for P in enum2(n):
+        if P.sum()==0:
+            continue
+        points.append(P)
+    #print "points:", len(points)
+
+    lines = []
+    lookup = {}
+    for L in enum2(2*n):
+        L.shape = (2, n)
+        L = row_reduce(L)
+        if len(L)!=2:
+            continue
+        key = get_key(L)
+        if key in lookup:
+            continue
+        lines.append(L)
+        lookup[key] = L
+    #print "lines:", len(lines)
+
+    # TOO SLOW:
+#    for m in range(3, n+1):
+#        spaces = []
+#        lookup = {}
+#        for A in enum2(m*n):
+#            A.shape = (m, n)
+#            A = row_reduce(A)
+#            if len(A)!=m:
+#                continue
+#            key = get_key(A)
+#            if key in lookup:
+#                continue
+#            spaces.append(A)
+#            lookup[key] = A
+#        print "spaces:", len(spaces)
+
+    incidence = []
+    tpmap = {} 
+    for point in points:
+        point = str(point)
+        tpmap[point] = 0
+        #print point
+
+    for L in lines:
+        line = str(tuple(tuple(row) for row in L))
+        tpmap[line] = 1
+        for P in span(L):
+            if P.sum():
+                incidence.append((str(P), line))
+
+    g = Geometry(incidence, tpmap)
+    assert g.get_diagram() == [(0, 1)]
+    return g
+
+
+def test():
+
+    desc = r"""
+
+    a
+    |\ B
+    | \
+   C|  c
+    | /
+    |/ A
+    b
+
+    """
+
+    g = Geometry(
+        "aB aC bA bC cB cA".split(), 
+        {'a':'p', 'b':'p', 'c':'p', 'A':'l', 'B':'l', 'C':'l'})
+
+    assert len(g.items) == 6
+    #print g.flags_type('l') 
+    #print g.flags_type('p') 
+
+    #g = g.residue(["a"])
+
+    for n in range(2, 7):
+        g = Geometry.polygon(n)
+        assert len(g.items)==2*n
+        assert len(g.maximal_flags())==2*n
+
+        assert len(g.flags_type(['p'])) == n
+        assert len(g.flags_type(['l'])) == n
+        assert len(g.flags_type(['p', 'l'])) == 2*n
+        if n>3:
+            assert not g.is_projective_plane()
+
+    g = Geometry.simplex(2)
+    h = g.residue([(0,), (0,1)])
+    assert len(h.items)==1
+    assert len(g.flags_type([0, 1])) == 6
+
+    for dim in range(4):
+        g = Geometry.simplex(dim)
+        assert len(g.items)==2**(dim+1)-1
+        assert len(g.maximal_flags())==factorial(dim+1)
+
+        h = g.residue([(0,)])
+
+        if dim>0:
+            g.residue([(0,), (0,1)])
+
+    g = Geometry.cube()
+    d = g.get_diagram()
+    assert d == [('e', 'v'), ('f', 'e')] # woo !
+
+    assert Geometry.simplex(4).get_diagram() == [(0, 1), (1, 2), (2, 3)] # A_4 Dynkin diagram !
+
+    #g = tesellate_3d()
+
+    g = fano()
+    assert g.get_diagram() == [('p', 'l')]
+
+    n = argv.get("n", 3)
+    g = projective(n)
 
 
 
