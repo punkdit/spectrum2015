@@ -2,6 +2,9 @@
 
 import os, sys
 
+import networkx as nx
+from matplotlib import pyplot
+
 from argv import Argv
 argv = Argv()
 
@@ -354,6 +357,73 @@ class Geometry(object):
             assert self.tpmap[line]==ltp
         return True
 
+    def get_system(self):
+        flags = list(self.maximal_flags())
+
+        graphs = {} # map tp -> graph
+        for tp in self.types:
+            graph = nx.Graph()
+            for flag in flags:
+                graph.add_node(flag)
+                #print "node:", tp, flag
+            graphs[tp] = graph
+
+        for i in flags:
+            ii = set(i)
+            for j in flags:
+                jj = set(j)
+                kk = ii.intersection(jj)
+                if len(kk)==1:
+                    tp = self.tpmap[list(kk)[0]]
+                    #print "edge:", tp, (i, j)
+                    graphs[tp].add_edge(i, j)
+        tpmap = {}
+        for tp, graph in graphs.items():
+            equ = nx.connected_components(graph)
+            tpmap[tp] = equ
+            #print "equ:", tp
+            #for items in equ:
+            #    print items
+        system = System(flags, tpmap)
+        return system
+
+    def get_graph(self):
+        graph = nx.Graph()
+        for item in self.items:
+            graph.add_node(item)
+        for i, j in self.incidence:
+            if i!=j and i<j:
+                graph.add_edge(i, j)
+        return graph
+
+
+class System(object):
+    """
+        Chamber system
+    """
+    def __init__(self, flags, tpmap):
+        # for every type, we have an equivelance relation on the Chambers
+        "tpmap : map type -> list of list of flags "
+        self.flags = flags
+        self.tpmap = tpmap
+
+    def __str__(self):
+        return "System(%s, %s)"%(self.flags, self.tpmap)
+
+    def get_graph(self):
+        graph = nx.Graph()
+        flags = self.flags
+        for i, c in enumerate(flags):
+            graph.add_node(i)
+        for tp, flagss in self.tpmap.items():
+            for flags in flagss:
+                for flag in flags:
+                  i = self.flags.index(flag)
+                  for _flag in flags:
+                    _i = self.flags.index(_flag)
+                    graph.add_edge(i, _i)
+        return graph
+
 
 def genidx(*shape):
     if len(shape)==0:
@@ -541,6 +611,14 @@ def test():
 
     n = argv.get("n", 3)
     g = projective(n)
+
+    s = g.get_system()
+    #print s
+
+    graph = s.get_graph()
+    #nx.draw(graph)
+    #pyplot.draw()
+    #pyplot.show()
 
 
 
