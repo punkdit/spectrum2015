@@ -58,6 +58,27 @@ assert len(list(choose(range(4), 2))) == 6
 assert len(list(choose(range(4), 3))) == 4
 
 
+#
+# http://mathworld.wolfram.com/q-BinomialCoefficient.html
+#
+def qbinomial(n, m, q=2):
+    "n choose_q m"
+    assert n>=m>=0, (n, m)
+
+    if n==m or m==0:
+        return 1
+
+    if m==1:
+        top = 1-q**n
+        bot = 1-q
+        assert top%bot == 0
+        return top//bot
+
+    return q**m * qbinomial(n-1, m) + qbinomial(n-1, m-1)
+
+assert qbinomial(4, 2) == 35
+
+
 class Geometry(object):
 
     def __init__(self, incidence, tpmap):
@@ -610,10 +631,24 @@ def test():
     assert g.get_diagram() == [('p', 'l')]
 
     n = argv.get("n", 3)
+    assert n>=3
     g = projective(n)
 
     assert len(g.tplookup[0]) == qbinomial(n, 1)
     assert len(g.tplookup[1]) == qbinomial(n, 2)
+
+    flags = list(g.maximal_flags())
+    a = flags[0]
+    N = len(flags)
+    if N>26:
+        names = dict((flags[i], chr(ord('A')+(i//26))+chr(ord('A')+(i%26))) for i in range(N))
+    else:
+        names = dict((flags[i], chr(ord('A')+i)) for i in range(N))
+
+    print "flags:", N
+    for b in flags:
+        c = set(a).intersection(set(b))
+        print names[a], names[b], len(c)
 
     s = g.get_system()
     #print s
@@ -624,30 +659,11 @@ def test():
     #pyplot.show()
 
 
-#
-# http://mathworld.wolfram.com/q-BinomialCoefficient.html
-#
-def qbinomial(n, m, q=2):
-    "n choose_q m"
-    assert n>=m>=0, (n, m)
-
-    if n==m or m==0:
-        return 1
-
-    if m==1:
-        top = 1-q**n
-        bot = 1-q
-        assert top%bot == 0
-        return top//bot
-
-    return q**m * qbinomial(n-1, m) + qbinomial(n-1, m-1)
-
-assert qbinomial(4, 2) == 35
-
 
 """
-https://ncatlab.org/nlab/show/building#buildings_as_metric_spaces
+buildings as enriched categories:
 https://golem.ph.utexas.edu/category/2010/02/3000_and_one_thing_to_think_ab.html#c032006
+https://ncatlab.org/nlab/show/building#buildings_as_metric_spaces
 
 magnitude of enriched category:
 https://golem.ph.utexas.edu/category/2011/06/the_magnitude_of_an_enriched_c.html
