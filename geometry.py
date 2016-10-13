@@ -645,6 +645,23 @@ def qbinomial(n, m, q=2):
 assert qbinomial(4, 2) == 35
 
 
+"""
+https://ncatlab.org/nlab/show/building#buildings_as_metric_spaces
+https://golem.ph.utexas.edu/category/2010/02/3000_and_one_thing_to_think_ab.html#c032006
+
+magnitude of enriched category:
+https://golem.ph.utexas.edu/category/2011/06/the_magnitude_of_an_enriched_c.html
+
+https://golem.ph.utexas.edu/category/2016/08/monoidal_categories_with_proje.html#c051238
+
+magnitude homology of a graph:
+https://golem.ph.utexas.edu/category/2015/05/categorifying_the_magnitude_of.html
+
+magnitude homology in general:
+https://golem.ph.utexas.edu/category/2016/09/magnitude_homology.html#more
+"""
+
+
 
 if __name__ == "__main__":
 
