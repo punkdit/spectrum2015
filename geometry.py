@@ -5,6 +5,7 @@ import os, sys
 import networkx as nx
 from matplotlib import pyplot
 
+from solve import zeros2, enum2, row_reduce, span, shortstr
 from argv import Argv
 argv = Argv()
 
@@ -417,6 +418,14 @@ class Geometry(object):
                 graph.add_edge(i, j)
         return graph
 
+    def rel(self, a, b):
+        incidence = self.incidence
+        A = zeros2(len(a), len(b))
+        for i, aa in enumerate(a):
+          for j, bb in enumerate(b):
+            A[i, j] = (aa, bb) in incidence
+        return A
+
 
 class System(object):
     """
@@ -503,7 +512,6 @@ def projective(n):
     # points are subspaces of dimension 1
     # lines are subspaces of dimension 2
     # etc.
-    from solve import zeros2, enum2, row_reduce, span, shortstr
 
     def get_key(L):
         vs = [str(v) for v in span(L) if v.sum()]
@@ -647,8 +655,11 @@ def test():
 
     print "flags:", N
     for b in flags:
+        A = g.rel(a, b)
+        print shortstr(A),
         c = set(a).intersection(set(b))
         print names[a], names[b], len(c)
+        print
 
     s = g.get_system()
     #print s
