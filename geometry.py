@@ -2,10 +2,11 @@
 
 import os, sys
 
+import numpy
 import networkx as nx
 from matplotlib import pyplot
 
-from solve import zeros2, enum2, row_reduce, span, shortstr
+from solve import zeros2, enum2, row_reduce, span, shortstr, shortstrx, solve
 from argv import Argv
 argv = Argv()
 
@@ -298,8 +299,8 @@ class Geometry(object):
         # every maximal flag is a chamber
         for flag in self.maximal_flags():
             if len(flag)!=self.rank:
-                print "%s not a chamber (rank=%d)"%(flag, self.rank)
-                assert 0, self
+                print "flag %s is not a chamber (rank=%d)"%(flag, self.rank)
+                assert 0
 
     def is_digon(self):
         if self.rank != 2:
@@ -507,7 +508,7 @@ def fano():
     return g
 
 
-def projective(n):
+def projective(n, dim=2):
     # Take n-dim F_2-vector space
     # points are subspaces of dimension 1
     # lines are subspaces of dimension 2
@@ -542,21 +543,21 @@ def projective(n):
         lookup[key] = L
     #print "lines:", len(lines)
 
-    # TOO SLOW:
-#    for m in range(3, n+1):
-#        spaces = []
-#        lookup = {}
-#        for A in enum2(m*n):
-#            A.shape = (m, n)
-#            A = row_reduce(A)
-#            if len(A)!=m:
-#                continue
-#            key = get_key(A)
-#            if key in lookup:
-#                continue
-#            spaces.append(A)
-#            lookup[key] = A
-#        print "spaces:", len(spaces)
+    spaces = []
+    if n>3 and dim>2:
+        m = 3
+        lookup = {}
+        for A in enum2(m*n):
+            A.shape = (m, n)
+            A = row_reduce(A)
+            if len(A)!=m:
+                continue
+            key = get_key(A)
+            if key in lookup:
+                continue
+            spaces.append(A)
+            lookup[key] = A
+        print "spaces:", len(spaces)
 
     incidence = []
     tpmap = {} 
@@ -572,25 +573,30 @@ def projective(n):
             if P.sum():
                 incidence.append((str(P), line))
 
+    for A in spaces:
+        space = freeze(A)
+        tpmap[space] = 2
+        for P in span(A):
+            if P.sum()==0:
+                continue
+            incidence.append((str(P), space))
+        for L in lines:
+            B = solve(A.transpose(), L.transpose())
+            if B is not None:
+                line = str(tuple(tuple(row) for row in L))
+                incidence.append((space, line))
+
     g = Geometry(incidence, tpmap)
-    assert g.get_diagram() == [(0, 1)]
+    if dim==2:
+        assert g.get_diagram() == [(0, 1)]
+    elif dim==3:
+        assert g.get_diagram() == [(0, 1), (1, 2)]
     return g
 
 
 def test():
 
-    desc = r"""
-
-    a
-    |\ B
-    | \
-   C|  c
-    | /
-    |/ A
-    b
-
-    """
-
+    # triangle:
     g = Geometry(
         "aB aC bA bC cB cA".split(), 
         {'a':'p', 'b':'p', 'c':'p', 'A':'l', 'B':'l', 'C':'l'})
@@ -645,29 +651,322 @@ def test():
     assert len(g.tplookup[0]) == qbinomial(n, 1)
     assert len(g.tplookup[1]) == qbinomial(n, 2)
 
+    if argv.cube:
+        g = Geometry.cube()
+    elif argv.simplex:
+        g = Geometry.simplex(2)
+    elif argv.triangle:
+        g = Geometry.polygon(3)
+    elif argv.projective:
+        dim = argv.get("dim", 2)
+        g = projective(n, dim)
+
+        if dim>2:
+            assert len(g.tplookup[2]) == qbinomial(n, 3)
+
+    if argv.system:
+        s = g.get_system()
+        graph = s.get_graph()
+        #nx.draw(graph)
+        #pyplot.draw()
+        #pyplot.show()
+
+
     flags = list(g.maximal_flags())
-    a = flags[0]
     N = len(flags)
     if N>26:
         names = dict((flags[i], chr(ord('A')+(i//26))+chr(ord('A')+(i%26))) for i in range(N))
     else:
         names = dict((flags[i], chr(ord('A')+i)) for i in range(N))
 
+    def le(f, g):
+        return numpy.alltrue(f<=g)
+
     print "flags:", N
+    a = flags[0]
+    rank = len(a)
+    table = {} # calculate all geometrical relationships (triangles)
+    size = {} # map each relationship to it's "size" : 0,1,..,dim+1
+    unit = freeze(g.rel(a, a))
     for b in flags:
-        A = g.rel(a, b)
-        print shortstr(A),
-        c = set(a).intersection(set(b))
-        print names[a], names[b], len(c)
+        AB = g.rel(a, b)
+        #size[freeze(AB)] = dim+1-len(set(a).intersection(set(b))) # no..
+        r = len(set(a).intersection(set(b)))
+        if r == rank:
+            size[freeze(AB)] = 0
+        if r == rank-1:
+            size[freeze(AB)] = 1
+        Bs = []
+        for c in flags:
+            BC = g.rel(b, c)
+            AC = g.rel(a, c)
+            key = freeze(AB), freeze(BC)
+            #table.setdefault(key, []).append(AC)
+            table.setdefault(key, set([])).add(freeze(AC))
+            #print shortstrx(AB, BC, AC)
+            #print
+
+    items = list(table.items())
+    items.sort()
+
+    mul = {} # Murphy product
+    bruhat = {} # Bruhat order
+    star = {} # anti-involution (..?)
+    meet = {} # join?
+    elements = set()
+    for key, values in items:
+        elements.add(key[0])
+        elements.add(key[1])
+        AB, BC = thaw(key[0]), thaw(key[1])
+        bruhat[key] = le(BC, AB)
+        values = [thaw(f) for f in values]
+        g = values[0]
+        for h in values:
+            #assert le(AC, h)
+            if le(h, g):
+                g = h
+        #mul.append((AB, BC, g))
+        #assert numpy.allclose(numpy.dot(AB, BC), g)
+        mul[key] = freeze(g) # Murphy product
+
+        AC = AB*BC # intersection
+        meet[key] = freeze(AC)
+        #if not numpy.allclose(g, AC):
+        #    print shortstrx(AB, BC, g)
+        #    print
+
+    print "relations:", len(elements)
+    elements = list(elements)
+    def cmp(g, h):
+        if g==h:
+            return 0
+        elif bruhat[h,g]:
+            return +1
+        return -1
+    elements.sort(cmp)
+
+    names = {}
+    I, L, P = elements[:3]
+    LP = mul[L, P]
+    PL = mul[P, L]
+    LPL = PLP = mul[LP, L]
+    assert LPL == elements[-1]
+    BOT = elements[-1]
+    names[I] = "I  "
+    names[L] = "L  "
+    names[P] = "P  "
+    names[mul[L, P]] = "LP "
+    names[mul[P, L]] = "PL "
+    names[BOT] = "_|_"
+    assert len(names)==6
+
+    star = {I:I, L:L, P:P, LP:PL, PL:LP, LPL:LPL}
+
+    show_table(elements, names, mul, 'mul')
+    print
+
+    for i in elements:
+        assert bruhat[i, i]
+    assert bruhat[I, L]
+    assert bruhat[L, LP]
+    assert bruhat[LP, LPL]
+
+    lhom = {}
+    rhom = {}
+    for c in elements:
+      for b in elements:
+        for a in elements:
+          if bruhat[c, mul[a, b]] and (lhom.get((c, b)) is None or bruhat[a, lhom[c, b]]):
+            lhom[c, b] = a
+          if bruhat[b, mul[c, a]] and (rhom.get((c, b)) is None or bruhat[a, rhom[c, b]]):
+            rhom[c, b] = a
+
+    for a in elements:
+      for b in elements:
+        assert rhom[a, b] == star[lhom[star[b], star[a]]]
+
+    for a in elements:
+        assert star[star[a]] == a
+
+    for a in elements:
+     for b in elements:
+      for c in elements:
+        if bruhat[c, mul[a, b]]:
+            assert bruhat[lhom[c, b], a]
+        if bruhat[b, mul[c, a]]:
+            assert bruhat[rhom[c, b], a]
+
+    show_table(elements, names, lhom, "lhom")
+    print 
+
+    show_table(elements, names, rhom, "rhom")
+
+    pairs = dict(((i, j), True) for i in range(len(elements)) for j in range(len(elements)))
+    for u in elements:
+      for v in elements:
+        for w in elements:
+            a = names[u]
+            b = names[v]
+            c = names[w]
+
+            lhs = bruhat[w, mul[u, v]]
+            rhs = bruhat[lhom[w, v], u]
+            assert lhs==rhs
+            #print lhs, rhs
+            #assert lhom[mul[u, v], w] == lhom[u, lhom[w, v]]
+            #assert lhom[v, mul[u, v]] == lhom[lhom[w, v], u]
+
+            lhs = int(bruhat[u, mul[v, w]])
+            rhs = int(bruhat[rhom[v, u], w])
+            assert lhs==rhs
+
+#            for idx, (a, b, c) in enumerate([(u,v,w), (u,w,v), (v,u,w), (v,w,u), (w,u,v), (w,v,u)]):
+#                lhs = int(bruhat[a, mul[b, c]])
+#                for jdx, (a1, b1, c1) in enumerate([(u,v,w), (u,w,v), (v,u,w), (v,w,u), (w,u,v), (w,v,u)]):
+#                    rhs = int(bruhat[rhom[a1, b1], c1])
+#                    if lhs!=rhs:
+#                        pairs[idx, jdx] = False
+#
+            #A = bruhat[w, mul[v, u]]
+            #rhs = bruhat[star[rhom[v, w]], u]
+            #assert lhs==rhs
+
+#    #print pairs
+#    for key, value in pairs.items():
+#        if value:
+#            print key
+
+    #poset_homology(elements, bruhat)
+
+    return
+
+    if argv.yang_baxter:
+        for f in elements:
+          for g in elements:
+            try:
+                if mul[f, mul[g, f]] == mul[g, mul[f, g]]:
+                    print "+",
+                else:
+                    print "-",
+            except KeyError:
+                pass
         print
 
-    s = g.get_system()
-    #print s
+    for f in elements:
+        assert mul[f, unit] == f
+        assert mul[unit, f] == f
 
-    graph = s.get_graph()
-    #nx.draw(graph)
-    #pyplot.draw()
-    #pyplot.show()
+    if argv.assoc or 1:
+        # Check assoc
+        for f in elements:
+          for g in elements:
+            #mul[f, g]
+            #meet[f, g]
+            for h in elements:
+                try:
+                    assert mul[mul[f,g], h] == mul[f, mul[g, h]]
+                except KeyError:
+                    pass
+    
+    if argv.quantale or 1:
+        # Check quantale
+        for f in elements:
+          for g in elements:
+            for h in elements:
+                try:
+                    assert mul[f, meet[g, h]] == meet[mul[f, g], mul[f, h]]
+                    assert mul[meet[g, h], f] == meet[mul[g, f], mul[h, f]]
+                except KeyError:
+                    pass
+
+    print "\nOK"
+
+def show_table(elements, names, mul, desc):
+
+    print desc[:3],
+    for i in elements:
+        print names[i],
+    print
+    for ii, i in enumerate(elements):
+      print names[i],
+      for jj, j in enumerate(elements):
+        k = mul[i, j]
+        #print "%2d"%elements.index(k),
+        print "%3s"%names.get(k, "?"),
+      print
+
+def freeze(A):
+    items = [A.shape]
+    for idx in genidx(*A.shape):
+        items.append((idx, A[idx]))
+    items = tuple(items)
+    return items
+
+def thaw(items):
+    #idx, value = items[0]
+    shape = items[0]
+    A = numpy.zeros(shape, dtype=numpy.int32)
+    for (idx, value) in items[1:]:
+        A[idx] = value
+    return A
+
+
+def all_chains(n, above, chain=()):
+    elements = above.keys()
+
+    if n==1:
+        for a in elements:
+            yield (a,)
+    elif n==2:
+        for a in elements:
+          for b in above[a]:
+            yield (a, b)
+        return
+
+    # build a nested for-loop
+    lines = [
+        "def get_all(elements, above):",
+        "  for a0 in elements:",
+    ]
+    indent = '   '
+    for i in range(n-1):
+        lines.append(indent + "for a%d in above[a%d]:" % (i+1, i))
+        indent += ' '
+    tpl = "(" + ','.join('a%d'%i for i in range(n)) + ")"
+    lines.append(indent + "yield %s"%tpl)
+    #print '\n'.join(lines)
+    exec ''.join(l+'\n' for l in lines)
+
+    for chain in get_all(elements, above):
+        yield chain
+
+
+def poset_homology(elements, order):
+
+    above = {}
+    for a in elements:
+        above[a] = [b for b in elements if order[a, b] and b!=a] # a <= b
+
+    r = len(elements) # 0-th homology
+    homology = [r]
+    n = 1
+    while 1:
+
+        chains = set(all_chains(n+1, above))
+        for chain in chains:
+            assert len(set(chain))==len(chain)==n+1
+
+        size = len(chains)
+        if size==0:
+            break
+        homology.append(size)
+        r += (-1)**n * size
+
+        n += 1
+
+    print "poset_homology:", homology, "=", r
+
+    return r
 
 
 
