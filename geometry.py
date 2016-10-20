@@ -1045,6 +1045,7 @@ def magnitude_homology(g, flags, monoid, names, mul, bruhat):
             for value in b12.values():
                 assert value == 0, value
 
+            #find_homology_2(b1, b2, len(chains[l, i-1]), len(chains[l, i]), len(chains[l, i+1]))
             find_homology(b1, b2, len(chains[l, i-1]), len(chains[l, i]), len(chains[l, i+1]))
 
             #if i==2 and names[l]=="L":
