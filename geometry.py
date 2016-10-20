@@ -6,7 +6,7 @@ import numpy
 import networkx as nx
 from matplotlib import pyplot
 
-from solve import zeros2, enum2, row_reduce, span, shortstr, shortstrx, solve
+from solve import zeros2, enum2, row_reduce, span, shortstr, shortstrx, solve, rank, find_kernel
 import isomorph
 from isomorph import Bag, Point, write
 
@@ -991,7 +991,14 @@ def magnitude_homology(g, flags, monoid, names, mul, bruhat):
         return A
 
     chains = {} # map l,n -> []
-    for l in monoid: # iterate over lengths
+    lengths = list(monoid)
+    if argv.get("l"):
+        name = argv.l
+        for l in monoid:
+            if names[l] == name:
+                lengths = [l]
+                break
+    for l in lengths:
         assert l in names
         for n in range(N):
 
@@ -1009,7 +1016,7 @@ def magnitude_homology(g, flags, monoid, names, mul, bruhat):
         bdys = {} # map 
         for n in range(N-1):
             # bdy maps n+1 chains to n chains
-            print "bdy: chains[%d] -> chains[%d]" % (n+1, n)
+            print "bdy: chains[%d] -> chains[%d]" % (n+1, n),
             bdy = {}
             source = chains[l, n+1]
             target = chains[l, n]
@@ -1026,7 +1033,7 @@ def magnitude_homology(g, flags, monoid, names, mul, bruhat):
                         #assert len(set(chain1))==n+1 # uniq NOT !
                         row = target.index(chain1)
                         bdy[row, col] = bdy.get((row, col), 0) + (-1)**i
-            print "bdy:", len(bdy), set(bdy.values())
+            print "nnz:", len(bdy), "range:", set(bdy.values())
             bdys[n+1] = bdy
 
         # bdys[n]: map n-chains to (n-1)-chains
@@ -1034,9 +1041,79 @@ def magnitude_homology(g, flags, monoid, names, mul, bruhat):
         for i in range(1, N-1):
             b1, b2 = bdys[i], bdys[i+1]
             b12 = compose(b1, b2)
-            print "len(bdy*bdy):", len(b12.values())
+            #print "len(bdy*bdy):", len(b12.values())
             for value in b12.values():
                 assert value == 0, value
+
+            find_homology(b1, b2, len(chains[l, i-1]), len(chains[l, i]), len(chains[l, i+1]))
+
+            #if i==2 and names[l]=="L":
+            #    return
+
+
+def find_homology(g, f, *dims):
+
+    print "find_homology"
+    print dims[2], "-f->", dims[1], "-g->", dims[0]
+
+    F = numpy.zeros((dims[1], dims[2]))
+    for row, col in f.keys():
+        v = f[row, col]
+        F[row, col] = v
+    #print shortstr(F)
+
+    G = numpy.zeros((dims[0], dims[1]))
+    for row, col in g.keys():
+        v = g[row, col]
+        G[row, col] = v
+    #print shortstr(G)
+
+    GF = numpy.dot(G, F)
+    #print shortstr(GF)
+    assert numpy.abs(GF).sum() == 0
+
+    import homology
+    if f and g:
+        d = homology.bettiNumber(G, F)
+        print "MH:", d
+
+# See also:
+# http://stackoverflow.com/questions/15638650/is-there-a-standard-solution-for-gauss-elimination-in-python
+
+
+def find_homology_2(g, f, *dims):
+
+    print "find_homology"
+    print dims[2], "-f->", dims[1], "-g->", dims[0]
+
+    F = numpy.zeros((dims[1], dims[2]))
+    for row, col in f.keys():
+        v = f[row, col]
+        F[row, col] = v % 2
+    #print shortstr(F)
+
+    G = numpy.zeros((dims[0], dims[1]))
+    for row, col in g.keys():
+        v = g[row, col]
+        G[row, col] = v % 2
+    #print shortstr(G)
+
+    GF = numpy.dot(G, F) % 2
+    #print shortstr(GF)
+    assert numpy.abs(GF).sum() == 0
+
+    F = F.astype(numpy.int32)
+    G = G.astype(numpy.int32)
+
+    print "rank(f)=%d, rank(g)=%d" % (rank(F), rank(G))
+    if g:
+        kerg = find_kernel(G)
+        print "ker(g):", len(kerg)
+    if f:
+        kerf = find_kernel(F)
+        print "ker(f):", len(kerf)
+
+
 
 
 def compose(g, f):
