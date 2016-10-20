@@ -7,6 +7,10 @@ import networkx as nx
 from matplotlib import pyplot
 
 from solve import zeros2, enum2, row_reduce, span, shortstr, shortstrx, solve
+import isomorph
+from isomorph import Bag, Point, write
+
+
 from argv import Argv
 argv = Argv()
 
@@ -235,6 +239,21 @@ class Geometry(object):
         g = Geometry(incidence, tpmap)
         return g
 
+    def is_flag(self, flag):
+        if not len(set(flag))==len(flag):
+            print "X"
+            return False
+        for i in flag:
+            if not i in self.items:
+                print "I"
+                return False
+            for j in flag:
+                if not (i, j) in self.incidence:
+                    print "C"
+                    return False
+        #print "."
+        return True
+
     def ordered_flags(self, flag=[]):
         #yield flag
         nbd = set(self.items)
@@ -427,6 +446,35 @@ class Geometry(object):
             A[i, j] = (aa, bb) in incidence
         return A
 
+    def get_bag(self):
+        items = list(self.items)
+        items.sort()
+        tpmap = self.tpmap
+        points = []
+        lookup = {}
+        for idx, item in enumerate(items):
+            tp = tpmap[item]
+            p = Point(str(tp), idx)
+            #p = Point("XX", idx)
+            lookup[item] = p
+            points.append(p)
+        #print points
+        for a, b in self.incidence:
+            lookup[a].nbd.append(lookup[b])
+        bag = Bag(points)
+        for p in points:
+            print p, p.nbd
+        return bag
+        
+    def get_symmetry(self):
+        bag0 = self.get_bag()
+        bag1 = self.get_bag()
+        count = 0
+        for f in isomorph.search(bag0, bag1):
+            print f
+            count += 1
+        return count
+
 
 class System(object):
     """
@@ -454,6 +502,40 @@ class System(object):
                     _i = self.flags.index(_flag)
                     graph.add_edge(i, _i)
         return graph
+
+    def get_bag(self):
+        flags = self.flags
+        tpmap = self.tpmap
+        lookup = {}
+        points = []
+        for flag in flags:
+            p = Point("f", len(lookup))
+            lookup[flag] = p
+            points.append(p)
+        for tp, flagss in tpmap.items():
+            p = Point("t", len(lookup))
+            lookup[tp] = p
+            points.append(p)
+            for i, flags in enumerate(flagss):
+                e = Point("e", len(lookup))
+                lookup[tp, i] = e
+                points.append(e)
+                p.nbd.append(e)
+                e.nbd.append(p)
+                for flag in flags:
+                    e.nbd.append(lookup[flag])
+                    lookup[flag].nbd.append(e)
+        bag = Bag(points)
+        return bag
+
+    def get_symmetry(self):
+        bag0 = self.get_bag()
+        bag1 = self.get_bag()
+        count = 0
+        for f in isomorph.search(bag0, bag1):
+            #print f
+            count += 1
+        return count
 
 
 def genidx(*shape):
@@ -663,6 +745,8 @@ def test():
 
         if dim>2:
             assert len(g.tplookup[2]) == qbinomial(n, 3)
+    else:
+        return
 
     if argv.system:
         s = g.get_system()
@@ -671,6 +755,11 @@ def test():
         #pyplot.draw()
         #pyplot.show()
 
+    if argv.symmetry:
+        #print g.get_symmetry()
+        s = g.get_system()
+        s.get_symmetry()
+        return
 
     flags = list(g.maximal_flags())
     N = len(flags)
@@ -686,16 +775,9 @@ def test():
     a = flags[0]
     rank = len(a)
     table = {} # calculate all geometrical relationships (triangles)
-    size = {} # map each relationship to it's "size" : 0,1,..,dim+1
     unit = freeze(g.rel(a, a))
     for b in flags:
         AB = g.rel(a, b)
-        #size[freeze(AB)] = dim+1-len(set(a).intersection(set(b))) # no..
-        r = len(set(a).intersection(set(b)))
-        if r == rank:
-            size[freeze(AB)] = 0
-        if r == rank-1:
-            size[freeze(AB)] = 1
         Bs = []
         for c in flags:
             BC = g.rel(b, c)
@@ -710,9 +792,8 @@ def test():
     items.sort()
 
     mul = {} # Murphy product
-    bruhat = {} # Bruhat order
+    bruhat = {} # Bruhat order bruhat[a, b] : a <= b
     star = {} # anti-involution (..?)
-    meet = {} # join?
     elements = set()
     for key, values in items:
         elements.add(key[0])
@@ -720,22 +801,37 @@ def test():
         AB, BC = thaw(key[0]), thaw(key[1])
         bruhat[key] = le(BC, AB)
         values = [thaw(f) for f in values]
-        g = values[0]
-        for h in values:
-            #assert le(AC, h)
-            if le(h, g):
-                g = h
-        #mul.append((AB, BC, g))
-        #assert numpy.allclose(numpy.dot(AB, BC), g)
-        mul[key] = freeze(g) # Murphy product
-
-        AC = AB*BC # intersection
-        meet[key] = freeze(AC)
-        #if not numpy.allclose(g, AC):
-        #    print shortstrx(AB, BC, g)
-        #    print
-
+        x = values[0]
+        for y in values:
+            #assert le(AC, y)
+            if le(y, x):
+                x = y
+        #mul.append((AB, BC, x))
+        #assert numpy.allclose(numpy.dot(AB, BC), x)
+        mul[key] = freeze(x) # Murphy product
+    assert freeze(g.rel(a, a)) in elements
     print "relations:", len(elements)
+
+    order = {}
+    for a in elements:
+      for b in elements:
+        order[a, b] = False
+    for a in elements:
+      for b in elements:
+        order[a, mul[a, b]] = True
+        order[b, mul[a, b]] = True
+
+    #assert order == bruhat # nope..
+    bruhat = order    
+
+    for a in elements:
+      assert bruhat[a, a]
+      for b in elements:
+        assert bruhat[a, mul[a, b]] 
+        assert bruhat[b, mul[a, b]] 
+        if a != b:
+            assert not bruhat[a, b] or not bruhat[b, a]
+
     elements = list(elements)
     def cmp(g, h):
         if g==h:
@@ -744,32 +840,6 @@ def test():
             return +1
         return -1
     elements.sort(cmp)
-
-    names = {}
-    I, L, P = elements[:3]
-    LP = mul[L, P]
-    PL = mul[P, L]
-    LPL = PLP = mul[LP, L]
-    assert LPL == elements[-1]
-    BOT = elements[-1]
-    names[I] = "I  "
-    names[L] = "L  "
-    names[P] = "P  "
-    names[mul[L, P]] = "LP "
-    names[mul[P, L]] = "PL "
-    names[BOT] = "_|_"
-    assert len(names)==6
-
-    star = {I:I, L:L, P:P, LP:PL, PL:LP, LPL:LPL}
-
-    show_table(elements, names, mul, 'mul')
-    print
-
-    for i in elements:
-        assert bruhat[i, i]
-    assert bruhat[I, L]
-    assert bruhat[L, LP]
-    assert bruhat[LP, LPL]
 
     lhom = {}
     rhom = {}
@@ -781,62 +851,46 @@ def test():
           if bruhat[b, mul[c, a]] and (rhom.get((c, b)) is None or bruhat[a, rhom[c, b]]):
             rhom[c, b] = a
 
-    for a in elements:
-      for b in elements:
-        assert rhom[a, b] == star[lhom[star[b], star[a]]]
+#    for a in elements:
+#     for b in elements:
+#      for c in elements:
+#        if bruhat[c, mul[a, b]]:
+#            assert bruhat[lhom[c, b], a]
+#        if bruhat[b, mul[c, a]]:
+#            assert bruhat[rhom[c, b], a]
 
-    for a in elements:
-        assert star[star[a]] == a
-
-    for a in elements:
-     for b in elements:
-      for c in elements:
-        if bruhat[c, mul[a, b]]:
-            assert bruhat[lhom[c, b], a]
-        if bruhat[b, mul[c, a]]:
-            assert bruhat[rhom[c, b], a]
-
-    show_table(elements, names, lhom, "lhom")
-    print 
-
-    show_table(elements, names, rhom, "rhom")
-
-    pairs = dict(((i, j), True) for i in range(len(elements)) for j in range(len(elements)))
     for u in elements:
       for v in elements:
         for w in elements:
-            a = names[u]
-            b = names[v]
-            c = names[w]
 
             lhs = bruhat[w, mul[u, v]]
             rhs = bruhat[lhom[w, v], u]
             assert lhs==rhs
-            #print lhs, rhs
-            #assert lhom[mul[u, v], w] == lhom[u, lhom[w, v]]
-            #assert lhom[v, mul[u, v]] == lhom[lhom[w, v], u]
 
             lhs = int(bruhat[u, mul[v, w]])
             rhs = int(bruhat[rhom[v, u], w])
-            assert lhs==rhs
-
-#            for idx, (a, b, c) in enumerate([(u,v,w), (u,w,v), (v,u,w), (v,w,u), (w,u,v), (w,v,u)]):
-#                lhs = int(bruhat[a, mul[b, c]])
-#                for jdx, (a1, b1, c1) in enumerate([(u,v,w), (u,w,v), (v,u,w), (v,w,u), (w,u,v), (w,v,u)]):
-#                    rhs = int(bruhat[rhom[a1, b1], c1])
-#                    if lhs!=rhs:
-#                        pairs[idx, jdx] = False
-#
-            #A = bruhat[w, mul[v, u]]
-            #rhs = bruhat[star[rhom[v, w]], u]
             #assert lhs==rhs
 
-#    #print pairs
-#    for key, value in pairs.items():
-#        if value:
-#            print key
-
     #poset_homology(elements, bruhat)
+
+    I = elements[0]
+    L = elements[1]
+    P = elements[2]
+    assert mul[I, L] == L
+    assert mul[L, P] in elements
+    LP = mul[L, P]
+    PL = mul[P, L]
+    LPL = elements[-1]
+    assert mul[LP, LPL] == LPL
+    names = {I:"I", L:"L", P:"P", LP:"LP", PL:"PL", LPL:"LPL"}
+
+    assert len(elements)==6
+    for a in elements:
+        assert a in names
+
+    if argv.magnitude:
+        magnitude_homology(g, flags, elements, names, mul, bruhat)
+
 
     return
 
@@ -880,6 +934,164 @@ def test():
                     pass
 
     print "\nOK"
+
+
+def uniqtuples(itemss):
+    if len(itemss)==0:
+        yield ()
+    elif len(itemss)==1:
+        items = itemss[0]
+        for head in items:
+            yield (head,)
+        return
+    for head in itemss[0]:
+        for tail in uniqtuples(itemss[1:]):
+            if head != tail[0]:
+                yield (head,)+tail
+
+
+def alltuples(itemss):
+    if len(itemss)==0:
+        yield ()
+    elif len(itemss)==1:
+        items = itemss[0]
+        for head in items:
+            yield (head,)
+        return
+    for head in itemss[0]:
+        for tail in alltuples(itemss[1:]):
+            yield (head,)+tail
+
+
+def magnitude_homology(g, flags, monoid, names, mul, bruhat):
+
+    print "magnitude_homology:"
+
+    N = argv.get("N", 2)
+
+    I = monoid[0]
+    for b in monoid:
+        assert mul[I, b] == b
+
+    for f in flags:
+        assert g.is_flag(f)
+
+    def length(chain):
+        for f in chain:
+            assert g.is_flag(f)
+        assert len(chain)
+        if len(chain)==1:
+            return I
+        A = g.rel(chain[0], chain[1])
+        A = freeze(A)
+        assert A in monoid
+        for i in range(1, len(chain)-1):
+            B = freeze(g.rel(chain[i], chain[i+1]))
+            A = mul[A, B]
+        return A
+
+    chains = {} # map l,n -> []
+    for l in monoid: # iterate over lengths
+        assert l in names
+        for n in range(N):
+
+            if n==0 and l==I:
+                nchains = [(flag,) for flag in flags] # objects of X
+    
+            else:
+                nchains = []
+                for chain in alltuples((flags,)*(n+1)):
+                    if length(chain) == l:
+                        nchains.append(chain)
+            chains[l,n] = nchains
+            print "l = %s, |%d-chains|=%d" % (names[l], n, len(nchains))
+
+        bdys = {} # map 
+        for n in range(N-1):
+            # bdy maps n+1 chains to n chains
+            print "bdy: chains[%d] -> chains[%d]" % (n+1, n)
+            bdy = {}
+            source = chains[l, n+1]
+            target = chains[l, n]
+            #print "|chains[%d]|=%d |chains[%d]|=%d" % (n+1, len(source), n, len(target))
+            #for chain in target:
+            #    print "\t", chain
+            for col, chain in enumerate(source):
+                assert len(chain)==n+2
+                for i in range(n+2):
+                    chain1 = chain[:i] + chain[i+1:]
+                    assert len(chain1)==n+1
+                    if length(chain1) == l:
+                        #print chain1
+                        #assert len(set(chain1))==n+1 # uniq NOT !
+                        row = target.index(chain1)
+                        bdy[row, col] = bdy.get((row, col), 0) + (-1)**i
+            print "bdy:", len(bdy), set(bdy.values())
+            bdys[n+1] = bdy
+
+        # bdys[n]: map n-chains to (n-1)-chains
+
+        for i in range(1, N-1):
+            b1, b2 = bdys[i], bdys[i+1]
+            b12 = compose(b1, b2)
+            print "len(bdy*bdy):", len(b12.values())
+            for value in b12.values():
+                assert value == 0, value
+
+
+def compose(g, f):
+    # first f then g
+    h = {}
+    #print g.keys()
+    for row, c in g.keys():
+        for r, col in f.keys():
+            if c==r:
+                #print row, col
+                h[row, col] = h.get((row, col), 0) + g[row, c] * f[r, col]
+
+    return h
+
+
+
+def test_projective_plane():
+
+    names = {}
+    I, L, P = elements[:3]
+    LP = mul[L, P]
+    PL = mul[P, L]
+    LPL = PLP = mul[LP, L]
+    assert LPL == elements[-1]
+    BOT = elements[-1]
+    names[I] = "I  "
+    names[L] = "L  "
+    names[P] = "P  "
+    names[mul[L, P]] = "LP "
+    names[mul[P, L]] = "PL "
+    names[BOT] = "_|_"
+    assert len(names)==6
+
+    star = {I:I, L:L, P:P, LP:PL, PL:LP, LPL:LPL}
+
+#    for a in elements:
+#      for b in elements:
+#        assert rhom[a, b] == star[lhom[star[b], star[a]]]
+#    for a in elements:
+#        assert star[star[a]] == a
+
+    show_table(elements, names, mul, 'mul')
+    print
+
+    for i in elements:
+        assert bruhat[i, i]
+    assert bruhat[I, L]
+    assert bruhat[L, LP]
+    assert bruhat[LP, LPL]
+
+    show_table(elements, names, lhom, "lhom")
+    print 
+
+    show_table(elements, names, rhom, "rhom")
+
 
 def show_table(elements, names, mul, desc):
 
@@ -969,6 +1181,19 @@ def poset_homology(elements, order):
     return r
 
 
+"""
+TWF links:
+
+http://math.ucr.edu/home/baez/week162.html # jordan algebras
+
+Lie groups & geometry, Borel groups, parabolic subgroups:
+http://math.ucr.edu/home/baez/week178.html
+http://math.ucr.edu/home/baez/week180.html
+
+the finite case & q-polynomials:
+http://math.ucr.edu/home/baez/week186.html
+
+"""
 
 """
 buildings as enriched categories:
