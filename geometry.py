@@ -998,6 +998,7 @@ def magnitude_homology(g, flags, monoid, names, mul, bruhat):
             if names[l] == name:
                 lengths = [l]
                 break
+
     for l in lengths:
         assert l in names
         for n in range(N):
@@ -1010,8 +1011,19 @@ def magnitude_homology(g, flags, monoid, names, mul, bruhat):
                 for chain in alltuples((flags,)*(n+1)):
                     if length(chain) == l:
                         nchains.append(chain)
+
+            assert len(set(nchains))==len(nchains)
             chains[l,n] = nchains
             print "l = %s, |%d-chains|=%d" % (names[l], n, len(nchains))
+            if n==2 and 0:
+                print "x0=x1:", len([c for c in nchains if c[0]==c[1]])
+                print "x1=x2:", len([c for c in nchains if c[1]==c[2]])
+                items = [c for c in nchains if c[0]!=c[1]!=c[2]]
+                print "x0!=x1!=x2:", len(items)
+                for chain in items:
+                    print chain
+                    for flag in chain:
+                        assert flag[0] == chain[0][0]
 
         bdys = {} # map 
         for n in range(N-1):
@@ -1025,7 +1037,8 @@ def magnitude_homology(g, flags, monoid, names, mul, bruhat):
             #    print "\t", chain
             for col, chain in enumerate(source):
                 assert len(chain)==n+2
-                for i in range(n+2):
+#                for i in range(n+2):
+                for i in range(1, n+1):
                     chain1 = chain[:i] + chain[i+1:]
                     assert len(chain1)==n+1
                     if length(chain1) == l:
@@ -1045,8 +1058,10 @@ def magnitude_homology(g, flags, monoid, names, mul, bruhat):
             for value in b12.values():
                 assert value == 0, value
 
-            #find_homology_2(b1, b2, len(chains[l, i-1]), len(chains[l, i]), len(chains[l, i+1]))
-            find_homology(b1, b2, len(chains[l, i-1]), len(chains[l, i]), len(chains[l, i+1]))
+            if argv.Z2:
+                find_homology_2(b1, b2, len(chains[l, i-1]), len(chains[l, i]), len(chains[l, i+1]))
+            else:
+                find_homology(b1, b2, len(chains[l, i-1]), len(chains[l, i]), len(chains[l, i+1]))
 
             #if i==2 and names[l]=="L":
             #    return
@@ -1055,7 +1070,7 @@ def magnitude_homology(g, flags, monoid, names, mul, bruhat):
 def find_homology(g, f, *dims):
 
     print "find_homology"
-    print dims[2], "-f->", dims[1], "-g->", dims[0]
+    print dims[2], "--f-->", dims[1], "--g-->", dims[0]
 
     F = numpy.zeros((dims[1], dims[2]))
     for row, col in f.keys():
@@ -1085,7 +1100,7 @@ def find_homology(g, f, *dims):
 def find_homology_2(g, f, *dims):
 
     print "find_homology"
-    print dims[2], "-f->", dims[1], "-g->", dims[0]
+    print dims[2], "--f-->", dims[1], "--g-->", dims[0]
 
     F = numpy.zeros((dims[1], dims[2]))
     for row, col in f.keys():
