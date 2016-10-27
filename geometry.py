@@ -6,7 +6,7 @@ import numpy
 import networkx as nx
 from matplotlib import pyplot
 
-from solve import zeros2, enum2, row_reduce, span, shortstr, shortstrx, solve, rank, find_kernel
+from solve import zeros2, enum2, row_reduce, span, shortstr, shortstrx, solve, rank, find_kernel, find_logops
 import isomorph
 from isomorph import Bag, Point, write
 
@@ -990,81 +990,78 @@ def magnitude_homology(g, flags, monoid, names, mul, bruhat):
             A = mul[A, B]
         return A
 
-    chains = {} # map l,n -> []
-    lengths = list(monoid)
-    if argv.get("l"):
-        name = argv.l
-        for l in monoid:
-            if names[l] == name:
-                lengths = [l]
-                break
+    for l in monoid:
+        name = names[l]
+        s = "%s = %s" % (name, l)
+        globals()[name] = l
 
-    for l in lengths:
+    chains = {}
+
+    ACCEPT = (I,)
+    ACCEPT = argv.get("accept")
+    print "ACCEPT:", repr(ACCEPT)
+    if ACCEPT is not None:
+        ACCEPT = eval(ACCEPT)
+    if ACCEPT in names:
+        ACCEPT = (ACCEPT,) # tuple-ize
+    for l in ACCEPT:
         assert l in names
-        for n in range(N):
 
-            if n==0 and l==I:
-                nchains = [(flag,) for flag in flags] # objects of X
-    
-            else:
-                nchains = []
-                for chain in alltuples((flags,)*(n+1)):
-                    if length(chain) == l:
-                        nchains.append(chain)
+    accept = lambda chain : length(chain) in ACCEPT
+    #accept = lambda chain : length(chain) in (I, L, P)
+    #accept = lambda chain : length(chain) in (I, L, PL) # DOES NOT WORK
+    #accept = lambda chain : length(chain) in (I, L, P, PL)
+    #accept = lambda chain : length(chain) in (I, L, P, PL, LP)
+    #accept = lambda chain : True
 
-            assert len(set(nchains))==len(nchains)
-            chains[l,n] = nchains
-            print "l = %s, |%d-chains|=%d" % (names[l], n, len(nchains))
-            if n==2 and 0:
-                print "x0=x1:", len([c for c in nchains if c[0]==c[1]])
-                print "x1=x2:", len([c for c in nchains if c[1]==c[2]])
-                items = [c for c in nchains if c[0]!=c[1]!=c[2]]
-                print "x0!=x1!=x2:", len(items)
-                for chain in items:
-                    print chain
-                    for flag in chain:
-                        assert flag[0] == chain[0][0]
+    for n in range(N):
 
-        bdys = {} # map 
-        for n in range(N-1):
-            # bdy maps n+1 chains to n chains
-            print "bdy: chains[%d] -> chains[%d]" % (n+1, n),
-            bdy = {}
-            source = chains[l, n+1]
-            target = chains[l, n]
-            #print "|chains[%d]|=%d |chains[%d]|=%d" % (n+1, len(source), n, len(target))
-            #for chain in target:
-            #    print "\t", chain
-            for col, chain in enumerate(source):
-                assert len(chain)==n+2
-#                for i in range(n+2):
-                for i in range(1, n+1):
-                    chain1 = chain[:i] + chain[i+1:]
-                    assert len(chain1)==n+1
-                    if length(chain1) == l:
-                        #print chain1
-                        #assert len(set(chain1))==n+1 # uniq NOT !
-                        row = target.index(chain1)
-                        bdy[row, col] = bdy.get((row, col), 0) + (-1)**i
-            print "nnz:", len(bdy), "range:", set(bdy.values())
-            bdys[n+1] = bdy
+        nchains = []
+        for chain in alltuples((flags,)*(n+1)):
+            if accept(chain):
+                nchains.append(chain)
 
-        # bdys[n]: map n-chains to (n-1)-chains
+        assert len(set(nchains))==len(nchains)
+        chains[n] = nchains
+        print "|%d-chains|=%d" % (n, len(nchains))
 
-        for i in range(1, N-1):
-            b1, b2 = bdys[i], bdys[i+1]
-            b12 = compose(b1, b2)
-            #print "len(bdy*bdy):", len(b12.values())
-            for value in b12.values():
-                assert value == 0, value
+    bdys = {} # map 
+    for n in range(N-1):
+        # bdy maps n+1 chains to n chains
+        print "bdy: chains[%d] -> chains[%d]" % (n+1, n),
+        bdy = {}
+        source = chains[n+1]
+        target = chains[n]
+        for col, chain in enumerate(source):
+            assert len(chain)==n+2
+            #for i in range(1, n+1): # skip first & last, like in the graph homology
+            for i in range(n+2):
+                chain1 = chain[:i] + chain[i+1:]
+                assert len(chain1)==n+1
+                if accept(chain1):
+                    #print chain1
+                    #assert len(set(chain1))==n+1 # uniq NOT !
+                    row = target.index(chain1)
+                    bdy[row, col] = bdy.get((row, col), 0) + (-1)**i
+        print "nnz:", len(bdy), "range:", set(bdy.values())
+        bdys[n+1] = bdy
 
-            if argv.Z2:
-                find_homology_2(b1, b2, len(chains[l, i-1]), len(chains[l, i]), len(chains[l, i+1]))
-            else:
-                find_homology(b1, b2, len(chains[l, i-1]), len(chains[l, i]), len(chains[l, i+1]))
+    # bdys[n]: map n-chains to (n-1)-chains
 
-            #if i==2 and names[l]=="L":
-            #    return
+    for i in range(1, N-1):
+        b1, b2 = bdys[i], bdys[i+1]
+        b12 = compose(b1, b2)
+        #print "len(bdy*bdy):", len(b12.values())
+        for value in b12.values():
+            assert value == 0, value
+
+        if argv.Z2:
+            find_homology_2(b1, b2, len(chains[i-1]), len(chains[i]), len(chains[i+1]))
+        else:
+            find_homology(b1, b2, len(chains[i-1]), len(chains[i]), len(chains[i+1]))
+
+        #if i==2 and names[l]=="L":
+        #    return
 
 
 def find_homology(g, f, *dims):
@@ -1107,12 +1104,21 @@ def find_homology_2(g, f, *dims):
         v = f[row, col]
         F[row, col] = v % 2
     #print shortstr(F)
+    #print
 
     G = numpy.zeros((dims[0], dims[1]))
     for row, col in g.keys():
         v = g[row, col]
         G[row, col] = v % 2
     #print shortstr(G)
+
+    if argv.logops:
+        L = find_logops(G, F.transpose())
+        #print shortstr(L)
+        #w = min([v.sum() for v in span(L) if v.sum()])
+        w = min([v.sum() for v in L])
+        print "weight:", w
+            
 
     GF = numpy.dot(G, F) % 2
     #print shortstr(GF)

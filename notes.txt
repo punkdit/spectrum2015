@@ -8,30 +8,28 @@ bdy maps non-trivial, ie. exact sequence.
 
 Z_2 homology, but Z homology looks the same.
 
-time ./geometry.py projective magnitude N=5 l=L
+$ ./geometry.py projective magnitude N=4 Z2 accept=L,
 flags: 21
 relations: 6
 magnitude_homology:
-l = L, |0-chains|=0
-l = L, |1-chains|=42
-l = L, |2-chains|=168
-l = L, |3-chains|=546
-l = L, |4-chains|=1680
+ACCEPT: 'L,'
+(((2, 2), ((0, 0), 0), ((0, 1), 1), ((1, 0), 1), ((1, 1), 1)),)
+|0-chains|=0
+|1-chains|=42
+|2-chains|=168
+|3-chains|=546
 bdy: chains[1] -> chains[0] nnz: 0 range: set([])
 bdy: chains[2] -> chains[1] nnz: 294 range: set([0, 1, -1])
 bdy: chains[3] -> chains[2] nnz: 1512 range: set([0, 1, -1])
-bdy: chains[4] -> chains[3] nnz: 6006 range: set([0, 1, -1])
-find_homology 0 294
-28 0
+find_homology
+168 --f--> 42 --g--> 0
+rank(f)=28, rank(g)=0
 ker(f): 140
-find_homology 294 1512
-140 28
+find_homology
+546 --f--> 168 --g--> 42
+rank(f)=140, rank(g)=28
 ker(g): 140
 ker(f): 406
-find_homology 1512 6006
-406 140
-ker(g): 406
-ker(f): 1274
 
 
 
