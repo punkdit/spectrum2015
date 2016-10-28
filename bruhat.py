@@ -59,7 +59,7 @@ class Coxeter(object):
         for i in gen:
           for j in gen:
             assert rel[i, j] == rel[j, i]
-            assert rel[i, j] in (2, 3, 4, 6)
+            #assert rel[i, j] in (2, 3, 4, 6)
         self.gen = gen
         self.rel = rel
 
@@ -155,6 +155,8 @@ class Coxeter(object):
                     newpairs += [(k, g) for g in group]
                     newpairs += [(g, k) for g in group]
                     group.add(k)
+                    if len(group)==max_size:
+                        break
             if not newpairs:
                 break
             pairs = newpairs
@@ -167,17 +169,30 @@ class Coxeter(object):
 def main():
 
     A_2 = Coxeter("LP", {("L", "P") : 3})
+    assert len(A_2.build())==6
 
-    A_2.build()
-    print A_2.group
+    I_5 = Coxeter("LP", {("L", "P") : 5})
+    assert len(I_5.build())==10
+    # B_2 : 8
 
-    A_3 = Coxeter("LPS", {("L", "P") : 3, ("L", "S"):3})
+    #G_2 = Coxeter("LP", {???})
+    #assert len(G_2.build())==12
 
-    print len(A_3.build())
+    B_3 = Coxeter("ABC", {("A", "B"):3, ("B", "C"):4})
+    assert len(B_3.build())==48
 
-    A_4 = Coxeter("LPSH", {("L", "P") : 3, ("L", "S"):3, ("S", "H"):3})
+    if argv.D_4:
+        D_4 = Coxeter("ABCD", {("A", "B"):3, ("A", "C"):3, ("A", "D"):3})
+        g = D_4.build()
+        assert len(g)==192
 
-    print len(A_4.build(max_size=120))
+    if argv.A_3:
+        A_3 = Coxeter("LPS", {("L", "P") : 3, ("L", "S"):3})
+        assert len(A_3.build())==24
+
+    if argv.A_4:
+        A_4 = Coxeter("LPSH", {("L", "P") : 3, ("L", "S"):3, ("S", "H"):3})
+        assert len(A_4.build())==120
 
 
 
