@@ -1131,9 +1131,9 @@ def find_homology_2(g, f, *dims):
     if g:
         kerg = find_kernel(G)
         print "ker(g):", len(kerg)
-    if f:
-        kerf = find_kernel(F)
-        print "ker(f):", len(kerf)
+    #if f:
+    #    kerf = find_kernel(F)
+    #    print "ker(f):", len(kerf)
 
 
 

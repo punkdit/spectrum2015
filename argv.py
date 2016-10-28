@@ -47,3 +47,5 @@ class Argv(object):
         return len(self.args)
 
 
+argv = Argv()
+

@@ -1,4 +1,43 @@
 
+
+27/10/16
+========
+
+n=3 (Fano plane) / A_2
+
+ACCEPT          | H_0   H_1   H_2  ...
+----------------|------------------
+I               |   .     .     .   
+I,L             |  14     .     .   
+I,L,P           |   1     8     .
+I,L,P,LP        |   1     8     .
+I,L,P,LP,PL     |   1     8     .
+I,L,P,LP,PL,LPL |   1     .     x
+  L             |   .    14     .
+  L,P           |   .    28     .
+  L,P,LP        |   .    28     .
+  L,P,LP,PL     |   .    28     .
+  L,P,LP,PL,LPL |   .    20     x
+  L,  LP        |   .    14     .
+  L,  LP,PL     |   .    14     .
+  L,  LP,PL,LPL |   .     6     .
+  L,  LP,   LPL |   .     .     x
+      LP        |   .     .     .
+      LP,PL     |   .     .     .
+      LP,PL,LPL |   .     .     x
+      LP,   LPL |   .     .     x
+            LPL |   .     .     x
+
+n=4 / A_2
+
+ACCEPT          | H_0   H_1 ...
+----------------|-----------
+I               |   .     . 
+I,L             |  15     . 
+I,L,P           |   1    56 
+  L,P           |   .   160 
+
+
 21/10/16
 ========
 
