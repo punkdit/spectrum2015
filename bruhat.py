@@ -4,6 +4,11 @@ import sys, os
 
 from argv import argv
 
+"""
+Coxeter groups:
+http://math.ucr.edu/home/baez/week62.html
+"""
+
 
 def pairs(gen):
     for s in gen:
@@ -16,7 +21,7 @@ def distinct_pairs(gen):
             if s != t:
                 yield (s, t)
 
-def rewrite(word, src, tgt):
+def rewrite(word, src, tgt): # 40% hotspot
     if src not in word:
         return
     assert src != tgt
@@ -83,7 +88,7 @@ class Coxeter(object):
         self.reduced = reduced
         self.lookup = lookup
 
-    def get_canonical(self, orig):
+    def get_canonical(self, orig): # 30% hotspot
         reduced = self.reduced
         if orig in reduced:
             return reduced[orig]
@@ -175,11 +180,20 @@ def main():
     assert len(I_5.build())==10
     # B_2 : 8
 
-    #G_2 = Coxeter("LP", {???})
-    #assert len(G_2.build())==12
-
     B_3 = Coxeter("ABC", {("A", "B"):3, ("B", "C"):4})
     assert len(B_3.build())==48
+
+    G_2 = Coxeter("LP", {("L", "P") : 6})
+    assert len(G_2.build())==12
+
+    #H_3 = Coxeter("ABC", {("A", "B") : 5, ("B", "C") : 3})
+    #assert len(H_3.build())==120
+
+    if argv.F_4:
+        F_4 = Coxeter("ABCD", {("A", "B"):3, ("A", "C"):4, ("A", "D"):3})
+        g = F_4.build(192)
+        print len(g)
+        assert len(g)==192
 
     if argv.D_4:
         D_4 = Coxeter("ABCD", {("A", "B"):3, ("A", "C"):3, ("A", "D"):3})
