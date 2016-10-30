@@ -40,6 +40,11 @@ def cancel_pairs(word):
         if word[i]==word[i+1]:
             yield word[:i] + word[i+2:]
 
+def idempotent_pairs(word):
+    for i in range(len(word)-1):
+        if word[i]==word[i+1]:
+            yield word[:i] + word[i+1:]
+
 assert list(cancel_pairs('xyzzz')) == ['xyz', 'xyz']
 
 
@@ -47,7 +52,7 @@ class Coxeter(object):
     """ Coxeter group
     """
 
-    def __init__(self, gen, rel, identity=''):
+    def __init__(self, gen, rel, identity='', bruhat=False):
         """
         gen : list of generators
         rel : map pairs (i,j) of generators to m_{ij} (this is the Coxeter matrix)
@@ -73,7 +78,10 @@ class Coxeter(object):
         for g in gen:
             reduced[g] = (g,)
             lookup[(g,)] = g
-            reduced[g+g] = reduced['']
+            if bruhat:
+                reduced[g+g] = reduced[g] # Bruhat monoid
+            else:
+                reduced[g+g] = reduced[''] # Coxeter group
             for h in gen:
                 if g==h:
                     continue
@@ -87,6 +95,7 @@ class Coxeter(object):
                 lookup[r] = ghm
         self.reduced = reduced
         self.lookup = lookup
+        self.bruhat = bruhat
 
     def get_canonical(self, orig): # 30% hotspot
         reduced = self.reduced
@@ -97,10 +106,11 @@ class Coxeter(object):
         items = set([orig])
         done = False
         #print "E"
+        pair_iter = idempotent_pairs if self.bruhat else cancel_pairs
         while not done:
             done = True
             for word in list(items):
-                for word1 in cancel_pairs(word):
+                for word1 in pair_iter(word):
                     items = set([word1])
                     assert len(word1)<len(word)
                     #print "X"
@@ -160,7 +170,7 @@ class Coxeter(object):
                     newpairs += [(k, g) for g in group]
                     newpairs += [(g, k) for g in group]
                     group.add(k)
-                    if len(group)==max_size:
+                    if max_size is not None and len(group)>=max_size:
                         break
             if not newpairs:
                 break
@@ -173,13 +183,20 @@ class Coxeter(object):
 
 def main():
 
-    A_2 = Coxeter("LP", {("L", "P") : 3})
+    bruhat = argv.bruhat
+
+    # |A_n| = (n+1)!
+    A_2 = Coxeter("LP", {("L", "P") : 3}, bruhat=bruhat)
     assert len(A_2.build())==6
 
+    print A_2.mul
+
+    # |I_n| = 2*n
     I_5 = Coxeter("LP", {("L", "P") : 5})
     assert len(I_5.build())==10
     # B_2 : 8
 
+    # |B_n| = 2^n n!
     B_3 = Coxeter("ABC", {("A", "B"):3, ("B", "C"):4})
     assert len(B_3.build())==48
 
@@ -191,9 +208,9 @@ def main():
 
     if argv.F_4:
         F_4 = Coxeter("ABCD", {("A", "B"):3, ("A", "C"):4, ("A", "D"):3})
-        g = F_4.build(192)
+        g = F_4.build()
         print len(g)
-        assert len(g)==192
+        assert len(g)==1152
 
     if argv.D_4:
         D_4 = Coxeter("ABCD", {("A", "B"):3, ("A", "C"):3, ("A", "D"):3})
