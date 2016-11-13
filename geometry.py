@@ -485,9 +485,17 @@ class System(object):
         "tpmap : map type -> list of list of flags "
         self.flags = flags
         self.tpmap = tpmap
+        self.graph = self.get_graph()
 
     def __str__(self):
-        return "System(%s, %s)"%(self.flags, self.tpmap)
+        return "System(%d)"%len(self)
+        #return "System(%s, %s)"%(self.flags, self.tpmap)
+
+    def __len__(self):
+        return len(self.flags)
+
+    def __getitem__(self, idx):
+        return self.flags[idx]
 
     def get_graph(self):
         graph = nx.Graph()
@@ -536,6 +544,33 @@ class System(object):
             #print f
             count += 1
         return count
+
+    def get_apartment(self, c, d):
+        assert c is not d
+        graph = self.graph
+        c = self.flags.index(c)
+        d = self.flags.index(d)
+        for path in nx.all_shortest_paths(graph, c, d):
+            print "path:", path
+
+
+def find_building(g):
+    print "find_building"
+    s = g.get_system()
+    print "flags:", len(s.flags)
+    graph = s.get_graph()
+
+
+    for c in s:
+      for d in s:
+        if c is d:
+            continue
+        print "get_apartment:"
+        apt = s.get_apartment(c, d)
+
+        return
+        
+
 
 
 def genidx(*shape):
@@ -672,6 +707,7 @@ def projective(n, dim=2):
     if dim==2:
         assert g.get_diagram() == [(0, 1)]
     elif dim==3:
+        assert n>3
         assert g.get_diagram() == [(0, 1), (1, 2)]
     return g
 
@@ -749,11 +785,8 @@ def test():
         return
 
     if argv.system:
-        s = g.get_system()
-        graph = s.get_graph()
-        #nx.draw(graph)
-        #pyplot.draw()
-        #pyplot.show()
+        find_building(g)
+        return
 
     if argv.symmetry:
         #print g.get_symmetry()
@@ -962,6 +995,14 @@ def alltuples(itemss):
         for tail in alltuples(itemss[1:]):
             yield (head,)+tail
 
+"""
+References:
+https://golem.ph.utexas.edu/category/2011/06/the_magnitude_of_an_enriched_c.html
+https://golem.ph.utexas.edu/category/2015/05/categorifying_the_magnitude_of.html
+https://golem.ph.utexas.edu/category/2016/09/magnitude_homology.html
+https://golem.ph.utexas.edu/category/2016/08/a_survey_of_magnitude.html#c050913
+https://golem.ph.utexas.edu/category/2016/08/monoidal_categories_with_proje.html#c051440
+"""
 
 def magnitude_homology(g, flags, monoid, names, mul, bruhat):
 
@@ -1282,6 +1323,9 @@ def poset_homology(elements, order):
 
 """
 TWF links:
+
+ADE classifications and Simple Lie Algebras:
+http://math.ucr.edu/home/baez/week64.html
 
 http://math.ucr.edu/home/baez/week162.html # jordan algebras
 
