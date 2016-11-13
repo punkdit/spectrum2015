@@ -47,7 +47,6 @@ def idempotent_pairs(word):
 
 assert list(cancel_pairs('xyzzz')) == ['xyz', 'xyz']
 
-
 class Coxeter(object):
     """ Coxeter group
     """
@@ -180,6 +179,11 @@ class Coxeter(object):
         return self.group
 
 
+class BruhatMonoid(Coxeter):
+    def __init__(self, *args, **kw):
+        kw["bruhat"] = True
+        Coxeter.__init__(self, *args, **kw)
+
 
 def main():
 
@@ -187,9 +191,9 @@ def main():
 
     # |A_n| = (n+1)!
     A_2 = Coxeter("LP", {("L", "P") : 3}, bruhat=bruhat)
-    assert len(A_2.build())==6
+    words = A_2.build()
+    assert len(words)==6
 
-    print A_2.mul
 
     # |I_n| = 2*n
     I_5 = Coxeter("LP", {("L", "P") : 5})
@@ -218,8 +222,10 @@ def main():
         assert len(g)==192
 
     if argv.A_3:
-        A_3 = Coxeter("LPS", {("L", "P") : 3, ("L", "S"):3})
+        A_3 = Coxeter("LPS", {("L", "P") : 3, ("L", "S"):3}, bruhat=bruhat)
         assert len(A_3.build())==24
+        print A_3.lookup
+        print A_3.reduced
 
     if argv.A_4:
         A_4 = Coxeter("LPSH", {("L", "P") : 3, ("L", "S"):3, ("S", "H"):3})

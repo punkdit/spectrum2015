@@ -9,6 +9,7 @@ from matplotlib import pyplot
 from solve import zeros2, enum2, row_reduce, span, shortstr, shortstrx, solve, rank, find_kernel, find_logops
 import isomorph
 from isomorph import Bag, Point, write
+from bruhat import BruhatMonoid
 
 
 from argv import Argv
@@ -399,36 +400,6 @@ class Geometry(object):
             assert self.tpmap[line]==ltp
         return True
 
-    def get_system(self):
-        flags = list(self.maximal_flags())
-
-        graphs = {} # map tp -> graph
-        for tp in self.types:
-            graph = nx.Graph()
-            for flag in flags:
-                graph.add_node(flag)
-                #print "node:", tp, flag
-            graphs[tp] = graph
-
-        for i in flags:
-            ii = set(i)
-            for j in flags:
-                jj = set(j)
-                kk = ii.intersection(jj)
-                if len(kk)==1:
-                    tp = self.tpmap[list(kk)[0]]
-                    #print "edge:", tp, (i, j)
-                    graphs[tp].add_edge(i, j)
-        tpmap = {}
-        for tp, graph in graphs.items():
-            equ = nx.connected_components(graph)
-            tpmap[tp] = equ
-            #print "equ:", tp
-            #for items in equ:
-            #    print items
-        system = System(flags, tpmap)
-        return system
-
     def get_graph(self):
         graph = nx.Graph()
         for item in self.items:
@@ -478,18 +449,60 @@ class Geometry(object):
 
 class System(object):
     """
-        Chamber system
+        Chamber (maximal flag) system
     """
-    def __init__(self, flags, tpmap):
-        # for every type, we have an equivelance relation on the Chambers
-        "tpmap : map type -> list of list of flags "
+
+    def __init__(self, geometry):
+        flags = list(geometry.maximal_flags())
+        tpmap = geometry.tpmap
+
+        graphs = {} # map tp -> graph
+        for tp in geometry.types:
+            graph = nx.Graph()
+            for flag in flags:
+                graph.add_node(flag)
+                #print "node:", tp, flag
+            graphs[tp] = graph
+
+        for flag in flags:
+            for _flag in flags:
+                assert len(flag)==len(_flag)
+                rank = len(flag)
+                idxs = [idx for idx in range(rank) if flag[idx]!=_flag[idx]]
+                if len(idxs)!=1:
+                    continue
+                idx = idxs[0]
+                assert tpmap[flag[idx]]==tpmap[_flag[idx]]
+                tp = tpmap[flag[idx]]
+                graphs[tp].add_edge(flag, _flag)
+
+        # union graph
+        graph = nx.Graph()
+        for i in flags:
+            graph.add_node(i)
+
+        for tp, equ in graphs.items():
+            for flag, _flag in nx.edges(equ):
+                graph.add_edge(flag, _flag, tp=tp)
+
+                assert len(flag)==len(_flag)
+                rank = len(flag)
+                idxs = [idx for idx in range(rank) if flag[idx]!=_flag[idx]]
+                assert len(idxs)==1
+                idx = idxs[0]
+                assert tpmap[flag[idx]]==tpmap[_flag[idx]]
+                assert tp == tpmap[flag[idx]]
+
         self.flags = flags
         self.tpmap = tpmap
-        self.graph = self.get_graph()
+        self.types = geometry.types
+        self.graphs = graphs
+        self.graph = graph
+        self._geodesics = {} # cache
 
     def __str__(self):
         return "System(%d)"%len(self)
-        #return "System(%s, %s)"%(self.flags, self.tpmap)
+        #return "System(%s, %s)"%(self.flags, self.equs)
 
     def __len__(self):
         return len(self.flags)
@@ -497,30 +510,16 @@ class System(object):
     def __getitem__(self, idx):
         return self.flags[idx]
 
-    def get_graph(self):
-        graph = nx.Graph()
+    def XXget_bag(self):
         flags = self.flags
-        for i, c in enumerate(flags):
-            graph.add_node(i)
-        for tp, flagss in self.tpmap.items():
-            for flags in flagss:
-                for flag in flags:
-                  i = self.flags.index(flag)
-                  for _flag in flags:
-                    _i = self.flags.index(_flag)
-                    graph.add_edge(i, _i)
-        return graph
-
-    def get_bag(self):
-        flags = self.flags
-        tpmap = self.tpmap
+        equs = self.equs
         lookup = {}
         points = []
         for flag in flags:
             p = Point("f", len(lookup))
             lookup[flag] = p
             points.append(p)
-        for tp, flagss in tpmap.items():
+        for tp, flagss in equs.items():
             p = Point("t", len(lookup))
             lookup[tp] = p
             points.append(p)
@@ -545,31 +544,161 @@ class System(object):
             count += 1
         return count
 
+    def get_geodesic(self, c, d):
+        """
+            find a minimal gallery from c to d, return as a list of types.
+        """
+        key = (c, d)
+        if key in self._geodesics:
+            return list(self._geodesics[c, d])
+        graph = self.graph
+        tpmap = self.tpmap
+        path = nx.shortest_path(graph, c, d)
+        assert path[0] == c
+        assert path[-1] == d
+        word = []
+        if c==d:
+            self._geodesics[key] = word
+            return word # <---- return
+        assert len(c)==len(d)
+        rank = len(c)
+        i = 0
+        while i+1 < len(path):
+            idx = None
+            for j in range(rank):
+                if path[i][j] != path[i+1][j]:
+                    assert idx is None, (idx, j)
+                    idx = j
+            tp = tpmap[path[i][idx]]
+            assert tp == tpmap[path[i+1][idx]]
+            word.append(tp)
+            if i:
+                assert word[i-1] != word[i]
+            i += 1
+        self._geodesics[key] = word
+        return word
+
     def get_apartment(self, c, d):
         assert c is not d
         graph = self.graph
-        c = self.flags.index(c)
-        d = self.flags.index(d)
         for path in nx.all_shortest_paths(graph, c, d):
             print "path:", path
+        # ???
 
 
-def find_building(g):
+def find_building(geometry):
     print "find_building"
-    s = g.get_system()
-    print "flags:", len(s.flags)
-    graph = s.get_graph()
+    system = System(geometry)
+    flags = system.flags
+    print "flags:", len(flags)
 
+    assert geometry.rank <= 3, "really?"
+    letters = "PLSXYZ"
+    I, L, P, S = "", "L", "P", "S"
+    gen = letters[:geometry.rank]
+    diagram = geometry.get_diagram()
 
-    for c in s:
-      for d in s:
-        if c is d:
-            continue
-        print "get_apartment:"
-        apt = s.get_apartment(c, d)
+    desc = {}
+    for i, j in diagram:
+        desc[gen[i], gen[j]] = 3
+    print "BruhatMonoid(%s, %s)" % (gen, desc)
+    monoid = BruhatMonoid(gen, desc)
+    words = monoid.build()
+    mul = monoid.mul
+    print "words:", len(words)
+    print words
+    assert mul[L, L] == L
 
-        return
-        
+    def length(chain):
+        assert len(chain)
+        if len(chain)==1:
+            return I
+        A = system.get_geodesic(chain[0], chain[1])
+        A = ''.join(gen[i] for i in A)
+        A = monoid.get_canonical(A)[0]
+        for i in range(1, len(chain)-1):
+            B = system.get_geodesic(chain[i], chain[i+1])
+            B = ''.join(gen[i] for i in B)
+            A = A+B
+            A = monoid.get_canonical(A)[0]
+        #assert A in words, repr(A)
+        Ac = monoid.get_canonical(A)
+        for w in words:
+            wc = monoid.get_canonical(w)
+            if Ac==wc:
+                return w
+        assert 0
+
+    chains = {}
+
+    ACCEPT = argv.get("accept")
+    if ACCEPT is not None:
+        ACCEPT = eval(ACCEPT)
+    else:
+        ACCEPT = (I,L,P)
+    if ACCEPT in words:
+        ACCEPT = (ACCEPT,) # tuple-ize
+    for l in ACCEPT:
+        assert l in words
+    print "ACCEPT:", repr(ACCEPT)
+
+    accept = lambda chain : length(chain) in ACCEPT
+    #accept = lambda chain : length(chain) in (I, L, P)
+    #accept = lambda chain : length(chain) in (I, L, PL) # DOES NOT WORK
+    #accept = lambda chain : length(chain) in (I, L, P, PL)
+    #accept = lambda chain : length(chain) in (I, L, P, PL, LP)
+    #accept = lambda chain : True
+
+    N = argv.get("N", 2)
+    for n in range(N):
+
+        nchains = []
+        for chain in alltuples((flags,)*(n+1)):
+            if accept(chain):
+                nchains.append(chain)
+
+        assert len(set(nchains))==len(nchains)
+        chains[n] = nchains
+        print "|%d-chains|=%d" % (n, len(nchains))
+
+    bdys = {} # map 
+    for n in range(N-1):
+        # bdy maps n+1 chains to n chains
+        print "bdy: chains[%d] -> chains[%d]" % (n+1, n),
+        bdy = {}
+        source = chains[n+1]
+        target = chains[n]
+        for col, chain in enumerate(source):
+            assert len(chain)==n+2
+            #for i in range(1, n+1): # skip first & last, like in the graph homology
+            for i in range(n+2):
+                chain1 = chain[:i] + chain[i+1:]
+                assert len(chain1)==n+1
+                if accept(chain1):
+                    #print chain1
+                    #assert len(set(chain1))==n+1 # uniq NOT !
+                    row = target.index(chain1)
+                    bdy[row, col] = bdy.get((row, col), 0) + (-1)**i
+        print "nnz:", len(bdy), "range:", set(bdy.values())
+        bdys[n+1] = bdy
+
+    # bdys[n]: map n-chains to (n-1)-chains
+
+    for i in range(1, N-1):
+        b1, b2 = bdys[i], bdys[i+1]
+        b12 = compose(b1, b2)
+        #print "len(bdy*bdy):", len(b12.values())
+        for value in b12.values():
+            assert value == 0, value
+
+        if argv.Z2:
+            find_homology_2(b1, b2, len(chains[i-1]), len(chains[i]), len(chains[i+1]))
+        else:
+            find_homology(b1, b2, len(chains[i-1]), len(chains[i]), len(chains[i+1]))
+
+        #if i==2 and names[l]=="L":
+        #    return
+
 
 
 
@@ -674,7 +803,7 @@ def projective(n, dim=2):
                 continue
             spaces.append(A)
             lookup[key] = A
-        print "spaces:", len(spaces)
+        #print "spaces:", len(spaces)
 
     incidence = []
     tpmap = {} 
@@ -807,7 +936,7 @@ def test():
     print "flags:", N
     a = flags[0]
     rank = len(a)
-    table = {} # calculate all geometrical relationships (triangles)
+    table = {} # calculate all _geometrical relationships (triangles)
     unit = freeze(g.rel(a, a))
     for b in flags:
         AB = g.rel(a, b)
@@ -921,8 +1050,8 @@ def test():
     for a in elements:
         assert a in names
 
-    if argv.magnitude:
-        magnitude_homology(g, flags, elements, names, mul, bruhat)
+    #if argv.magnitude:
+    #    magnitude_homology(g, flags, elements, names, mul, bruhat)
 
 
     return
@@ -1004,105 +1133,105 @@ https://golem.ph.utexas.edu/category/2016/08/a_survey_of_magnitude.html#c050913
 https://golem.ph.utexas.edu/category/2016/08/monoidal_categories_with_proje.html#c051440
 """
 
-def magnitude_homology(g, flags, monoid, names, mul, bruhat):
-
-    print "magnitude_homology:"
-
-    N = argv.get("N", 2)
-
-    I = monoid[0]
-    for b in monoid:
-        assert mul[I, b] == b
-
-    for f in flags:
-        assert g.is_flag(f)
-
-    def length(chain):
-        for f in chain:
-            assert g.is_flag(f)
-        assert len(chain)
-        if len(chain)==1:
-            return I
-        A = g.rel(chain[0], chain[1])
-        A = freeze(A)
-        assert A in monoid
-        for i in range(1, len(chain)-1):
-            B = freeze(g.rel(chain[i], chain[i+1]))
-            A = mul[A, B]
-        return A
-
-    for l in monoid:
-        name = names[l]
-        s = "%s = %s" % (name, l)
-        globals()[name] = l
-
-    chains = {}
-
-    ACCEPT = (I,)
-    ACCEPT = argv.get("accept")
-    print "ACCEPT:", repr(ACCEPT)
-    if ACCEPT is not None:
-        ACCEPT = eval(ACCEPT)
-    if ACCEPT in names:
-        ACCEPT = (ACCEPT,) # tuple-ize
-    for l in ACCEPT:
-        assert l in names
-
-    accept = lambda chain : length(chain) in ACCEPT
-    #accept = lambda chain : length(chain) in (I, L, P)
-    #accept = lambda chain : length(chain) in (I, L, PL) # DOES NOT WORK
-    #accept = lambda chain : length(chain) in (I, L, P, PL)
-    #accept = lambda chain : length(chain) in (I, L, P, PL, LP)
-    #accept = lambda chain : True
-
-    for n in range(N):
-
-        nchains = []
-        for chain in alltuples((flags,)*(n+1)):
-            if accept(chain):
-                nchains.append(chain)
-
-        assert len(set(nchains))==len(nchains)
-        chains[n] = nchains
-        print "|%d-chains|=%d" % (n, len(nchains))
-
-    bdys = {} # map 
-    for n in range(N-1):
-        # bdy maps n+1 chains to n chains
-        print "bdy: chains[%d] -> chains[%d]" % (n+1, n),
-        bdy = {}
-        source = chains[n+1]
-        target = chains[n]
-        for col, chain in enumerate(source):
-            assert len(chain)==n+2
-            #for i in range(1, n+1): # skip first & last, like in the graph homology
-            for i in range(n+2):
-                chain1 = chain[:i] + chain[i+1:]
-                assert len(chain1)==n+1
-                if accept(chain1):
-                    #print chain1
-                    #assert len(set(chain1))==n+1 # uniq NOT !
-                    row = target.index(chain1)
-                    bdy[row, col] = bdy.get((row, col), 0) + (-1)**i
-        print "nnz:", len(bdy), "range:", set(bdy.values())
-        bdys[n+1] = bdy
-
-    # bdys[n]: map n-chains to (n-1)-chains
-
-    for i in range(1, N-1):
-        b1, b2 = bdys[i], bdys[i+1]
-        b12 = compose(b1, b2)
-        #print "len(bdy*bdy):", len(b12.values())
-        for value in b12.values():
-            assert value == 0, value
-
-        if argv.Z2:
-            find_homology_2(b1, b2, len(chains[i-1]), len(chains[i]), len(chains[i+1]))
-        else:
-            find_homology(b1, b2, len(chains[i-1]), len(chains[i]), len(chains[i+1]))
-
-        #if i==2 and names[l]=="L":
-        #    return
+#def magnitude_homology(g, flags, monoid, names, mul, bruhat):
+#
+#    print "magnitude_homology:"
+#
+#    N = argv.get("N", 2)
+#
+#    I = monoid[0]
+#    for b in monoid:
+#        assert mul[I, b] == b
+#
+#    for f in flags:
+#        assert g.is_flag(f)
+#
+#    def length(chain):
+#        for f in chain:
+#            assert g.is_flag(f)
+#        assert len(chain)
+#        if len(chain)==1:
+#            return I
+#        A = g.rel(chain[0], chain[1])
+#        A = freeze(A)
+#        assert A in monoid
+#        for i in range(1, len(chain)-1):
+#            B = freeze(g.rel(chain[i], chain[i+1]))
+#            A = mul[A, B]
+#        return A
+#
+#    for l in monoid:
+#        name = names[l]
+#        s = "%s = %s" % (name, l)
+#        globals()[name] = l
+#
+#    chains = {}
+#
+#    ACCEPT = (I,)
+#    ACCEPT = argv.get("accept")
+#    print "ACCEPT:", repr(ACCEPT)
+#    if ACCEPT is not None:
+#        ACCEPT = eval(ACCEPT)
+#    if ACCEPT in names:
+#        ACCEPT = (ACCEPT,) # tuple-ize
+#    for l in ACCEPT:
+#        assert l in names
+#
+#    accept = lambda chain : length(chain) in ACCEPT
+#    #accept = lambda chain : length(chain) in (I, L, P)
+#    #accept = lambda chain : length(chain) in (I, L, PL) # DOES NOT WORK
+#    #accept = lambda chain : length(chain) in (I, L, P, PL)
+#    #accept = lambda chain : length(chain) in (I, L, P, PL, LP)
+#    #accept = lambda chain : True
+#
+#    for n in range(N):
+#
+#        nchains = []
+#        for chain in alltuples((flags,)*(n+1)):
+#            if accept(chain):
+#                nchains.append(chain)
+#
+#        assert len(set(nchains))==len(nchains)
+#        chains[n] = nchains
+#        print "|%d-chains|=%d" % (n, len(nchains))
+#
+#    bdys = {} # map 
+#    for n in range(N-1):
+#        # bdy maps n+1 chains to n chains
+#        print "bdy: chains[%d] -> chains[%d]" % (n+1, n),
+#        bdy = {}
+#        source = chains[n+1]
+#        target = chains[n]
+#        for col, chain in enumerate(source):
+#            assert len(chain)==n+2
+#            #for i in range(1, n+1): # skip first & last, like in the graph homology
+#            for i in range(n+2):
+#                chain1 = chain[:i] + chain[i+1:]
+#                assert len(chain1)==n+1
+#                if accept(chain1):
+#                    #print chain1
+#                    #assert len(set(chain1))==n+1 # uniq NOT !
+#                    row = target.index(chain1)
+#                    bdy[row, col] = bdy.get((row, col), 0) + (-1)**i
+#        print "nnz:", len(bdy), "range:", set(bdy.values())
+#        bdys[n+1] = bdy
+#
+#    # bdys[n]: map n-chains to (n-1)-chains
+#
+#    for i in range(1, N-1):
+#        b1, b2 = bdys[i], bdys[i+1]
+#        b12 = compose(b1, b2)
+#        #print "len(bdy*bdy):", len(b12.values())
+#        for value in b12.values():
+#            assert value == 0, value
+#
+#        if argv.Z2:
+#            find_homology_2(b1, b2, len(chains[i-1]), len(chains[i]), len(chains[i+1]))
+#        else:
+#            find_homology(b1, b2, len(chains[i-1]), len(chains[i]), len(chains[i+1]))
+#
+#        #if i==2 and names[l]=="L":
+#        #    return
 
 
 def find_homology(g, f, *dims):
@@ -1359,7 +1488,12 @@ https://golem.ph.utexas.edu/category/2016/09/magnitude_homology.html#more
 
 if __name__ == "__main__":
 
-    test()
+    if argv.profile:
+       import cProfile as profile
+       profile.run("test()")
+
+    else:
+       test()
 
 
 
