@@ -1,12 +1,17 @@
 13/11/16
 ========
 
-n=4,  A_3
+n=4,  
+type A_3
 
 ACCEPT          | H_0   H_1   H_2  ...
 ----------------|------------------
-I,L,P           |  15   120     x
-I,L,P,S         |   x     x     x
+I               |   .     .     x
+I,P             | 105     .     x
+I,  L           | 105     .     x
+I,    S         | 105     .     x
+I,P,L           |  15   120     x   (*)
+I,P,L,S         |   1   316     x   (*)
 
 
 13/11/16
@@ -46,6 +51,7 @@ ii) ..?
 iii) if e is a chamber on a minimal gallery from c to d, then
 e is contained in every appartment that contains c and d.
 
+A projective plane has one appartment for every triangle.
 
 
 11. Buildings
@@ -91,6 +97,8 @@ mapping class group of the surface, which is an infinite
 group. But there is also a subgroup that fixes a
 particular pair-of-pants decomposition.
 
+parabolic subgroups of the braid group:
+https://arxiv.org/abs/1402.5541
 
 
 
@@ -103,13 +111,13 @@ ACCEPT          | H_0   H_1   H_2  ...
 ----------------|------------------
 I               |   .     .     .   
 I,L             |  14     .     .   
-I,L,P           |   1     8     .
-I,L,P,LP        |   1     8     .
-I,L,P,LP,PL     |   1     8     .
+I,L,P           |   1     8     .   (*)
+I,L,P,LP        |   1     8     .   (*)
+I,L,P,LP,PL     |   1     8     .   (*)
 I,L,P,LP,PL,LPL |   1     .     x
-  L             |   .    14     .
-  L,P           |   .    28     .
-  L,P,LP        |   .    28     .
+  L             |   .    14     . # <--- these all have trivial 0-chains
+  L,P           |   .    28     . # <--- 
+  L,P,LP        |   .    28     . # ...
   L,P,LP,PL     |   .    28     .
   L,P,LP,PL,LPL |   .    20     x
   L,  LP        |   .    14     .
@@ -128,7 +136,7 @@ ACCEPT          | H_0   H_1 ...
 ----------------|-----------
 I               |   .     . 
 I,L             |  15     . 
-I,L,P           |   1    56 
+I,L,P           |   1    56    (*)
   L,P           |   .   160 
 
 

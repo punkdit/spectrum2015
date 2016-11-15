@@ -887,6 +887,7 @@ def magnitude_homology(geometry):
 
     chains = {}
 
+    # ACCEPT is a tuple of accept lengths
     ACCEPT = argv.get("accept")
     if ACCEPT is not None:
         ACCEPT = ACCEPT.replace("I", '')
@@ -898,13 +899,7 @@ def magnitude_homology(geometry):
     for l in ACCEPT:
         assert l in words
     print "ACCEPT:", repr(ACCEPT)
-
     accept = lambda chain : length(chain) in ACCEPT
-    #accept = lambda chain : length(chain) in (I, L, P)
-    #accept = lambda chain : length(chain) in (I, L, PL) # DOES NOT WORK
-    #accept = lambda chain : length(chain) in (I, L, P, PL)
-    #accept = lambda chain : length(chain) in (I, L, P, PL, LP)
-    #accept = lambda chain : True
 
     N = argv.get("N", 2)
     for n in range(N):
@@ -940,6 +935,9 @@ def magnitude_homology(geometry):
         bdys[n+1] = bdy
 
     # bdys[n]: map n-chains to (n-1)-chains
+
+    if not argv.homology:
+        return
 
     for i in range(1, N-1):
         b1, b2 = bdys[i], bdys[i+1]
