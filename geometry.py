@@ -502,6 +502,40 @@ class System(object):
         self.monoid = None
         self._geodesics = {} # cache
 
+    def get_geodesic(self, c, d):
+        """
+            Find a minimal gallery from c to d, return as a list of types.
+        """
+        key = (c, d)
+        if key in self._geodesics:
+            return list(self._geodesics[c, d])
+        graph = self.graph
+        tpmap = self.tpmap
+        path = nx.shortest_path(graph, c, d)
+        assert path[0] == c
+        assert path[-1] == d
+        word = []
+        if c==d:
+            self._geodesics[key] = list(word)
+            return word # <---- return
+        assert len(c)==len(d)
+        rank = len(c)
+        i = 0
+        while i+1 < len(path):
+            idx = None
+            for j in range(rank):
+                if path[i][j] != path[i+1][j]:
+                    assert idx is None, (idx, j)
+                    idx = j
+            tp = tpmap[path[i][idx]]
+            assert tp == tpmap[path[i+1][idx]]
+            word.append(tp)
+            if i:
+                assert word[i-1] != word[i]
+            i += 1
+        self._geodesics[key] = list(word)
+        return word
+
     def build(self, letters):
         geometry = self.geometry
         gen = letters[:geometry.rank]
@@ -516,8 +550,19 @@ class System(object):
         print "words:", len(words)
         print words
         self.monoid = monoid
+        self.mul = monoid.mul
         self.words = monoid.words
-        self.I = ""
+        self.I = I = ""
+        weyl = {} # map each pair of flags to the Weyl distance
+        flags = self.flags
+        for i in flags:
+          for j in flags:
+            a = I
+            path = self.get_geodesic(i, j)
+            for b in path:
+                a = mul[a, gen[b]]
+            weyl[i, j] = a
+        self.weyl = weyl
 
     def __str__(self):
         return "System(%d)"%len(self)
@@ -563,46 +608,12 @@ class System(object):
             count += 1
         return count
 
-    def get_geodesic(self, c, d):
-        """
-            find a minimal gallery from c to d, return as a list of types.
-        """
-        key = (c, d)
-        if key in self._geodesics:
-            return list(self._geodesics[c, d])
-        graph = self.graph
-        tpmap = self.tpmap
-        path = nx.shortest_path(graph, c, d)
-        assert path[0] == c
-        assert path[-1] == d
-        word = []
-        if c==d:
-            self._geodesics[key] = list(word)
-            return word # <---- return
-        assert len(c)==len(d)
-        rank = len(c)
-        i = 0
-        while i+1 < len(path):
-            idx = None
-            for j in range(rank):
-                if path[i][j] != path[i+1][j]:
-                    assert idx is None, (idx, j)
-                    idx = j
-            tp = tpmap[path[i][idx]]
-            assert tp == tpmap[path[i+1][idx]]
-            word.append(tp)
-            if i:
-                assert word[i-1] != word[i]
-            i += 1
-        self._geodesics[key] = list(word)
-        return word
-
     def length(self, chain):
         assert len(chain)
         if len(chain)==1:
             return self.I  # <--- return
         monoid = self.monoid
-        mul = monoid.mul
+        mul = self.mul
         gen = monoid.gen
         A = self.get_geodesic(chain[0], chain[1])
         for i in range(1, len(chain)-1):
@@ -613,10 +624,8 @@ class System(object):
         if len(A)==1:
             A = gen[A[0]]
         elif len(A)==2:
-            #A = gen[A[0]] + gen[A[1]]
             A = mul[gen[A[0]], gen[A[1]]]
         elif len(A)==3:
-            #A = gen[A[0]] + gen[A[1]] + gen[A[2]]
             A = mul[mul[gen[A[0]], gen[A[1]]], gen[A[2]]]
         else:
             a = gen[A[0]]
@@ -625,13 +634,65 @@ class System(object):
             A = a
         assert A in self.words
         return A
-        Ac = monoid.get_canonical(A)
-        for w in self.words:
-            wc = monoid.get_canonical(w)
-            if Ac==wc:
-                return w
-        assert 0
 
+    def get_nchains_0(self, accept):
+        flags = self.flags
+        if self.I in accept:
+            return [(flag,) for flag in flags]
+        return []
+
+    def get_nchains_1(self, accept):
+        flags = self.flags
+        weyl = self.weyl
+        chains = []
+        for key, value in weyl.items():
+            if value in accept:
+                chains.append(key)
+        return chains
+
+    def get_nchains_2(self, accept):
+        flags = self.flags
+        weyl = self.weyl
+        chains = []
+        mul = self.mul
+        for k, v in weyl.items():
+            a, b = k
+            for c in flags:
+                if mul[v, weyl[b, c]] in accept:
+                    chains.append((a, b, c))
+        return chains
+
+    def get_nchains_3(self, accept):
+        flags = self.flags
+        weyl = self.weyl
+        chains = []
+        mul = self.mul
+        for k, v in weyl.items():
+            a, b = k
+            for c in flags:
+              w = mul[v, weyl[b, c]]
+              for d in flags:
+                if mul[w, weyl[c, d]] in accept:
+                    chains.append((a, b, c, d))
+        return chains
+
+    def get_nchains(self, n, accept):
+        if n==0:
+            return self.get_nchains_0(accept) # <--- return
+        if n==1:
+            return self.get_nchains_1(accept) # <--- return
+        if n==2:
+            return self.get_nchains_2(accept) # <--- return
+        if n==3:
+            return self.get_nchains_3(accept) # <--- return
+        flags = self.flags
+        nchains = []
+        for chain in alltuples((flags,)*(n+1)):
+            if self.length(chain) in accept:
+                nchains.append(chain)
+
+        assert len(set(nchains))==len(nchains)
+        return nchains
 
 
 
@@ -909,31 +970,23 @@ def magnitude_homology(geometry):
 
     chains = {}
 
-    # ACCEPT is a tuple of accept lengths
-    ACCEPT = argv.get("accept")
-    if ACCEPT is not None:
-        ACCEPT = ACCEPT.replace("I", '')
-        ACCEPT = ACCEPT.split(',')
+    # accept is a tuple of lengths
+    accept = argv.get("accept")
+    if accept is not None:
+        accept = accept.replace("I", '')
+        accept = accept.split(',')
     else:
-        ACCEPT = (I,L,P)
-    if ACCEPT in system.words:
-        ACCEPT = (ACCEPT,) # tuple-ize
-    for l in ACCEPT:
+        accept = (I,L,P)
+    if accept in system.words:
+        accept = (accept,) # tuple-ize
+    for l in accept:
         assert l in system.words
-    print "ACCEPT:", repr(ACCEPT)
-    accept = lambda chain : system.length(chain) in ACCEPT
+    print "accept:", repr(accept)
 
     N = argv.get("N", 2)
     for n in range(N):
-
-        nchains = []
-        for chain in alltuples((flags,)*(n+1)):
-            if accept(chain):
-                nchains.append(chain)
-
-        assert len(set(nchains))==len(nchains)
-        chains[n] = nchains
-        print "|%d-chains|=%d" % (n, len(nchains))
+        chains[n] = system.get_nchains(n, accept)
+        print "|%d-chains|=%d" % (n, len(chains[n]))
 
     bdys = {} # map 
     for n in range(N-1):
@@ -948,7 +1001,7 @@ def magnitude_homology(geometry):
             for i in range(n+2):
                 chain1 = chain[:i] + chain[i+1:]
                 assert len(chain1)==n+1
-                if accept(chain1):
+                if system.length(chain1) in accept:
                     #print chain1
                     #assert len(set(chain1))==n+1 # uniq NOT !
                     row = target.index(chain1)
