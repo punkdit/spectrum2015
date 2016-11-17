@@ -498,7 +498,26 @@ class System(object):
         self.types = geometry.types
         self.graphs = graphs
         self.graph = graph
+        self.geometry = geometry
+        self.monoid = None
         self._geodesics = {} # cache
+
+    def build(self, letters):
+        geometry = self.geometry
+        gen = letters[:geometry.rank]
+        diagram = geometry.get_diagram()
+        desc = {}
+        for i, j in diagram:
+            desc[gen[i], gen[j]] = 3
+        print "BruhatMonoid(%s, %s)" % (gen, desc)
+        monoid = BruhatMonoid(gen, desc)
+        words = monoid.build()
+        mul = monoid.mul
+        print "words:", len(words)
+        print words
+        self.monoid = monoid
+        self.words = monoid.words
+        self.I = ""
 
     def __str__(self):
         return "System(%d)"%len(self)
@@ -577,6 +596,41 @@ class System(object):
             i += 1
         self._geodesics[key] = list(word)
         return word
+
+    def length(self, chain):
+        assert len(chain)
+        if len(chain)==1:
+            return self.I  # <--- return
+        monoid = self.monoid
+        mul = monoid.mul
+        gen = monoid.gen
+        A = self.get_geodesic(chain[0], chain[1])
+        for i in range(1, len(chain)-1):
+            B = self.get_geodesic(chain[i], chain[i+1])
+            A = A+B
+        if not len(A):
+            return self.I  # <--- return
+        if len(A)==1:
+            A = gen[A[0]]
+        elif len(A)==2:
+            #A = gen[A[0]] + gen[A[1]]
+            A = mul[gen[A[0]], gen[A[1]]]
+        elif len(A)==3:
+            #A = gen[A[0]] + gen[A[1]] + gen[A[2]]
+            A = mul[mul[gen[A[0]], gen[A[1]]], gen[A[2]]]
+        else:
+            a = gen[A[0]]
+            for b in A[1:]:
+                a = mul[a, gen[b]]
+            A = a
+        assert A in self.words
+        return A
+        Ac = monoid.get_canonical(A)
+        for w in self.words:
+            wc = monoid.get_canonical(w)
+            if Ac==wc:
+                return w
+        assert 0
 
 
 
@@ -847,43 +901,11 @@ def magnitude_homology(geometry):
     system = System(geometry)
     flags = system.flags
     print "flags:", len(flags)
-
-    assert geometry.rank <= 3, "really?"
     letters = "PLSXYZ"
     I, P, L, S = "", "P", "L", "S"
-    gen = letters[:geometry.rank]
-    diagram = geometry.get_diagram()
+    system.build(letters)
 
-    desc = {}
-    for i, j in diagram:
-        desc[gen[i], gen[j]] = 3
-    print "BruhatMonoid(%s, %s)" % (gen, desc)
-    monoid = BruhatMonoid(gen, desc)
-    words = monoid.build()
-    mul = monoid.mul
-    print "words:", len(words)
-    print words
-    assert mul[L, L] == L
-
-    def length(chain):
-        assert len(chain)
-        if len(chain)==1:
-            return I
-        A = system.get_geodesic(chain[0], chain[1])
-        A = ''.join(gen[i] for i in A)
-        A = monoid.get_canonical(A)[0]
-        for i in range(1, len(chain)-1):
-            B = system.get_geodesic(chain[i], chain[i+1])
-            B = ''.join(gen[i] for i in B)
-            A = A+B
-            A = monoid.get_canonical(A)[0]
-        #assert A in words, repr(A)
-        Ac = monoid.get_canonical(A)
-        for w in words:
-            wc = monoid.get_canonical(w)
-            if Ac==wc:
-                return w
-        assert 0
+    assert geometry.rank <= 3, "really?"
 
     chains = {}
 
@@ -894,12 +916,12 @@ def magnitude_homology(geometry):
         ACCEPT = ACCEPT.split(',')
     else:
         ACCEPT = (I,L,P)
-    if ACCEPT in words:
+    if ACCEPT in system.words:
         ACCEPT = (ACCEPT,) # tuple-ize
     for l in ACCEPT:
-        assert l in words
+        assert l in system.words
     print "ACCEPT:", repr(ACCEPT)
-    accept = lambda chain : length(chain) in ACCEPT
+    accept = lambda chain : system.length(chain) in ACCEPT
 
     N = argv.get("N", 2)
     for n in range(N):

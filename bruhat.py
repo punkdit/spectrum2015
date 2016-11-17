@@ -151,9 +151,9 @@ class Coxeter(object):
 
     def build(self, max_size=None):
         lookup = self.lookup # map canonical -> word
-        group = set(lookup.keys()) # canonical forms
-        #print "group:", group
-        pairs = [(i, j) for i in group for j in group]
+        words = set(lookup.keys()) # canonical forms
+        #print "words:", words
+        pairs = [(i, j) for i in words for j in words]
         mul = {} # map (i,j) -> i*j
         while 1:
             newpairs = []
@@ -165,18 +165,28 @@ class Coxeter(object):
                 k = self.get_canonical(gh) # updates lookup aswell
                 gh = lookup[k]
                 mul[g, h] = gh
-                if k not in group:
-                    newpairs += [(k, g) for g in group]
-                    newpairs += [(g, k) for g in group]
-                    group.add(k)
-                    if max_size is not None and len(group)>=max_size:
+                if k not in words:
+                    newpairs += [(k, g) for g in words]
+                    newpairs += [(g, k) for g in words]
+                    newpairs += [(k, k) for g in words]
+                    words.add(k)
+                    if max_size is not None and len(words)>=max_size:
                         break
             if not newpairs:
                 break
             pairs = newpairs
         self.mul = mul
-        self.group = lookup.values()
-        return self.group
+        self.words = lookup.values()
+        self.check()
+        return self.words
+
+    def check(self):
+        words, mul = self.words, self.mul
+        for i in words:
+          for j in words:
+            k = mul.get((i, j))
+            assert k is not None
+            assert k in words
 
 
 class BruhatMonoid(Coxeter):
@@ -193,7 +203,6 @@ def main():
     A_2 = Coxeter("LP", {("L", "P") : 3}, bruhat=bruhat)
     words = A_2.build()
     assert len(words)==6
-
 
     # |I_n| = 2*n
     I_5 = Coxeter("LP", {("L", "P") : 5})
@@ -224,13 +233,14 @@ def main():
     if argv.A_3:
         A_3 = Coxeter("LPS", {("L", "P") : 3, ("L", "S"):3}, bruhat=bruhat)
         assert len(A_3.build())==24
-        print A_3.lookup
-        print A_3.reduced
+        #print A_3.lookup
+        #print A_3.reduced
 
     if argv.A_4:
         A_4 = Coxeter("LPSH", {("L", "P") : 3, ("L", "S"):3, ("S", "H"):3})
         assert len(A_4.build())==120
 
+    print "OK"
 
 
 
