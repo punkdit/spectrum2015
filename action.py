@@ -73,6 +73,7 @@ class Perm(object):
         s = "{%s}"%(', '.join(items))
         self._str = s
         return s
+    __repr__ = __str__
 
     def __hash__(self):
         return hash(str(self))
@@ -259,6 +260,11 @@ class Group(object):
         for el in els:
             assert el.items is items
         self.items = items
+
+    @property
+    def identity(self):
+        p = Perm.identity(self.items)
+        return p
 
     def __len__(self):
         return len(self.els)
@@ -469,6 +475,55 @@ class Group(object):
                 yield func
 
 
+def is_hom(hom):
+    for g in hom.keys():
+      for h in hom.keys():
+        k = g*h
+        if k in hom:
+            if hom[k] != hom[g]*hom[h]:
+                return False
+    return True
+
+
+def close_hom(hom):
+    hom = dict(hom)
+    for g in hom.keys():
+      for h in hom.keys():
+        k = g*h
+        if k in hom:
+            if hom[k] != hom[g]*hom[h]:
+                return None
+        else:
+            hom[k] = hom[g]*hom[h]
+    return hom
+
+
+def find_all_homs(G, H, hom=None, remain=None):
+    if hom is None:
+        GI = G.identity
+        hom = {GI : H.identity}
+        #remain = [p for p in G if p != GI]
+
+    for g in G:
+        if g in hom:
+            continue
+
+        for h in H:
+            hom[g] = h
+
+            hom1 = close_hom(hom)
+            if hom1 is None:
+                pass
+
+            elif len(hom1) == len(G):
+                yield hom1
+
+            else:
+                for _hom in find_all_homs(G, H, hom1):
+                    yield _hom
+
+
+
 def test():
 
     items = list('abc')
@@ -503,19 +558,20 @@ def test():
     S4_22 = S4.choice(2)
     S4_22.check()
 
+    # Pauli group
+    X = Perm((3, 1, 2, 0), items4)
+    Z = Perm((2, 3, 0, 1), items4)
+    I = Perm((0, 1, 2, 3), items4)
+    w = Perm((3, 2, 1, 0), items4)
+    assert X*X==I
+    assert Z*Z==I
+    assert Z*X != X*Z
+    assert Z*X*Z*X == w
+    P1 = Group.generate([X, Z])
+    assert len(P1)==8
+
     if 0:
-        # Pauli group
-        X = Perm((3, 1, 2, 0), items4)
-        Z = Perm((2, 3, 0, 1), items4)
-        I = Perm((0, 1, 2, 3), items4)
-        w = Perm((3, 2, 1, 0), items4)
-        assert X*X==I
-        assert Z*Z==I
-        assert Z*X != X*Z
-        assert Z*X*Z*X == w
-        P = Group.generate([X, Z])
-        assert len(P)==8
-        group = P.square(P)
+        group = P1.square(P1)
         print "orbits:", len(group.orbits())
         for orbit in group.orbits():
             print orbit
@@ -524,6 +580,45 @@ def test():
                 i, j = items4.index(i), items4.index(j)
                 A[i, j] = 1
             print A
+
+    # Pauli group
+    items = "+00 -00 +01 -01 +10 -10 +11 -11".split()
+    #          0   1   2   3   4   5   6   7
+    II = Perm((0, 1, 2, 3, 4, 5, 6, 7), items)
+    XI = Perm((4, 5, 6, 7, 0, 1, 2, 3), items)
+    IX = Perm((2, 3, 0, 1, 6, 7, 4, 5), items)
+    ZI = Perm((0, 1, 2, 3, 5, 4, 7, 6), items)
+    IZ = Perm((0, 1, 3, 2, 4, 5, 7, 6), items)
+    w2 = Perm((1, 0, 3, 2, 5, 4, 7, 6), items)
+    assert XI*XI==II
+    assert ZI*ZI==II
+    assert IX*IX==II
+    assert IZ*IZ==II
+    assert ZI*XI != XI*ZI
+    assert ZI*XI == w2*XI*ZI
+    assert ZI*XI*ZI*XI == w2
+    assert IZ*IX != IX*IZ
+    assert IZ*IX == w2*IX*IZ
+    assert IZ*IX*IZ*IX == w2
+
+    assert ZI*IX == IX*ZI
+
+    P2 = Group.generate([XI, ZI, IX, IZ])
+    assert len(P2)==32
+
+    #homs = [f for f in find_all_homs(P1, P2, {I:II, w:w2})] # 152 solutions
+    #assert len(homs)==152
+
+    hom = {II:I} # 963 solutions
+    hom = {II:I, w2:I} # 963 solutions
+    hom = {II:I, w2:w, XI:X} # 0 solutions
+    hom = {II:I, XI:X} # 64 solutions
+    hom = {II:I, XI:X, IX:X} # 16 solutions
+    hom = {II:I, w2:w} # 0 solutions
+    count = 0
+    for f in find_all_homs(P2, P1, hom):
+        count += 1
+    assert count==0, count
 
     if 0:
         #G1 = S4.choice(2)

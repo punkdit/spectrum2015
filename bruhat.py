@@ -219,6 +219,14 @@ def main():
     #H_3 = Coxeter("ABC", {("A", "B") : 5, ("B", "C") : 3})
     #assert len(H_3.build())==120
 
+    I_4 = Coxeter("XZ", {("X", "Z") : 4})
+    assert len(I_4.build()) == 8
+
+    I_44 = Coxeter("UVXZ", {
+        ("U", "X"):2, ("U", "Z"):2, ("V", "X"):2, ("V", "Z"):2, 
+        ("U", "V"):4, ("X", "Z") : 4})
+    #print len(I_44.build()) # 64 ???
+
     if argv.F_4:
         F_4 = Coxeter("ABCD", {("A", "B"):3, ("A", "C"):4, ("A", "D"):3})
         g = F_4.build()
