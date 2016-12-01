@@ -19,7 +19,7 @@ while 1:
         pass
 
     if t > TIME:
-        rval = os.system("make")
+        rval = os.system(' '.join(sys.argv[2:]))
         assert rval == 0
         TIME = t
 

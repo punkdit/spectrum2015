@@ -1,5 +1,23 @@
 
 
+30/11/16
+========
+
+Projective plane defines a gauge code:
+gauge operators are lines
+stabs are pairs of lines.
+Throw out a gauge operator to get a logop.
+
+Projective plane of order q :
+    q+1 points on each line,
+    q+1 lines intersect each point
+    |lines| = |points| = q^2 + q + 1
+
+q is conjectured to always be a prime power.
+
+
+
+
 
 13/11/16
 ========
@@ -82,6 +100,8 @@ the Weyl distance between c and d.
 
 An appartment of C is a chamber subsystem isomorphic to C(M).
 
+W itself is a building, with weyl distance delta(v,w):=v^{-1}w.
+
 
 
 12/11/16
@@ -107,6 +127,31 @@ particular pair-of-pants decomposition.
 
 parabolic subgroups of the braid group:
 https://arxiv.org/abs/1402.5541
+
+1/11/16
+=======
+
+3D gauge color code
+qubits\edges as a rank 4 thin chamber system
+qubits = maximal flags (chambers)
+edges : 4 types (colors)
+
+dynkin diagram is affine (tilde) A_3:
+
+R   B
+o---o
+|   |
+o---o
+Y   G
+
+gauge operators : rank two residues 
+    there are six of these corresponding to
+    the six choices from the four types
+
+A geometry corresponding to affine A_3 is
+the tetrahedral-octahedral honeycomb:
+https://en.wikipedia.org/wiki/Tetrahedral-octahedral_honeycomb
+
 
 
 
@@ -182,8 +227,12 @@ ker(f): 406
 
 
 
-28/9/16 
-=======
+28/9/16,  30/11/16
+==================
+
+All the roots have the same length (check this),
+and so we only get simply laced Dynkin diagrams...???
+
 
 ./symplectic.py test_model xy ideals n=10
 Gx: 10
@@ -191,13 +240,56 @@ r = 8
 ideal: 45
 ideal: 45
 cartan: 10
+So each ideal has rank n=5, dim = 2n^2 - n, lie algebra is so_10
 
-./symplectic.py test_model compass ideals l=4
+./symplectic.py test_model compass ideals closure l=4
 Gx: 16
 r = 9
 algebra dimension: 130816 == 256 * 511
-ideal: 130816
-cartan: 256
+ideal: 130816 ---> one ideal means it is simple 
+cartan: 256 ---> rank 256
+dim = 256^2 + 256 * 255 = n^2 + n*(n-1) = 2*n^2 - n
+So this must be the lie algebra so_512
+
+./symplectic.py test_model ising ideals n=8
+Gx: 8
+r = 7
+ideal: 120
+cartan: 8
+120 = 2*n^2 - n
+lie algebra is so_16
+
+./symplectic.py test_model gcolor ideals 
+guage ops: 18
+qubits: 15
+stabs: 4
+Lattice(3:15, 2:28, 1:18, 0:4)
+Gx: 18
+r = 6
+ideal: 3 ideal: 3 ideal: 3 ideal: 3 ideal: 3 ideal: 3
+cartan: 6
+rank n=1
+six copies of sl_2
+
+./symplectic.py test_model gcolor2 ideals 
+Gx: 48
+r = 18
+ideal: 63 ideal: 63 ideal: 63 ideal: 63 ideal: 63 ideal: 63
+cartan: 42
+rank n=7
+six copies of sl_8
+
+./symplectic.py test_model gcolor size=2 ideals 
+guage ops: 80
+qubits: 65
+stabs: 16
+Lattice(3:65, 2:128, 1:80, 0:16)
+Gx: 80
+r = 32
+ideal: 1023 ideal: 1023 ideal: 1023 ideal: 1023 == 32^2 - 1, rank n=31
+ideal: 4095 ideal: 4095 == 64^2 - 1, rank n=63
+cartan: 250 == 4*31 + 2*63
+== 4*sl_32 + 2*sl_64
 
 
 

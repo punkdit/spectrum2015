@@ -203,7 +203,7 @@ exercise 4.2.3: The Hecke algebra of $\GL_n(\Field_q).$
 % http://mathoverflow.net/questions/15438/a-slick-proof-of-the-bruhat-decomposition-for-gl-nk
 %
 
-\subsection{Incidence geometry}
+\section{Incidence geometry}
 
 This is based on the book \cite{Buekenhout2013}.
 An \Defn{incidence system} is a triple 
@@ -244,22 +244,45 @@ This is the subsystem of edges and faces incident on $x.$
 % page 73: diagram over I
 
 
-\subsection{Dynkin diagrams}
+\section{Classification of semi-simple Lie Algebras}
 
-\begin{center}
+Let $n$ be the rank of a simple lie algebra $\mathfrak{g}.$
+This is the dimension of the cartan subalgebra $\mathfrak{h}.$
+This $n$ is also the subscript on the followin Dynkin diagrams. 
+(Dynkin used these to classify simple Lie algebras in 1947.)
+
+The Cartan subalgebra $\mathfrak{h}$ is a maximal abelian Lie subalgebra 
+of $\mathfrak{g}.$
+
+Simple Lie algebras have connected Dynkin diagrams.
+
+$A_n : \mathfrak{sl}_{n+1}$ traceless $(n+1)\times (n+1)$ matrices. 
+Algebra dimension is $n^2 + 2n.$
+
+$B_n : \mathfrak{so}_{2n+1}$.
+Algebra dimension is $2n^2 + n.$
+
+$C_n : \mathfrak{sp}_{2n}$.
+Algebra dimension is $2n^2 + n.$
+
+$D_n : \mathfrak{so}_{2n}$.
+Algebra dimension is $2n^2 - n.$
+
+
+
+For $n\ge 1:$
   \begin{tikzpicture}[scale=.4]
-    \draw (-1,0) node[anchor=east]  {$A_k$};
+    \draw (-1,0) node[anchor=east]  {$A_n$};
     \foreach \x in {0,...,5}
     \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
     \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
     \foreach \y in {1.15,...,4.15}
     \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
   \end{tikzpicture}
-\end{center}
 
-\begin{center}
+For $n\ge 2:$
   \begin{tikzpicture}[scale=.4]
-    \draw (-1,0) node[anchor=east]  {$B_k$};
+    \draw (-1,0) node[anchor=east]  {$B_n$};
     \foreach \x in {0,...,4}
     \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
     \draw[xshift=5 cm,thick,fill=black] (5 cm, 0) circle (.3 cm);
@@ -269,11 +292,10 @@ This is the subsystem of edges and faces incident on $x.$
     \draw[thick] (8.3 cm, .1 cm) -- +(1.4 cm,0);
     \draw[thick] (8.3 cm, -.1 cm) -- +(1.4 cm,0);
   \end{tikzpicture}
-\end{center}
 
-\begin{center}
+For $n\ge 3:$
   \begin{tikzpicture}[scale=.4]
-    \draw (-1,0) node[anchor=east]  {$C_k$};
+    \draw (-1,0) node[anchor=east]  {$C_n$};
     \foreach \x in {0,...,4}
     \draw[xshift=\x cm,thick,fill=black] (\x cm,0) circle (.3cm);
     \draw[xshift=5 cm,thick] (5 cm, 0) circle (.3 cm);
@@ -283,11 +305,10 @@ This is the subsystem of edges and faces incident on $x.$
     \draw[thick] (8.3 cm, .1 cm) -- +(1.4 cm,0);
     \draw[thick] (8.3 cm, -.1 cm) -- +(1.4 cm,0);
   \end{tikzpicture}
-\end{center}
 
-\begin{center}
+For $n\ge 4:$
   \begin{tikzpicture}[scale=.4]
-    \draw (-1,0) node[anchor=east]  {$D_k$};
+    \draw (-1,0) node[anchor=east]  {$D_n$};
     \foreach \x in {0,...,4}
     \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
     \draw[xshift=8 cm,thick] (30: 17 mm) circle (.3cm);
@@ -298,9 +319,7 @@ This is the subsystem of edges and faces incident on $x.$
     \draw[xshift=8 cm,thick] (30: 3 mm) -- (30: 14 mm);
     \draw[xshift=8 cm,thick] (-30: 3 mm) -- (-30: 14 mm);
   \end{tikzpicture}
-\end{center}
 
-\begin{center}
   \begin{tikzpicture}[scale=.4]
     \draw (-1,0) node[anchor=east]  {$G_2$};
     \draw[thick] (0 ,0) circle (.3 cm);
@@ -309,9 +328,8 @@ This is the subsystem of edges and faces incident on $x.$
     \draw[thick] (0: 3 mm) -- +(1.4 cm, 0);
     \draw[thick] (-30: 3 mm) -- +(1.5 cm, 0);
   \end{tikzpicture}
-\end{center}
+Algebra dimension is $14.$
 
-\begin{center}
   \begin{tikzpicture}[scale=.4]
     \draw (-3,0) node[anchor=east]  {$F_4$};
     \draw[thick] (-2 cm ,0) circle (.3 cm);
@@ -323,9 +341,7 @@ This is the subsystem of edges and faces incident on $x.$
     \draw[thick] (-15: 3 mm) -- +(1.5 cm, 0);
     \draw[xshift=2 cm,thick] (0: 3 mm) -- +(1.4 cm, 0);
   \end{tikzpicture}
-\end{center}
 
-\begin{center}
   \begin{tikzpicture}[scale=.4]
     \draw (-1,1) node[anchor=east]  {$E_6$};
     \foreach \x in {0,...,4}
@@ -335,9 +351,8 @@ This is the subsystem of edges and faces incident on $x.$
     \draw[thick] (4 cm,2 cm) circle (3 mm);
     \draw[thick] (4 cm, 3mm) -- +(0, 1.4 cm);
   \end{tikzpicture}
-\end{center}
+Algebra dimension is $78.$
 
-\begin{center}
   \begin{tikzpicture}[scale=.4]
     \draw (-1,1) node[anchor=east]  {$E_7$};
     \foreach \x in {0,...,5}
@@ -347,9 +362,8 @@ This is the subsystem of edges and faces incident on $x.$
     \draw[thick] (4 cm,2 cm) circle (3 mm);
     \draw[thick] (4 cm, 3mm) -- +(0, 1.4 cm);
   \end{tikzpicture}
-\end{center}
+Algebra dimension is $133.$
 
-\begin{center}
   \begin{tikzpicture}[scale=.4]
     \draw (-1,1) node[anchor=east]  {$E_8$};
     \foreach \x in {0,...,6}
@@ -359,7 +373,16 @@ This is the subsystem of edges and faces incident on $x.$
     \draw[thick] (4 cm,2 cm) circle (3 mm);
     \draw[thick] (4 cm, 3mm) -- +(0, 1.4 cm);
   \end{tikzpicture}
-\end{center}
+Algebra dimension is $248.$
+
+The undirected diagrams notate a finite reflection group,
+known as a Weyl group.
+
+Usually with directed Dynkin diagrams the arrows point to the shorter root.
+In the above diagrams, nodes corresponding to shorter roots are filled.
+
+The outer automorphism group of the Lie algebra
+corresponds to automorphisms of the Dynkin diagram.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

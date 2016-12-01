@@ -122,11 +122,16 @@ def build_xy(n):
         Gz[i, i] = 1
         Gz[i, (i+1)%n] = 1
 
-    Hx = zeros2(1, n)
-    Hz = zeros2(1, n)
+    if n%2 == 0:
+        Hx = zeros2(1, n)
+        Hz = zeros2(1, n)
+    
+        Hx[:] = 1
+        Hz[:] = 1
 
-    Hx[:] = 1
-    Hz[:] = 1
+    else:
+        Hx = Hz = None
+
 
     return Gx, Gz, Hx, Hz
 
@@ -469,6 +474,39 @@ def build_gcolor2():
     return Gx, Gz, Hx
 
 
+def build_projective(n, dim=2):
+
+    import geometry
+    g = geometry.projective(n, dim)
+
+    P = g.types[0]
+    L = g.types[1]
+    if dim==3:
+        L = g.types[2]
+
+    points = g.tplookup[P]
+    lines = g.tplookup[L]
+
+    #lines = lines[:-4] # throw one out
+    #points = points[:-1] # throw one out
+
+    n = len(points)
+    m = len(lines)
+    Gx = zeros2(m, n)
+    for i, line in enumerate(lines):
+        for j, point in enumerate(points):
+            if (line, point) in g.incidence:
+                Gx[i, j] = 1
+
+    #print shortstr(Gx)
+
+    Gz = Gx.copy()
+
+    Hx = None
+    Hz = None
+
+    return Gx, Gz, Hx, Hz
+
 
 
 
@@ -513,6 +551,11 @@ def build(name=""):
     elif argv.pauli:
         n = argv.get('n', 2)
         Gx, Gz, Hx, Hz = build_pauli(n)
+
+    elif argv.projective:
+        n = argv.get('n', 3)
+        dim = argv.get('dim', 2)
+        Gx, Gz, Hx, Hz = build_projective(n, dim)
 
     elif argv.test:
         Gx, Gz, Hx, Hz = build_test()
@@ -781,10 +824,18 @@ if __name__ == "__main__":
 
     print model
 
-    print shortstrx(model.Hx, model.Tz)
+    print "Hx/Hz:"
+    print shortstrx(model.Hx, model.Hz)
     print
+    print "Gx/Gz:"
     print shortstrx(Gx, Gz)
     print
+    print "Lx/Lz:"
     print shortstrx(model.Lx, model.Lz)
+
+    if len(model.Lx):
+        w = min([v.sum() for v in span(model.Lx) if v.sum()])
+        print "distance:", w
+        
 
 

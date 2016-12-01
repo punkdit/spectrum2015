@@ -1130,59 +1130,6 @@ def compose(g, f):
 
 
 
-def test_projective_plane():
-
-    names = {}
-    I, L, P = elements[:3]
-    LP = mul[L, P]
-    PL = mul[P, L]
-    LPL = PLP = mul[LP, L]
-    assert LPL == elements[-1]
-    BOT = elements[-1]
-    names[I] = "I  "
-    names[L] = "L  "
-    names[P] = "P  "
-    names[mul[L, P]] = "LP "
-    names[mul[P, L]] = "PL "
-    names[BOT] = "_|_"
-    assert len(names)==6
-
-    star = {I:I, L:L, P:P, LP:PL, PL:LP, LPL:LPL}
-
-#    for a in elements:
-#      for b in elements:
-#        assert rhom[a, b] == star[lhom[star[b], star[a]]]
-#    for a in elements:
-#        assert star[star[a]] == a
-
-    show_table(elements, names, mul, 'mul')
-    print
-
-    for i in elements:
-        assert bruhat[i, i]
-    assert bruhat[I, L]
-    assert bruhat[L, LP]
-    assert bruhat[LP, LPL]
-
-    show_table(elements, names, lhom, "lhom")
-    print 
-
-    show_table(elements, names, rhom, "rhom")
-
-
-def show_table(elements, names, mul, desc):
-
-    print desc[:3],
-    for i in elements:
-        print names[i],
-    print
-    for ii, i in enumerate(elements):
-      print names[i],
-      for jj, j in enumerate(elements):
-        k = mul[i, j]
-        #print "%2d"%elements.index(k),
-        print "%3s"%names.get(k, "?"),
-      print
 
 def freeze(A):
     items = [A.shape]
@@ -1272,6 +1219,9 @@ http://math.ucr.edu/home/baez/week180.html
 
 the finite case & q-polynomials:
 http://math.ucr.edu/home/baez/week186.html
+
+Projective planes, relation to finite fields:
+http://math.ucr.edu/home/baez/week145.html
 
 """
 
