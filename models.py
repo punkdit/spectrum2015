@@ -139,11 +139,16 @@ def build_xy(n):
 def build_random(n):
 
     m = n
-    Gx = rand2(m, n, p=0.2)
-    Gz = rand2(m, n, p=0.2)
+    Gx = rand2(m, n, p=0.3)
+    Gz = rand2(m, n, p=0.3)
 
-    Hx = zeros2(0, n)
-    Hz = zeros2(0, n)
+    Hx = Hz = None
+
+    Gx = Gx[[i for i in range(m) if Gx[i].sum()], :]
+    Gz = Gz[[i for i in range(m) if Gz[i].sum()], :]
+
+    Gx = linear_independant(Gx)
+    Gz = linear_independant(Gz)
 
     return Gx, Gz, Hx, Hz
 

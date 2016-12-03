@@ -276,15 +276,28 @@ def build_roots(ops):
     for g in gops:
         hs = [h for h in hops if h.anticommutes(g)]
 
+        #print "hs:", len(hs)
+
         for signs in cross([(+1, -1)]*len(hs)):
+            #print signs
             g1 = g
             for i, h in enumerate(hs):
+                assert h != zero
                 #assert h.anticommutes(g1)
                 if signs[i] == 1:
                     g1 = (I+h)*g1
                 else:
                     assert signs[i] == -1
                     g1 = (I-h)*g1
+                #assert g1 != zero, signs # hmmm...
+                #if g1 == zero:
+                #    break
+
+            if g1 == zero:
+                #print "zero"
+                #break # <-----------------
+                continue
+
             if g1 in eigs:
                 continue
 
@@ -304,10 +317,42 @@ def build_roots(ops):
                     assert 0
             root = tuple(root)
             if root not in roots:
-                print root
                 roots.add(root)
+                r = sum(r**2 for r in root)
+                print r, root
+                if r==0:
+                    print g
+                    print g1
+                    print g2
 
     print "eigs:", len(eigs)
+    print "roots:", len(roots)
+    lengths = {}
+    for root in roots:
+        r = sum(r**2 for r in root)
+        lengths[r] = lengths.get(r, 0) + 1
+    if len(lengths)>1:
+        keys = lengths.keys()
+        assert len(keys)==2, lengths
+        keys.sort()
+        short, long_ = keys
+        print "short roots:", lengths[keys[0]]
+        print "long  roots:", lengths[keys[1]]
+
+
+def report_lie(cartan, ideal):
+    n = len(cartan) # rank
+    m = len(ideal)
+    print "ideal:", len(ideal), "cartan:", len(cartan)
+    if m == n**2 + 2*n:
+        print "A_%d = sl_%d" % (n, n+1)
+    elif m == 2*n**2 + n:
+        print "B_%d = so_%d, *OR*" % (n, 2*n+1)
+        print "C_%d = sp_%d" % (n, 2*n)
+    elif m == 2*n**2 - n:
+        print "D_%d = so_%d" % (n, 2*n)
+    else:
+        print "unkown lie algebra"
 
 
 
@@ -327,6 +372,7 @@ def test_model():
     r, n = Rx.shape
 
     #print shortstrx(Rx, Rz)
+    print shortstrx(Gx, Gz)
     print "Gx:", len(Gx)
     print "r =", len(Rx)
 
@@ -334,11 +380,9 @@ def test_model():
     found = set()
     gops = []
     for gx in Gx:
-        #rx = dot2(Px, gx)
-        #rx = dot2(gx, PxtRzt)
         rx = dot2(gx, Rzt)
-        #print rx, dot2(gx, PxtRzt)
-        assert rx.sum()
+        if rx.sum()==0: # stabilizer..
+            continue
         rx = mkop(rx, None)
         s = rx.tostring()
         if s not in found:
@@ -348,10 +392,9 @@ def test_model():
 
     cartan = []
     for gz in Gz:
-        #rz = dot2(Pz, gz)
-        #rz = dot2(gz, PztRxt)
         rz = dot2(gz, Rxt)
-        assert rz.sum()
+        if rz.sum()==0: # stabilizer..
+            continue
         rz = mkop(None, rz)
         s = rz.tostring()
         if s not in found:
@@ -452,9 +495,11 @@ def test_model():
             #print "remain:", len(remain)
             op = remain.pop(0)
             ideal = find_ideal([op], ops)
-            print "ideal:", len(ideal)
-            algebra = build_roots(ideal)
-            nh += len([op for op in ideal if is_zop(op)])
+            cartan = [op for op in ideal if is_zop(op)]
+            report_lie(cartan, ideal)
+            if argv.roots:
+                build_roots(ideal)
+            nh += len(cartan)
             count = 0
             s_ideal = set(str(op) for op in ideal)
 
@@ -490,7 +535,7 @@ def test_model():
             ideal = set(op.tostring() for op in ideal)
             remain = [op for op in remain if not op.tostring() in ideal]
 
-        print "cartan:", nh
+        #print "cartan:", nh
         return
 
 
