@@ -335,6 +335,7 @@ def do_lanczos(A, U):
 
 
 def do_orbigraph(A, U):
+    print "do_orbigraph"
     #print A
     degrees = {} # out-degree
     for key, value in A.items():
@@ -764,7 +765,7 @@ def getnum(v):
 def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
 
     name = argv.get("name", "ex3.tmp.c")
-    #print "slepc", name
+    print "slepc: name=%s"%name
 
     r = len(Rx)
     n = 2**r
@@ -884,7 +885,9 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
 
 
     if argv.run:
-        cmd = "./%s -eps_nev 1 -eps_ncv 3 -eps_largest_real -eps_view_vectors binary:evec.bin "%stem
+        nev = argv.get("nev", 1)
+        cmd = "./%s -eps_nev %d -eps_ncv %d -eps_largest_real -eps_view_vectors binary:evec.bin "
+        cmd = cmd%(stem, nev, nev+2)
         #cmd += " -eps_type arnoldi -info -eps_monitor -eps_tol 1e-3"
         print cmd
         rval = os.system(cmd)
@@ -976,6 +979,7 @@ def get_perm(fn):
 
 
 def do_symmetry(Gx, Gz, Hx, Hz):
+    "find permutation symmetries of the code"
 
     bag0 = Tanner.build(Gx, Gz)
     bag1 = Tanner.build(Gx, Gz)

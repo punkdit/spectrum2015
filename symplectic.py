@@ -18,7 +18,6 @@ from isomorph import write
 
 import models
 from models import genidx
-import gauge
 import cbracket
 cbracket = cbracket.bracket
 
@@ -429,6 +428,7 @@ def test_model():
             assert numpy.allclose(numpy.dot(A, B), numpy.dot(B, A))
 
     if argv.render_ideals:
+        import gauge
         model = gauge.make(Gx, Gz, Hx, Hz)
 
         found = set()

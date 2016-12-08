@@ -646,6 +646,11 @@ def build(name=""):
 
         Gx, Gz, Hx, Hz = fn()
 
+    if Hx is None:
+        Hx = find_stabilizers(Gz, Gx)
+    if Hz is None:
+        Hz = find_stabilizers(Gx, Gz)
+
     return Gx, Gz, Hx, Hz
 
 
