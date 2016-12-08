@@ -110,6 +110,69 @@ def build_compass(li, lj=None):
     return Gx, Gz, Hx, Hz
 
 
+def build_compass3(li, lj=None, lk=None):
+
+    if lj is None:
+        lj = li
+
+    if lk is None:
+        lk = li
+
+    n = li*lj*lk
+
+    keys = [(i, j, k) for i in range(li) for j in range(lj) for k in range(lk)]
+    coords = {}  
+    for i, j, k in keys:
+        for di in range(-li, li+1):
+          for dj in range(-lj, lj+1):
+            for dk in range(-lk, lk+1):
+              coords[i+di, j+dj, k+dk] = keys.index(((i+di)%li, (j+dj)%lj, (k+dk)%lk))
+
+    m = 2*n 
+    Gx = zeros2(m, n)
+    Gz = zeros2(m, n)
+
+    idx = 0 
+    for i in range(li):
+      for j in range(lj):
+       for k in range(lk):
+        Gx[idx, coords[i, j, k]] = 1 
+        Gx[idx, coords[i+1, j, k]] = 1 
+
+        Gz[idx, coords[i, j, k]] = 1 
+        Gz[idx, coords[i, j+1, k]] = 1 
+        idx += 1
+
+        Gx[idx, coords[i, j, k]] = 1 
+        Gx[idx, coords[i, j+1, k]] = 1 
+
+        Gz[idx, coords[i, j, k]] = 1 
+        Gz[idx, coords[i, j, k+1]] = 1 
+        idx += 1
+
+    assert idx == m
+
+#    mx = lj-1
+#    Hx = zeros2(mx, n)
+#    for idx in range(mx):
+#      for i in range(li):
+#        Hx[idx, coords[i, idx]] = 1
+#        Hx[idx, coords[i, idx+1]] = 1
+#
+#    mz = li-1
+#    Hz = zeros2(mz, n)
+#    for idx in range(mz):
+#      for j in range(lj):
+#        Hz[idx, coords[idx, j]] = 1
+#        Hz[idx, coords[idx+1, j]] = 1
+#
+#    assert dot2(Hx, Hz.transpose()).sum() == 0
+
+    Hx = Hz = None
+
+    return Gx, Gz, Hx, Hz
+
+
 def build_xy(n):
 
     m = n
@@ -540,6 +603,13 @@ def build(name=""):
         li = argv.get('li', l)
         lj = argv.get('lj', l)
         Gx, Gz, Hx, Hz = build_compass(li, lj)
+
+    elif argv.compass3:
+        l = argv.get('l', 3)
+        li = argv.get('li', l)
+        lj = argv.get('lj', l)
+        lk = argv.get('lk', l)
+        Gx, Gz, Hx, Hz = build_compass3(li, lj, lk)
 
     elif argv.xy:
         n = argv.get('n', 4)
