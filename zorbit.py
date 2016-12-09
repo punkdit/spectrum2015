@@ -1003,9 +1003,9 @@ def do_symmetry(Gx, Gz, Hx, Hz):
         #print perm
 
         # this is the action of graph automorphism on the stabilizers
-        rows1 = [rows.index(shortstr(h[perm])) for h in Hx]
-        print rows1 
-        perms.append(rows1)
+#        rows1 = [rows.index(shortstr(h[perm])) for h in Hx]
+#        print rows1 
+#        perms.append(rows1)
 
         count += 1
     print

@@ -351,7 +351,17 @@ def report_lie(cartan, ideal):
     elif m == 2*n**2 - n:
         print "D_%d = so_%d" % (n, 2*n)
     else:
-        print "unkown lie algebra"
+        print "Unkown lie algebra"
+    if n==2 and m==14:
+        print "G_2"
+    elif n==4 and m==52:
+        print "F_4"
+    elif n==6 and m==78:
+        print "E_6"
+    elif n==7 and m==133:
+        print "E_7"
+    elif n==8 and m==248:
+        print "E_8"
 
 
 

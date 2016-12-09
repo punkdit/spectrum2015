@@ -1,4 +1,56 @@
 
+8/12/16
+=======
+
+simon@bucket ~/home/github/spectrum2015 $ ./zorbit.py compass3 slepc run nev=2
+(1, 27) (54, 27)
+n = 27
+Lz: 1
+Hx: 2 Hz: 2
+Gx: 54 Gz: 54
+Rx: 22 Rz: 22
+slepc: name=ex3.tmp.c
+./ex3.tmp -eps_nev 2 -eps_ncv 4 -eps_largest_real -eps_view_vectors binary:evec.bin 
+Hamiltonian Eigenproblem (matrix-free version), n=4194304
+EPSSetInitialSpace
+EPSSolve
+/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ Solution method: krylovschur
+
+ Number of requested eigenvalues: 2
+ Linear eigensolve converged (2 eigenpairs) due to CONVERGED_TOL; iterations 37
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+/\       60.295471            9.57965e-09
+/\       58.382445            9.15877e-09
+ ---------------------- --------------------
+
+
+simon@bucket ~/home/github/spectrum2015 $ ./zorbit.py compass3 slepc run excite=0
+(1, 27) (54, 27)
+n = 27
+Lz: 1
+Hx: 2 Hz: 2
+Gx: 54 Gz: 54
+Rx: 22 Rz: 22
+excite: 0
+./ex3.tmp -eps_nev 1 -eps_ncv 3 -eps_largest_real -eps_view_vectors binary:evec.bin 
+Hamiltonian Eigenproblem (matrix-free version), n=4194304
+EPSSetInitialSpace
+EPSSolve
+/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ Solution method: krylovschur
+
+ Number of requested eigenvalues: 1
+ Linear eigensolve converged (1 eigenpair) due to CONVERGED_TOL; iterations 53
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+/\       59.757677            7.43549e-09
+ ---------------------- --------------------
+
+
+
+
 4/12/16
 =======
 

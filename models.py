@@ -201,9 +201,10 @@ def build_xy(n):
 
 def build_random(n):
 
+    p = argv.get("p", 0.3)
     m = n
-    Gx = rand2(m, n, p=0.3)
-    Gz = rand2(m, n, p=0.3)
+    Gx = rand2(m, n, p=p)
+    Gz = rand2(m, n, p=p)
 
     Hx = Hz = None
 
@@ -650,6 +651,10 @@ def build(name=""):
         Hx = find_stabilizers(Gz, Gx)
     if Hz is None:
         Hz = find_stabilizers(Gx, Gz)
+
+    if argv.flip:
+        Gz, Gx = Gx, Gz
+        Hz, Hx = Hx, Hz
 
     return Gx, Gz, Hx, Hz
 
