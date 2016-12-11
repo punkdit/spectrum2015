@@ -202,9 +202,12 @@ def build_xy(n):
 def build_random(n):
 
     p = argv.get("p", 0.3)
-    m = n
-    Gx = rand2(m, n, p=p)
-    Gz = rand2(m, n, p=p)
+    m = argv.get("m", n)
+    mx = argv.get("mx", m)
+    mz = argv.get("mz", m)
+
+    Gx = rand2(mx, n, p=p)
+    Gz = rand2(mz, n, p=p)
 
     Hx = Hz = None
 

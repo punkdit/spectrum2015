@@ -1,3 +1,86 @@
+10/12/16
+========
+
+butters.physics.usyd.edu.au:spectrum2015$ ./zorbit.py compass3 symmetry > zorbit.1.out &
+
+
+$ ./symplectic.py test_model random ideals forever n=6 > search.6.txt
+grep [ABCDEFG]_ search.6.txt |sort|uniq
+A_15 = sl_16
+A_1 = sl_2
+A_31 = sl_32
+A_3 = sl_4
+A_7 = sl_8
+B_16 = so_33, *OR*
+B_2 = so_5, *OR*
+B_32 = so_65, *OR*
+B_3 = so_7, *OR*
+B_4 = so_9, *OR*
+B_5 = so_11, *OR*
+B_8 = so_17, *OR*
+C_16 = sp_32
+C_2 = sp_4
+C_32 = sp_64
+C_3 = sp_6
+C_4 = sp_8
+C_5 = sp_10
+C_8 = sp_16
+D_16 = so_32
+D_32 = so_64
+D_4 = so_8
+D_5 = so_10
+D_6 = so_12
+D_8 = so_16
+
+
+9/12/16
+=======
+
+kyle.physics.usyd.edu.au:spectrum2015$ ./zorbit.py dense orbigraph compass3
+(1, 27) (54, 27)
+n = 27
+Lz: 1
+Hx: 2 Hz: 2
+Gx: 54 Gz: 54
+Rx: 22 Rz: 22
+Hx|Tx:
+111111111111111111......... .1.........................
+.........111111111111111111 11.........................
+Hx:
+0 111111111111111111......... 18
+1 .........111111111111111111 18
+GzTx
+0 .111..........1....................................... 4
+1 1.11.1......1.1....................................... 6
+Tx: 2
+excite: (0, 0)
+do_orbigraph pnauty.init_graph 4194304 226492416 54
+pnauty.search pnauty.search: Automorphism group size = 216
+orbits: 20609
+eigval, degeneracy:
+    (60.2954709426+0j) 1
+    (58.3824449207+0j) 1
+    (52.7250084533+0j) 1
+    ...
+excite: (0, 1)
+do_orbigraph pnauty.init_graph 4194304 226492416 54
+pnauty.search pnauty.search: Automorphism group size = 72
+orbits: 60283
+eigval, degeneracy:
+    (59.7576766425+0j) 1
+    (56.3030110616+0j) 1
+    (54.2588413501+0j) 1
+    ...
+excite: (1, 1)
+do_orbigraph pnauty.init_graph 4194304 226492416 54
+pnauty.search pnauty.search: Automorphism group size = 72
+orbits: 60283
+eigval, degeneracy:
+    (59.7576766425+0j) 1
+    (56.3030110616+0j) 1
+    (54.2588413501+0j) 1
+    ...
+
 
 8/12/16
 =======
@@ -122,6 +205,17 @@ sl_4, sl_n : p211
 
 Weyl group of sp: p271
 
+From wikipedia:
+The Weyl group of the Lie algebra {\displaystyle {\mathfrak {sl}}_{n}}￼
+is the symmetric group on n elements, Sn. The action
+can be realized as follows. If {\displaystyle {\mathfrak {h}}}￼ is
+the Cartan subalgebra of all diagonal matrices with trace zero,
+then Sn acts on {\displaystyle {\mathfrak {h}}}￼ via conjugation by
+permutation matrices. This action induces an action on the dual
+space {\displaystyle {\mathfrak {h}}^{\ast }}￼, which is the required Weyl
+group action.
+
+Humphreys p9: an automorphism exp(ad x) with ad x nilpotent
 
 
 30/11/16
@@ -368,6 +462,7 @@ Gx: 16
 r = 9
 algebra dimension: 130816 == 256 * 511
 ideal: 130816 ---> one ideal means it is simple 
+130816 == 2^17 - 2^8
 cartan: 256 ---> rank 256
 dim = 256^2 + 256 * 255 = n^2 + n*(n-1) = 2*n^2 - n
 So this must be the lie algebra so_512
@@ -473,9 +568,9 @@ This is C_2 == B_2
 
 
 
+So what?
 
-
-So what? Suzuki-Trotter... ?
+Suzuki-Trotter is all about the brackets... ?
 
 
 28/9/16

@@ -5,6 +5,7 @@ Find the closure of the gauge operators under bracket.
 """
 
 import sys, os
+from fractions import gcd, Fraction
 
 import numpy
 from numpy import concatenate
@@ -12,7 +13,7 @@ from numpy import concatenate
 import networkx as nx
 
 from solve import get_reductor, array2, row_reduce, dot2, shortstr, zeros2, shortstrx, eq2
-from solve import u_inverse, find_kernel, find_logops, identity2, solve
+from solve import u_inverse, find_kernel, find_logops, identity2, solve, rank
 from solve import check_conjugate, check_commute
 from isomorph import write
 
@@ -20,6 +21,15 @@ import models
 from models import genidx
 import cbracket
 cbracket = cbracket.bracket
+
+
+def cross(itemss):
+    if len(itemss)==0:
+        yield ()
+    else:
+        for head in itemss[0]:
+            for tail in cross(itemss[1:]):
+                yield (head,)+tail
 
 
 
@@ -142,8 +152,11 @@ class Operator(object):
         items = []
         for key, value in self.v.items():
             if value != 0:
-                items.append("%s*%s"%(value, numpy.fromstring(key, dtype=numpy.int32)))
-        return "Operator(%s)"%('+'.join(items))
+                #if isinstance(value, Fraction):
+                items.append("%s*%s"%(str(value), numpy.fromstring(key, dtype=numpy.int32)))
+        s = "Operator(%s)"%('+'.join(items))
+        s = s.replace("+-", "-")
+        return s
     __repr__ = __str__
 
     def __eq__(self, other):
@@ -156,6 +169,12 @@ class Operator(object):
 
     def __ne__(self, other):
         return not (self==other)
+
+    def is_zero(self):
+        for value in self.v.values():
+            if value != 0:
+                return False
+        return True
 
     def __hash__(self):
         v = self.v
@@ -180,12 +199,17 @@ class Operator(object):
 
     def __rmul__(self, r):
         v = {}
-        assert int(r) == r
-        r = int(r)
+        assert Fraction(r) == r
+        r = Fraction(r)
         for key, value in self.v.items():
             v[key] = r*value
         op = Operator(v)
         return op
+
+    def __div__(self, r):
+        assert Fraction(r) == r
+        r = Fraction(r)
+        return (1/r)*self
 
     def __neg__(self):
         return -1*self
@@ -208,6 +232,19 @@ class Operator(object):
         op = Operator(v)
         return op
 
+    def reduce(self):
+        values = [abs(v) for v in self.v.values()]
+        values = list(set(values))
+        if not values:
+            return self
+        factor = reduce(gcd, values)
+        v = {}
+        for key, value in self.v.items():
+            assert value % factor == 0
+            v[key] = value//factor
+        op = Operator(v)
+        return op
+
     def bracket(self, other):
         return self*other - other*self
 
@@ -217,6 +254,30 @@ class Operator(object):
     def anticommutes(self, other):
         return self*other != other*self
 
+    def dot(self, other):
+        r = 0
+        for k1, v1 in self.v.items():
+            v2 = other.v.get(k1, 0)
+            r += v1*v2
+        return r
+
+    def scale(self, other):
+        "find r such that r*self == other"
+        if other.is_zero():
+            return 0
+        r = None
+        for k1, v1 in self.v.items():
+            if v1 == 0:
+                continue
+            v2 = other.v.get(k1, 0)
+            assert v2
+            r = Fraction(v2, v1)
+            break
+        assert r*self == other
+        if r.denominator==1:
+            r = r.numerator
+        return r
+        
 
 
 def test_algebra():
@@ -234,6 +295,7 @@ def test_algebra():
     assert II!=XI
     assert (II+XI) == (XI+II)
     assert (XI+XI) == 2*XI
+    assert (XI+XI)/2 == XI
 
     for op in ops:
         assert op*op == II
@@ -245,18 +307,58 @@ def test_algebra():
     assert (II - XI) * ZZ == ZZ - (XI*ZZ)
 
     assert hash(XI * IZ) == hash(IZ * XI)
-
-
 test_algebra()
-    
 
-def cross(itemss):
-    if len(itemss)==0:
-        yield ()
-    else:
-        for head in itemss[0]:
-            for tail in cross(itemss[1:]):
-                yield (head,)+tail
+
+class Algebra(object):
+    def __init__(self, ops):
+        self.ops = ops
+
+    def __str__(self):
+        return "%s([%s])"%(
+            self.__class__.__name__,
+            ', '.join(str(op) for op in self.ops))
+
+    def __getitem__(self, idx):
+        return self.ops[idx]
+
+    def __len__(self):
+        return len(self.ops)
+
+    def components(self, g):
+        v = []
+        for h in self.ops:
+            r = h.dot(g)
+            v.append(r)
+        return tuple(v)
+
+
+class Cartan(Algebra):
+    "Cartan subalgebra, represented by a basis of operators."
+
+    def get_eig(self, g):
+        root = []
+        for h in self.ops:
+            g1 = h.bracket(g)
+            if g1.is_zero():
+                root.append(0)
+            elif g1 == 2*g:
+                root.append(2)
+            elif g1 == -2*g:
+                root.append(-2)
+            else:
+                assert 0, "not an eigenvalue"
+        root = tuple(root)
+        return root
+
+    def act(self, root, h):
+        #print "act:", root, h
+        v = self.components(h)
+        #print "v:", v
+        r = 0
+        for i in range(len(self)):
+            r += v[i] * root[i]
+        return r
 
 
 def build_roots(ops):
@@ -265,15 +367,16 @@ def build_roots(ops):
     I = Operator([0]*len(ops[0]))
     zero = Operator()
 
-    hops = [Operator(op) for op in ops if is_zop(op)] # cartan subalgebra
+    cartan = Cartan([Operator(op) for op in ops if is_zop(op)])
     gops = [Operator(op) for op in ops if not is_zop(op)]
 
-    print "build_roots", len(hops), len(gops)
+    print "build_roots", len(cartan), len(gops)
 
     eigs = set()
     roots = set()
+    root_space = {} # map root -> operator
     for g in gops:
-        hs = [h for h in hops if h.anticommutes(g)]
+        hs = [h for h in cartan if h.anticommutes(g)]
 
         #print "hs:", len(hs)
 
@@ -297,26 +400,15 @@ def build_roots(ops):
                 #break # <-----------------
                 continue
 
-            if g1 in eigs:
+            if g1 in eigs or -g1 in eigs:
                 continue
 
             eigs.add(g1)
+            root = cartan.get_eig(g1)
     
-            # check that this is an eig
-            root = []
-            for h in hops:
-                g2 = h.bracket(g1)
-                if g2 == zero:
-                    root.append(0)
-                elif g2 == 2*g1:
-                    root.append(2)
-                elif g2 == -2*g1:
-                    root.append(-2)
-                else:
-                    assert 0
-            root = tuple(root)
             if root not in roots:
                 roots.add(root)
+                root_space[root] = g1
                 r = sum(r**2 for r in root)
                 print r, root
                 if r==0:
@@ -326,6 +418,50 @@ def build_roots(ops):
 
     print "eigs:", len(eigs)
     print "roots:", len(roots)
+
+    roots = list(roots)
+
+    perms = []
+    for alpha in roots:
+        nalpha = tuple(-a for a in alpha)
+        #def W(beta):
+    
+        X = root_space[alpha]
+        Y = root_space[nalpha]
+        H = X.bracket(Y)
+        #print "X:", X
+        #print "Y:", Y
+        #print "H:", H
+    
+        r = X.scale(H.bracket(X)) # r*X == H.bracket(X)
+        r = Fraction(2, r)
+        H = r*H
+        assert H.bracket(X) == 2*X
+        assert H.bracket(Y) == -2*Y
+        #print X.bracket(Y) == H
+    
+        #print cartan
+        #print cartan.components(H)
+        assert cartan.act(alpha, H) == 2
+    
+        alpha = numpy.array(alpha)
+        #print "alpha:", alpha
+        perm = []
+        for beta in roots:
+            c = cartan.act(beta, H)
+            assert int(c)==c
+            c = int(c)
+            #print beta, c,
+            root = numpy.array(beta) - c*alpha
+            root = tuple(root)
+            #print root
+            assert root in roots
+            perm.append(root)
+        assert len(set(perm))==len(roots)
+        perms.append(perm)
+
+    print "perms:", len(perms)
+        
     lengths = {}
     for root in roots:
         r = sum(r**2 for r in root)
@@ -382,8 +518,10 @@ def test_model():
 
     #print shortstrx(Rx, Rz)
     print shortstrx(Gx, Gz)
-    print "Gx:", len(Gx)
-    print "r =", len(Rx)
+    print "Gx:", len(Gx), "Gz:", len(Gz), "Rx/z:", len(Rx)
+
+    #RR = dot2(Rz, Rx.transpose()) == I
+    #assert rank(RR)==r
 
     ops = []
     found = set()
@@ -410,10 +548,6 @@ def test_model():
             found.add(s)
             ops.append(rz)
             cartan.append(rz)
-
-    #for op in ops:
-    #    print op
-    #print "cartan:", len(cartan)
 
 
     if argv.closure:
@@ -671,6 +805,10 @@ if __name__ == "__main__":
 
     else:
         fn = eval(fn)
-        fn()
+
+        while 1:
+            fn()
+            if not argv.forever:
+                break
 
 
