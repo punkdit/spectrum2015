@@ -470,7 +470,7 @@ So this must be the lie algebra so_512
 ./symplectic.py test_model ideals compass l=3
 Gx: 9
 r = 4
-ideal: 255 == n**2 + 2*n, sl_15
+ideal: 255 == n**2 + 2*n, sl_16
 cartan: 15
 
 ./symplectic.py test_model ising ideals n=8

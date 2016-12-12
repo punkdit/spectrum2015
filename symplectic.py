@@ -424,8 +424,7 @@ def build_roots(ops):
     perms = []
     for alpha in roots:
         nalpha = tuple(-a for a in alpha)
-        #def W(beta):
-    
+
         X = root_space[alpha]
         Y = root_space[nalpha]
         H = X.bracket(Y)
@@ -438,7 +437,7 @@ def build_roots(ops):
         H = r*H
         assert H.bracket(X) == 2*X
         assert H.bracket(Y) == -2*Y
-        #print X.bracket(Y) == H
+        #print X.bracket(Y) == H # doesn't matter
     
         #print cartan
         #print cartan.components(H)
