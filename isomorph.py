@@ -296,9 +296,9 @@ def from_ham(H, syndromes=None):
 
 
 def from_ham_syndromes(H, syndromes):
-    n = len(H)
-    assert len(syndromes)==n
-    m = len(syndromes[0])
+    n = len(H) # dimension of state space
+    assert len(syndromes)==n # one syndrome for each basis vector
+    m = len(syndromes[0]) # each syndrome has m check values
     points = []
     for i in range(n):
         p = Point('(%s)'%H[i, i], i)

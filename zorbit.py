@@ -45,6 +45,47 @@ def build_isomorph(Gx):
     return perms
 
 
+def get_cycles(perm):
+    f = dict((i, j) for i, j in enumerate(perm) if i!=j)
+    cycles = []
+    remain = set(f.keys())
+    while remain:
+        i = iter(remain).next()
+        cycle = [i]
+        while 1:
+            remain.remove(i)
+            j = f[i]
+            if j == cycle[0]:
+                break
+            assert j not in cycle
+            cycle.append(j)
+            i = j
+        cycles.append(cycle)
+    return cycles
+
+
+def write_gap(perms):
+    name = argv.get("name", "zorbit.gap")
+    print "open(%r, 'w')"%(name,)
+    f = open(name, 'w')
+    f.write("G:=Group(")
+    for i, perm in enumerate(perms):
+        #print len(perm)
+        #print str(perm)
+        cycles = get_cycles(perm)
+        if not cycles:
+            continue
+        s = ''.join(str(tuple(c)) for c in cycles)
+        s = s.replace(' ', '') 
+        f.write(s)
+        if i+1<len(perms):
+            f.write(",\n  ")
+    f.write(");\n")
+    f.write("G1:= SmallerDegreePermutationRepresentation(G);;\n");
+    f.write("Image(G1);\n");
+    f.close()
+
+
 def build_orbigraph(H, syndromes=None):
     import networkx as nx
 
@@ -65,11 +106,13 @@ def build_orbigraph(H, syndromes=None):
         f = [None]*n
         #print fn
         for i, j in fn.items():
-            if i>=n:
-                continue
             assert i<n and j<n
             f[i] = j
             graph.add_edge(i, j)
+        #for i, j in enumerate(f):
+        #    if i!=j:
+        #        print (i,j),
+        #print
         f = tuple(f)
         if f in fs:
             #write('/')
@@ -79,6 +122,8 @@ def build_orbigraph(H, syndromes=None):
         count += 1
     print
     print "isomorphisms:", count
+    if argv.gap:
+        write_gap(fs)
 
     equs = nx.connected_components(graph)
     m = len(equs)
@@ -1248,6 +1293,37 @@ def main():
         vals -= offset # offset doesn't change vecs
 
         show_eigs(vals)
+
+    elif argv.orbigraph:
+
+        assert n<=1024
+
+        H = numpy.zeros((n, n))
+        syndromes = []
+        for i, v in enumerate(verts):
+            syndromes.append(dot2(Gz, v))
+            count = dot2(Gz, v).sum()
+            Pxv = dot2(Px, v)
+            assert count == dot2(Gz, Pxv).sum()
+            H[i, i] = mz - 2*count
+            for g in Gx:
+                v1 = (g+v)%2
+                v1 = dot2(Px, v1)
+                j = lookup[v1.tostring()]
+                H[i, j] += 1
+    
+        if argv.showham:
+            s = lstr2(H, 0).replace(',  ', ' ')
+            s = s.replace(' 0', ' .')
+            s = s.replace(', -', '-')
+            print s
+    
+        if argv.symplectic:
+            H1 = build_orbigraph(H, syndromes)
+        else:
+            H1 = build_orbigraph(H)
+        #print "orbigraph:"
+        #print H1
 
 
 from argv import Argv
