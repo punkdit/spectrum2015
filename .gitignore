@@ -1,0 +1,6 @@
+*.pyc
+*.pyo
+*.log
+*.o
+*.so
+*.out

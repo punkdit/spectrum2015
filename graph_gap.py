@@ -52,7 +52,7 @@ mx = (W/DX)
 my = (H/DY)
 
 ticksize = 0.2
-def plot_axes():
+def plot_axes(xtext="qubits: $n$", ytext=r"gap: $\lambda_1-\lambda_2$"):
     c.stroke(path.line(0., 0., 1.05*W, 0.), [deco.earrow(size=0.3)])
     c.stroke(path.line(0., 0., 0., 1.08*H), [deco.earrow(size=0.3)])
     
@@ -66,10 +66,11 @@ def plot_axes():
         c.stroke(path.line(0., y, ticksize, y))
         c.text(-2*ticksize, y, str(i), center)
     
-    c.text(W/2., -6*ticksize, "qubits: $n$", center)
+    c.text(W/2., -6*ticksize, xtext, center)
     
     x, y = -5*ticksize, H/2.
-    c.text(x, y, r"gap: $\lambda_1-\lambda_2$", [trafo.rotate(90, 0., 0)]+center)
+    c.text(x, y, ytext, [trafo.rotate(90, 0., 0)]+center)
+
 plot_axes()
 
 #g = graph.graphxy(
@@ -131,21 +132,21 @@ c.writePDFfile("pic-gap.pdf")
 
 c = canvas.canvas()
 
-plot_axes()
+plot_axes(ytext=r"gap")
 
 clrs = {0:white, 8:blue, 12:green, 18:lred, 24:yellow}
 
 r = 0.13
 
 for row, weight in enumerate([8, 12, 18, 24]):
-    x = 10*mx
+    x = 10*mx + 1*ticksize
     y = 1.5*my - 0.7*row
 
     p = path.circle(x, y, r)
     c.fill(p, [clrs[weight]])
     c.stroke(p, st_thick)
 
-    c.text(x+2*ticksize, y, "$w(S_X)=%d$"%weight, west)
+    c.text(x+2*ticksize, y, "$w(s_Z)=%d$"%weight, west)
 
 #data = {}
 ##for n in [15, 65, 175]:

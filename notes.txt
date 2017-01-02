@@ -1,3 +1,174 @@
+30/12/16
+========
+
+Random gauge codes without stabilizers appear to be gapless.
+
+./zorbit.py  random n=12 seed=1 slepc run nev=2
+(1, 12) (11, 12)
+n = 12
+Lz: 1
+Hx: 0 Hz: 0
+Gx: 11 Gz: 11
+Rx: 11 Rz: 11
+slepc: name=ex3.tmp.c
+./ex3.tmp -eps_nev 2 -eps_ncv 4 -eps_largest_real -eps_view_vectors binary:evec.bin 
+Hamiltonian Eigenproblem (matrix-free version), n=2048
+EPSSetInitialSpace
+EPSSolve
+/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ Solution method: krylovschur
+
+ Number of requested eigenvalues: 2
+ Linear eigensolve converged (2 eigenpairs) due to CONVERGED_TOL; iterations 67
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+/\       12.799345            9.37364e-09
+/\       12.368187            8.56468e-09
+ ---------------------- --------------------
+
+
+./zorbit.py  random n=12 seed=5 slepc run nev=2
+(1, 12) (11, 12)
+n = 12
+Lz: 1
+Hx: 0 Hz: 0
+Gx: 11 Gz: 11
+Rx: 11 Rz: 11
+slepc: name=ex3.tmp.c
+./ex3.tmp -eps_nev 2 -eps_ncv 4 -eps_largest_real -eps_view_vectors binary:evec.bin 
+Hamiltonian Eigenproblem (matrix-free version), n=2048
+EPSSetInitialSpace
+EPSSolve
+/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ Solution method: krylovschur
+
+ Number of requested eigenvalues: 2
+ Linear eigensolve converged (2 eigenpairs) due to CONVERGED_TOL; iterations 79
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+/\       12.429275             8.3897e-09
+/\       12.098874            9.30159e-09
+ ---------------------- --------------------
+
+./zorbit.py  random n=12  slepc run nev=2 seed=7
+(1, 12) (11, 12)
+n = 12
+Lz: 1
+Hx: 0 Hz: 0
+Gx: 11 Gz: 11
+Rx: 11 Rz: 11
+slepc: name=ex3.tmp.c
+./ex3.tmp -eps_nev 2 -eps_ncv 4 -eps_largest_real -eps_view_vectors binary:evec.bin 
+Hamiltonian Eigenproblem (matrix-free version), n=2048
+EPSSetInitialSpace
+EPSSolve
+/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ Solution method: krylovschur
+
+ Number of requested eigenvalues: 2
+ Linear eigensolve converged (2 eigenpairs) due to CONVERGED_TOL; iterations 69
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+/\       12.548900            6.66174e-09
+/\       12.144080            8.75712e-09
+ ---------------------- --------------------
+
+
+./zorbit.py  random n=16  slepc run nev=2 seed=10
+(1, 16) (15, 16)
+n = 16
+Lz: 1
+Hx: 0 Hz: 0
+Gx: 15 Gz: 15
+Rx: 15 Rz: 15
+slepc: name=ex3.tmp.c
+./ex3.tmp -eps_nev 2 -eps_ncv 4 -eps_largest_real -eps_view_vectors binary:evec.bin 
+Hamiltonian Eigenproblem (matrix-free version), n=32768
+EPSSetInitialSpace
+EPSSolve
+/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ Solution method: krylovschur
+
+ Number of requested eigenvalues: 2
+ Linear eigensolve converged (2 eigenpairs) due to CONVERGED_TOL; iterations 56
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+/\       16.232598            9.93397e-09
+/\       16.100906            7.48044e-09
+ ---------------------- --------------------
+
+
+./zorbit.py  random n=16  slepc run nev=2 seed=13
+(2, 16) (14, 16)
+n = 16
+Lz: 2
+Hx: 0 Hz: 0
+Gx: 14 Gz: 14
+Rx: 14 Rz: 14
+slepc: name=ex3.tmp.c
+./ex3.tmp -eps_nev 2 -eps_ncv 4 -eps_largest_real -eps_view_vectors binary:evec.bin 
+Hamiltonian Eigenproblem (matrix-free version), n=16384
+EPSSetInitialSpace
+EPSSolve
+/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ Solution method: krylovschur
+
+ Number of requested eigenvalues: 2
+ Linear eigensolve converged (2 eigenpairs) due to CONVERGED_TOL; iterations 52
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+/\       15.193336            7.76112e-09
+/\       15.029775            9.00137e-09
+ ---------------------- --------------------
+
+./zorbit.py  random n=20  slepc run nev=2 seed=1
+(1, 20) (19, 20)
+n = 20
+Lz: 1
+Hx: 0 Hz: 0
+Gx: 19 Gz: 19
+Rx: 19 Rz: 19
+slepc: name=ex3.tmp.c
+./ex3.tmp -eps_nev 2 -eps_ncv 4 -eps_largest_real -eps_view_vectors binary:evec.bin 
+Hamiltonian Eigenproblem (matrix-free version), n=524288
+EPSSetInitialSpace
+EPSSolve
+/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ Solution method: krylovschur
+
+ Number of requested eigenvalues: 2
+ Linear eigensolve converged (2 eigenpairs) due to CONVERGED_TOL; iterations 57
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+/\       20.136888            9.35054e-09
+/\       20.081742            8.00547e-09
+ ---------------------- --------------------
+
+
+./zorbit.py  random n=20  slepc run nev=2 seed=2
+(1, 20) (19, 20)
+n = 20
+Lz: 1
+Hx: 0 Hz: 0
+Gx: 19 Gz: 19
+Rx: 19 Rz: 19
+slepc: name=ex3.tmp.c
+./ex3.tmp -eps_nev 2 -eps_ncv 4 -eps_largest_real -eps_view_vectors binary:evec.bin 
+Hamiltonian Eigenproblem (matrix-free version), n=524288
+EPSSetInitialSpace
+EPSSolve
+/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ Solution method: krylovschur
+
+ Number of requested eigenvalues: 2
+ Linear eigensolve converged (2 eigenpairs) due to CONVERGED_TOL; iterations 58
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+/\       20.286634            9.93301e-09
+/\       20.217833            7.86596e-09
+ ---------------------- --------------------
+
+
 
 14/12/16
 ========
