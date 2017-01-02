@@ -17,7 +17,7 @@ repr-abstract.pdf: repr-abstract.tex refs.bib
 	pdflatex repr-abstract.tex
 
 
-hecke.pdf: hecke.tex refs.bib
+hecke.pdf: hecke.tex 
 	pdflatex hecke.tex
 	bibtex hecke
 	pdflatex hecke.tex
