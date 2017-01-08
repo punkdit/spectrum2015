@@ -965,34 +965,40 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
         s = s[16:16+sz] # pick the first vector
     else:
         assert 0, "sz=%d but s=%s"%(sz, len(s))
+
     vec0 = numpy.fromstring(s, dtype=">d")
+
+    EPSILON = 1e-9
+    pos = vec0[numpy.where(vec0>-0.5*EPSILON)] + EPSILON
+    neg = -vec0[numpy.where(vec0<+0.5*EPSILON)] + EPSILON
+
+    if len(pos):
+        assert pos.min() > 0.
+    if len(neg):
+        assert neg.min() > 0.
     
-    r0, r1 = vec0.min(), vec0.max()
-    if abs(r0)>abs(r1):
-        vec0 = -vec0
+    #r0, r1 = vec0.min(), vec0.max()
+    #if abs(r0)>abs(r1):
+    #    vec0 = -vec0
         
-    r0, r1 = vec0.min(), vec0.max()
-    if r0 < 0.:
-        vec0 += -r0 + 1e-9
+    #r0, r1 = vec0.min(), vec0.max()
+    #if r0 < 0.:
+    #    vec0 += -r0 + 1e-9
 
     assert excite is None
 
     print "building U.."
     gz, n = Gz.shape
-    U = []
+    xdata = []
     for i, v in enumerate(genidx((2,)*r)):
         v = array2(v)
         syndrome = dot2(Gz, Rx.transpose(), v)
         value = gz - 2*syndrome.sum()
         #print shortstr(dot2(Rx.transpose(), v)), value
-        U.append(value)
+        xdata.append(value)
 
-    xdata = U
-
-    assert vec0.min() > 0.
-
-    vec0 = numpy.log2(vec0)
-    ydata = list(vec0)
+    pos = numpy.log2(pos)
+    ydata = list(pos)
 
     data = {}
     my = 100. # mul y
