@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys, os
+import math
 
 import numpy
 from scipy import sparse
@@ -931,8 +932,15 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
 
     if argv.run:
         nev = argv.get("nev", 1)
-        cmd = "./%s -eps_nev %d -eps_ncv %d -eps_largest_real -eps_view_vectors binary:evec.bin "
-        cmd = cmd%(stem, nev, nev+2)
+        cmd = "./%s -eps_nev %d -eps_ncv %d -eps_largest_real" 
+
+        cmd += " -eps_view_vectors binary:evec.bin "
+
+        cmd = cmd%(stem, nev, max(2*nev, 4))
+        eps_tol = argv.get("eps_tol")
+        if eps_tol is not None:
+            cmd += " -eps_tol %s "%eps_tol
+
         #cmd += " -eps_type arnoldi -info -eps_monitor -eps_tol 1e-3"
         print cmd
         rval = os.system(cmd)
@@ -941,18 +949,22 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     if not argv.plot:
         return
 
-    from pyx import graph
-
     assert argv.plot.endswith(".pdf")
 
     s = open("evec.bin").read()
     sz = 8*2**r
+
     if len(s)==sz+8:
         s = s[8:]
     elif len(s)==sz+16:
         s = s[16:]
+    #elif len(s)==2*(sz+16): # got two vectors
+    #    s = s[16:16+sz] # pick the first vector
+    elif len(s)%(sz+16) == 0:
+        count = len(s)/(sz+16)
+        s = s[16:16+sz] # pick the first vector
     else:
-        assert 0, (len(s)- sz)
+        assert 0, "sz=%d but s=%s"%(sz, len(s))
     vec0 = numpy.fromstring(s, dtype=">d")
     
     r0, r1 = vec0.min(), vec0.max()
@@ -975,42 +987,49 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
         #print shortstr(dot2(Rx.transpose(), v)), value
         U.append(value)
 
-#    #U1 = list(U)
-#    x0 = max(U)
-#    delta = argv.get("delta", 2.0)
-#    done = False
-#    while not done:
-#        done = True
-#        for i, v in enumerate(genidx((2,)*r)):
-#            if U[i] == x0:
-#                continue
-#            v = array2(v)
-#            js = []
-#            for g in Gx:
-#                u = (v + dot2(g, PxtQx))%2
-#                j = eval('0b'+shortstr(u, zero='0'))
-#                js.append(j)
-#            x = max(U[j] for j in js)
-#            if U[i] > x-delta:
-#                U[i] = x-delta # sag
-#                done = False
-#        write('.')
-
     xdata = U
-    ydata = list(vec0)
 
     assert vec0.min() > 0.
 
-    print "graph.."
-    g = graph.graphxy(
-        width=16,
-        x=graph.axis.linear(reverse=True),
-        y=graph.axis.log(min=0.8*vec0.min(), max=1.2*vec0.max()))
-    # either provide lists of the individual coordinates
-    g.plot(graph.data.values(x=xdata, y=ydata))
-    # or provide one list containing the whole points
-    #g.plot(graph.data.points(list(zip(range(10), range(10))), x=1, y=2))
-    g.writePDFfile(argv.plot)
+    vec0 = numpy.log2(vec0)
+    ydata = list(vec0)
+
+    data = {}
+    my = 100. # mul y
+    for i in range(len(xdata)):
+        x = xdata[i] # integer
+        y = ydata[i]
+        y = int(round(my*y))
+        data[x, y] = data.get((x, y), 0) + 1
+
+    from pyx import graph, canvas, path, trafo
+
+    c = canvas.canvas()
+    #tr = trafo.scale(-0.4, 1.0)
+    sx = -0.4
+    sy = 1.8
+    for key, value in data.items():
+        x, y = key
+        y = sy*y/my
+        x = sx*x
+        value = 1 + math.log(value)
+        r = 0.02*value
+        #c.stroke(path.circle(x, y, r))
+        c.stroke(path.line(x-r, y, x+r, y))
+    c.writePDFfile(argv.plot)
+
+
+    if 0:
+        print "graph.."
+    
+        g = graph.graphxy(
+            width=16,
+            x=graph.axis.linear(reverse=True),
+            y=graph.axis.linear())
+            #y=graph.axis.log(min=0.8*vec0.min(), max=1.2*vec0.max()))
+    
+        g.plot(graph.data.values(x=xdata, y=ydata))
+        g.writePDFfile(argv.plot)
 
 
 

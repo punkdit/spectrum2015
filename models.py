@@ -201,13 +201,14 @@ def build_xy(n):
 
 def build_random(n):
 
+    weight = argv.get("weight")
     p = argv.get("p", 0.3)
     m = argv.get("m", n)
     mx = argv.get("mx", m)
     mz = argv.get("mz", m)
 
-    Gx = rand2(mx, n, p=p)
-    Gz = rand2(mz, n, p=p)
+    Gx = rand2(mx, n, p=p, weight=weight)
+    Gz = rand2(mz, n, p=p, weight=weight)
 
     Hx = Hz = None
 
@@ -216,6 +217,31 @@ def build_random(n):
 
     Gx = linear_independant(Gx)
     Gz = linear_independant(Gz)
+
+    return Gx, Gz, Hx, Hz
+
+
+def build_random_nostabs(n):
+
+    m = argv.get("m", n)
+    mx = argv.get("mx", m)
+    mz = argv.get("mz", m)
+    while 1:
+
+        Gx, Gz, Hx, Hz = build_random(n)
+
+        if len(Gx)<mx or len(Gz)<mz:
+            write("m")
+            continue
+
+        Hx = find_stabilizers(Gz, Gx)
+        Hz = find_stabilizers(Gx, Gz)
+
+        if len(Hx)+len(Hz) == 0:
+            break
+        write("H")
+
+    print
 
     return Gx, Gz, Hx, Hz
 
@@ -627,6 +653,10 @@ def build(name=""):
         n = argv.get('n', 4)
         Gx, Gz, Hx, Hz = build_random(n)
 
+    elif argv.random_nostabs:
+        n = argv.get('n', 4)
+        Gx, Gz, Hx, Hz = build_random_nostabs(n)
+
     elif argv.pauli:
         n = argv.get('n', 2)
         Gx, Gz, Hx, Hz = build_pauli(n)
@@ -658,6 +688,9 @@ def build(name=""):
     if argv.flip:
         Gz, Gx = Gx, Gz
         Hz, Hx = Hx, Hz
+
+    if argv.show:
+        print shortstrx(Gx, Gz)
 
     return Gx, Gz, Hx, Hz
 
