@@ -226,6 +226,8 @@ def build_random_nostabs(n):
     m = argv.get("m", n)
     mx = argv.get("mx", m)
     mz = argv.get("mz", m)
+    hx = argv.get("hx", 0)
+    hz = argv.get("hz", 0)
     while 1:
 
         Gx, Gz, Hx, Hz = build_random(n)
@@ -237,9 +239,10 @@ def build_random_nostabs(n):
         Hx = find_stabilizers(Gz, Gx)
         Hz = find_stabilizers(Gx, Gz)
 
-        if len(Hx)+len(Hz) == 0:
+        if len(Hx)==hx and len(Hz)==hz:
             break
-        write("H")
+
+        write("H(%d,%d)"%(len(Hx), len(Hz)))
 
     print
 

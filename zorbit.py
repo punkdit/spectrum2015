@@ -4,6 +4,7 @@ import sys, os
 import math
 
 import numpy
+from numpy import log2
 from scipy import sparse
 from scipy.sparse.linalg import eigs, eigsh
 
@@ -962,66 +963,108 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     #    s = s[16:16+sz] # pick the first vector
     elif len(s)%(sz+16) == 0:
         count = len(s)/(sz+16)
-        s = s[16:16+sz] # pick the first vector
+#        s = s[16:16+sz] # pick the first vector
+        ev_idx = argv.get("ev_idx", 0)
+        s = s[16+ev_idx*(16+sz):(ev_idx+1)*(16+sz)]
     else:
         assert 0, "sz=%d but s=%s"%(sz, len(s))
 
     vec0 = numpy.fromstring(s, dtype=">d")
-
-    EPSILON = 1e-9
-    pos = vec0[numpy.where(vec0>-0.5*EPSILON)] + EPSILON
-    neg = -vec0[numpy.where(vec0<+0.5*EPSILON)] + EPSILON
-
-    if len(pos):
-        assert pos.min() > 0.
-    if len(neg):
-        assert neg.min() > 0.
-    
-    #r0, r1 = vec0.min(), vec0.max()
-    #if abs(r0)>abs(r1):
-    #    vec0 = -vec0
-        
-    #r0, r1 = vec0.min(), vec0.max()
-    #if r0 < 0.:
-    #    vec0 += -r0 + 1e-9
+    assert len(vec0)==2**r
 
     assert excite is None
 
-    print "building U.."
+    print "graphing..."
     gz, n = Gz.shape
     xdata = []
+    lookup = {}
+    GzRxt = dot2(Gz, Rx.transpose())
     for i, v in enumerate(genidx((2,)*r)):
         v = array2(v)
-        syndrome = dot2(Gz, Rx.transpose(), v)
+        lookup[v.tostring()] = i
+        syndrome = dot2(GzRxt, v)
         value = gz - 2*syndrome.sum()
-        #print shortstr(dot2(Rx.transpose(), v)), value
         xdata.append(value)
 
-    pos = numpy.log2(pos)
-    ydata = list(pos)
+    pdata = {}
+    ndata = {}
+    my = 20. # mul y
+    EPSILON = 1e-4
 
-    data = {}
-    my = 100. # mul y
-    for i in range(len(xdata)):
+    for i in range(len(vec0)):
         x = xdata[i] # integer
-        y = ydata[i]
-        y = int(round(my*y))
-        data[x, y] = data.get((x, y), 0) + 1
+        y = vec0[i]
+        if abs(y) < EPSILON:
+            continue
+        if y > 0.:
+            y = log2(y)
+            y = int(round(my*y))
+            pdata[x, y] = pdata.get((x, y), 0) + 1
+        else:
+            y = -y
+            y = log2(y)
+            y = int(round(my*y))
+            ndata[x, y] = ndata.get((x, y), 0) + 1
 
-    from pyx import graph, canvas, path, trafo
+    from pyx import graph, canvas, path, trafo, color, deco
 
     c = canvas.canvas()
-    #tr = trafo.scale(-0.4, 1.0)
-    sx = -0.4
-    sy = 1.8
-    for key, value in data.items():
+    sx = 0.4
+    sy = 1.4
+    tr = trafo.scale(sx, sy)
+
+    green = color.rgb(0.2,0.6,0.2)
+    brown = color.rgb(0.8,0.2,0.2)
+    grey = color.rgb(0.4,0.4,0.4)
+
+    W = 2*gz
+    H = log2(EPSILON)
+    dy = 1.2/my
+
+    X0 = -gz
+    Y0 = 0.
+
+    c.stroke(path.line(X0, Y0, X0+1.1*W, Y0), [tr, grey, deco.earrow()])
+    c.stroke(path.line(X0, Y0, X0, Y0+1.1*H), [tr, grey, deco.earrow()])
+    for i in range(gz+1):
+        c.stroke(path.line(X0+2*i, Y0, X0+2*i, Y0+H), [tr, grey])
+
+    def showp(v):
+        v = array2(v)
+        syndrome = dot2(GzRxt, v)
+        x = gz - 2*syndrome.sum()
+        i = lookup[v.tostring()]
+        print v, vec0[i]
+        y = 0.5*dy + log2(abs(vec0[i]))
+        c.stroke(path.circle(-x*sx, y*sy, 0.1))
+    v = array2([0]*r)
+    showp(v)
+    for i in range(r):
+        v[i] = 1
+        showp(v)
+        v[i] = 0
+
+    R = 0.15
+    for key, value in pdata.items():
         x, y = key
-        y = sy*y/my
-        x = sx*x
+        y = y/my
+        x = -x
         value = 1 + math.log(value)
-        r = 0.02*value
+        r = R*value
         #c.stroke(path.circle(x, y, r))
-        c.stroke(path.line(x-r, y, x+r, y))
+        #c.stroke(path.line(x, y, x+r, y), [brown, tr])
+        c.fill(path.rect(x, y, r, dy), [brown, tr])
+
+    for key, value in ndata.items():
+        x, y = key
+        y = y/my
+        x = -x
+        value = 1 + math.log(value)
+        r = R*value
+        #c.stroke(path.circle(x, y, r))
+        #c.stroke(path.line(x-r, y, x, y), [green, tr])
+        c.fill(path.rect(x-r, y, r, dy), [green, tr])
+
     c.writePDFfile(argv.plot)
 
 

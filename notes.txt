@@ -1,3 +1,113 @@
+
+10/1/17
+=======
+
+time ./zorbit.py  random_nostabs n=16  slepc run nev=20 p=0.5 show   weight=3  eps_tol=0.0001 plot=pic-random-spectrum.pdf seed=0
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Usually the gap comes from a frustrated stabilizer.
+Below is a counter-example.
+
+see eigenvalue plots for the first four eigenvalues:
+pic-random-spectrum-0.pdf  pic-random-spectrum-2.pdf
+pic-random-spectrum-1.pdf  pic-random-spectrum-3.pdf
+
+ ./zorbit.py random_nostabs n=20 m=19 weight=3 hz=1 hx=1 slepc run nev=5 eps_tol=0.0001 seed=25 show plot=pic-random-spectrum-0.pdf nev=1
+ ./zorbit.py random_nostabs n=20 m=19 weight=3 hz=1 hx=1 slepc run nev=5 eps_tol=0.0001 seed=25 show plot=pic-random-spectrum-1.pdf nev=3 ev_idx=1
+ ./zorbit.py random_nostabs n=20 m=19 weight=3 hz=1 hx=1 slepc run nev=5 eps_tol=0.0001 seed=25 show plot=pic-random-spectrum-2.pdf nev=3 ev_idx=2
+ ./zorbit.py random_nostabs n=20 m=19 weight=3 hz=1 hx=1 slepc run nev=5 eps_tol=0.0001 seed=25 show plot=pic-random-spectrum-3.pdf nev=4 ev_idx=3
+
+
+
+./zorbit.py random_nostabs n=20 m=19 weight=3 hz=1 hx=1 slepc run nev=5 eps_tol=0.0001 seed=25
+
+.........1...1...1.. ....1.1.......1.....
+1................1.1 ..1..............1.1
+1........11......... ......1..........1.1
+.....1.........1..1. ...1.1......1.......
+1....1.........1.... .....1....1.1.......
+.......1.....1.....1 .1.......11.........
+.......1.1.......1.. ....1..........1.1..
+...1.....1.....1.... ..........1....1..1.
+.....1.......1....1. ......1.....1..1....
+.....1......11...... ......1.......11....
+..1.............1.1. .11.1...............
+........1.1.1....... ........1.....1....1
+....1.........11.... .......1.....1..1...
+.11.......1......... .1.1....1...........
+..1..........1...1.. .......1.......1...1
+1....1..1........... ...........1.....1.1
+......11...1........ 1...1.........1.....
+.......1.11......... ......1.....1....1..
+............1.1....1 ..........11......1.
+
+
+miltonian Eigenproblem (matrix-free version), n=262144
+EPSSetInitialSpace
+EPSSolve
+/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ Solution method: krylovschur
+
+ Number of requested eigenvalues: 5
+ Linear eigensolve converged (6 eigenpairs) due to CONVERGED_TOL; iterations 77
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+/\       21.166402            4.03109e-05
+/\       20.878253            3.90712e-05
+/\       20.337777            5.83742e-05 <------ wierdo !
+/\       19.920809             9.4361e-05
+/\       19.845702            9.74971e-05
+/\       19.799308            5.30467e-05
+ ---------------------- --------------------
+
+n = 20
+Lz: 0
+Hx: 1 Hz: 1
+Gx: 19 Gz: 19
+Rx: 18 Rz: 18
+slepc: name=ex3.tmp.c
+./ex3.tmp -eps_nev 5 -eps_ncv 10 -eps_largest_real -eps_view_vectors binary:evec.bin  -eps_tol 0.0001 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+./zorbit.py random_nostabs n=20 m=19 weight=3 hz=1 hx=1 slepc run nev=1 eps_tol=0.0001 seed=25 excite=0
+
+m m m m m m m m m m m m m m m m m m m m m m m Hamiltonian Eigenproblem (matrix-free version), n=262144
+EPSSetInitialSpace
+EPSSolve
+/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ Solution method: krylovschur
+
+ Number of requested eigenvalues: 1
+ Linear eigensolve converged (1 eigenpair) due to CONVERGED_TOL; iterations 15
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+/\       20.722761            8.82192e-05
+ ---------------------- --------------------
+
+n = 20
+Lz: 0
+Hx: 1 Hz: 1
+Gx: 19 Gz: 19
+Rx: 18 Rz: 18
+slepc: name=ex3.tmp.c
+excite: 0
+./ex3.tmp -eps_nev 1 -eps_ncv 4 -eps_largest_real -eps_view_vectors binary:evec.bin  -eps_tol 0.0001
+
+
+
+
+
+9/1/17
+======
+
+
+
+
+
 30/12/16
 ========
 
