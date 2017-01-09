@@ -2,8 +2,64 @@
 10/1/17
 =======
 
-time ./zorbit.py  random_nostabs n=16  slepc run nev=20 p=0.5 show   weight=3  eps_tol=0.0001 plot=pic-random-spectrum.pdf seed=0
 
+model = "random_nostabs n=8 weight=3 m=7 h=1 "
+$ ./parse_sy.py logfile.run_symplectic.out  
+      D_32: 8.5513, +/- 0.2045, count=195
+      A_63: 8.4985, +/- 0.1886, count=1089
+ B_32 C_32: 9.0333, +/- 0.1410, count=13
+  A_31 A_1: 8.9289, +/- 0.1677, count=3
+
+$ ./parse_sy.py logfile.run_symplectic.out  gap0 # <-- vacuum gap
+      D_32: 0.9603, +/- 0.1754, count=195
+      A_63: 0.9695, +/- 0.1605, count=1089
+ B_32 C_32: 1.0012, +/- 0.1573, count=13
+  A_31 A_1: 1.2707, +/- 0.1095, count=3
+
+$ ./parse_sy.py logfile.run_symplectic.out  gap
+      D_32: 0.4861, +/- 0.1932, count=195
+      A_63: 0.4527, +/- 0.1509, count=1089
+ B_32 C_32: 0.8627, +/- 0.2200, count=13
+  A_31 A_1: 0.5094, +/- 0.0978, count=3
+
+
+
+
+stabilizer misses 2nd eval:
+
+./symplectic.py test_model ideals random_nostabs n=9 weight=3 m=8 h=1  seed=38
+A_127
+./zorbit.py slepc run random_nostabs n=9 weight=3 m=8 h=1  show nev=5 seed=38 
+[10.097567, 9.33573, 8.780509, 8.675319, 8.338299]
+./zorbit.py slepc run random_nostabs n=9 weight=3 m=8 h=1  show nev=1 excite=0 seed=38 
+[9.294884]
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+./symplectic.py test_model random_nostabs ideals n=7 forever weight=3
+B/C_64
+
+./symplectic.py test_model random_nostabs ideals n=5 weight=3  roots
+C_16
+
+./symplectic.py test_model random_nostabs ideals n=8 m=7 hx=1 hz=1 forever weight=3
+A_63 or D_32
+
+./symplectic.py test_model random_nostabs ideals n=8 m=6 h=2 forever weight=3
+A_15 or D_8
+
+./symplectic.py test_model random_nostabs ideals n=8 m=5 h=3 forever weight=3
+mostly A_3
+
+./symplectic.py test_model random_nostabs ideals n=9 m=8 h=1 forever weight=3
+mostly A_127, otherwise B/C_64
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+time ./zorbit.py  random_nostabs n=16  slepc run nev=20 p=0.5 show   weight=3  eps_tol=0.0001 plot=pic-random-spectrum.pdf seed=0
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

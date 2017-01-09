@@ -221,13 +221,47 @@ def build_random(n):
     return Gx, Gz, Hx, Hz
 
 
+def build_random_selfdual(n):
+
+    weight = argv.get("weight", 3)
+    m = argv.get("m", n)
+    h = argv.get("h", 0)
+
+    while 1:
+        Gx = rand2(m, n, weight=weight)
+        Gz = Gx.copy()
+    
+        Hx = Hz = None
+    
+        Gx = Gx[[i for i in range(m) if Gx[i].sum()], :]
+        Gx = linear_independant(Gx)
+    
+        if len(Gx)<m:
+            write("m")
+            continue
+
+        Gz = Gx.copy()
+
+        Hx = find_stabilizers(Gz, Gx)
+        Hz = find_stabilizers(Gx, Gz)
+
+        if len(Hx)==h and len(Hz)==h:
+            break
+
+        write("H(%d,%d)"%(len(Hx), len(Hz)))
+
+    print
+    return Gx, Gz, Hx, Hz
+
+
 def build_random_nostabs(n):
 
     m = argv.get("m", n)
     mx = argv.get("mx", m)
     mz = argv.get("mz", m)
-    hx = argv.get("hx", 0)
-    hz = argv.get("hz", 0)
+    h = argv.get("h", 0)
+    hx = argv.get("hx", h)
+    hz = argv.get("hz", h)
     while 1:
 
         Gx, Gz, Hx, Hz = build_random(n)
@@ -659,6 +693,10 @@ def build(name=""):
     elif argv.random_nostabs:
         n = argv.get('n', 4)
         Gx, Gz, Hx, Hz = build_random_nostabs(n)
+
+    elif argv.random_selfdual:
+        n = argv.get('n', 4)
+        Gx, Gz, Hx, Hz = build_random_selfdual(n)
 
     elif argv.pauli:
         n = argv.get('n', 2)

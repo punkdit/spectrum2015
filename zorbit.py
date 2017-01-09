@@ -930,22 +930,20 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     rval = os.system(cmd)
     assert rval == 0
 
+    nev = argv.get("nev", 1)
+    cmd = "./%s -eps_nev %d -eps_ncv %d -eps_largest_real" 
 
-    if argv.run:
-        nev = argv.get("nev", 1)
-        cmd = "./%s -eps_nev %d -eps_ncv %d -eps_largest_real" 
+    cmd += " -eps_view_vectors binary:evec.bin "
 
-        cmd += " -eps_view_vectors binary:evec.bin "
+    cmd = cmd%(stem, nev, max(2*nev, 4))
+    eps_tol = argv.get("eps_tol")
+    if eps_tol is not None:
+        cmd += " -eps_tol %s "%eps_tol
 
-        cmd = cmd%(stem, nev, max(2*nev, 4))
-        eps_tol = argv.get("eps_tol")
-        if eps_tol is not None:
-            cmd += " -eps_tol %s "%eps_tol
-
-        #cmd += " -eps_type arnoldi -info -eps_monitor -eps_tol 1e-3"
-        print cmd
-        rval = os.system(cmd)
-        assert rval == 0
+    #cmd += " -eps_type arnoldi -info -eps_monitor -eps_tol 1e-3"
+    print cmd
+    rval = os.system(cmd)
+    assert rval == 0
 
     if not argv.plot:
         return
