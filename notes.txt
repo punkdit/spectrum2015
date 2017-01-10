@@ -3,6 +3,53 @@
 =======
 
 
+
+time ./zorbit.py random_selfdual n=22 slepc nev=5 eps_tol=0.0001 seed=0
+ Number of requested eigenvalues: 5
+ Linear eigensolve converged (5 eigenpairs) due to CONVERGED_TOL; iterations 337
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+/\       23.519784            9.30076e-05
+/\       23.489387            2.25245e-05
+/\       21.922052            9.80731e-05
+/\       21.910055            0.000103358
+/\       21.906982            9.94174e-05
+ ---------------------- --------------------
+
+time ./zorbit.py random_selfdual n=22 slepc nev=5 eps_tol=0.0001 seed=1
+Number of requested eigenvalues: 5
+ Linear eigensolve converged (5 eigenpairs) due to CONVERGED_TOL; iterations 128
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+/\       23.709621             7.2403e-05
+/\       23.674844            8.37842e-05
+/\       22.608333            9.99695e-05
+/\       22.578957            5.98228e-05
+/\       22.103010            0.000101265
+ ---------------------- --------------------
+
+
+
+
+time ./zorbit.py random_selfdual n=20 slepc seed=0 nev=5 eps_tol=0.0001
+ Number of requested eigenvalues: 5
+ Linear eigensolve converged (5 eigenpairs) due to CONVERGED_TOL; iterations 188
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+/\       21.792634            8.28542e-05
+/\       21.736621             2.2828e-05
+/\       20.389528             9.7056e-05
+/\       20.365643            9.33963e-05
+/\       20.290360            0.000102516
+ ---------------------- --------------------
+
+
+
+
+
 model = "random_nostabs n=8 weight=3 m=7 h=1 "
 $ ./parse_sy.py logfile.run_symplectic.out  
       D_32: 8.5513, +/- 0.2045, count=195

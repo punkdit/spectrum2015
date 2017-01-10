@@ -6,6 +6,7 @@ Find the closure of the gauge operators under bracket.
 
 import sys, os
 from fractions import gcd, Fraction
+from random import choice
 
 import numpy
 from numpy import concatenate
@@ -514,6 +515,74 @@ def build_roots(ops, hamiltonian):
         print "long  roots:", lengths[keys[1]]
 
 
+def random_roots(ops, hamiltonian):
+
+    assert ops
+    I = Operator([0]*len(ops[0]))
+    zero = Operator()
+
+    cartan = Cartan([Operator(op) for op in ops if is_zop(op)])
+    gops = [Operator(op) for op in ops if not is_zop(op)]
+
+    print "random_roots", len(cartan), len(gops)
+
+    eigs = set()
+    roots = set()
+    root_space = {} # map root -> operator
+    for g in gops:
+        hs = [h for h in cartan if h.anticommutes(g)]
+
+        #print "hs:", len(hs)
+        #for signs in cross([(+1, -1)]*len(hs)):
+
+        while 1:
+            signs = []
+            for i in range(len(hs)):
+                signs.append(choice([-1,+1]))
+
+            #print signs
+            g1 = g
+            for i, h in enumerate(hs):
+                assert h != zero
+                #assert h.anticommutes(g1)
+                if signs[i] == 1:
+                    g1 = (I+h)*g1
+                else:
+                    assert signs[i] == -1
+                    g1 = (I-h)*g1
+                #assert g1 != zero, signs # hmmm...
+                if g1.is_zero():
+                    print "(%d/%d)"%(i, len(hs)),
+                    break
+
+            if g1.is_zero():
+                #break # <-----------------
+                continue
+            print
+
+            if g1 in eigs or -g1 in eigs:
+                continue
+
+            eigs.add(g1)
+            root = cartan.get_eig(g1)
+    
+            if root not in roots:
+                roots.add(root)
+                root_space[root] = g1
+                r = sum(r**2 for r in root)
+                print "%d: %s"%(r, ' '.join("%2d"%ri for ri in root))
+                if r==0:
+                    print g
+                    print g1
+                    print g2
+
+            break
+
+    print "eigs:", len(eigs)
+    print "roots:", len(roots)
+
+
+
 def report_lie(cartan, ideal):
     n = len(cartan) # rank
     m = len(ideal)
@@ -692,6 +761,9 @@ def test_model():
 
         if argv.roots:
             build_roots(ideal, hamiltonian)
+
+        if argv.random_roots:
+            random_roots(ideal, hamiltonian)
 
         nh += len(cartan)
         count = 0

@@ -201,7 +201,7 @@ def build_xy(n):
 
 def build_random(n):
 
-    weight = argv.get("weight")
+    weight = argv.get("weight", 3)
     p = argv.get("p", 0.3)
     m = argv.get("m", n)
     mx = argv.get("mx", m)
