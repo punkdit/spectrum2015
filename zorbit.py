@@ -933,10 +933,11 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     nev = argv.get("nev", 1)
     cmd = "./%s -eps_nev %d -eps_ncv %d -eps_largest_real" 
 
-    cmd += " -eps_view_vectors binary:evec.bin "
+    if argv.plot:
+        cmd += " -eps_view_vectors binary:evec.bin "
 
     cmd = cmd%(stem, nev, max(2*nev, 4))
-    eps_tol = argv.get("eps_tol")
+    eps_tol = argv.get("eps_tol", 1e-4)
     if eps_tol is not None:
         cmd += " -eps_tol %s "%eps_tol
 
@@ -1184,6 +1185,7 @@ def main():
     #print shortstr(find_stabilizers(Gx, Gz))
 
     Lz = find_logops(Gx, Hz)
+    Lx = find_logops(Gz, Hx)
     #print "Lz:", shortstr(Lz)
 
     if Lz.shape[0]*Lz.shape[1]:
@@ -1201,7 +1203,9 @@ def main():
 
     n = Gx.shape[1]
     print "n =", n
-    print "Lz:", len(Lz)
+    if len(Lx):
+        print "Lx Lz:"
+        print shortstrx(Lx, Lz)
     print "Hx:", len(Hx), "Hz:", len(Hz)
     print "Gx:", len(Gx), "Gz:", len(Gz)
 
@@ -1211,6 +1215,8 @@ def main():
     Rx = row_reduce(Rx, truncate=True)
     rx = len(Rx)
     print "Rx:", rx, "Rz:", rz
+    if argv.show:
+        print shortstrx(Rx, Rz)
 
     Qx = u_inverse(Rx)
     Pxt = Px.transpose()

@@ -515,7 +515,7 @@ def build_roots(ops, hamiltonian):
         print "long  roots:", lengths[keys[1]]
 
 
-def random_roots(ops, hamiltonian):
+def search_roots(ops, hamiltonian):
 
     assert ops
     I = Operator([0]*len(ops[0]))
@@ -524,7 +524,7 @@ def random_roots(ops, hamiltonian):
     cartan = Cartan([Operator(op) for op in ops if is_zop(op)])
     gops = [Operator(op) for op in ops if not is_zop(op)]
 
-    print "random_roots", len(cartan), len(gops)
+    print "search_roots", len(cartan), len(gops)
 
     eigs = set()
     roots = set()
@@ -535,33 +535,50 @@ def random_roots(ops, hamiltonian):
         #print "hs:", len(hs)
         #for signs in cross([(+1, -1)]*len(hs)):
 
+        signs = [+1]
+        stack = [g]
+        idx = 0
         while 1:
-            signs = []
-            for i in range(len(hs)):
-                signs.append(choice([-1,+1]))
 
-            #print signs
-            g1 = g
-            for i, h in enumerate(hs):
-                assert h != zero
-                #assert h.anticommutes(g1)
-                if signs[i] == 1:
-                    g1 = (I+h)*g1
-                else:
-                    assert signs[i] == -1
-                    g1 = (I-h)*g1
-                #assert g1 != zero, signs # hmmm...
-                if g1.is_zero():
-                    print "(%d/%d)"%(i, len(hs)),
-                    break
+            #print "idx =", idx
+
+            assert len(stack)==idx+1
+            assert len(signs)==idx+1
+            g = stack[idx]
+
+            h = hs[idx]
+            if signs[idx] == 1:
+                g1 = (I+h)*g
+            else:
+                assert signs[idx] == -1
+                g1 = (I-h)*g
 
             if g1.is_zero():
-                #break # <-----------------
-                continue
-            print
 
-            if g1 in eigs or -g1 in eigs:
+                if signs[idx] == 1:
+                    signs[idx] = -1
+                    continue
+
+                # backtrack
+                while idx>=0 and signs[idx] == -1:
+                    idx -= 1
+                    stack.pop()
+                    signs.pop()
+
+                if idx>=0:
+                    signs[idx] = -1
+                    continue
+
+                break # finished search
+
+            if idx+1 < len(hs):
+                stack.append(g1)
+                signs.append(+1)
+                idx += 1
                 continue
+
+            #if g1 in eigs or -g1 in eigs:
+            #    continue
 
             eigs.add(g1)
             root = cartan.get_eig(g1)
@@ -576,7 +593,25 @@ def random_roots(ops, hamiltonian):
                     print g1
                     print g2
 
-            break
+            if not argv.all_roots:
+                break
+
+            if 1:
+                if signs[idx] == 1:
+                    signs[idx] = -1
+                    continue
+
+                # backtrack
+                while idx>=0 and signs[idx] == -1:
+                    idx -= 1
+                    stack.pop()
+                    signs.pop()
+
+                if idx>=0:
+                    signs[idx] = -1
+                    continue
+
+                break # finished search
 
     print "eigs:", len(eigs)
     print "roots:", len(roots)
@@ -762,8 +797,8 @@ def test_model():
         if argv.roots:
             build_roots(ideal, hamiltonian)
 
-        if argv.random_roots:
-            random_roots(ideal, hamiltonian)
+        if argv.search_roots:
+            search_roots(ideal, hamiltonian)
 
         nh += len(cartan)
         count = 0
