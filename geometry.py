@@ -536,6 +536,27 @@ class System(object):
         self._geodesics[key] = list(word)
         return word
 
+    def build_weyl(self, monoid):
+        mul = monoid.mul
+        words = monoid.words
+        print "words:", len(words)
+        print words
+        self.monoid = monoid
+        self.mul = monoid.mul
+        self.words = monoid.words
+        self.I = I = ""
+        weyl = {} # map each pair of flags to the Weyl distance
+        flags = self.flags
+        gen = monoid.gen
+        for i in flags:
+          for j in flags:
+            a = I
+            path = self.get_geodesic(i, j)
+            for b in path:
+                a = mul[a, gen[b]]
+            weyl[i, j] = a
+        self.weyl = weyl
+
     def build(self, letters):
         geometry = self.geometry
         gen = letters[:geometry.rank]
@@ -546,23 +567,7 @@ class System(object):
         print "BruhatMonoid(%s, %s)" % (gen, desc)
         monoid = BruhatMonoid(gen, desc)
         words = monoid.build()
-        mul = monoid.mul
-        print "words:", len(words)
-        print words
-        self.monoid = monoid
-        self.mul = monoid.mul
-        self.words = monoid.words
-        self.I = I = ""
-        weyl = {} # map each pair of flags to the Weyl distance
-        flags = self.flags
-        for i in flags:
-          for j in flags:
-            a = I
-            path = self.get_geodesic(i, j)
-            for b in path:
-                a = mul[a, gen[b]]
-            weyl[i, j] = a
-        self.weyl = weyl
+        self.build_weyl(monoid)
 
     def __str__(self):
         return "System(%d)"%len(self)
@@ -693,6 +698,102 @@ class System(object):
 
         assert len(set(nchains))==len(nchains)
         return nchains
+
+
+class MonoidSystem(System):
+    def __init__(self, monoid):
+        flags = list(monoid.words)
+        
+        graphs = {} # map tp -> graph
+        for tp in monoid.gen:
+            graph = nx.Graph()
+            for flag in flags:
+                graph.add_node(flag)
+                #print "node:", tp, flag
+            graphs[tp] = graph
+
+        # this is a thin geometry
+        for flag in flags:
+            for tp in monoid.gen:
+                _flag = monoid.mul[tp, flag]
+                graphs[tp].add_edge(flag, _flag)
+                #graphs[tp].add_edge(_flag, flag)
+
+        # union graph
+        graph = nx.Graph()
+        for i in flags:
+            graph.add_node(i)
+
+        for tp, equ in graphs.items():
+            for flag, _flag in nx.edges(equ):
+                graph.add_edge(flag, _flag, tp=tp)
+
+        self.flags = flags
+        #self.tpmap = tpmap
+        self.types = monoid.gen
+        self.graphs = graphs
+        self.graph = graph
+        self.geometry = None
+        self.monoid = monoid
+        self._geodesics = {} # cache
+
+        self.build_weyl(monoid)
+
+    def get_geodesic(self, c, d):
+        """
+            Find a minimal gallery from c to d, return as a list of types.
+        """
+        key = (c, d)
+        if key in self._geodesics:
+            return list(self._geodesics[c, d])
+        graph = self.graph
+        monoid = self.monoid
+        word = []
+        if c==d:
+            self._geodesics[key] = list(word)
+            return word # <---- return
+        path = nx.shortest_path(graph, c, d)
+        assert path[0] == c
+        assert path[-1] == d
+        print "get_geodesic %20s" % ((c, d),),
+        print "path:", path
+        i = 0
+        while i+1 < len(path):
+            a, b = path[i:i+2]
+            data = graph.get_edge_data(a, b)
+            tp = data['tp']
+            #for tp in monoid.gen:
+            #    if monoid.mul[tp, a] == b or monoid.mul[tp, b] == a:
+            #        break
+            #else:
+            #    assert 0, (a, b)
+            word.append(monoid.gen.index(tp))
+            if i:
+                assert word[i-1] != word[i], "word=%s, path=%s" % (word, path)
+            i += 1
+        self._geodesics[key] = list(word)
+        return word
+
+    def build_weyl(self, monoid):
+        mul = monoid.mul
+        words = monoid.words
+        print "words:", len(words)
+        print words
+        self.monoid = monoid
+        self.mul = monoid.mul
+        self.words = monoid.words
+        self.I = I = ""
+        weyl = {} # map each pair of flags to the Weyl distance
+        flags = self.flags
+        gen = monoid.gen
+        for i in flags:
+          for j in flags:
+            a = I
+            path = self.get_geodesic(i, j)
+            for b in path:
+                a = mul[a, gen[b]]
+            weyl[i, j] = a
+        self.weyl = weyl
 
 
 
@@ -904,6 +1005,25 @@ def test():
 
         if dim>2:
             assert len(g.tplookup[2]) == qbinomial(n, 3)
+    elif argv.bruhat:
+        if argv.A_2:
+            monoid = BruhatMonoid("LP", {("L", "P") : 3})
+        elif argv.A_3:
+            monoid = BruhatMonoid("LPS", {("L", "P") : 3, ("L", "S"):3})
+        elif argv.A_4:
+            monoid = BruhatMonoid("LPSH", {("L", "P") : 3, ("L", "S"):3, ("S", "H"):3})
+        elif argv.B_2:
+            monoid = BruhatMonoid("LP", {("L", "P"):4})
+        elif argv.B_3:
+            monoid = BruhatMonoid("LPS", {("L", "P"):3, ("P", "S"):4})
+        elif argv.D_4:
+            monoid = BruhatMonoid("LPSH", {("L", "P"):3, ("L", "S"):3, ("L", "H"):3})
+        else:
+            return
+        monoid.build()
+        system = MonoidSystem(monoid)
+        magnitude_homology(system=system)
+
     else:
         return
 
@@ -957,16 +1077,21 @@ https://golem.ph.utexas.edu/category/2016/08/a_survey_of_magnitude.html#c050913
 https://golem.ph.utexas.edu/category/2016/08/monoidal_categories_with_proje.html#c051440
 """
 
-def magnitude_homology(geometry):
-    print "find_building"
-    system = System(geometry)
-    flags = system.flags
-    print "flags:", len(flags)
+def magnitude_homology(geometry=None, system=None):
+
     letters = "PLSXYZ"
     I, P, L, S = "", "P", "L", "S"
-    system.build(letters)
 
-    assert geometry.rank <= 3, "really?"
+    if system is None:
+        print "find_building"
+        assert geometry is not None
+        assert geometry.rank <= 3, "really?"
+        system = System(geometry)
+
+        system.build(letters)
+
+    flags = system.flags
+    print "flags:", len(flags)
 
     chains = {}
 

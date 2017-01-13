@@ -580,10 +580,11 @@ def search_roots(ops, hamiltonian):
             #if g1 in eigs or -g1 in eigs:
             #    continue
 
-            eigs.add(g1)
-            root = cartan.get_eig(g1)
-    
-            if root not in roots:
+            if g1 not in eigs and -g1 not in eigs:
+                eigs.add(g1)
+                root = cartan.get_eig(g1)
+
+                assert root not in roots
                 roots.add(root)
                 root_space[root] = g1
                 r = sum(r**2 for r in root)

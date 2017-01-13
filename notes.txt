@@ -1,4 +1,27 @@
 
+12/1/17
+=======
+
+time ./symplectic.py random_nostabs n=7 seed=0 search_roots
+B_64 = so_129, *OR*
+C_64 = sp_128
+search_roots 64 8192
+...
+eigs: 127
+roots: 127
+real 21m5.115s
+
+
+time ./symplectic.py random_nostabs n=6 seed=4 search_roots
+D_32 = so_64
+search_roots 32 1984
+eigs: 62
+roots: 62
+
+
+
+11/1/17
+=======
 
 time ./symplectic.py random_nostabs n=8 m=7 h=1 seed=69 search_roots all_roots
 eigs: 4033

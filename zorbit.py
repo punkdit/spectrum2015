@@ -1015,33 +1015,40 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     green = color.rgb(0.2,0.6,0.2)
     brown = color.rgb(0.8,0.2,0.2)
     grey = color.rgb(0.4,0.4,0.4)
+    lgrey = color.rgb(0.8,0.8,0.8)
 
     W = 2*gz
     H = log2(EPSILON)
-    dy = 1.2/my
+    dy = 0.5 * 1.2/my
 
     X0 = -gz
     Y0 = 0.
 
-    c.stroke(path.line(X0, Y0, X0+1.1*W, Y0), [tr, grey, deco.earrow()])
-    c.stroke(path.line(X0, Y0, X0, Y0+1.1*H), [tr, grey, deco.earrow()])
-    for i in range(gz+1):
-        c.stroke(path.line(X0+2*i, Y0, X0+2*i, Y0+H), [tr, grey])
+    c.stroke(path.line(X0, Y0, X0+1.1*W, Y0), [tr, deco.earrow()])
+    c.stroke(path.line(X0, Y0, X0, Y0+1.1*H), [tr, deco.earrow()])
 
-    def showp(v):
-        v = array2(v)
+    def showp(gx, radius):
+        v = dot2(gx, PxtQx)
         syndrome = dot2(GzRxt, v)
         x = gz - 2*syndrome.sum()
         i = lookup[v.tostring()]
-        print v, vec0[i]
+        #print syndrome, syndrome.sum(), vec0[i]
         y = 0.5*dy + log2(abs(vec0[i]))
-        c.stroke(path.circle(-x*sx, y*sy, 0.1))
-    v = array2([0]*r)
-    showp(v)
-    for i in range(r):
-        v[i] = 1
-        showp(v)
-        v[i] = 0
+        c.fill(path.circle(-x*sx, y*sy, radius), [lgrey])
+
+    showp(zeros2(n), 0.8)
+    for gx in Gx:
+        showp(gx, 0.4)
+
+    for gx0 in Gx:
+      for gx1 in Gx:
+        gx = (gx0+gx1)%2
+        if gx.sum()==0:
+            continue
+        showp(gx, 0.2)
+
+    for i in range(1, gz+1):
+        c.stroke(path.line(X0+2*i, Y0, X0+2*i, Y0+H), [tr, grey])
 
     R = 0.15
     for key, value in pdata.items():
