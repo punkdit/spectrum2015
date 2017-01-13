@@ -383,8 +383,15 @@ def build_hex(li, lj=None):
             coords[i+di, j+dj] = keys.index(((i+di)%li, (j+dj)%lj))
 
     Gx = []
-    for i in range(li):
-      for j in range(lj):
+    if argv.open:
+        idxs = range(li-1)
+        jdxs = range(lj-1)
+    else:
+        idxs = range(li)
+        jdxs = range(lj)
+
+    for i in idxs:
+      for j in jdxs:
         g = zeros2(n)
         g[coords[i,   j]] = 1 
         g[coords[i,   j+1]] = 1 
