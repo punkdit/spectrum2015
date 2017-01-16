@@ -988,7 +988,12 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     pdata = {}
     ndata = {}
     my = 20. # mul y
-    EPSILON = 1e-4
+    EPSILON = 1e-6
+
+    def yfunc(y):
+        y = log2(abs(y))
+        y = int(round(my*y))
+        return y
 
     for i in range(len(vec0)):
         x = xdata[i] # integer
@@ -996,17 +1001,24 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
         if abs(y) < EPSILON:
             continue
         if y > 0.:
-            y = log2(y)
-            y = int(round(my*y))
+            y = yfunc(y)
             pdata[x, y] = pdata.get((x, y), 0) + 1
         else:
-            y = -y
-            y = log2(y)
-            y = int(round(my*y))
+            y = yfunc(y)
             ndata[x, y] = ndata.get((x, y), 0) + 1
 
-    from pyx import graph, canvas, path, trafo, color, deco
-
+    from pyx import graph, canvas, path, trafo, color, deco, text
+    
+    north = [text.halign.boxcenter, text.valign.top]
+    northeast = [text.halign.boxright, text.valign.top]
+    northwest = [text.halign.boxleft, text.valign.top]
+    south = [text.halign.boxcenter, text.valign.bottom]
+    southeast = [text.halign.boxright, text.valign.bottom]
+    southwest = [text.halign.boxleft, text.valign.bottom]
+    east = [text.halign.boxright, text.valign.middle]
+    west = [text.halign.boxleft, text.valign.middle]
+    center = [text.halign.boxcenter, text.valign.middle]
+    
     c = canvas.canvas()
     sx = 0.4
     sy = 1.4
@@ -1024,16 +1036,14 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     X0 = -gz
     Y0 = 0.
 
-    c.stroke(path.line(X0, Y0, X0+1.1*W, Y0), [tr, deco.earrow()])
-    c.stroke(path.line(X0, Y0, X0, Y0+1.1*H), [tr, deco.earrow()])
-
     def showp(gx, radius):
         v = dot2(gx, PxtQx)
         syndrome = dot2(GzRxt, v)
         x = gz - 2*syndrome.sum()
         i = lookup[v.tostring()]
         #print syndrome, syndrome.sum(), vec0[i]
-        y = 0.5*dy + log2(abs(vec0[i]))
+        y = (1./my)*yfunc(vec0[i]) + 0.5*dy
+        #y = 0.5*dy + log2(abs(vec0[i]))
         c.fill(path.circle(-x*sx, y*sy, radius), [lgrey])
 
     showp(zeros2(n), 0.8)
@@ -1047,8 +1057,27 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
             continue
         showp(gx, 0.2)
 
-    for i in range(1, gz+1):
-        c.stroke(path.line(X0+2*i, Y0, X0+2*i, Y0+H), [tr, grey])
+    for i in range(0, gz+1):
+        x, y = X0+2*i, Y0
+        c.stroke(path.line(x, y, x, y+H), [tr, grey])
+        if i%2 == 0:
+            c.text(x*sx, y*sy + 0.2, "%d"%i, south)
+
+    c.stroke(path.line(X0, Y0, X0+1.0*W+3.5, Y0), [tr, deco.earrow(size=0.5)])
+    c.stroke(path.line(X0, Y0, X0, Y0+1.0*H-0.5), [tr, deco.earrow(size=0.5)])
+
+    y = 1.0
+    i = 0
+    while y > EPSILON:
+
+        x = X0*sx
+        y1 = sy*(1./my)*yfunc(y)
+        c.stroke(path.line(x, y1, x-0.1, y1))
+
+        c.text(x-0.3, y1, "%d"%i, east)
+
+        y /= 2.
+        i -= 1
 
     R = 0.15
     for key, value in pdata.items():

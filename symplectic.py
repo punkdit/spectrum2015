@@ -501,6 +501,17 @@ def build_roots(ops, hamiltonian):
                 #print g
                 count += 1
         print "Hamiltonian stabilizer subgroup:", count
+    else:
+        items = range(N)
+        gen = [Perm(tuple(perm), items) for perm in perms]
+        #group = Group.generate(gen)
+        #print "Weyl group:", len(group)
+        count = 0
+        for g in gen:
+            if [hc[g[i]] for i in items] == hc:
+                #print g
+                count += 1
+        print "Hamiltonian stabilizer gen:", count
         
     lengths = {}
     for root in roots:
