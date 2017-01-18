@@ -410,6 +410,42 @@ def build_hex(li, lj=None):
     return Gx, Gz, None, None
 
 
+def build_quad(li, lj=None):
+    if lj is None:
+        lj = li
+    n = li*lj
+
+    keys = [(i, j) for i in range(li) for j in range(lj)]
+    coords = {}  
+    for i, j in keys:
+        for di in range(-li, li+1):
+          for dj in range(-lj, lj+1):
+            coords[i+di, j+dj] = keys.index(((i+di)%li, (j+dj)%lj))
+
+    Gx = []
+    if argv.open:
+        idxs = range(li-1)
+        jdxs = range(lj-1)
+    else:
+        idxs = range(li)
+        jdxs = range(lj)
+
+    for i in idxs:
+      for j in jdxs:
+        g = zeros2(n)
+        g[coords[i,   j]] = 1 
+        g[coords[i,   j+1]] = 1 
+        g[coords[i+1, j]] = 1 
+        g[coords[i+1, j+1]] = 1 
+        Gx.append(g)
+
+    Gx = array2(Gx)
+
+    Gz = Gx.copy()
+
+    return Gx, Gz, None, None
+
+
 
 def mkop(n, ops):
     A = zeros2(len(ops), n)
@@ -602,6 +638,12 @@ def build(name=""):
         li = argv.get('li', l)
         lj = argv.get('lj', l)
         Gx, Gz, Hx, Hz = build_hex(li, lj)
+
+    elif argv.quad:
+        l = argv.get('l', 3)
+        li = argv.get('li', l)
+        lj = argv.get('lj', l)
+        Gx, Gz, Hx, Hz = build_quad(li, lj)
 
     elif argv.xy:
         n = argv.get('n', 4)
