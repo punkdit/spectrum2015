@@ -2,6 +2,7 @@
 
 import sys
 from heapq import heappush, heappop, heapify
+from random import random
 
 import numpy
 import scipy.sparse.linalg as la
@@ -11,11 +12,12 @@ try:
     from pyx import canvas, path, deco, trafo, style, text, color, deformer
     from pyx.color import rgb 
     
-    text.set(mode="latex") 
-    text.set(docopt="12pt")
-    text.preamble(r"\usepackage{amsmath,amsfonts,amssymb}")
-    
-    text.preamble(r"\def\ket #1{|#1\rangle}")
+    if 0:
+        text.set(mode="latex") 
+        text.set(docopt="12pt")
+        text.preamble(r"\usepackage{amsmath,amsfonts,amssymb}")
+        
+        text.preamble(r"\def\ket #1{|#1\rangle}")
 
     black = rgb(0., 0., 0.)
     blue = rgb(0., 0., 0.8)
@@ -208,9 +210,15 @@ class ZOp(Op):
 def mkop(tp, s):
     n = len(s)
     idxs = []
-    for i, x in enumerate(s):
-        if s[i]=='1':
-            idxs.append(i)
+    if type(s) is str:
+        for i, x in enumerate(s):
+            if s[i]=='1':
+                idxs.append(i)
+    else:
+        for i, x in enumerate(s):
+            assert s[i] in [0,1]
+            if s[i]:
+                idxs.append(i)
     return tp(n, idxs)
 
 
@@ -292,68 +300,21 @@ class Model(object):
         return syndrome
 
 
+from models import build_model
+class CodeModel(Model):
 
-class CompassModel(Model):
-    def __init__(self, l):
+    def __init__(self, code=None):
+        if code is None:
+            code = build_model()
     
-        write("build_compass...")
-        n = l**2
-    
-        keys = [(i, j) for i in range(l) for j in range(l)]
-        coords = {}  
-        for i, j in keys:
-            for di in range(-l, l+1):
-              for dj in range(-l, l+1):
-                coords[i+di, j+dj] = keys.index(((i+di)%l, (j+dj)%l))
-    
-        m = n 
-        xops = []
-        zops = []
-    
-        idx = 0 
-        for i in range(l):
-            for j in range(l):
-                op = XOp(n, [coords[i, j], coords[i, j+1]])
-                xops.append(op)
-    
-                op = ZOp(n, [coords[i, j], coords[i+1, j]])
-                zops.append(op)
-    
-                idx += 1
-                write(idx)
-    
-        assert idx == m
-        assert len(xops) == len(zops) == n
-    
-        gauge = SumOp(2**n, xops+zops)
-        print "done"
-    
-        xstabs = []
-        zstabs = []
-        for i in range(l-1):
-            idxs = []
-            for j in range(l):
-                idxs.append(coords[j, i])
-                idxs.append(coords[j, i+1])
-            op = XOp(n, idxs)
-            xstabs.append(op)
-    
-            idxs = []
-            for j in range(l):
-                idxs.append(coords[i, j])
-                idxs.append(coords[i+1, j])
-            op = ZOp(n, idxs)
-            zstabs.append(op)
+        self.n = code.n
+        self.xops = [mkop(XOp, g) for g in code.Gx]
+        self.zops = [mkop(ZOp, g) for g in code.Gz]
+        self.xstabs = [mkop(XOp, g) for g in code.Hx]
+        self.zstabs = [mkop(ZOp, g) for g in code.Hz]
+        self.A = SumOp(2**code.n, self.xops+self.zops)
 
-        self.xlogop = XOp(n, [coords[i, 0] for i in range(l)]) 
-        self.zlogop = ZOp(n, [coords[0, i] for i in range(l)]) 
-    
-        self.n = n # qubits
-        self.A = gauge
-        self.xops = xops
-        self.zops = zops
-        self.xstabs = xstabs
-        self.zstabs = zstabs
+
 
 
 def plot(model, v):
@@ -463,71 +424,6 @@ def load(fname):
     return a
 
 
-
-gcolor_gauge = """
-1111...........
-11..11.........
-1.1.1.1........
-..11..11.......
-.1.1.1.1.......
-....1111.......
-11......11.....
-1.1.....1.1....
-........1111...
-..11......11...
-.1.1.....1.1...
-1...1...1...1..
-........11..11.
-.1...1...1...1.
-....11......11.
-........1.1.1.1
-..1...1...1...1
-....1.1.....1.1
-"""
-
-gcolor_stab = """
-11111111.......
-1111....1111...
-11..11..11..11.
-1.1.1.1.1.1.1.1
-"""
-
-gcolor_logop = "........1111111"
-
-
-class GColorModel(Model):
-  def __init__(self):
-
-    xops = []
-    zops = []
-
-    write("building GColorModel...")
-
-    for op in gcolor_gauge.strip().split():
-        xops.append(mkop(XOp, op))
-        zops.append(mkop(ZOp, op))
-
-    xstabs = []
-    zstabs = []
-    for op in gcolor_stab.strip().split():
-        xstabs.append(mkop(XOp, op))
-        zstabs.append(mkop(ZOp, op))
-
-    self.xlogop = mkop(XOp, gcolor_logop)
-    self.zlogop = mkop(ZOp, gcolor_logop)
-
-    n = len(op)
-    self.A = SumOp(2**n, xops+zops)
-    self.n = n
-    self.xops = xops
-    self.zops = zops
-
-    self.xstabs = xstabs
-    self.zstabs = zstabs
-
-    write("done\n")
-
-
 def commutes(A, B, sign=-1):
     n = A.n
     v = numpy.random.normal(size=n)
@@ -565,19 +461,12 @@ def show_eigs(vals):
         print '\t', val, counts[val]
     
 
+
 def test():
 
     norm = lambda v : (v**2).sum()**0.5
 
-    if argv.compass:
-        l = argv.get("l", 3)
-        model = CompassModel(l)
-
-    elif argv.gcolor:
-        model = GColorModel()
-
-    else:
-        return
+    model = CodeModel()
 
     if argv.test:
         stabs = model.xstabs+model.zstabs
@@ -586,7 +475,7 @@ def test():
             assert commutes(A, model.zlogop)
             for B in stabs:
                 assert commutes(A, B)
-        assert anticommutes(model.xlogop, model.zlogop)
+        #assert anticommutes(model.xlogop, model.zlogop)
         print "OK"
         return
 
@@ -609,10 +498,22 @@ def test():
     A = model.A
 
     if argv.perturb:
-        # doesn't work very well...
-        alpha = 0.0001
-        perturb = [alpha * op for op in model.xstabs]
-        A = SumOp(2**model.n, A.ops+perturb)
+#        # doesn't work very well...
+#        alpha = 0.0001
+#        perturb = [alpha * op for op in model.xstabs]
+#        A = SumOp(2**model.n, A.ops+perturb)
+
+        alpha = argv.get("alpha", 1e-4)
+
+        def rnd(alpha):
+            return alpha * (2*random() - 1.)
+
+        ops = []
+        for i in range(model.n):
+            ops.append(rnd(alpha)*XOp(model.n, [i]))
+            ops.append(rnd(alpha)*ZOp(model.n, [i]))
+        A = SumOp(2**model.n, A.ops + ops)
+
 
     projs = []
     I = IdOp(A.n)
@@ -623,6 +524,7 @@ def test():
         flip = zflip
     else:
         stabs = model.xstabs + model.zstabs
+
     for op in stabs:
         if flip:
             op = 0.5 * (I - op)
@@ -631,9 +533,10 @@ def test():
             op = 0.5 * (I + op)
         projs.append(op)
 
-    P = projs[0]
-    for i in range(1, len(projs)):
-        P = P * projs[i]
+    if projs:
+        P = projs[0]
+        for i in range(1, len(projs)):
+            P = P * projs[i]
 
     if argv.stabilize:
         A = P*A*P
@@ -685,11 +588,14 @@ def test():
     
     # vals go from smallest to highest
     show_eigs(vals)
-    print "iterations:", model.A.count
+    #print "iterations:", model.A.count
+
 
     if argv.verbose:
         for i in range(k):
             print i, "syndrome", model.get_syndrome(vecs[:, i])
+
+    return
 
     idx = argv.get("idx", 0)
     k = vecs.shape[1]
