@@ -1,8 +1,15 @@
 
-all: repr.pdf hecke.pdf 
+all: repr.pdf hecke.pdf spectrum.pdf
 
 #out: repr
 #	open repr.pdf 
+
+spectrum.pdf: spectrum.tex refs.bib
+	pdflatex spectrum.tex
+	bibtex spectrum
+	pdflatex spectrum.tex
+	pdflatex spectrum.tex
+
 
 repr.pdf: repr.tex refs.bib pic-gcolor-1.pdf
 	pdflatex repr.tex

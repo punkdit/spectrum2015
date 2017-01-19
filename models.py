@@ -11,12 +11,15 @@ from solve import row_reduce, RowReduction, span, get_reductor
 from solve import u_inverse, find_logops, solve, find_kernel, linear_independant
 from solve import rand2, find_stabilizers, find_errors
 
-from lanczos import write
 from code import lstr2
 
 from argv import Argv
 argv = Argv()
 
+
+def write(s):
+    sys.stdout.write(str(s)+' ')
+    sys.stdout.flush()
 
 
 def genidx(shape):
