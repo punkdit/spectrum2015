@@ -469,7 +469,7 @@ def plu_reduce(A, truncate=False, check=False, verbose=False):
     return P, L, U
 
 
-def linear_independant(A, check=False, verbose=False):
+def linear_independent(A, check=False, verbose=False):
     """ Remove linear dependant rows of A
     """
 
@@ -479,7 +479,7 @@ def linear_independant(A, check=False, verbose=False):
     P, L, U = plu_reduce(A)
 
     if verbose:
-        print "linear_independant"
+        print "linear_independent"
         print "P L U = A"
         print P.shape, L.shape, U.shape
         print shortstrx(P, L, U, A)
@@ -742,7 +742,7 @@ def find_logops(Hx, Hz, check=False, verbose=False):
         assert dot2(Hx, u).sum()==0
         U.append(u)
     Lz = array2(U)
-    Lz = linear_independant(Lz, check=check)
+    Lz = linear_independent(Lz, check=check)
 
     if verbose:
         print "Lz="
@@ -760,7 +760,7 @@ def find_stabilizers(Gx, Gz):
     Hz = zeros2(len(vs), n)
     for i, v in enumerate(vs):
         Hz[i] = dot2(v.transpose(), Gz)  
-    Hz = linear_independant(Hz)
+    Hz = linear_independent(Hz)
     return Hz
 
 
@@ -1493,7 +1493,7 @@ def check_logops(Hx):
         assert dot2(Hx, v).sum()==0 # in the kernel
         assert not contains(imHzt, v), shortstr(v) # not in the image
 
-    # linear independant:
+    # linear independent:
     assert len(list(image(z_ops))) == 2**len(z_ops)
 
 
@@ -1714,7 +1714,7 @@ def test_conjugate_ops():
     assert eq2(identity2(Tx.shape[0]), I)
 
 
-def test_linear_independant():
+def test_linear_independent():
 
     A = parse("""
     ...1111.......
@@ -1733,7 +1733,7 @@ def test_linear_independant():
     """)
 
     spA = list(span(A))
-    AA = linear_independant(A, check=True, verbose=False)
+    AA = linear_independent(A, check=True, verbose=False)
     #print shortstr(AA)
     assert AA.shape == row_reduce(A, truncate=True).shape
     #print shortstr(row_reduce(A))
@@ -1848,7 +1848,7 @@ if __name__=="__main__":
     test_logops_bicycle()
     test_logops_toric()
     test_conjugate_ops()
-    test_linear_independant()
+    test_linear_independent()
     test_entry()
     test_pushout()
     test_fromkernel()

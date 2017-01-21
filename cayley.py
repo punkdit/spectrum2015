@@ -7,7 +7,7 @@ from scipy import sparse
 
 from solve import shortstr, shortstrx, parse, eq2, dot2, zeros2, array2, identity2
 from solve import row_reduce, RowReduction, span, get_reductor
-from solve import u_inverse, find_logops, solve, find_kernel, linear_independant
+from solve import u_inverse, find_logops, solve, find_kernel, linear_independent
 
 import models
 from lanczos import write
@@ -273,7 +273,7 @@ def main():
     r = len(Bx)
     N = 2**r
     Bx = row_reduce(Bx, truncate=True)
-    assert len(Bx)==r # linearly independant rows
+    assert len(Bx)==r # linearly independent rows
     Cx = u_inverse(Bx)
 
     H = {}

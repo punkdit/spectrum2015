@@ -10,7 +10,7 @@ import networkx as nx
 
 from solve import shortstr, shortstrx, parse, eq2, dot2, zeros2, array2, identity2
 from solve import row_reduce, RowReduction, span, get_reductor
-from solve import u_inverse, find_logops, solve, find_kernel, linear_independant
+from solve import u_inverse, find_logops, solve, find_kernel, linear_independent
 from solve import System, Unknown, pseudo_inverse
 
 import isomorph

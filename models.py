@@ -8,7 +8,7 @@ from numpy import concatenate
 
 from solve import shortstr, shortstrx, parse, eq2, dot2, zeros2, array2, identity2
 from solve import row_reduce, RowReduction, span, get_reductor
-from solve import u_inverse, find_logops, solve, find_kernel, linear_independant
+from solve import u_inverse, find_logops, solve, find_kernel, linear_independent
 from solve import rand2, find_stabilizers, find_errors
 
 from code import lstr2
@@ -228,8 +228,8 @@ def build_random(n):
     li = argv.get("li", True)
 
     if li:
-        Gx = linear_independant(Gx)
-        Gz = linear_independant(Gz)
+        Gx = linear_independent(Gx)
+        Gz = linear_independent(Gz)
 
     return Gx, Gz, Hx, Hz
 
@@ -247,7 +247,7 @@ def build_random_selfdual(n):
         Hx = Hz = None
     
         Gx = Gx[[i for i in range(m) if Gx[i].sum()], :]
-        Gx = linear_independant(Gx)
+        Gx = linear_independent(Gx)
     
         if len(Gx)<m:
             write("m")

@@ -10,7 +10,7 @@ from scipy.sparse.linalg import eigs, eigsh
 
 from solve import shortstr, shortstrx, parse, eq2, dot2, zeros2, array2, identity2
 from solve import row_reduce, RowReduction, span, get_reductor
-from solve import u_inverse, find_logops, solve, find_kernel, linear_independant
+from solve import u_inverse, find_logops, solve, find_kernel, linear_independent
 from solve import System, Unknown, pseudo_inverse
 from solve import find_errors, find_stabilizers, check_commute
 
@@ -665,7 +665,7 @@ def dense_full(Gx, Gz, Hx, Hz, Rx, Pxt, Qx, Pz, Tx, **kw):
         r = len(Bx)
         N = 2**r
         Bx = row_reduce(Bx, truncate=True)
-        assert len(Bx)==r # linearly independant rows
+        assert len(Bx)==r # linearly independent rows
         Cx = u_inverse(Bx)
 
         if N<=1024:
@@ -988,7 +988,7 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     pdata = {}
     ndata = {}
     my = 20. # mul y
-    EPSILON = 1e-6
+    EPSILON = argv.get("EPSILON", 1e-6)
 
     def yfunc(y):
         y = log2(abs(y))
