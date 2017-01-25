@@ -89,6 +89,18 @@ class Perm(object):
         return Perm(perm, self.items)
     __call__ = __mul__
 
+    def __pow__(self, n):
+        assert int(n)==n
+        if n==0:
+            return Perm.identity(self.items)
+        if n<0:
+            self = self.__invert__()
+            n = -n
+        g = self
+        for i in range(n-1):
+            g = self*g
+        return g
+
     def __invert__(self):
         perm = {}
         for item in self.items:
