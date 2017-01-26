@@ -2,7 +2,6 @@
 
 import sys
 
-import numpy
 
 
 def mulclose(els, verbose=False, maxsize=None):
@@ -59,6 +58,10 @@ class Perm(object):
     def identity(cls, items):
         n = len(items)
         perm = dict((item, item) for item in items)
+        return Perm(perm, items)
+
+    def restrict(self, items):
+        perm = dict((i, self.perm[i]) for i in items)
         return Perm(perm, items)
 
     def __str__(self):
@@ -583,6 +586,7 @@ def test():
     assert len(P1)==8
 
     if 0:
+        import numpy
         group = P1.square(P1)
         print "orbits:", len(group.orbits())
         for orbit in group.orbits():
