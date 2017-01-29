@@ -51,7 +51,7 @@ class Coxeter(object):
     """ Coxeter group
     """
 
-    def __init__(self, gen, rel, identity='', bruhat=False):
+    def __init__(self, gen, rel, identity='', bruhat=False, build=False):
         """
         gen : list of generators
         rel : map pairs (i,j) of generators to m_{ij} (this is the Coxeter matrix)
@@ -95,6 +95,8 @@ class Coxeter(object):
         self.reduced = reduced
         self.lookup = lookup
         self.bruhat = bruhat
+        if build:
+            self.build()
 
     def get_canonical(self, orig): # 30% hotspot
         reduced = self.reduced

@@ -6,6 +6,7 @@ Represent coxeter group as reflection group of a root system.
 See: 
     Humphreys, p63-66
     https://en.wikipedia.org/wiki/Root_system
+
 """
 
 
@@ -38,6 +39,24 @@ def choose(m, n):
     return factorial(m) // factorial(n)
 
 
+def rdot(a, b):
+    assert len(a)==len(b)
+    r = sum(ai*bi for (ai,bi) in zip(a, b))
+    return r
+
+
+def rnorm2(a):
+    r = sum(ai*ai for ai in a)
+    return r
+
+
+def rscale(v, a):
+    assert Fraction(v)==v
+    assert type(a) is tuple
+    a = tuple(v*ai for ai in a)
+    return a
+
+
 class Weyl(object):
     def __init__(self, roots, gen, simple=None):
         self.roots = roots # list of tuples
@@ -47,10 +66,35 @@ class Weyl(object):
         for g in gen:
             assert g*g == self.identity
 
+        #if simple is not None:
+        #    self.check_simple()
+
+    def check_simple(self):
+        """
+        A set of simple roots for a root system \Phi is
+        a set of roots that form a basis for the Euclidean
+        space spanned by \Phi with the special property that each
+        root has components with respect to this basis that are
+        either all nonnegative or all nonpositive.
+        
+        https://en.wikipedia.org/wiki/E8_(mathematics)#Simple_roots
+        """
+
+        simple = self.simple
+        print "simple:", simple
+        roots = self.roots
+        n = len(simple)
+        for root in roots:
+            if root in simple or rscale(-1, root) in simple:
+                continue
+            print "root:", root
+        print "OK"
+
     @classmethod
     def build_A(cls, n):
     
         roots = []
+        simple = []
         lookup = {}
         for i in range(n+1):
           for j in range(n+1):
@@ -64,9 +108,12 @@ class Weyl(object):
             root = tuple(root)
             lookup[root] = len(roots)
             roots.append(root)
+            if j==i+1:
+                simple.append(root)
     
         #assert len(pos_roots) == choose(n+1, 2) # number of positive roots
         assert len(lookup) == len(roots)
+        assert len(roots) == n*(n+1)
     
         gen = []
         for i in range(n):
@@ -78,7 +125,7 @@ class Weyl(object):
                 perm.append(jdx)
             perm = Perm(perm, roots)
             gen.append(perm)
-        return cls(roots, gen)
+        return cls(roots, gen, simple)
 
     @classmethod
     def build_B(cls, n, k=1):
@@ -108,6 +155,7 @@ class Weyl(object):
             lookup[root] = len(roots)
             roots.append(root)
         assert len(lookup) == len(roots)
+        assert len(roots) == 2*n**2
     
         gen = []
         for i in range(n-1):
@@ -295,18 +343,20 @@ class Weyl(object):
             d = sum(root[i]**2 for i in range(3))
             if d==2 or d==6:
                 roots.append(root)
-        print roots
         assert len(roots)==12
         simple = [(1, -1, 0), (-1, 2, -1)]
         return cls.build_simple(roots, simple)
 
-    def matrix(self):
+    def matrix(self, desc=None):
         "coxeter matrix"
         m = {}
         gen = self.gen
         n = len(gen)
         for i in range(n):
           for j in range(i+1, n):
+            key = (i, j)
+            if desc:
+                key = (desc[i], desc[j])
             gi = gen[i]
             gj = gen[j]
             g = gigj = gi*gj
@@ -314,7 +364,7 @@ class Weyl(object):
             while 1:
                 if g == self.identity:
                     if k > 2:
-                        m[i, j] = k
+                        m[key] = k
                     break
                 g = gigj * g
                 k += 1
@@ -322,6 +372,131 @@ class Weyl(object):
         return m
 
 
+
+def mulclose_pri(els, verbose=False, maxsize=None):
+    els = set(els)
+    changed = True
+    while changed:
+        if verbose:
+            print "mulclose:", len(els)
+        changed = False
+        _els = list(els)
+        pairs = [(g, h) for g in _els for h in _els]
+        pairs.sort(key = lambda (g,h) : len(g.word+h.word))
+
+        for A, B in pairs:
+            C = A*B 
+            if C not in els:
+                els.add(C)
+                if maxsize and len(els)>=maxsize:
+                    return list(els)
+                changed = True
+    return els 
+
+
+
+
+
+def build_monoid(G):
+    "build the Coxeter-Bruhat monoid, represented as a monoid of functions."
+    roots = G.roots
+    print "roots:", len(roots)
+#    print roots
+#    print
+
+    names = 'ABCDEF'
+    gen = G.gen
+    for i, g in enumerate(gen):
+        g.word = names[i]
+        print g.str()
+    print
+    n = len(gen)
+    identity = Perm(dict((r, r) for r in roots), roots, '')
+    weyl = mulclose_pri([identity]+gen)
+    weyl = list(weyl)
+    weyl.sort(key = lambda g : (len(g.word), g.word))
+    for w in weyl:
+        print w.word,
+    print
+    print "weyl:", len(weyl)
+
+    r0 = roots[0]
+    bdy = set([r0])
+    seen = set()
+    identity = dict((r, r) for r in roots)
+    perms = [dict(identity) for g in gen]
+    while bdy:
+
+        _bdy = set()
+        seen.update(bdy)
+        for r0 in bdy:
+          for i in range(n):
+            g = gen[i]
+            perm = perms[i]
+            r1 = g*r0
+            assert perm.get(r0) == r0
+            if r1 not in seen:
+                perm[r0] = r1
+                _bdy.add(r1)
+
+        bdy = _bdy
+
+#    for perm in perms:
+##        for key in list(perm.keys()):
+##            if perm[key] is 
+#        print perm
+
+    gen = [Perm(perm, roots) for perm in [identity]+perms]
+    identity = Perm(identity, roots)
+    for g in gen[1:]:
+        print g.str()
+        assert g*g == g
+    
+    monoid = mulclose(gen)
+    print len(monoid)
+
+    desc = "ABCDEFG"[:n]
+    m = G.matrix(desc)
+
+    from bruhat import Coxeter
+    monoid = Coxeter(desc, m, bruhat=True, build=True)
+    for w in monoid.words:
+        print w,
+    print
+    return
+
+    def tr(word):
+        g = identity
+        for c in word:
+            g = g * gen[desc.index(c)]
+        return g
+
+    lookup = {}
+    for w0 in monoid.words:
+        g = tr(w0)
+        w1 = lookup.get(g)
+        if w1 is not None:
+            print w0, "=", w1
+        else:
+            lookup[g] = w0
+            print w0
+            
+
+    for w0 in monoid.words:
+      for w1 in monoid.words:
+        w2 = monoid.mul[w0, w1]
+        if tr(w0)*tr(w1) == tr(w2):
+            pass
+        else:
+            print "%r*%r = %r" % (w0, w1, w2),
+            print " ****************** FAIL"
+
+    #for i in range(n):
+    #  for j in range(n):
+        
+
+    return gen
+        
 
 
 def test(n):
@@ -429,32 +604,63 @@ def main():
     if n:
         test(n)
 
-    #else:
-    #    for n in range(2, 6):
-    #        test(n)
+    elif argv.test:
+        for n in range(2, 6):
+            test(n)
 
-    if argv.E8:
-        E8 = Weyl.build_E8()
-        print E8.matrix()
+    G = None
 
-    if argv.E7:
-        E7 = Weyl.build_E7()
-        print E7.matrix()
+    if argv.E_8:
+        G = Weyl.build_E8()
+        assert G.matrix() == {
+            (0, 1):3, (1, 2):3, (2, 3):3, (3, 4):3, (4, 5):3, (4, 6):3, (6, 7):3}
 
-    if argv.E6:
-        E6 = Weyl.build_E6()
-        print E6.matrix()
-        #items = mulclose(E6.gen, verbose=True)
+    if argv.E_7:
+        G = Weyl.build_E7()
+        assert G.matrix() == {
+            (0, 6): 3, (1, 2): 3, (2, 3): 3, (3, 4): 3, (3, 5): 3, (5, 6): 3}
+
+    if argv.E_6:
+        G = Weyl.build_E6()
+        assert G.matrix() == {
+            (0, 1): 3, (1, 2): 3, (2, 3): 3, (2, 4): 3, (4, 5): 3}
+        #items = mulclose(G.gen, verbose=True)
         #print "|E6|=", len(items)
 
-    if argv.F4:
-        F4 = Weyl.build_F4()
-        print F4.matrix()
+    if argv.F_4:
+        G = Weyl.build_F4()
+        assert G.matrix() == {(0, 1): 3, (1, 2): 4, (2, 3): 3}
+        #items = mulclose(G.gen, verbose=True)
+        #print "|F4|=", len(items) # == 1152
 
-    if argv.G2:
-        G2 = Weyl.build_G2()
-        print G2.matrix()
-        assert len(mulclose(G2.gen)) == 12 # dihedral group D_6
+    if argv.G_2:
+        G = Weyl.build_G2()
+        assert G.matrix() == {(0, 1): 6}
+        assert len(mulclose(G.gen)) == 12 # dihedral group D_6
+
+    for arg in argv:
+        if len(arg) != 3 or arg[1]!="_":
+            continue
+        try:
+            n = int(arg[2:])
+        except:
+            continue
+
+        print "building %s"%arg
+        if arg.startswith("A"):
+            G = Weyl.build_A(n)
+        if arg.startswith("B"):
+            G = Weyl.build_B(n)
+        if arg.startswith("C"):
+            G = Weyl.build_C(n)
+        if arg.startswith("D"):
+            G = Weyl.build_D(n)
+
+    if G is None:
+        return
+
+    if argv.monoid:
+        M = build_monoid(G)
 
 
 if __name__ == "__main__":

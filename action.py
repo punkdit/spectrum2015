@@ -36,7 +36,7 @@ class Perm(object):
     """
     A permutation of a list of items.
     """
-    def __init__(self, perm, items):
+    def __init__(self, perm, items, word=''):
         #if isinstance(perm, list):
         #    perm = tuple(perm)
         if perm and isinstance(perm, (list, tuple)) and isinstance(perm[0], (int, long)):
@@ -53,6 +53,7 @@ class Perm(object):
         for key, value in perm.items():
             assert key in items, repr(key)
             assert value in items, repr(value)
+        self.word = word
 
     @classmethod
     def identity(cls, items):
@@ -78,6 +79,16 @@ class Perm(object):
         return s
     __repr__ = __str__
 
+    def str(self):
+        perm = self.perm
+        items = self.items
+        s = []
+        for i, item in enumerate(items):
+            j = items.index(perm[item])
+            s.append("%d:%d"%(i, j))
+        s = "{%s}"%(', '.join(s))
+        return s
+
     def __hash__(self):
         return hash(str(self))
 
@@ -89,7 +100,7 @@ class Perm(object):
         perm = {}
         for item in self.items:
             perm[item] = other.perm[self.perm[item]]
-        return Perm(perm, self.items)
+        return Perm(perm, self.items, self.word+other.word)
     __call__ = __mul__
 
     def __pow__(self, n):
