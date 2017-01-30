@@ -98,8 +98,10 @@ class Perm(object):
             return item
         assert self.items is other.items
         perm = {}
-        for item in self.items:
-            perm[item] = other.perm[self.perm[item]]
+        #for item in self.items:
+            #perm[item] = other.perm[self.perm[item]]
+        for item in other.items:
+            perm[item] = self.perm[other.perm[item]]
         return Perm(perm, self.items, self.word+other.word)
     __call__ = __mul__
 

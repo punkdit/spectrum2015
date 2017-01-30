@@ -397,8 +397,10 @@ def mulclose_pri(els, verbose=False, maxsize=None):
 
 
 
-def build_monoid(G):
+def test_monoid(G):
     "build the Coxeter-Bruhat monoid, represented as a monoid of functions."
+    "this representation is not faithful."
+
     roots = G.roots
     print "roots:", len(roots)
 #    print roots
@@ -408,6 +410,7 @@ def build_monoid(G):
     gen = G.gen
     for i, g in enumerate(gen):
         g.word = names[i]
+        print "%s:"%g.word,
         print g.str()
     print
     n = len(gen)
@@ -415,6 +418,7 @@ def build_monoid(G):
     weyl = mulclose_pri([identity]+gen)
     weyl = list(weyl)
     weyl.sort(key = lambda g : (len(g.word), g.word))
+    print "weyl:",
     for w in weyl:
         print w.word,
     print
@@ -441,31 +445,46 @@ def build_monoid(G):
 
         bdy = _bdy
 
-#    for perm in perms:
-##        for key in list(perm.keys()):
-##            if perm[key] is 
-#        print perm
-
-    gen = [Perm(perm, roots) for perm in [identity]+perms]
+    gen = [Perm(perms[i], roots, gen[i].word) for i in range(len(perms))]
     identity = Perm(identity, roots)
-    for g in gen[1:]:
+    for g in gen:
         print g.str()
         assert g*g == g
     
-    monoid = mulclose(gen)
-    print len(monoid)
+    monoid = mulclose_pri([identity]+gen)
+    print "monoid:", len(monoid)
+    #monoid = mulclose(monoid)
+    #print "monoid:", len(monoid)
 
     desc = "ABCDEFG"[:n]
-    m = G.matrix(desc)
 
-    from bruhat import Coxeter
-    monoid = Coxeter(desc, m, bruhat=True, build=True)
-    for w in monoid.words:
-        print w,
+    def translate(word):
+        "monoid to weyl"
+        g = identity
+        for c in word:
+            g = g * G.gen[desc.index(c)]
+        return g
+
+    monoid = list(monoid)
+    monoid.sort(key = lambda g : (len(g.word), g.word))
+    for g in monoid:
+        tgt = list(set(g.perm.values()))
+        g = translate(g.word)
+        print "%6s"%g.word, len(tgt)
     print
+
     return
 
-    def tr(word):
+    m = G.matrix(desc)
+
+    from bruhat import BruhatMonoid
+    monoid = BruhatMonoid(desc, m, bruhat=True, build=True)
+    #for w in monoid.words:
+    #    print w,
+    #print
+
+    def translate(word):
+        "translate to function monoid"
         g = identity
         for c in word:
             g = g * gen[desc.index(c)]
@@ -473,30 +492,23 @@ def build_monoid(G):
 
     lookup = {}
     for w0 in monoid.words:
-        g = tr(w0)
+        g = translate(w0)
         w1 = lookup.get(g)
         if w1 is not None:
             print w0, "=", w1
         else:
             lookup[g] = w0
             print w0
-            
 
     for w0 in monoid.words:
       for w1 in monoid.words:
         w2 = monoid.mul[w0, w1]
-        if tr(w0)*tr(w1) == tr(w2):
+        if translate(w0)*translate(w1) == translate(w2):
             pass
         else:
             print "%r*%r = %r" % (w0, w1, w2),
             print " ****************** FAIL"
 
-    #for i in range(n):
-    #  for j in range(n):
-        
-
-    return gen
-        
 
 
 def test(n):
@@ -660,7 +672,7 @@ def main():
         return
 
     if argv.monoid:
-        M = build_monoid(G)
+        test_monoid(G)
 
 
 if __name__ == "__main__":
