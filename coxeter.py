@@ -658,7 +658,7 @@ def main():
         except:
             continue
 
-        print "building %s"%arg
+        print "constructing %s"%arg
         if arg.startswith("A"):
             G = Weyl.build_A(n)
         if arg.startswith("B"):
