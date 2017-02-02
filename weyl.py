@@ -68,8 +68,43 @@ class Weyl(object):
         for g in gen:
             assert g*g == self.identity
 
-        if simple is not None:
+        if self.simple is None:
+            self.build_simple()
+
+        if self.simple is not None:
             self.check_simple()
+
+    def build_simple(self):
+        #print "build_simple"
+        gen = self.gen
+        roots = self.roots
+        n = len(gen)
+        simple = []
+        for g in gen:
+          for root in roots:
+            nroot = rscale(-1, root)
+            if g(root) != nroot:
+                continue
+            assert nroot not in simple
+
+            #print "root:", shortstr(root)
+            if not simple:
+                simple.append(root)
+                break
+
+            signs = [rdot(root, _root) for _root in simple]
+            #print "signs:", signs
+            if max(signs) == min(signs) == 0:
+                simple.append(root)
+            elif max(signs) > 0:
+                assert min(signs) >= 0
+                simple.append(nroot)
+            else:
+                simple.append(root)
+            break
+
+        assert len(simple) == n, "only found %s simple roots, expected %d" % (len(simple), n)
+        self.simple = simple
 
     def check_simple(self):
         """
@@ -94,19 +129,33 @@ class Weyl(object):
         #print dot(U, V)
 
         roots = self.roots
+        gen = self.gen
         n = len(simple)
+        for i in range(n):
+            root = simple[i]
+            assert gen[i](root) == rscale(-1, root)
+            #print root, gen[i](root)
+
+        for i in range(n):
+            for j in range(i+1, n):
+                assert rdot(simple[i], simple[j]) <= 0
+
         for root in roots:
-            if root in simple or rscale(-1, root) in simple:
+            nroot = rscale(-1, root)
+            for g in gen:
+                if g(root) == nroot:
+                    assert root in simple or rscale(-1, root) in simple
+
+            if root in simple or nroot in simple:
                 continue
             a = dot(root, V)
-            print "root:", shortstr(root, a)
+            #print "root:", shortstr(root, a)
             pos = (a>=0).astype(numpy.int)
             neg = (a<=0).astype(numpy.int)
             #assert pos.sum() == n or neg.sum() == n
             if pos.sum() != n and neg.sum() != n:
-                print "FAIL"
-                assert 0
-        #print "OK"
+                assert 0, "FAIL"
+        #print "check_simple: OK"
 
     @classmethod
     def build_A(cls, n):
@@ -199,6 +248,7 @@ class Weyl(object):
 
     @classmethod
     def build_C(cls, n):
+        # um,,, fix the roots here..
         return cls.build_B(n, k=2)
 
     @classmethod
@@ -247,7 +297,7 @@ class Weyl(object):
         return cls(roots, gen)
 
     @classmethod
-    def build_simple(cls, roots, simple):
+    def buildfrom_simple(cls, roots, simple):
         "use generators from reflections of simple roots"
         for root in simple:
             assert root in roots
@@ -298,10 +348,10 @@ class Weyl(object):
         root = [-half]*8
         simple.append(tuple(root))
 
-        return cls.build_simple(roots, simple)
+        return cls.buildfrom_simple(roots, simple)
 
     @classmethod
-    def build_E7(cls): # XXX BROKEN
+    def build_E7(cls):
         E8 = cls.build_E8()
         idxs = range(8)
         # delete one root:
@@ -311,11 +361,11 @@ class Weyl(object):
             if sum(root0[i]*root[i] for i in idxs)==0:
                 roots.append(root)
         assert len(roots)==126
-        simple = [roots[0]] + [root for root in E8.simple if root in roots]
-        return cls.build_simple(roots, simple)
+        simple = [rscale(-1, roots[0])] + [root for root in E8.simple if root in roots]
+        return cls.buildfrom_simple(roots, simple)
 
     @classmethod
-    def build_E6(cls): # XXX BROKEN
+    def build_E6(cls):
         E8 = cls.build_E8()
         idxs = range(8)
         # delete two roots:
@@ -327,9 +377,9 @@ class Weyl(object):
                 sum(root1[i]*root[i] for i in idxs)==0:
                 roots.append(root)
         assert len(roots)==72
-        simple = [(0, 0, 0, 1, 0, 0, 0, -1)]
+        simple = [(0, 0, 0, -1, 0, 0, 0, 1)]
         simple += [root for root in E8.simple if root in roots]
-        return cls.build_simple(roots, simple)
+        return cls.buildfrom_simple(roots, simple)
 
     @classmethod
     def build_F4(cls):
@@ -350,7 +400,7 @@ class Weyl(object):
             (0, 1, -1, 0),
             (0, 0, 1, 0),
             (-half, -half, -half, -half)]
-        return cls.build_simple(roots, simple)
+        return cls.buildfrom_simple(roots, simple)
 
     @classmethod
     def build_G2(cls):
@@ -363,7 +413,7 @@ class Weyl(object):
                 roots.append(root)
         assert len(roots)==12
         simple = [(1, -1, 0), (-1, 2, -1)]
-        return cls.build_simple(roots, simple)
+        return cls.buildfrom_simple(roots, simple)
 
     def matrix(self, desc=None):
         "coxeter matrix"

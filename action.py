@@ -65,6 +65,14 @@ class Perm(object):
         perm = dict((i, self.perm[i]) for i in items)
         return Perm(perm, items)
 
+    def fixes(self, items):
+        items = set(items)
+        for item in items:
+            item = self(item)
+            if item not in items:
+                return False
+        return True
+
     def __str__(self):
         #return str(dict((i, self.perm[i]) for i in range(self.n)))
         #return str(dict((i, self.perm[i]) for i in range(self.n)))
