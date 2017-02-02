@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Represent coxeter group as reflection group of a root system.
+Represent Weyl group as reflection group of a root system.
 
 See: 
     Humphreys, p63-66
@@ -14,8 +14,10 @@ import sys, os
 from fractions import Fraction
 from operator import mul
 
+import numpy
 
 from action import Perm, Group, mulclose
+from gelim import solve, array, identity, dot, shortstr
 from argv import argv
 
 
@@ -66,8 +68,8 @@ class Weyl(object):
         for g in gen:
             assert g*g == self.identity
 
-        #if simple is not None:
-        #    self.check_simple()
+        if simple is not None:
+            self.check_simple()
 
     def check_simple(self):
         """
@@ -81,14 +83,30 @@ class Weyl(object):
         """
 
         simple = self.simple
-        print "simple:", simple
+        n = len(simple)
+        U = array(simple)
+        #print "simple:"
+        #print U
+        V = solve(U, identity(len(U)), check=True)
+        #print "inverse:"
+        #print V
+        #print "UV:"
+        #print dot(U, V)
+
         roots = self.roots
         n = len(simple)
         for root in roots:
             if root in simple or rscale(-1, root) in simple:
                 continue
-            print "root:", root
-        print "OK"
+            a = dot(root, V)
+            print "root:", shortstr(root, a)
+            pos = (a>=0).astype(numpy.int)
+            neg = (a<=0).astype(numpy.int)
+            #assert pos.sum() == n or neg.sum() == n
+            if pos.sum() != n and neg.sum() != n:
+                print "FAIL"
+                assert 0
+        #print "OK"
 
     @classmethod
     def build_A(cls, n):
@@ -283,7 +301,7 @@ class Weyl(object):
         return cls.build_simple(roots, simple)
 
     @classmethod
-    def build_E7(cls):
+    def build_E7(cls): # XXX BROKEN
         E8 = cls.build_E8()
         idxs = range(8)
         # delete one root:
@@ -297,7 +315,7 @@ class Weyl(object):
         return cls.build_simple(roots, simple)
 
     @classmethod
-    def build_E6(cls):
+    def build_E6(cls): # XXX BROKEN
         E8 = cls.build_E8()
         idxs = range(8)
         # delete two roots:

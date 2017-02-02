@@ -12,10 +12,21 @@ class SMap(object):
 
     def __setitem__(self, key, s):
         i, j = key
-        for idx, c in enumerate(s):
-            self.data[i, j+idx] = c
-        self.rows = max(self.rows, i)
-        self.cols = max(self.cols, j+idx)
+        rows = self.rows
+        cols = self.cols
+        if isinstance(s, SMap):
+            for _key in s.data.keys():
+                ii, jj = i+_key[0], j+_key[1]
+                self.data[ii, jj] = s.data[_key]
+                rows = max(rows, ii)
+                cols = max(cols, jj)
+        else:
+            for idx, c in enumerate(s):
+                self.data[i, j+idx] = c
+            rows = max(rows, i)
+            cols = max(cols, j+idx)
+        self.rows = rows
+        self.cols = cols
 
     def __getitem__(self, key):
         return self.data.get(key, ' ')

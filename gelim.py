@@ -5,21 +5,85 @@ Gaussian elimination over the rationals.
 """
 
 import sys, os
-from random import randint
+from random import randint, seed
 from fractions import Fraction
 
 
 import numpy
 from numpy import dot
-
+from smap import SMap
 from argv import argv
 
+
+def fstr(x):
+    x = Fraction(x)
+    a, b = x.numerator, x.denominator
+    if b==1:
+        return str(a)
+    if a==0:
+        return "."
+    return "%s/%s"%(a, b)
+
+
+def shortstr(*items, **kw):
+
+    if len(items)>1:
+        return shortstrx(*items, **kw)
+
+    A = items[0]
+    if type(A) in [list, tuple]:
+        A = array(A)
+
+    shape = kw.get("shape")
+    if shape:
+        A = A.view()
+        A.shape = shape
+
+    if len(A.shape)==1:
+        A = A.view()
+        A.shape = (1, len(A))
+    m, n = A.shape
+    items = {}
+    dw = 3
+    for i in range(m):
+      for j in range(n):
+        x = A[i, j]
+        s = fstr(x)
+        dw = max(dw, len(s)+1)
+        items[i, j] = s
+
+    smap = SMap()
+    for i in range(m):
+      smap[i, 0] = "["
+      smap[i, n*dw+1] = "]"
+      for j in range(n):
+        s = items[i, j]
+        s = s.rjust(dw-1)
+        smap[i, j*dw+1] = s
+
+    return smap
+
+
+def shortstrx(*items, **kw):
+    smaps = [shortstr(item, **kw) for item in items]
+    smap = SMap()
+    col = 0
+    for A in items:
+        s = shortstr(A)
+        smap[0, col] = s
+        col += s.cols + 1
+
+    return smap
 
 
 def zeros(m, n):
     A = numpy.empty((m, n), dtype=object)
     A[:] = 0
     return A
+
+
+def array(items):
+    return numpy.array(items, dtype=object)
 
 
 def identity(m):
@@ -34,12 +98,12 @@ def eq(A, B):
     return r==0
 
 
-def shortstr(A):
-    return str(A)
+#def shortstr(A):
+#    return str(A)
 
 
-def shortstrx(*args):
-    return '\n'.join(str(A) for A in args)
+#def shortstrx(*args):
+#    return '\n'.join(str(A) for A in args)
 
 
 
@@ -155,29 +219,37 @@ def u_inverse(U, check=False, verbose=False):
         col = cols[0]
         leading.append(col)
 
+    assert sorted(leading) == leading
+    assert len(set(leading)) == len(leading)
+
     U1 = zeros(n, m)
 
-    #print shortstrx(U, U1)
+    #print shortstr(U)
 
     # Work backwards
     i = len(leading)-1 # <= m
     while i>=0:
 
         j = leading[i]
-        #print "i=", i, "j=", j
-        U1[j, i] = 1
+        #print "i=%d, j=%d"%(i, j)
+        r = Fraction(1, U[i, j])
+        U1[j, i] = r
 
-        #print shortstrx(U, U1)
+        #print "U, U1, U*U1:"
+        #print shortstrx(U, U1, dot(U, U1))
 
         k = i-1
         while k>=0:
             #print "dot"
             #print shortstr(U[k,:])
             #print shortstr(U1[:,i])
-            if dot(U[k, :], U1[:, i]):
+            r = dot(U[k, :], U1[:, i])
+            #print "=", r
+            if r != 0:
                 j = leading[k]
+                s = U[k, j]
                 #print "set", j, i
-                U1[j, i] = 1
+                U1[j, i] = -Fraction(r, s)
             #print shortstr(U1[:,i])
             assert dot(U[k, :], U1[:, i]) == 0
             k -= 1
@@ -197,18 +269,23 @@ def l_inverse(L, check=False, verbose=False):
     # Work forwards
     for i in range(m):
         #u = L1[:, i]
+        assert L[i, i] == 1
         for j in range(i+1, m):
+            #print "i=%d, j=%d"%(i, j)
+            #print "L, L1, L*L1:"
+            #print shortstrx(L, L1, dot(L, L1))
             r = dot(L[j, :], L1[:, i])
-            if r:
-                L1[j, i] = 1
+            #print "r =", r
+            if r != 0:
+                assert L1[j, i] == 0
+                L1[j, i] = -r
+            r = dot(L[j, :], L1[:, i])
+            #print "r =", r
+            #print shortstrx(L, L1, dot(L, L1))
             assert dot(L[j, :], L1[:, i]) == 0
 
     assert eq(dot(L, L1), identity(m))
     return L1
-
-
-
-
 
 
 def pseudo_inverse(A, check=False):
@@ -223,9 +300,9 @@ def pseudo_inverse(A, check=False):
     return A1
 
 
-def solve(H, u, force=False, debug=False):
+def solve(H, u, force=False, debug=False, check=False):
     "Solve Hv = u"
-    A = pseudo_inverse(H)
+    A = pseudo_inverse(H, check)
     v = dot(A, u)
     if eq(dot(H, v), u) or force:
         return v
@@ -234,8 +311,28 @@ def solve(H, u, force=False, debug=False):
 
 def test():
 
+    _seed = argv.get("seed")
+    if _seed is not None:
+        seed(_seed)
+
     m, n = 4, 5
     A = zeros(m, n)
+    U = zeros(m, n)
+
+    for i in range(m):
+      for j in range(i, n):
+        a = randint(-3, 3)
+        if i==j and a==0:
+            a = 1
+        U[i, j] = Fraction(a, randint(1, 3))
+
+    V = u_inverse(U)
+
+    L = identity(m)
+    for i in range(m):
+        for j in range(i):
+            L[i, j] = Fraction(randint(-3, 3), randint(1, 3))
+    V = l_inverse(L)
 
     for i in range(m):
       for j in range(n):
@@ -243,9 +340,9 @@ def test():
 
     P, L, U = plu_reduce(A, check=True, verbose=True)
 
-    print P
-    print L
-    print U
+    #print P
+    #print L
+    #print U
 
 
 if __name__ == "__main__":
