@@ -17,7 +17,7 @@ from operator import mul
 import numpy
 
 from action import Perm, Group, mulclose
-from gelim import solve, array, identity, dot, shortstr
+from gelim import solve, array, identity, dot, shortstr, eq, dotx, kernel
 from argv import argv
 
 
@@ -67,6 +67,8 @@ class Weyl(object):
         self.simple = simple
         for g in gen:
             assert g*g == self.identity
+
+        self.n = len(gen)
 
         if self.simple is None:
             self.build_simple()
@@ -440,6 +442,90 @@ class Weyl(object):
         return m
 
 
+def representation(G):
+
+    gen = G.gen
+    simple = G.simple
+    #print "simple:", simple
+
+    # Simple vectors in the Euclidean (standard) basis.
+    S = array(simple)
+    print "S:"
+    print shortstr(S)
+    I = identity(G.n)
+
+    # T maps vectors in the Euclidean basis to vectors in Simple basis.
+    Tt = solve(S, identity(G.n), check=True)
+    T = Tt.transpose()
+    print "T:"
+    print shortstr(T)
+
+    assert eq(dot(S, Tt), I)
+
+    Ws = [] # weight spaces
+    for g in gen:
+
+        # A is the matrix representation of g in the simple root basis.
+
+        #print "A:", [g(s) for s in simple]
+        rows = []
+        for s in simple:
+            r = g(s)
+            r = dot(T, r)
+            #print shortstr(r)
+            rows.append(r)
+        A = array(rows).transpose()
+        assert eq(dot(A, A), identity(len(A))) # reflection
+        #print "A:"
+        #print shortstr(A)
+
+        # W is the fixed space of A, expressed as vectors in the Euclidean basis.
+        # These vectors (rows of W) lie on the "mirror" that is A.
+        W = []
+        for root in simple:
+            groot = g(root)
+            if groot == rscale(-1, root):
+                continue
+
+            w = array(root) + array(groot) # easy!
+            W.append(w)
+            assert numpy.abs(w).sum()
+
+            #u = solve(S.transpose(), w)
+            #v = dot(S.transpose(), u)
+            #assert eq(v, w)
+
+        W = array(W)
+        Ws.append(W)
+        print "W:"
+        print shortstr(W)
+        B = dotx((A-identity(len(A))), T, W.transpose())
+        #print "A*T*Wt:"
+        #print shortstr(dotx(A, T, W.transpose()))
+        #print "(A-I)*T*Wt:"
+        #print shortstr(B)
+        assert numpy.abs(B).sum() == 0
+
+        #B = dotx(S.transpose(), A, T)
+        #print "B:"
+        #print shortstr(B)
+
+    print '--'*10
+
+    for i in range(G.n):
+
+        Ws1 = list(Ws)
+        Ws1.pop(i)
+
+        W = numpy.concatenate(tuple(Ws1))
+        print "W:"
+        print shortstr(W)
+
+        K = kernel(W.transpose())
+        print "K:"
+        print shortstr(K)
+
+
 
 def mulclose_pri(els, verbose=False, maxsize=None):
     els = set(els)
@@ -741,6 +827,8 @@ def main():
 
     if argv.monoid:
         test_monoid(G)
+
+    representation(G)
 
 
 if __name__ == "__main__":

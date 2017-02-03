@@ -98,6 +98,23 @@ def eq(A, B):
     return r==0
 
 
+def dotx(*items):
+    idx = 0
+    A = items[idx]
+    while idx+1 < len(items):
+        B = items[idx+1]
+        A = dot(A, B)
+        idx += 1 
+    return A
+
+
+def compose(*items):
+    items = list(reversed(items))
+    A = dotx(*items)
+    return A
+
+
+
 #def shortstr(A):
 #    return str(A)
 
@@ -296,16 +313,65 @@ def pseudo_inverse(A, check=False):
     P, L, U = plu_reduce(A, verbose=False, check=check)
     L1 = l_inverse(L, check=check)
     U1 = u_inverse(U, check=check)
+    #print "P, L, U, PLU:"
+    #print shortstr(P, L, U, dot(dot(P, L), U))
+    
     A1 = dot(U1, dot(L1, P.transpose()))
+    #print shortstr(dot(A1, A))
     return A1
 
 
 def solve(H, u, force=False, debug=False, check=False):
     "Solve Hv = u"
+    assert len(H) == len(u)
     A = pseudo_inverse(H, check)
+    #print "pseudo_inverse"
+    #print shortstr(A)
     v = dot(A, u)
     if eq(dot(H, v), u) or force:
         return v
+
+
+def kernel(A, check=False):
+    """
+        return K such that dot(A, K) == 0.
+    """
+    # https://en.wikipedia.org/wiki/Kernel_%28linear_algebra%29#Computation_by_Gaussian_elimination
+
+    m, n = A.shape
+    A, A0 = A.copy(), A
+
+    K = identity(n)
+
+    i = 0
+    for j in range(n):
+        while i<m and (A[i, j:]!=0).sum()==0:
+            i += 1
+        if i==m:
+            break
+
+        if A[i, j] == 0:
+            k = j
+            while A[i, k]==0:
+                k += 1
+            swap_col(A, j, k)
+            swap_col(K, j, k)
+
+        for k in range(j+1, n):
+            r = -Fraction(A[i, k], A[i, j])
+            A[:, k] += r * A[:, j]
+            K[:, k] += r * K[:, j]
+
+        i += 1
+        if i==m:
+            break
+
+    K = K[:, j+1:]
+    if check:
+        B = dot(A0, K)
+        assert numpy.abs(B).sum()==0
+
+    return K.transpose()
 
 
 
@@ -338,11 +404,32 @@ def test():
       for j in range(n):
         A[i, j] = Fraction(randint(-3, 3), randint(1, 3))
 
-    P, L, U = plu_reduce(A, check=True, verbose=True)
+    P, L, U = plu_reduce(A, check=True, verbose=False)
+
+
+    while 1:
+        m, n = 3, 4
+        A = zeros(m, n)
+        for i in range(m):
+          for j in range(n):
+            a = randint(-2, 2)
+            A[i, j] = Fraction(a, randint(1, 3))
+    
+        K = kernel(A, check=True)
+        #print "kernel: A, K, A*K"
+        #print shortstr(A, K, dot(A, K))
+        B = dot(A, K.transpose())
+        assert numpy.abs(B).sum()==0
+
+        if K.shape[1]>1:
+            break
+
 
     #print P
     #print L
     #print U
+
+    print "OK"
 
 
 if __name__ == "__main__":
