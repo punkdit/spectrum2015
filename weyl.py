@@ -479,6 +479,9 @@ def representation(G):
         #print "A:"
         #print shortstr(A)
 
+        print "St*A*T:"
+        print shortstr(dotx(S.transpose(), A, T))
+
         # W is the fixed space of A, expressed as vectors in the Euclidean basis.
         # These vectors (rows of W) lie on the "mirror" that is A.
         W = []
