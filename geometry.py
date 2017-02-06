@@ -10,6 +10,7 @@ from solve import zeros2, enum2, row_reduce, span, shortstr, shortstrx, solve, r
 import isomorph
 from isomorph import Bag, Point, write
 from bruhat import BruhatMonoid
+from action import Perm, Group
 
 
 from argv import Argv
@@ -433,18 +434,14 @@ class Geometry(object):
         for a, b in self.incidence:
             lookup[a].nbd.append(lookup[b])
         bag = Bag(points)
-        for p in points:
-            print p, p.nbd
+        #for p in points:
+        #    print p, p.nbd
         return bag
         
     def get_symmetry(self):
         bag0 = self.get_bag()
         bag1 = self.get_bag()
-        count = 0
-        for f in isomorph.search(bag0, bag1):
-            print f
-            count += 1
-        return count
+        return isomorph.search(bag0, bag1)
 
 
 class System(object):
@@ -1034,11 +1031,74 @@ def test():
     if argv.magnitude:
         magnitude_homology(g)
 
-    if argv.symmetry:
+    if argv.hecke:
+        hecke(g)
         #print g.get_symmetry()
-        s = g.get_system()
-        s.get_symmetry()
+        #s = g.get_system()
+        #s.get_symmetry()
         return
+
+
+def hecke(self):
+
+    bag0 = self.get_bag()
+    bag1 = self.get_bag()
+
+    points = [p for p in bag0 if p.desc=='0']
+    lines = [p for p in bag0 if p.desc=='1']
+    print points
+    print lines
+    flags = []
+    for p in points:
+        ls = [l for l in p.nbd if l!=p]
+        print p, ls
+        for l in ls:
+            flags.append((p, l))
+
+    print "flags:", len(flags)
+
+#    for point in bag0:
+#        print point, repr(point.desc)
+
+    #items = [(point.idx, line.idx) for point in points for line in lines]
+    #items = [(a.idx, b.idx) for a in points for b in points]
+    items = [(a, b) for a in flags for b in flags]
+
+    perms = []
+    for f in isomorph.search(bag0, bag1):
+        #print f
+        g = dict((bag0[idx], bag0[f[idx]]) for idx in f.keys())
+        perm = {}
+        for a, b in items:
+            a1 = (g[a[0]], g[a[1]])
+            b1 = (g[b[0]], g[b[1]])
+            assert (a1, b1) in items
+            perm[a, b] = a1, b1
+        perm = Perm(perm, items)
+        perms.append(perm)
+        write('.')
+    print
+
+    g = Group(perms, items)
+
+    orbits = g.orbits()
+    #print orbits
+    print "orbits:", len(orbits)
+
+    n = len(flags)
+    basis = []
+    for orbit in orbits:
+        A = zeros2(n, n)
+        #print orbits
+        for a, b in orbit:
+            A[flags.index(a), flags.index(b)] = 1
+        #print shortstr(A)
+        #print A.sum()
+        #print
+        basis.append(A)
+
+    #print shortstr(numpy.dot(basis[1], basis[2]))
+
 
 
 

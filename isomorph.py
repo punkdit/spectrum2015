@@ -546,7 +546,7 @@ def search(bag0, bag1, depth=1, fn=None, verbose=False):
         if len(fn) == len(bag0):
             if verbose:
                 print "FOUND"
-            yield fn
+            yield dict(fn)
 
         else:
             # try to add another state

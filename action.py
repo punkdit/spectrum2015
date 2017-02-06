@@ -657,7 +657,7 @@ def test():
         count += 1
     assert count==0, count
 
-    if 0:
+    if 1:
         #G1 = S4.choice(2)
         G1 = S4.choice(3, 2, 1)
         G2 = S4.choice(2)
