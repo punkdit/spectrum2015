@@ -1093,11 +1093,25 @@ def hecke(self):
         for a, b in orbit:
             A[flags.index(a), flags.index(b)] = 1
         #print shortstr(A)
-        #print A.sum()
+        print A.sum()
         #print
         basis.append(A)
 
-    #print shortstr(numpy.dot(basis[1], basis[2]))
+
+    I = basis[0]
+    L = basis[1]
+    P = basis[-1]
+    q = 2
+
+    eq = numpy.allclose
+    dot = numpy.dot
+
+    assert eq(dot(L, L), L+q*I)
+    assert eq(dot(P, P), P+q*I)
+    assert eq(dot(L, dot(P, L)), dot(P, dot(L, P)))
+    print shortstr(dot(L, dot(P, L)))
+    print
+    print shortstr(dot(P, dot(L, P)))
 
 
 
