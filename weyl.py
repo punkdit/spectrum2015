@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Represent Weyl group as reflection group of a root system.
+Represent any Weyl group as a permutation group of a root system.
 
 See: 
     Humphreys, p63-66
@@ -60,7 +60,8 @@ def rscale(v, a):
 
 
 class Weyl(object):
-    def __init__(self, roots, gen, simple=None):
+    def __init__(self, roots, gen, simple=None, name=None, check=True):
+        assert self.__class__ != Weyl
         self.roots = roots # list of tuples
         self.gen = gen # list of Weyl group generators (Perm's)
         self.identity = Perm.identity(roots)
@@ -69,12 +70,17 @@ class Weyl(object):
             assert g*g == self.identity
 
         self.n = len(gen)
+        self.name = name
 
         if self.simple is None:
             self.build_simple()
 
-        if self.simple is not None:
+        assert self.simple is not None
+        if check:
             self.check_simple()
+
+    def __str__(self):
+        return "%s(%d)"%(self.__class__.__name__, self.n)
 
     def build_simple(self):
         #print "build_simple"
@@ -107,6 +113,29 @@ class Weyl(object):
 
         assert len(simple) == n, "only found %s simple roots, expected %d" % (len(simple), n)
         self.simple = simple
+
+    @classmethod
+    def buildfrom_simple(cls, roots, simple, **kw):
+        "use generators from reflections of simple roots"
+        for root in simple:
+            assert root in roots
+        n = len(roots[0])
+        idxs = range(n)
+        lookup = dict((root, i) for (i, root) in enumerate(roots))
+        gen = []
+        for alpha in simple:
+            #print "alpha:", alpha
+            r0 = sum(alpha[i]*alpha[i] for i in idxs)
+            perm = []
+            for root in roots:
+                #print "    root:", root
+                r = sum(alpha[i]*root[i] for i in idxs)
+                _root = tuple(root[i] - 2*Fraction(r, r0)*alpha[i] for i in idxs)
+                #print "    _root:", _root
+                perm.append(lookup[_root])
+            perm = Perm(perm, roots)
+            gen.append(perm)
+        return cls(roots, gen, simple, **kw)
 
     def check_simple(self):
         """
@@ -159,9 +188,32 @@ class Weyl(object):
                 assert 0, "FAIL"
         #print "check_simple: OK"
 
+    def matrix(self, desc=None):
+        "coxeter matrix"
+        m = {}
+        gen = self.gen
+        n = len(gen)
+        for i in range(n):
+          for j in range(i+1, n):
+            key = (i, j)
+            if desc:
+                key = (desc[i], desc[j])
+            gi = gen[i]
+            gj = gen[j]
+            g = gigj = gi*gj
+            k = 1
+            while 1:
+                if g == self.identity:
+                    if k > 2:
+                        m[key] = k
+                    break
+                g = gigj * g
+                k += 1
+                assert k<10
+        return m
+
     @classmethod
-    def build_A(cls, n):
-    
+    def build_A(cls, n, **kw):
         roots = []
         simple = []
         lookup = {}
@@ -194,10 +246,10 @@ class Weyl(object):
                 perm.append(jdx)
             perm = Perm(perm, roots)
             gen.append(perm)
-        return cls(roots, gen, simple)
+        return Weyl_A(roots, gen, simple, name="A_%d"%n, **kw)
 
     @classmethod
-    def build_B(cls, n, k=1):
+    def build_B(cls, n, k=1, **kw):
     
         roots = []
         lookup = {}
@@ -246,15 +298,15 @@ class Weyl(object):
         perm = Perm(perm, roots)
         gen.append(perm)
 
-        return cls(roots, gen)
+        return Weyl_B(roots, gen, name="B_%d"%n, **kw)
 
     @classmethod
-    def build_C(cls, n):
+    def build_C(cls, n, **kw):
         # um,,, fix the roots here..
-        return cls.build_B(n, k=2)
+        return Weyl_C.build_B(n, k=2, **kw)
 
     @classmethod
-    def build_D(cls, n):
+    def build_D(cls, n, **kw):
 
         assert n>=2
 
@@ -296,34 +348,11 @@ class Weyl(object):
         perm = Perm(perm, roots)
         gen.append(perm)
 
-        return cls(roots, gen)
+        return Weyl_D(roots, gen, name="D_%d"%n, **kw)
 
     @classmethod
-    def buildfrom_simple(cls, roots, simple):
-        "use generators from reflections of simple roots"
-        for root in simple:
-            assert root in roots
-        n = len(roots[0])
-        idxs = range(n)
-        lookup = dict((root, i) for (i, root) in enumerate(roots))
-        gen = []
-        for alpha in simple:
-            #print "alpha:", alpha
-            r0 = sum(alpha[i]*alpha[i] for i in idxs)
-            perm = []
-            for root in roots:
-                #print "    root:", root
-                r = sum(alpha[i]*root[i] for i in idxs)
-                _root = tuple(root[i] - 2*Fraction(r, r0)*alpha[i] for i in idxs)
-                #print "    _root:", _root
-                perm.append(lookup[_root])
-            perm = Perm(perm, roots)
-            gen.append(perm)
-        return cls(roots, gen, simple)
-
-    @classmethod
-    def build_E8(cls):
-        D8 = cls.build_D(8)
+    def build_E8(cls, check=False):
+        D8 = cls.build_D(8, check=check)
         half = Fraction(1, 2)
         roots = list(D8.roots)
         for signs in cross([(-1, 1)]*8):
@@ -350,11 +379,11 @@ class Weyl(object):
         root = [-half]*8
         simple.append(tuple(root))
 
-        return cls.buildfrom_simple(roots, simple)
+        return Weyl_E8.buildfrom_simple(roots, simple, name="E_8", check=check)
 
     @classmethod
-    def build_E7(cls):
-        E8 = cls.build_E8()
+    def build_E7(cls, check=False):
+        E8 = cls.build_E8(check=check)
         idxs = range(8)
         # delete one root:
         root0 = E8.simple[0]
@@ -364,11 +393,11 @@ class Weyl(object):
                 roots.append(root)
         assert len(roots)==126
         simple = [rscale(-1, roots[0])] + [root for root in E8.simple if root in roots]
-        return cls.buildfrom_simple(roots, simple)
+        return Weyl_E7.buildfrom_simple(roots, simple, name="E_7", check=check)
 
     @classmethod
-    def build_E6(cls):
-        E8 = cls.build_E8()
+    def build_E6(cls, check=False):
+        E8 = cls.build_E8(check=check)
         idxs = range(8)
         # delete two roots:
         root0 = E8.simple[0]
@@ -381,10 +410,10 @@ class Weyl(object):
         assert len(roots)==72
         simple = [(0, 0, 0, -1, 0, 0, 0, 1)]
         simple += [root for root in E8.simple if root in roots]
-        return cls.buildfrom_simple(roots, simple)
+        return Weyl_E6.buildfrom_simple(roots, simple, name="E_6", check=check)
 
     @classmethod
-    def build_F4(cls):
+    def build_F4(cls, **kw):
         roots = []
         idxs = range(4)
         for root in cross([(-1,0,1)]*4):
@@ -402,10 +431,10 @@ class Weyl(object):
             (0, 1, -1, 0),
             (0, 0, 1, 0),
             (-half, -half, -half, -half)]
-        return cls.buildfrom_simple(roots, simple)
+        return Weyl_F.buildfrom_simple(roots, simple, name="F_4", **kw)
 
     @classmethod
-    def build_G2(cls):
+    def build_G2(cls, **kw):
         roots = []
         for root in cross([(-2, -1, 0, 1, 2)]*3):
             if sum(root) != 0:
@@ -415,31 +444,161 @@ class Weyl(object):
                 roots.append(root)
         assert len(roots)==12
         simple = [(1, -1, 0), (-1, 2, -1)]
-        return cls.buildfrom_simple(roots, simple)
+        return Weyl_G.buildfrom_simple(roots, simple, name="G_2", **kw)
 
-    def matrix(self, desc=None):
-        "coxeter matrix"
-        m = {}
+    def prod_sk(self, sk):
+        g = self.identity
         gen = self.gen
-        n = len(gen)
-        for i in range(n):
-          for j in range(i+1, n):
-            key = (i, j)
-            if desc:
-                key = (desc[i], desc[j])
-            gi = gen[i]
-            gj = gen[j]
-            g = gigj = gi*gj
-            k = 1
-            while 1:
-                if g == self.identity:
-                    if k > 2:
-                        m[key] = k
-                    break
-                g = gigj * g
-                k += 1
-                assert k<10
-        return m
+        for i in sk:
+            g = g * gen[i]
+        return g
+
+    def longest_element(self):
+        g = self.identity
+        for sk in self.iter_sk():
+            g = g * self.prod_sk(sk)
+        return g
+
+
+"""
+Calculation of longest element:
+https://arxiv.org/pdf/1108.1048v2.pdf Table 1,
+
+Also Humphreys, "when is -I in W?":
+http://people.math.umass.edu/~jeh/pub/longest.pdf
+"""
+
+class Weyl_A(Weyl):
+    def iter_sk(self):
+        n = self.n
+        for k in range(1, n+1):
+            sk = []
+            i = n-k
+            while i<=n-1:
+                sk.append(i)
+                i += 1
+            yield sk
+
+
+class Weyl_B(Weyl):
+    def iter_sk(self):
+        n = self.n
+        for k in range(1, n+1):
+            sk = []
+            i = n-k
+            while i<=n-1:
+                sk.append(i)
+                i += 1
+            i -= 1
+            while i>n-k:
+                i -= 1
+                sk.append(i)
+            #print "k=%d, sk=%s"%(k, sk)
+            yield sk
+
+
+class Weyl_C(Weyl_B):
+    pass
+
+
+class Weyl_D(Weyl):
+    def iter_sk(self):
+        n = self.n
+        assert n>2
+        yield [n-1]
+        yield [n-2]
+        for k in range(3, n+1):
+            sk = []
+            i = n-k
+            while i<=n-3:
+                sk.append(i)
+                i += 1
+            sk.append(n-1)
+            i = n-2
+            while i>=n-k:
+                sk.append(i)
+                i -= 1
+            #print "k=%d, sk=%s"%(k, sk)
+            yield sk
+
+
+class Weyl_E6(Weyl):
+    diagram = """
+          3
+          |
+    0--1--2--4--5
+    """
+    def iter_sk(self):
+        n = self.n
+        D_5 = Weyl.build_D(5, check=False)
+        for sk in D_5.iter_sk():
+            yield sk
+        sk = [i-1 for i in [6, 5, 3, 4, 2, 1, 3, 2, 5, 3, 4, 6, 5, 3, 2, 1]]
+        yield sk
+
+
+class Weyl_E7(Weyl):
+    diagram = """
+          4
+          |
+    1--2--3--5--6--0
+    """
+    def iter_sk(self):
+        n = self.n
+        D_5 = Weyl.build_D(5, check=False)
+        for sk in D_5.iter_sk():
+            sk = [i+1 for i in sk]
+            yield sk
+        sk = [6, 5, 3, 4, 2, 1, 3, 2, 5, 3, 4, 6, 5, 3, 2, 1]
+        yield sk
+        sk = [7, 6, 5, 3, 4, 2, 1, 3, 2, 5, 3, 4, 
+            6, 5, 3, 2, 1, 7, 6, 5, 3, 4, 2, 3, 5, 6, 7]
+        sk = [i%7 for i in sk] # fix numbers
+        yield sk
+
+
+class Weyl_E8(Weyl):
+    diagram = """
+          5
+          |
+    7--6--4--3--2--1--0
+    """
+    def iter_sk(self):
+        tx = {1:7, 2:6, 3:4, 4:5, 5:3, 6:2, 7:1, 8:0}
+        n = self.n
+        D_5 = Weyl.build_D(5, check=False)
+        for sk in D_5.iter_sk():
+            sk = [tx[i+1] for i in sk]
+            yield sk
+        sk = [6, 5, 3, 4, 2, 1, 3, 2, 5, 3, 4, 6, 5, 3, 2, 1]
+        sk = [tx[i] for i in sk]
+        yield sk
+        sk = [7, 6, 5, 3, 4, 2, 1, 3, 2, 5, 3, 4, 
+            6, 5, 3, 2, 1, 7, 6, 5, 3, 4, 2, 3, 5, 6, 7]
+        sk = [tx[i] for i in sk]
+        yield sk
+        sk = [8, 7, 6, 5, 3, 4, 2, 1, 3, 2, 5, 3, 4, 6, 5, 3, 2, 1, 7, 6, 5, 3, 4,
+            2, 3, 5, 6, 7, 8, 7, 6, 5, 3, 4, 2, 1, 3, 2, 5, 3, 4, 6, 5, 3, 2, 1,
+            7, 6, 5, 3, 4, 2, 3, 5, 6, 7, 8]
+        sk = [tx[i] for i in sk]
+        yield sk
+
+
+
+class Weyl_F(Weyl):
+    def iter_sk(self):
+        B_3 = Weyl.build_B(3)
+        for sk in B_3.iter_sk():
+            yield sk
+        sk = [i-1 for i in [4, 3, 2, 1, 3, 2, 3, 4, 3, 2, 1, 3, 2, 3, 4]]
+        yield sk
+
+
+class Weyl_G(Weyl):
+    def iter_sk(self):
+        yield [0]
+        yield [1, 0, 1, 0, 1]
+
 
 
 def representation(G):
@@ -551,6 +710,40 @@ def mulclose_pri(els, verbose=False, maxsize=None):
     return els 
 
 
+
+def find_negi(G):
+
+    roots = G.roots
+    print "roots:", len(roots)
+#    print roots
+#    print
+
+    names = 'ABCDEF'
+    gen = G.gen
+    for i, g in enumerate(gen):
+        g.word = names[i]
+        print "%s:"%g.word,
+        print g.str()
+    print
+    n = len(gen)
+    identity = Perm(dict((r, r) for r in roots), roots, '')
+    weyl = mulclose_pri([identity]+gen)
+    weyl = list(weyl)
+    weyl.sort(key = lambda g : (len(g.word), g.word))
+    print "weyl:",
+    for w in weyl:
+        print w.word,
+    print
+    print "weyl:", len(weyl)
+
+    nroots = [rscale(-1, root) for root in roots]
+    n = len(roots)
+    for g in weyl:
+        for i in range(n):
+            if g(roots[i]) != nroots[i]:
+                break
+        else:
+            print "%s = -I" % g.word
 
 
 
@@ -767,6 +960,61 @@ def test(n):
         assert len(mulclose(G.gen)) == (2**(n-1))*factorial(n)
 
 
+def test_longest_element():
+
+    G = Weyl.build_A(2)
+    g = G.longest_element()
+    A, B = G.gen
+    assert g == A*B*A
+
+    G = Weyl.build_A(3)
+    g = G.longest_element()
+    A, B, C = G.gen
+    assert g == B*C*B*A*B*C
+
+    G = Weyl.build_B(2)
+    g = G.longest_element()
+    A, B = G.gen
+    assert g == B*A*B*A
+
+    G = Weyl.build_B(3)
+    g = G.longest_element()
+    A, B, C = G.gen
+    assert g == C*A*B*C*A*B*C*A*B
+
+    G = Weyl.build_D(4)
+    g = G.longest_element()
+    A, B, C, D = G.gen
+    assert g == B*A*D*B*A*D*C*B*D*A*B*C
+
+    G = Weyl.build_D(6)
+    g = G.longest_element()
+    for root in G.roots:
+        assert g(root) == rscale(-1, root)
+
+    G = Weyl.build_E7()
+    g = G.longest_element()
+    for root in G.roots:
+        assert g(root) == rscale(-1, root)
+
+    G = Weyl.build_E8()
+    g = G.longest_element()
+    for root in G.roots:
+        assert g(root) == rscale(-1, root)
+
+    G = Weyl.build_F4()
+    g = G.longest_element()
+    for root in G.roots:
+        assert g(root) == rscale(-1, root)
+
+    G = Weyl.build_G2()
+    g = G.longest_element()
+    for root in G.roots:
+        assert g(root) == rscale(-1, root)
+
+    print "OK"
+    
+
 def main():
 
     n = argv.n
@@ -776,6 +1024,12 @@ def main():
     elif argv.test:
         for n in range(2, 6):
             test(n)
+        test_longest_element()
+
+
+    if argv.test_longest_element:
+        test_longest_element()
+
 
     G = None
 
@@ -828,10 +1082,18 @@ def main():
     if G is None:
         return
 
+    if argv.longest_element:
+        g = G.longest_element()
+        print g
+
     if argv.monoid:
         test_monoid(G)
 
-    representation(G)
+    if argv.representation:
+        representation(G)
+
+    if argv.find_negi:
+        find_negi(G)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,39 @@
 
+7/2/17
+======
+
+When the group has -I, it is the longest element:
+
+B_2:
+weyl:  A B AB BA ABA BAB BABA
+weyl: 8
+BABA = -I
+
+B_3:
+weyl: 48
+CABCABCAB = -I
+
+B_4:
+weyl: 384
+DCBABCDCBACDCDBC = -I
+
+
+D_4:
+weyl: 192
+BADBADCBDABC = -I
+
+G_2:
+weyl: 12
+ABABAB = -I
+
+
+./weyl.py F_4 find_negi
+
+F_4:
+weyl: 1152
+CBCDABCBDCABACDCBACBACBD = -I
+
+
 4/2/17
 ======
 
