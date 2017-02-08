@@ -56,14 +56,14 @@ class Perm(object):
         self.word = word
 
     @classmethod
-    def identity(cls, items):
+    def identity(cls, items, *args, **kw):
         n = len(items)
         perm = dict((item, item) for item in items)
-        return Perm(perm, items)
+        return Perm(perm, items, *args, **kw)
 
-    def restrict(self, items):
+    def restrict(self, items, *args, **kw):
         perm = dict((i, self.perm[i]) for i in items)
-        return Perm(perm, items)
+        return Perm(perm, items, *args, **kw)
 
     def fixes(self, items):
         items = set(items)

@@ -1,4 +1,26 @@
 
+8/2/17
+======
+
+Look for anti-commuting pairs:
+
+B_3: None
+G_2: None
+
+B_4:
+weyl: 384
+AC*BADCDB = -BADCDB*AC
+ABAD*CDBC = -CDBC*ABAD
+
+
+./weyl.py D_4 find_negi 
+AC*BADB = -BADB*AC
+ABCDB*BDBCB = -BDBCB*ABCDB
+...
+
+
+
+
 7/2/17
 ======
 
@@ -32,6 +54,14 @@ ABABAB = -I
 F_4:
 weyl: 1152
 CBCDABCBDCABACDCBACBACBD = -I
+
+
+time ./geometry.py projective hecke n=4
+orbits: 7
+real 1439m56.663s
+user 1440m2.229s
+
+
 
 
 4/2/17

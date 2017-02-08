@@ -11,6 +11,7 @@ See:
 
 
 import sys, os
+import string
 from fractions import Fraction
 from operator import mul
 
@@ -59,12 +60,35 @@ def rscale(v, a):
     return a
 
 
+
+def mulclose_pri(els, verbose=False, maxsize=None):
+    "multiplicative closure; short words first"
+    els = set(els)
+    changed = True
+    while changed:
+        if verbose:
+            print "mulclose:", len(els)
+        changed = False
+        _els = list(els)
+        pairs = [(g, h) for g in _els for h in _els]
+        pairs.sort(key = lambda (g,h) : len(g.word+h.word))
+
+        for A, B in pairs:
+            C = A*B 
+            if C not in els:
+                els.add(C)
+                if maxsize and len(els)>=maxsize:
+                    return list(els)
+                changed = True
+    return els 
+
+
 class Weyl(object):
     def __init__(self, roots, gen, simple=None, name=None, check=True):
         assert self.__class__ != Weyl
         self.roots = roots # list of tuples
         self.gen = gen # list of Weyl group generators (Perm's)
-        self.identity = Perm.identity(roots)
+        self.identity = Perm.identity(roots, '')
         self.simple = simple
         for g in gen:
             assert g*g == self.identity
@@ -81,6 +105,22 @@ class Weyl(object):
 
     def __str__(self):
         return "%s(%d)"%(self.__class__.__name__, self.n)
+
+    def generate(self):
+        gen = self.gen
+        n = len(gen)
+        names = string.uppercase
+        assert n<=len(names)
+        for i, g in enumerate(gen):
+            g.word = names[i]
+            #print "%s:"%g.word,
+            #print g.str()
+        #print
+        roots = self.roots
+        weyl = mulclose_pri([self.identity]+gen)
+        weyl = list(weyl)
+        weyl.sort(key = lambda g : (len(g.word), g.word))
+        return weyl
 
     def build_simple(self):
         #print "build_simple"
@@ -116,7 +156,7 @@ class Weyl(object):
 
     @classmethod
     def buildfrom_simple(cls, roots, simple, **kw):
-        "use generators from reflections of simple roots"
+        "use _generators from reflections of simple roots"
         for root in simple:
             assert root in roots
         n = len(roots[0])
@@ -466,6 +506,8 @@ https://arxiv.org/pdf/1108.1048v2.pdf Table 1,
 
 Also Humphreys, "when is -I in W?":
 http://people.math.umass.edu/~jeh/pub/longest.pdf
+
+http://mathoverflow.net/questions/54926/longest-element-of-weyl-groups
 """
 
 class Weyl_A(Weyl):
@@ -689,47 +731,16 @@ def representation(G):
 
 
 
-def mulclose_pri(els, verbose=False, maxsize=None):
-    els = set(els)
-    changed = True
-    while changed:
-        if verbose:
-            print "mulclose:", len(els)
-        changed = False
-        _els = list(els)
-        pairs = [(g, h) for g in _els for h in _els]
-        pairs.sort(key = lambda (g,h) : len(g.word+h.word))
-
-        for A, B in pairs:
-            C = A*B 
-            if C not in els:
-                els.add(C)
-                if maxsize and len(els)>=maxsize:
-                    return list(els)
-                changed = True
-    return els 
-
-
-
 def find_negi(G):
 
     roots = G.roots
+    simple = G.simple
     print "roots:", len(roots)
 #    print roots
 #    print
 
-    names = 'ABCDEF'
-    gen = G.gen
-    for i, g in enumerate(gen):
-        g.word = names[i]
-        print "%s:"%g.word,
-        print g.str()
-    print
-    n = len(gen)
-    identity = Perm(dict((r, r) for r in roots), roots, '')
-    weyl = mulclose_pri([identity]+gen)
-    weyl = list(weyl)
-    weyl.sort(key = lambda g : (len(g.word), g.word))
+    weyl = G.generate()
+
     print "weyl:",
     for w in weyl:
         print w.word,
@@ -738,6 +749,27 @@ def find_negi(G):
 
     nroots = [rscale(-1, root) for root in roots]
     n = len(roots)
+    N = len(weyl)
+
+    for i in range(N):
+      for j in range(i+1, N):
+        X = weyl[i]
+        Z = weyl[j]
+        XZ = X*Z
+        ZX = Z*X
+
+        for root in simple:
+            if XZ(root) != rscale(-1, ZX(root)):
+                break
+        else:
+            if len(X.word)==len(Z.word) or 0:
+                x, z = X.word, Z.word
+                print "%s*%s = -%s*%s" % (x, z, z, x)
+                return
+
+
+    return
+
     for g in weyl:
         for i in range(n):
             if g(roots[i]) != nroots[i]:
@@ -753,21 +785,8 @@ def test_monoid(G):
 
     roots = G.roots
     print "roots:", len(roots)
-#    print roots
-#    print
 
-    names = 'ABCDEF'
-    gen = G.gen
-    for i, g in enumerate(gen):
-        g.word = names[i]
-        print "%s:"%g.word,
-        print g.str()
-    print
-    n = len(gen)
-    identity = Perm(dict((r, r) for r in roots), roots, '')
-    weyl = mulclose_pri([identity]+gen)
-    weyl = list(weyl)
-    weyl.sort(key = lambda g : (len(g.word), g.word))
+    weyl = G.generate()
     print "weyl:",
     for w in weyl:
         print w.word,
@@ -971,6 +990,14 @@ def test_longest_element():
     g = G.longest_element()
     A, B, C = G.gen
     assert g == B*C*B*A*B*C
+
+    w = A*C*B
+    assert g == (w**2)
+    return
+
+    while w != g:
+        w = w*A*C*C
+        print "."
 
     G = Weyl.build_B(2)
     g = G.longest_element()
