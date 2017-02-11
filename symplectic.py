@@ -806,7 +806,7 @@ def test_model():
         cartan = [op for op in ideal if is_zop(op)]
         report_lie(cartan, ideal)
 
-        if argv.roots:
+        if argv.roots or argv.build_roots:
             build_roots(ideal, hamiltonian)
 
         if argv.search_roots:

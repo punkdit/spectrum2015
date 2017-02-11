@@ -7,6 +7,10 @@ See:
     Humphreys, p63-66
     https://en.wikipedia.org/wiki/Root_system
 
+"Root Systems and Generalized Associahedra"
+Sergey Fomin and Nathan Reading
+https://arxiv.org/pdf/math/0505518.pdf
+
 """
 
 
@@ -19,6 +23,7 @@ import numpy
 
 from action import Perm, Group, mulclose
 from gelim import solve, array, identity, dot, shortstr, eq, dotx, kernel
+from gelim import Subspace
 from argv import argv
 
 
@@ -643,7 +648,7 @@ class Weyl_G(Weyl):
 
 
 
-def representation(G):
+def representation(G, verbose=False):
 
     gen = G.gen
     simple = G.simple
@@ -655,15 +660,18 @@ def representation(G):
     print shortstr(S)
     I = identity(G.n)
 
-    # T maps vectors in the Euclidean basis to vectors in Simple basis.
+    # T maps vectors in the Euclidean basis to vectors in the Simple basis.
     Tt = solve(S, identity(G.n), check=True)
     T = Tt.transpose()
     print "T:"
     print shortstr(T)
+    print '--'*10
 
     assert eq(dot(S, Tt), I)
 
     Ws = [] # weight spaces
+    As = [] # As for generators
+
     for g in gen:
 
         # A is the matrix representation of g in the simple root basis.
@@ -677,8 +685,9 @@ def representation(G):
             rows.append(r)
         A = array(rows).transpose()
         assert eq(dot(A, A), identity(len(A))) # reflection
-        #print "A:"
-        #print shortstr(A)
+        As.append(A)
+        print "A:"
+        print shortstr(A)
 
         print "St*A*T:"
         print shortstr(dotx(S.transpose(), A, T))
@@ -716,18 +725,105 @@ def representation(G):
 
     print '--'*10
 
+    Ws = [Subspace(W) for W in Ws]
+    for W in Ws:
+        print "W:"
+        print W
+
+    print '--'*10
+
+    # not needed...
+    # W0 = Subspace(S)
+    # Ws = [W.intersect(W0) for W in Ws]
+
+    # Each of these weights will lie on all but one of the A mirrors
+    weights = []
+
     for i in range(G.n):
 
         Ws1 = list(Ws)
         Ws1.pop(i)
 
-        W = numpy.concatenate(tuple(Ws1))
-        print "W:"
-        print shortstr(W)
+        W = Ws1[0]
+        for j in range(1, len(Ws1)):
+            W = W.intersect(Ws1[j])
 
-        K = kernel(W.transpose())
-        print "K:"
-        print shortstr(K)
+        print "weight:"
+        print W
+
+        W = W.W # get the numpy array
+        assert len(W)==1
+        W.shape = W.shape[1],
+
+        A = As[i]
+        B = dotx(S.transpose(), A, T)
+        w = W.transpose()
+        Bw = dot(B, w)
+        assert not eq(Bw, w)
+        v = Bw - w # we will scale w so that this delta will be equal to S[i]
+        v = v.transpose() # row vector
+        s = S[i]
+        r = None
+        for j in range(len(v)):
+            assert (v[j]==0) == (s[j]==0)
+            if v[j]==0:
+                continue
+            assert r is None or r==s[j]/v[j]
+            r = s[j]/v[j]
+
+        w = r*w
+        #print shortstr(w)
+        v = dot(B, w) - w
+        assert eq(v, s)
+
+        weights.append(w)
+
+    W = array(weights)
+    print "W:"
+    print shortstr(W)
+    Wt = W.transpose()
+    St = S.transpose()
+
+    # What combination of weights gives the (simple) roots?
+    U = solve(Wt, St)
+    print "U:"
+    print shortstr(U)
+
+    # What combination of roots gives the weights?
+    V = solve(St, Wt)
+    print "V:"
+    print shortstr(V)
+
+    print '--'*10
+
+    #for A in As:
+    weyl = G.generate() # entire weyl group, sorted by word length
+    print "weyl:", len(weyl)
+    I = weyl[0]
+    assert I.word == '' # identity
+
+    rows = []
+    for s in simple:
+        r = I(s)
+        r = dot(T, r)
+        #print shortstr(r)
+        rows.append(r)
+    A0 = array(rows).transpose()
+
+    for g in weyl:
+        rows = []
+        for s in simple:
+            r = g(s)
+            r = dot(T, r)
+            #print shortstr(r)
+            rows.append(r)
+        A = array(rows).transpose()
+
+        #print "A:"
+        #print shortstr(A)
+        print g.word or 'I'
+        D = dot(A-A0, V).transpose()
+        print shortstr(D)
 
 
 
@@ -827,7 +923,7 @@ def test_monoid(G):
 
     desc = "ABCDEFG"[:n]
 
-    def translate(word):
+    def txlate(word):
         "monoid to weyl"
         g = identity
         for c in word:
@@ -838,7 +934,7 @@ def test_monoid(G):
     monoid.sort(key = lambda g : (len(g.word), g.word))
     for g in monoid:
         tgt = list(set(g.perm.values()))
-        g = translate(g.word)
+        g = txlate(g.word)
         print "%6s"%g.word, len(tgt)
     print
 
@@ -852,8 +948,8 @@ def test_monoid(G):
     #    print w,
     #print
 
-    def translate(word):
-        "translate to function monoid"
+    def txlate(word):
+        "_translate to function monoid"
         g = identity
         for c in word:
             g = g * gen[desc.index(c)]
@@ -861,7 +957,7 @@ def test_monoid(G):
 
     lookup = {}
     for w0 in monoid.words:
-        g = translate(w0)
+        g = txlate(w0)
         w1 = lookup.get(g)
         if w1 is not None:
             print w0, "=", w1
@@ -872,7 +968,7 @@ def test_monoid(G):
     for w0 in monoid.words:
       for w1 in monoid.words:
         w2 = monoid.mul[w0, w1]
-        if translate(w0)*translate(w1) == translate(w2):
+        if txlate(w0)*txlate(w1) == txlate(w2):
             pass
         else:
             print "%r*%r = %r" % (w0, w1, w2),
@@ -1089,7 +1185,7 @@ def main():
         assert len(mulclose(G.gen)) == 12 # dihedral group D_6
 
     for arg in argv:
-        if len(arg) != 3 or arg[1]!="_":
+        if len(arg) < 3 or arg[1]!="_":
             continue
         try:
             n = int(arg[2:])
@@ -1105,6 +1201,8 @@ def main():
             G = Weyl.build_C(n)
         if arg.startswith("D"):
             G = Weyl.build_D(n)
+
+        print "roots:", len(G.roots)
 
     if G is None:
         return

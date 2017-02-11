@@ -1,4 +1,335 @@
 
+12/2/17
+=======
+
+
+http://math.ucr.edu/home/baez/week234.html
+
+
+Start to see the Bruhat order:
+./weyl.py B_2 representation
+weyl: 8
+
+[ 0  0 ]
+[ 0  0 ]
+A
+[ 1  0 ]
+[ 0  0 ]
+B
+[ 0  0 ]
+[ 0  1 ]
+AB
+[ 1  0 ]
+[ 1  1 ]
+BA
+[ 1  2 ]
+[ 0  1 ]
+ABA
+[ 2  2 ]
+[ 1  1 ]
+BAB
+[ 1  2 ]
+[ 1  2 ]
+BABA
+[ 2  2 ]
+[ 1  2 ]
+
+./weyl.py B_3 representation
+weyl: 48
+
+[ 0  0  0 ]
+[ 0  0  0 ]
+[ 0  0  0 ]
+A
+[ 1  0  0 ]
+[ 0  0  0 ]
+[ 0  0  0 ]
+B
+[ 0  0  0 ]
+[ 0  1  0 ]
+[ 0  0  0 ]
+C
+[ 0  0  0 ]
+[ 0  0  0 ]
+[ 0  0  1 ]
+AB
+[ 1  0  0 ]
+[ 1  1  0 ]
+[ 0  0  0 ]
+BA
+[ 1  1  0 ]
+[ 0  1  0 ]
+[ 0  0  0 ]
+BC
+[ 0  0  0 ]
+[ 0  1  0 ]
+[ 0  1  1 ]
+CA
+[ 1  0  0 ]
+[ 0  0  0 ]
+[ 0  0  1 ]
+CB
+[ 0  0  0 ]
+[ 0  1  2 ]
+[ 0  0  1 ]
+ABC
+[ 1  0  0 ]
+[ 1  1  0 ]
+[ 1  1  1 ]
+BAB
+[ 1  1  0 ]
+[ 1  1  0 ]
+[ 0  0  0 ]
+BCA
+[ 1  1  0 ]
+[ 0  1  0 ]
+[ 0  1  1 ]
+BCB
+[ 0  0  0 ]
+[ 0  2  2 ]
+[ 0  1  1 ]
+CAB
+[ 1  0  0 ]
+[ 1  1  2 ]
+[ 0  0  1 ]
+CBA
+[ 1  1  2 ]
+[ 0  1  2 ]
+[ 0  0  1 ]
+CBC
+[ 0  0  0 ]
+[ 0  1  2 ]
+[ 0  1  2 ]
+ABCA
+[ 1  1  0 ]
+[ 1  1  0 ]
+[ 1  1  1 ]
+ABCB
+[ 1  0  0 ]
+[ 2  2  2 ]
+[ 1  1  1 ]
+BCAB
+[ 1  1  0 ]
+[ 1  3  2 ]
+[ 0  1  1 ]
+BCBA
+[ 1  2  2 ]
+[ 0  2  2 ]
+[ 0  1  1 ]
+CABC
+[ 1  0  0 ]
+[ 1  1  2 ]
+[ 1  1  2 ]
+CBAB
+[ 1  1  2 ]
+[ 1  1  2 ]
+[ 0  0  1 ]
+CBCA
+[ 1  1  2 ]
+[ 0  1  2 ]
+[ 0  1  2 ]
+CBCB
+[ 0  0  0 ]
+[ 0  2  2 ]
+[ 0  1  2 ]
+ABCAB
+[ 1  1  0 ]
+[ 2  3  2 ]
+[ 1  1  1 ]
+ABCBA
+[ 2  2  2 ]
+[ 2  2  2 ]
+[ 1  1  1 ]
+BCABA
+[ 1  2  2 ]
+[ 1  3  2 ]
+[ 0  1  1 ]
+BCABC
+[ 1  1  0 ]
+[ 1  3  2 ]
+[ 1  2  2 ]
+BCBCA
+[ 1  2  2 ]
+[ 0  2  2 ]
+[ 0  1  2 ]
+CABCA
+[ 1  1  2 ]
+[ 1  1  2 ]
+[ 1  1  2 ]
+CABCB
+[ 1  0  0 ]
+[ 2  2  2 ]
+[ 1  1  2 ]
+CBCAB
+[ 1  1  2 ]
+[ 1  3  4 ]
+[ 0  1  2 ]
+ABCBAB
+[ 2  2  2 ]
+[ 2  3  2 ]
+[ 1  1  1 ]
+BCABCA
+[ 1  2  2 ]
+[ 1  3  2 ]
+[ 1  2  2 ]
+BCABCB
+[ 1  1  0 ]
+[ 2  3  2 ]
+[ 1  2  2 ]
+BCBCAB
+[ 1  2  2 ]
+[ 1  3  4 ]
+[ 0  1  2 ]
+CABCAB
+[ 1  1  2 ]
+[ 2  3  4 ]
+[ 1  1  2 ]
+CABCBA
+[ 2  2  2 ]
+[ 2  2  2 ]
+[ 1  1  2 ]
+CBCABC
+[ 1  1  2 ]
+[ 1  3  4 ]
+[ 1  2  3 ]
+BCABCAB
+[ 1  2  2 ]
+[ 2  4  4 ]
+[ 1  2  2 ]
+BCABCBA
+[ 2  2  2 ]
+[ 2  3  2 ]
+[ 1  2  2 ]
+BCBCABC
+[ 1  2  2 ]
+[ 1  3  4 ]
+[ 1  2  3 ]
+CABCABC
+[ 1  1  2 ]
+[ 2  3  4 ]
+[ 1  2  3 ]
+CABCBAB
+[ 2  2  2 ]
+[ 2  3  4 ]
+[ 1  1  2 ]
+ABCBCABC
+[ 2  2  2 ]
+[ 2  3  4 ]
+[ 1  2  3 ]
+BCABCABC
+[ 1  2  2 ]
+[ 2  4  4 ]
+[ 1  2  3 ]
+BCABCBAB
+[ 2  2  2 ]
+[ 2  4  4 ]
+[ 1  2  2 ]
+CABCABCAB
+[ 2  2  2 ]
+[ 2  4  4 ]
+[ 1  2  3 ]
+
+
+G_2:
+weyl: 12
+
+[ 0  0 ]
+[ 0  0 ]
+A
+[ 1  0 ]
+[ 0  0 ]
+B
+[ 0  0 ]
+[ 0  1 ]
+AB
+[ 1  0 ]
+[ 3  1 ]
+BA
+[ 1  1 ]
+[ 0  1 ]
+ABA
+[ 3  1 ]
+[ 3  1 ]
+BAB
+[ 1  1 ]
+[ 3  3 ]
+ABAB
+[ 3  1 ]
+[ 6  3 ]
+BABA
+[ 3  2 ]
+[ 3  3 ]
+ABABA
+[ 4  2 ]
+[ 6  3 ]
+BABAB
+[ 3  2 ]
+[ 6  4 ]
+ABABAB
+[ 4  2 ]
+[ 6  4 ]
+
+
+
+
+11/2/17
+=======
+
+Q1) find simple roots given list of all roots
+Use this to manipulate roots from symplectic.py in weyl.py
+Pick a fundamental chamber, simple roots correspond to mirrors
+that bound the chamber.
+
+
+Q2)
+find weyl group elements that fix Hamiltonian,
+or
+how to find a particular permutation of roots in the Weyl group
+
+Lemma: any fixed non-zero vector must lie in at least one of the mirrors
+
+Lemma: all order two elements come from reflections: 
+NOPE: take s_1 s_2, where s_1 and s_2 commute.
+
+
+
+10/2/17
+=======
+
+Try to find elements of Weyl group that fix the
+Hamiltonian (fail.)
+
+./symplectic.py compass l=3 build_roots
+ideal: 255 cartan: 15
+A_15 = sl_16
+build_roots 15 240
+32 (2, 2, 2, 2, 0, 0, 2, 2, 0, 2, 0, 2, 0, 0, 0)
+32 (2, 2, 2, -2, 0, 0, -2, -2, 0, 2, 0, -2, 0, 0, 0)
+32 (2, 2, -2, 2, 0, 0, -2, 2, 0, -2, 0, -2, 0, 0, 0)
+32 (2, 2, -2, -2, 0, 0, 2, -2, 0, -2, 0, 2, 0, 0, 0)
+...
+32 (0, 0, 0, -2, 0, -2, -2, -2, 0, 0, 0, -2, -2, -2, -2)
+eigs: 240
+roots: 240
+Hamiltonian: [16, 16, 0, 16, 16, 16, 0, 16, 16, 16, 16, 16, 16, 0, 16, 16, 16, 16, 16, 16, 16, 16, 0, 16, 16, 0, 16, 16, 16, 16, 0, 16, 0, 16, 0, 16, 0, 0, 0, 0, 0, 16, 16, 16, 0, 16, 0, 0, 16, 16, 16, 16, 16, 16, 16, 16, 0, 16, 16, 0, 16, 16, 0, 0, 0, 16, 16, 0, 16, 16, 16, 0, 0, 16, 16, 0, 16, 16, 16, 16, 16, 0, 0, 16, 16, 16, 16, 16, 0, 0, 0, 16, 0, 16, 16, 16, 0, 16, 16, 16, 16, 0, 16, 0, 16, 16, 16, 16, 0, 16, 0, 16, 16, 16, 16, 16, 16, 0, 0, 16, 0, 16, 16, 0, 0, 0, 16, 0, 16, 0, 16, 16, 0, 16, 0, 0, 16, 0, 16, 0, 16, 0, 16, 0, 16, 0, 16, 16, 16, 16, 0, 0, 16, 16, 0, 16, 16, 16, 0, 0, 0, 16, 16, 16, 16, 0, 0, 0, 16, 0, 0, 16, 0, 16, 0, 16, 0, 16, 16, 16, 16, 16, 0, 0, 16, 16, 16, 16, 0, 16, 0, 0, 0, 0, 16, 0, 0, 0, 16, 0, 16, 16, 0, 16, 0, 0, 0, 16, 0, 16, 0, 16, 16, 0, 0, 16, 16, 0, 0, 16, 0, 16, 16, 16, 0, 16, 0, 0, 16, 0, 0, 16, 16, 16, 16, 0, 16, 16, 0, 0]
+perms: 240
+Hamiltonian stabilizer gen: 0
+
+
+9/2/17
+======
+
+groups acting on:
+    polyhedra (eg. platonic solids)
+    polynomials (eg. symmetric polynomials)
+    quadratic forms (integer quadratic forms)
+
+
+(Humphreys p79)
+The Coxeter number:
+h=2N/n where N is the number of positive roots.
+
+
 8/2/17
 ======
 
@@ -7,13 +338,20 @@ Look for anti-commuting pairs:
 B_3: None
 G_2: None
 
+B_2:
+weyl: 8
+A*B = -B*A
+
+
 B_4:
 weyl: 384
 AC*BADCDB = -BADCDB*AC
 ABAD*CDBC = -CDBC*ABAD
+...
 
 
 ./weyl.py D_4 find_negi 
+weyl: 192
 AC*BADB = -BADB*AC
 ABCDB*BDBCB = -BDBCB*ABCDB
 ...
