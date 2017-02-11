@@ -139,7 +139,9 @@ closure = find_ideal
 
 
 class Operator(object):
-    "sparse vector"
+    """ Sparse vector (with integer components) representing a sum of Pauli operators.
+        Define addition and multiplication, so these things form an algebra.
+    """
     def __init__(self, v={}):
         if type(v) is dict:
             v = dict(v)
@@ -154,7 +156,7 @@ class Operator(object):
             k = numpy.fromstring(k, dtype=numpy.int32)
             n = len(k)
             assert n%2==0
-        self.n = n//2
+        self.n = n//2 # number of qubits
 
     def __str__(self):
         items = []
@@ -237,7 +239,7 @@ class Operator(object):
                 continue
             k2 = numpy.fromstring(k2, dtype=numpy.int32)
             sign = -1 if halfbracket(k1, k2) else +1
-            k = (k1+k2)%2 # mul
+            k = (k1+k2)%2 # product of Pauli operators (up to sign)
             #print "__mul__", v1, k1, v2, k2, sign*v1*v2, k
             k = k.tostring()
             v[k] = v.get(k, 0) + sign*v1*v2
@@ -325,8 +327,10 @@ test_algebra()
 
 
 class Algebra(object):
+    """ List of Operator objects that form the basis for an algebra.
+    """
     def __init__(self, ops):
-        self.ops = ops
+        self.ops = ops # basis
 
     def __str__(self):
         return "%s([%s])"%(
@@ -351,6 +355,9 @@ class Cartan(Algebra):
     "Cartan subalgebra, represented by a basis of operators."
 
     def get_eig(self, g):
+        r""" find \lambda, a root, such that:
+            [h, g] = \lambda(h) g for h in Cartan
+        """
         root = []
         for h in self.ops:
             g1 = h.bracket(g)
@@ -376,6 +383,8 @@ class Cartan(Algebra):
 
 
 def build_roots(ops, hamiltonian):
+    """ build all roots using orbits of X-type stabilizers.
+    """
 
     assert ops
     I = Operator([0]*len(ops[0]))
@@ -501,6 +510,7 @@ def build_roots(ops, hamiltonian):
                 #print g
                 count += 1
         print "Hamiltonian stabilizer subgroup:", count
+
     else:
         items = range(N)
         gen = [Perm(tuple(perm), items) for perm in perms]
@@ -527,6 +537,9 @@ def build_roots(ops, hamiltonian):
 
 
 def search_roots(ops, hamiltonian):
+    """ Search for roots as in build_roots but use a backtracking
+        algorithm. Does not find all roots.
+    """
 
     assert ops
     I = Operator([0]*len(ops[0]))
