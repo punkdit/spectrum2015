@@ -150,10 +150,9 @@ class Perm(object):
         return items
 
 
-class Species(object):
-    def __call__(self, group, items):
-        pass
-
+#class Species(object):
+#    def __call__(self, group, items):
+#        pass
 
 #class PointedSpecies(Species):
 
@@ -284,16 +283,15 @@ assert len(choose(items4, 3)) == 4
 assert len(choose(items4, 4)) == 1
 
 
-class Group(object):
+class Action(object):
     """
-    This is really a group *action*, since each of our
-    elements is presented as an action on a set of "items".
+    A list of Perm's, closed under multiplication.
     """
 
-    def __init__(self, els, items):
-        els = list(els)
-        self.els = els
-        for el in els:
+    def __init__(self, perms, items):
+        perms = list(perms)
+        self.perms = perms
+        for el in perms:
             assert el.items is items
         self.items = items
 
@@ -303,16 +301,16 @@ class Group(object):
         return p
 
     def __len__(self):
-        return len(self.els)
+        return len(self.perms)
 
     def __getitem__(self, idx):
-        return self.els[idx]
+        return self.perms[idx]
     
     @classmethod
-    def generate(cls, els, *args):
-        items = els[0].items
-        els = list(mulclose(els, *args))
-        return cls(els, items)
+    def generate(cls, perms, *args):
+        items = perms[0].items
+        perms = list(mulclose(perms, *args))
+        return cls(perms, items)
 
     def __add__(self, other):
         items = disjoint_union(self.items, other.items)
@@ -334,7 +332,7 @@ class Group(object):
             _perm = Perm(_perm, items)
             perms.append(_perm)
         perms = list(mulclose(perms))
-        return Group(perms, items)
+        return Action(perms, items)
 
     def __mul__(self, other):
         items = [(i, j) for i in self.items for j in other.items]
@@ -346,7 +344,7 @@ class Group(object):
                 perm[i, j] = g[i], h[j]
             perm = Perm(perm, items)
             perms.append(perm)
-        group = Group(perms, items)
+        group = Action(perms, items)
         return group
 
     def square(self, other=None):
@@ -363,29 +361,29 @@ class Group(object):
                 perm[i, j] = g[i], h[j]
             perm = Perm(perm, items)
             perms.append(perm)
-        group = Group(perms, items)
+        group = Action(perms, items)
         return group
 
     def fixed(self):
         fixed = {}
-        for el in self.els:
+        for el in self.perms:
             fixed[el] = el.fixed()
         return fixed
 
     def stab(self, item):
         "stabilizer subgroup"
-        els = []
-        for g in self.els:
+        perms = []
+        for g in self.perms:
             if g[item]==item:
-                els.append(g)
-        return Group(els, self.items)
+                perms.append(g)
+        return Action(perms, self.items)
 
     def orbit(self, item):
         items = set()
         changed = True
         while changed:
             changed = False
-            for g in self.els:
+            for g in self.perms:
                 _item = g*item
                 if _item not in items:
                     changed = True
@@ -424,7 +422,7 @@ class Group(object):
 #            _g = Perm(_perm, _items)
 #            #_group.add(_g)
 #            _group.append(_g)
-#        return Group(_group, _items)
+#        return Action(_group, _items)
 
     def choice(group, *ks):
         "choose k elements"
@@ -440,7 +438,7 @@ class Group(object):
                 _perm[flag] = _flag
             _g = Perm(_perm, _items)
             _group.append(_g)
-        return Group(_group, _items)
+        return Action(_group, _items)
 
     def is_hom(self, items, func):
         #print "is_hom", items, func
@@ -460,7 +458,7 @@ class Group(object):
                     return # fail
             #group.add(Perm(perm, items))
             group.append(Perm(perm, items))
-        group = Group(group, items)
+        group = Action(group, items)
         return group
 
     def all_homs(self, items, surjective=True):
@@ -474,16 +472,16 @@ class Group(object):
                 yield group, func
 
     def isomorphic(self, other):
-        assert isinstance(other, Group)
+        assert isinstance(other, Action)
         if len(self)!=len(other):
             return False
         n = len(self)
         for i in range(n):
           for j in range(n):
-            g = self.els[i] * self.els[j]
-            g = self.els.index(g) # slow
-            h = other.els[i] * other.els[j]
-            h = other.els.index(h) # slow
+            g = self.perms[i] * self.perms[j]
+            g = self.perms.index(g) # slow
+            h = other.perms[i] * other.perms[j]
+            h = other.perms.index(h) # slow
             if g!=h:
                 return False
         return True
@@ -511,6 +509,57 @@ class Group(object):
                 yield func
 
 
+class Hom(object):
+    """
+        A map of Action's is a map of the perms and a 
+        map of the inderlying items, such that these two maps commute.
+    """
+    def __init__(self, G, H, send_perms, send_items, check=False):
+        assert isinstance(G, Action)
+        assert isinstance(H, Action)
+        self.G = G
+        self.H = H
+        self.send_perms = dict(send_perms) # map G.perms to H.perms
+        self.send_items = dict(send_items) # map G.items to H.items
+        if check:
+            self.check()
+
+    def check(self):
+        G, H, send_perms, send_items = self.G, self.H, self.send_perms, self.send_items
+        assert len(send_perms)==len(G.perms)
+        assert len(send_items)==len(G.items)
+        for item in G.items:
+            assert item in f
+            assert send_items[item] in H.items
+        for perm in G.perms:
+            assert perm in f
+            assert send_perms[perm] in H.perms
+
+        # G and H should really be the same group..
+        for g1 in G.perms:
+          h1 = send_perms[g1]
+          for g2 in G.perms:
+            h2 = send_perms[g2]
+            assert send_perms[g1*g2] == h1*h2
+        for g in G.perms:
+            # g is a perm on G.items
+            h = send_perms[g]
+            # h is a perm on H.items, check it agrees with send_items of g.
+            #g1 = dict((
+            #for item in G.items:
+            
+
+    def __mul__(self, other):
+        "composition of Hom's"
+        assert isinstance(other, Hom)
+        f = {}
+        for item in self.G.items:
+            f[item] = other.f[self.f[item]]
+        hom = Hom(self.G, other.H, f)
+        return hom
+
+
+
 def is_hom(hom):
     for g in hom.keys():
       for h in hom.keys():
@@ -535,6 +584,10 @@ def close_hom(hom):
 
 
 def find_all_homs(G, H, hom=None, remain=None):
+    """
+        Iterate through all homomorphisms from Action G to Action H.
+        Yield each homomorphism as a dict : Perm -> Perm.
+    """
     if hom is None:
         GI = G.identity
         hom = {GI : H.identity}
@@ -559,6 +612,15 @@ def find_all_homs(G, H, hom=None, remain=None):
                     yield _hom
 
 
+#class Action(object):
+#    """
+#        A group action is a homomorphism from a Action to another Action.
+#    """
+#    def __init__(self, group, hom):
+#        self.group = group
+#        self.hom = dict(hom) # dict : Perm -> Perm
+
+
 
 def test():
 
@@ -576,7 +638,7 @@ def test():
     assert h*h != g
     assert not (h*h == e)
 
-    S3 = Group.generate([g, h])
+    S3 = Action.generate([g, h])
     S3.check()
     assert len(S3) == 6
 
@@ -588,7 +650,7 @@ def test():
     items4 = list('abcd')
     g = Perm((1, 2, 3, 0), items4)
     h = Perm((1, 0, 2, 3), items4)
-    S4 = Group.generate([g, h])
+    S4 = Action.generate([g, h])
     assert len(S4)==24
 
     S4_22 = S4.choice(2)
@@ -603,7 +665,7 @@ def test():
     assert Z*Z==I
     assert Z*X != X*Z
     assert Z*X*Z*X == w
-    P1 = Group.generate([X, Z])
+    P1 = Action.generate([X, Z])
     assert len(P1)==8
 
     if 0:
@@ -640,7 +702,7 @@ def test():
 
     assert ZI*IX == IX*ZI
 
-    P2 = Group.generate([XI, ZI, IX, IZ])
+    P2 = Action.generate([XI, ZI, IX, IZ])
     assert len(P2)==32
 
     #homs = [f for f in find_all_homs(P1, P2, {I:II, w:w2})] # 152 solutions
@@ -694,7 +756,7 @@ def test():
 
     #print len(list(S4.all_homs(list('ab'))))
 
-    Z4 = Group.generate([Perm((1, 2, 3, 0), items4)])
+    Z4 = Action.generate([Perm((1, 2, 3, 0), items4)])
     Z4.check()
     assert len(Z4)==4
 
@@ -715,7 +777,7 @@ def test():
     #for g in Z4:
     #    print g, g.fixed()
 
-    Z22 = Group.generate([Perm((1, 0, 3, 2), items4), Perm((2, 3, 0, 1), items4)])
+    Z22 = Action.generate([Perm((1, 0, 3, 2), items4), Perm((2, 3, 0, 1), items4)])
     assert len(Z22)==4
 
     assert len(list(Z22.all_homs_iso(Z22))) == 4

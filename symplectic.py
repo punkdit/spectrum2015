@@ -451,7 +451,7 @@ def build_roots(ops, hamiltonian):
     hc = [(-r if r<0 else r) for r in hc]
     print "Hamiltonian:", hc
 
-    from action import Perm, Group
+    from action import Perm, Action
 
     perms = []
     for alpha in roots:
@@ -502,7 +502,7 @@ def build_roots(ops, hamiltonian):
     if N <= 24:
         items = range(N)
         gen = [Perm(tuple(perm), items) for perm in perms]
-        group = Group.generate(gen)
+        group = Action.generate(gen)
         print "Weyl group:", len(group)
         count = 0
         for g in group:
@@ -514,7 +514,7 @@ def build_roots(ops, hamiltonian):
     else:
         items = range(N)
         gen = [Perm(tuple(perm), items) for perm in perms]
-        #group = Group.generate(gen)
+        #group = Action.generate(gen)
         #print "Weyl group:", len(group)
         count = 0
         for g in gen:

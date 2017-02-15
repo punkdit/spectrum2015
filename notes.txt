@@ -1,8 +1,57 @@
 
-12/2/17
+16/2/17
 =======
 
 
+
+
+15/2/17
+=======
+
+"""
+ What's the free symmetric 2-rig on one generator?
+It's the category of STRUCTURE TYPES! 
+""" - http://math.ucr.edu/home/baez/week191.html
+
+Alex Hoffnung, A categorification of the Hecke algebra, http://math.ucr.edu/~alex/hecke.pdf
+http://math.ucr.edu/home/baez/week284.html
+
+Categorify negative numbers as Euler char of a chain complex 0->A->B->0
+
+The open interval has euler char -1: 
+(0, 1) = (0, 1/2) u {1/2} u (1/2, 1)
+giving X = X + 1 + X, so X=-1.
+Schanuel: "Negative sets have Euler characteristic and dimension"
+http://math.ucr.edu/home/baez/week184.html
+
+
+ An Objective Representation of the Gaussian Integers
+Marcelo Fiore, Tom Leinster
+https://arxiv.org/abs/math/0211454
+"We analyse the free rig on a generator x subject
+to the equivalence x = 1 + x + x^2,
+showing that in it the non-constant polynomials form a ring.
+This ring can be identified with the Gaussian integers, which
+thus acquire objective meaning. "
+
+
+14/2/17
+=======
+
+The Cayley-Dickson Construction: Reals -> complex -> Quaternions -> Octonions -> ...
+http://math.ucr.edu/home/baez/octonions/node5.html
+
+
+
+
+
+12/2/17
+=======
+
+homomorphism of braid group B_3 into SL(2,Z):
+http://math.ucr.edu/home/baez/week233.html
+
+Mathieu groups are symmetry groups of steiner systems :
 http://math.ucr.edu/home/baez/week234.html
 
 

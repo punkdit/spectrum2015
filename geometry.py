@@ -4,13 +4,12 @@ import os, sys
 
 import numpy
 import networkx as nx
-from matplotlib import pyplot
 
 from solve import zeros2, enum2, row_reduce, span, shortstr, shortstrx, solve, rank, find_kernel, find_logops
 import isomorph
 from isomorph import Bag, Point, write
 from bruhat import BruhatMonoid
-from action import Perm, Group
+from action import Perm, Action
 
 
 from argv import Argv
@@ -1079,7 +1078,7 @@ def hecke(self):
         write('.')
     print
 
-    g = Group(perms, items)
+    g = Action(perms, items)
 
     orbits = g.orbits()
     #print orbits

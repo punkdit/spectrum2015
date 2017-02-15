@@ -21,7 +21,7 @@ from operator import mul
 
 import numpy
 
-from action import Perm, Group, mulclose
+from action import Perm, Action, mulclose
 from gelim import solve, array, identity, dot, shortstr, eq, dotx, kernel
 from gelim import Subspace
 from argv import argv
