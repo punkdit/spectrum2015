@@ -5,7 +5,7 @@ Calculate the Burnside Ring corresponding to a particular G-set.
 
 Klein geometry: 
 (1) a set of "points" and a group G acting on the set.
-(2) subgroups of G are the "geometric properties" 
+(2) (conjugacy classes of) subgroups of G are the "geometric properties" 
 
 For example, a triangle.
 This has symmetry group of order 6, and lattice
