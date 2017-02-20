@@ -1001,8 +1001,8 @@ class Hom(object):
             return
         graph0 = self.get_graph()
         graph1 = other.get_graph()
-        #for fn in isomorph.search(graph0, graph1):
-        for fn in isomorph.search_recursive(graph0, graph1):
+        for fn in isomorph.search(graph0, graph1):
+        #for fn in isomorph.search_recursive(graph0, graph1):
             send_items = {}
             for i in range(n):
                 send_items[self.tgt.items[i]] = other.tgt.items[fn[i]]

@@ -527,6 +527,8 @@ class State(object):
 def search(bag0, bag1, depth=1, fn=None, verbose=False):
 
     assert bag0 is not bag1
+    if len(bag0) != len(bag1):
+        return
 
     if fn is None:
         fn = {}
@@ -552,7 +554,10 @@ def search(bag0, bag1, depth=1, fn=None, verbose=False):
         bag0.set_colour(bag0[idx], str(idx))
         bag1.set_colour(bag1[fn[idx]], str(idx))
 
-    state = State(bag0, bag1, depth)
+    try:
+        state = State(bag0, bag1, depth)
+    except Backtrack:
+        return
 
     idx = remain.pop(0)
     state.choose(idx)
