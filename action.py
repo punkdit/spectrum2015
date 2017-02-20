@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
 import sys
+import string
 
 from util import factorial, all_subsets
 from argv import argv
+
+import isomorph
 
 
 def mulclose(els, verbose=False, maxsize=None):
@@ -35,6 +38,87 @@ class Set(object):
         return str(self.els)
 
 
+class Equ(object):
+    "Equivalence class for an _equivelance relation"
+    def __init__(self, item):
+        self.items = [item]
+        self.parent = None 
+
+    def __str__(self):
+        return "Equ(%s, top=%s)" % (
+            self.items, self.top if self.parent else None)
+
+    @property
+    def top(self):
+        top = self
+        while top.parent:
+            top = top.parent
+        if top is not self:
+            self.parent = top
+        return top
+
+#    def add(self, item):
+#        assert item not in self.items
+#        self.items.append(item)
+
+    def merge(self, other):
+        top = self
+        while top.parent:
+            top = top.parent
+        while other.parent:
+            other = other.parent
+        if top is other:
+            return
+        other.parent = top
+        top.items += other.items
+
+    def eq(e1, e2):
+        while e1.parent:
+            e1 = e1.parent
+        while e2.parent:
+            e2 = e2.parent
+        return e1 is e2
+
+
+def quotient(items, relation=None):
+    """ return a dict:item->items that sends each item 
+        to the list of equivelant items 
+        under the equivelance relation.
+    """
+    if relation is None:
+        relation = lambda a,b : (a==b)
+    equs = [Equ(item) for item in items]
+    hom = {}
+    n = len(items)
+    for i in range(n):
+        ei = equs[i]
+        for j in range(i+1, n):
+            ej = equs[j]
+            if ei.eq(ej):
+                continue
+            if relation(items[i], items[j]):
+                ei.merge(ej)
+    for i in range(n):
+        hom[items[i]] = list(equs[i].top.items)
+    return hom
+
+def quotient_rep(items, relation=None):
+    """ return a dict:item->item that sends each item 
+        to a representative equivelant item
+        under the equivelance relation.
+    """
+    hom = quotient(items, relation)
+    hom = dict((item, items[0]) for (item, items) in hom.items()) # confused ?
+    return hom
+
+
+assert quotient(range(7), (lambda i,j : (i-j)%3==0)) \
+    == {0: [0, 3, 6], 1: [1, 4], 2: [2, 5], 3: [0, 3, 6], 4: [1, 4], 5: [2, 5], 6: [0, 3, 6]}
+
+assert quotient_rep(range(7), (lambda i,j : (i-j)%3==0)) \
+    == {0:0, 1:1, 2:2, 3:0, 4:1, 5:2, 6:0}
+
+
 class Perm(object):
 
     """
@@ -48,15 +132,15 @@ class Perm(object):
         if not isinstance(perm, dict):
             perm = dict((perm[i], items[i]) for i in range(len(perm)))
         self.perm = perm # map item -> item
-        self.items = set(items)
+        set_items = set(items)
+        self.set_items = set_items
+        self.items = list(items)
         assert len(perm) == len(items), (perm, items)
         self.n = len(perm)
         self._str = None
-        if len(items)>10:
-            items = set(items)
         for key, value in perm.items():
-            assert key in items, repr(key)
-            assert value in items, repr(value)
+            assert key in set_items, repr(key)
+            assert value in set_items, repr(value)
         self.word = word
 
     @classmethod
@@ -91,15 +175,19 @@ class Perm(object):
         return s
 
     def __str__(self):
-        remain = set(self.items)
+        remain = set(self.set_items)
         s = []
+#        print "__str__", self.perm, self.items
         while remain:
             item = iter(remain).next()
+#            print "item:", item
             orbit = [item]
             item1 = self*item
+#            print "item1:", item1
             while item1 != item:
                 orbit.append(item1)
                 item1 = self*item1
+                assert len(orbit) <= len(self.items)
             s.append("(%s)"%(' '.join(str(item) for item in orbit)))
             assert orbit
             n = len(remain)
@@ -107,12 +195,14 @@ class Perm(object):
                 remain.remove(item)
             assert len(remain) < n
         #return "Perm(%s)"%(''.join(s))
+#        print "__str__: end"
         return ''.join(s)
-    __repr__ = __str__
+#    __repr__ = __str__
 
     def str(self):
         perm = self.perm
-        items = self.items
+        items = list(self.items)
+        #items.sort()
         s = []
         for i, item in enumerate(items):
             j = items.index(perm[item])
@@ -120,13 +210,31 @@ class Perm(object):
         s = "{%s}"%(', '.join(s))
         return s
 
+    def __str__(self):
+        return "Perm(%s)"%self.str()
+    __repr__ = __str__
+
     def __hash__(self):
         return hash(str(self))
 
+    def leftmul(self, action):
+        perms = [self*perm for perm in action]
+        action = Group(perms, action.items)
+        return action
+
+    def rightmul(self, action):
+        perms = [perm*self for perm in action]
+        action = Group(perms, action.items)
+        return action
+
     def __mul__(self, other):
+        if isinstance(other, Group):
+            perms = [self*perm for perm in other]
+            action = Group(perms, self.items)
+            return action # <----- return
         if not isinstance(other, Perm):
             item = self.perm[other]
-            return item
+            return item # <---- return
         assert self.items == other.items
         perm = {}
         #for item in self.items:
@@ -134,7 +242,9 @@ class Perm(object):
         for item in other.items:
             perm[item] = self.perm[other.perm[item]]
         return Perm(perm, self.items, self.word+other.word)
-    __call__ = __mul__
+
+    def __call__(self, item):
+        return self.perm[item]
 
     def __pow__(self, n):
         assert int(n)==n
@@ -153,6 +263,7 @@ class Perm(object):
         for item in self.items:
             perm[self.perm[item]] = item
         return Perm(perm, self.items)
+    inverse = __invert__
 
     def __eq__(self, other):
         assert self.items == other.items
@@ -309,17 +420,41 @@ assert len(choose(items4, 3)) == 4
 assert len(choose(items4, 4)) == 1
 
 
-class Action(object):
+class Group(object):
     """
-    A list of Perm's, closed under multiplication.
+    A collection of Perm's.
     """
 
     def __init__(self, perms, items, check=False):
         perms = list(perms)
-        self.perms = perms
-        self.items = set(items)
+        self.perms = perms # ordered 
+        self.items = list(items) # ordered 
+        self.set_items = set(items) # unordered
+        self.set_perms = set(perms) # unordered
         for perm in perms:
+            assert isinstance(perm, Perm)
             assert perm.items == self.items, (perm.items, items)
+        self._str = None # cache
+
+    def str(self):
+        if not self._str:
+            ss = [perm.str() for perm in self.perms]
+            ss.sort()
+            self._str = ''.join(ss)
+        return self._str
+
+    def __eq__(self, other):
+        return (self.items == other.items and self.set_perms == other.set_perms)
+
+    def __ne__(self, other):
+        return (self.items == other.items and self.set_perms == other.set_perms)
+
+    def __hash__(self):
+        return hash(self.str())
+
+    def __contains__(self, g):
+        assert g.items == self.items
+        return g in self.set_perms
 
     @classmethod
     def generate(cls, perms, *args, **kw):
@@ -340,7 +475,7 @@ class Action(object):
         else:
             items = list(items_or_n)
         perm = Perm.identity(items)
-        G = Action([perm], items, check=check)
+        G = Group([perm], items, check=check)
         return G
 
     @classmethod
@@ -357,7 +492,7 @@ class Action(object):
             perm[items[i+1]] = items[i]
             perms.append(perm)
         perms = [Perm(perm, items) for perm in perms]
-        G = Action.generate(perms, check=check)
+        G = Group.generate(perms, check=check)
         assert len(G) == factorial(n)
         return G
 
@@ -373,7 +508,7 @@ class Action(object):
             for k in range(n)]
         assert len(perms) == n
         perms = [Perm(perm, items) for perm in perms]
-        G = Action(perms, items, check=check)
+        G = Group(perms, items, check=check)
         return G
 
     @classmethod
@@ -388,12 +523,15 @@ class Action(object):
             dict((items[i], items[(i+1)%n]) for i in range(n)),
             dict((items[i], items[(-i)%n]) for i in range(n))]
         perms = [Perm(perm, items) for perm in perms]
-        G = Action.generate(perms, check=check)
+        G = Group.generate(perms, check=check)
         assert len(G) == 2*n
         return G
 
     def __str__(self):
-        return "Action(%s, %s)"%(self.perms, self.items)
+        return "Group(%s, %s)"%(self.perms, self.items)
+
+    def __repr__(self):
+        return "Group(%d, %d)"%(len(self.perms), len(self.items))
 
     def __len__(self):
         return len(self.perms)
@@ -401,6 +539,17 @@ class Action(object):
     def __getitem__(self, idx):
         return self.perms[idx]
     
+    def __mul__(self, other):
+        if isinstance(other, Group):
+            assert self.items == other.items
+            perms = set(g*h for g in self for h in other)
+            return Group(perms, self.items)
+        elif isinstance(other, Perm):
+            assert self.items == other.items
+            perms = set(g*other for g in self)
+            return Group(perms, self.items)
+        raise TypeError
+
     def __add__(self, other):
         items = disjoint_union(self.items, other.items)
         perms = []
@@ -421,10 +570,9 @@ class Action(object):
             _perm = Perm(_perm, items)
             perms.append(_perm)
         perms = list(mulclose(perms))
-        return Action(perms, items)
+        return Group(perms, items)
 
-    def __mul__(self, other):
-        "direct product of groups"
+    def direct_product(self, other):
         items = [(i, j) for i in self.items for j in other.items]
         perms = []
         for g in self:
@@ -434,7 +582,7 @@ class Action(object):
                 perm[i, j] = g[i], h[j]
             perm = Perm(perm, items)
             perms.append(perm)
-        group = Action(perms, items)
+        group = Group(perms, items)
         return group
 
     def square(self, other=None):
@@ -456,7 +604,7 @@ class Action(object):
             perms.append(perm)
             #send_perms[g] = perm.restrict(diagonal)
             send_perms[g] = perm
-        action = Action(perms, items)
+        action = Group(perms, items)
         #print len(send_perms), len(self)
         #print self
         #print action
@@ -477,22 +625,22 @@ class Action(object):
         for g in self.perms:
             if g[item]==item:
                 perms.append(g)
-        return Action(perms, self.items)
+        return Group(perms, self.items)
 
     def orbit(self, item):
-        items = set(g*item for g in self.perms)
+        items = set(g(item) for g in self.perms)
         return items
 
     def orbits(self):
         #print "orbits"
         #print self.perms
         #print self.items
-        remain = set(self.items)
+        remain = set(self.set_items)
         orbits = []
         while remain:
             #print "remain:", remain
             item = iter(remain).next()
-            orbit = set(g*item for g in self.perms)
+            orbit = set(g(item) for g in self.perms)
             #print "orbit:", orbit
             for item in orbit:
                 remain.remove(item)
@@ -501,7 +649,7 @@ class Action(object):
 
     def components(self):
         orbits = self.orbits()
-        actions = [Action([perm.restrict(orbit) for perm in self.perms], orbit) for orbit in orbits]
+        actions = [Group([perm.restrict(orbit) for perm in self.perms], orbit) for orbit in orbits]
         return actions
 
     def check(group):
@@ -516,7 +664,7 @@ class Action(object):
         # Cauchy-Frobenius lemma
         assert n == sum(len(g.fixed()) for g in group)
 
-    def all_subactions(self):
+    def subactions(self):
         "All subgroups, acting on the same items. Return as list of homs into self."
         # do the brute-force stupid algorithm
         n = len(self.perms)
@@ -532,12 +680,58 @@ class Action(object):
                 continue
             permss.append(perms)
             send_perms = identity(perms)
-            action = Action(perms, self.items)
+            action = Group(perms, self.items)
             hom = Hom(action, self, send_perms, send_items)
             homs.append(hom)
-        #actions = [Action(perms, self.items) for perms in permss]
+        #actions = [Group(perms, self.items) for perms in permss]
         #return actions
         return homs
+
+    def left_cosets(self, H=None):
+        cosets = set()
+        if H is not None:
+            Hs = [H]
+        else:
+            Hs = [hom.src for hom in self.subactions()]
+        for action in Hs:
+            for g in self:
+                coset = Group([g*h for h in action], self.items)
+                cosets.add(coset)
+        return list(cosets)
+
+    def left_action(self, items):
+        send_perms = {}
+        perms = []
+        for g in self:
+            perm = {}
+            for item in items:
+                perm[item] = g*item
+            perm = Perm(perm, items)
+            perms.append(perm)
+            send_perms[g] = perm
+        f = quotient_rep(perms)
+        send_perms = dict((k, f[v]) for (k, v) in send_perms.items())
+        perms = list(f.values())
+        action = Group(perms, items)
+        hom = Hom(self, action, send_perms)
+        return hom
+
+    def is_subaction(self, H):
+        assert H.items == self.items
+        for g in H.perms:
+            if not g in self.perms:
+                return False
+        return True
+
+    def is_conjugate(self, H1, H2):
+        "is subaction H1 conjugate to subaction H2?"
+        if len(H1) != len(H2):
+            return False
+        assert H1.items == self.items
+        assert H2.items == self.items
+        assert self.is_subaction(H1)
+        assert self.is_subaction(H2)
+        # BLAH
 
 #    def choice(group, k):
 #        "choose k elements"
@@ -556,7 +750,7 @@ class Action(object):
 #            _g = Perm(_perm, _items)
 #            #_group.add(_g)
 #            _group.append(_g)
-#        return Action(_group, _items)
+#        return Group(_group, _items)
 
     def choice(group, *ks):
         "choose k elements"
@@ -572,7 +766,7 @@ class Action(object):
                 _perm[flag] = _flag
             _g = Perm(_perm, _items)
             _group.append(_g)
-        return Action(_group, _items)
+        return Group(_group, _items)
 
     def is_hom(self, items, func):
         #print "is_hom", items, func
@@ -592,7 +786,7 @@ class Action(object):
                     return # fail
             #group.add(Perm(perm, items))
             group.append(Perm(perm, items))
-        group = Action(group, items)
+        group = Group(group, items)
         return group
 
     def all_homs(self, items, surjective=True):
@@ -606,7 +800,7 @@ class Action(object):
                 yield group, func
 
     def isomorphic(self, other):
-        assert isinstance(other, Action)
+        assert isinstance(other, Group)
         if len(self)!=len(other):
             return False
         n = len(self)
@@ -645,17 +839,20 @@ class Action(object):
 
 class Hom(object):
     """
-        A map of Action's is a map of the perms and a 
+        A map of Group's is a map of the perms and a 
         map of the inderlying items, such that these two maps commute.
     """
-    def __init__(self, G, H, send_perms, send_items, check=False):
-        assert isinstance(G, Action)
-        assert isinstance(H, Action)
+    def __init__(self, G, H, send_perms, send_items=None, check=False):
+        assert isinstance(G, Group)
+        assert isinstance(H, Group)
         self.G = G
         self.H = H
         self.send_perms = dict(send_perms) # map G.perms to H.perms
-        self.send_items = dict(send_items) # map G.items to H.items
-        if check:
+        if send_items is not None:
+            self.send_items = dict(send_items) # map G.items to H.items
+        else:
+            self.send_items = None
+        if check or 1:
             self.check()
 
     @property
@@ -678,6 +875,14 @@ class Hom(object):
         return (self.G!=other.G or self.H!=other.H or self.send_perms!=other.send_perms 
             or self.send_items!=other.send_items)
 
+    def __hash__(self):
+        send_perms = self.send_perms
+        send_perms = tuple((perm, send_perms[perm]) for perm in self.G)
+        send_items = self.send_items
+        if send_items is not None:
+            send_items = tuple((item, send_items[item]) for item in self.G.items)
+        return hash((self.G, self.H, send_perms, send_items))
+
     @classmethod
     def identity(cls, G, check=False):
         send_perms = dict((g, g) for g in G)
@@ -687,22 +892,25 @@ class Hom(object):
     def check(self):
         G, H, send_perms, send_items = self.G, self.H, self.send_perms, self.send_items
         assert len(send_perms)==len(G.perms)
-        assert len(send_items)==len(G.items)
-        for item in G.items:
-            assert item in send_items
-            assert send_items[item] in H.items
-        for perm in G.perms:
-            assert perm in send_perms
-            assert send_perms[perm] in H.perms
 
-        # G and H should really be the same (isomorphic) as abstract groups. 
-        # Here we merely check that we have a homomorphism of groups.
+        # Here we check that we have a homomorphism of groups.
         for g1 in G.perms:
           h1 = send_perms[g1]
           for g2 in G.perms:
             h2 = send_perms[g2]
             assert send_perms[g1*g2] == h1*h2
-        #assert len(G) == len(H)
+
+        for perm in G.perms:
+            assert perm in send_perms
+            assert send_perms[perm] in H.perms
+
+        if send_items is None:
+            return
+
+        assert len(send_items)==len(G.items)
+        for item in G.items:
+            assert item in send_items
+            assert send_items[item] in H.items
 
         for g in G.perms:
             # g is a perm on G.items
@@ -728,17 +936,111 @@ class Hom(object):
         hom = Hom(self.G, other.H, send_perms, send_items)
         return hom
 
+    def pushout(self, other):
+        assert self.src == other.src
+        items = []
+        perms = []
+        for a1 in self.tgt.items:
+          for a2 in other.tgt.items:
+            items.append((a1, a2))
+        send_perms = {}
+        for g in self.src:
+            perm = {}
+            for a1, a2 in items:
+                h1 = self.send_perms[g]
+                h2 = other.send_perms[g]
+                perm[(a1, a2)] = h1(a1), h2(a2)
+            perm = Perm(perm, items)
+            perms.append(perm)
+            send_perms[g] = perm
+        action = Group(perms, items)
+        return Hom(self.src, action, send_perms)
+
+    def components(self):
+        src, tgt = self.src, self.tgt
+        orbits = tgt.orbits() # argghh, may not be surjective..
+        homs = []
+        for orbit in orbits:
+            send_perms = {}
+            perms = []
+            for perm in src:
+                perm1 = self.send_perms[perm].restrict(orbit)
+                send_perms[perm] = perm1
+                perms.append(perm1)
+            G = Group(perms, orbit)
+            homs.append(Hom(src, G, send_perms))
+        return homs
+
+    def get_graph(self):
+        graph = isomorph.Graph()
+        src, tgt = self.src, self.tgt
+        send_perms = self.send_perms
+        items = tgt.items
+        n = len(items)
+        # fibres are all the same:
+        fibres = [graph.add("fibre") for item in items]
+        for i, perm in enumerate(src):
+            lookup = dict((item, graph.add()) for item in items)
+            for j in range(n):
+                graph.join(fibres[j], lookup[items[j]])
+            # each layer is unique and contains the "action of g"
+            layer = graph.add("layer_%d"%i)
+            for item in items:
+                graph.join(lookup[item], layer)
+                gitem = send_perms[perm](item)
+                if gitem == item:
+                    # don't need an edge here
+                    continue
+                graph.add_directed(lookup[item], lookup[gitem])
+        return graph
+
+    def isomorphisms(self, other):
+        """ yield all isomorphisms in the category of G-sets.
+            Each isomorphism is a dict:item->item mapping items
+            on the tgt actions.
+        """
+        assert self.src == other.src
+        n = len(self.tgt.items)
+        if n != len(other.tgt.items):
+            return
+        graph0 = self.get_graph()
+        graph1 = other.get_graph()
+        #for fn in isomorph.search(graph0, graph1):
+        for fn in isomorph.search_recursive(graph0, graph1):
+            send_items = {}
+            for i in range(n):
+                send_items[self.tgt.items[i]] = other.tgt.items[fn[i]]
+            yield send_items
+
+    def isomorphic(self, other):
+        "is isomorphic in the category of G-sets"
+        for send_items in self.isomorphisms(other):
+            return True
+        return False
+
 
 def test_hom():
 
     n = argv.get("n", 3)
     items = range(n)
 
-    G = Action.trivial(items, check=True)
+    G = Group.trivial(items, check=True)
     assert len(G.components()) == len(items)
 
-    G = Action.cyclic(items, check=True)
+    hom = Hom.identity(G)
+    assert len(list(hom.isomorphisms(hom))) == factorial(n)
+
+    G = Group.cyclic(items, check=True)
     assert len(G.components()) == 1
+
+    hom = Hom.identity(G)
+    assert len(list(hom.isomorphisms(hom))) == n
+
+    if n<=6:
+        H = Group.cyclic(list("abcdef"[:n]))
+        send_perms = dict((G[i], H[i]) for i in range(len(G)))
+        hom1 = Hom(G, H, send_perms)
+        assert len(list(hom.isomorphisms(hom1))) == n
 
     hom = G.square()
     hom.check()
@@ -746,29 +1048,124 @@ def test_hom():
     for G1 in hom.src.components():
         assert len(G1)==n
 
-    F = Action.dihedral(items, check=True)
-    assert len(F.components()) == 1
-    homFF = F.square()
-    homFF.check()
-    for G1 in homFF.src.components():
-        print len(G1),
-    print
+    G = Group.dihedral(items, check=True)
+    assert len(G.components()) == 1
+
+    # Find all conjugacy classes of subgroups
+    homs = G.subactions()
+    Hs = [hom.src for hom in homs]
+    equs = dict((H1, Equ(H1)) for H1 in Hs)
+    for H1 in Hs:
+        for g in G:
+            if g in H1:
+                continue
+            H2 = g * H1 * (~g) # conjugate
+            if H2 == H1:
+                continue
+            else:
+                #print len(H1), "~", len(H2)
+                equs[H1].merge(equs[H2])
+
+    # get equivelance classes
+    equs = set(equ.top for equ in equs.values())
+    print "equs:", len(equs)
+    for equ in equs:
+        print "equ:", [len(H) for H in equ.items]
+
+    homs = []
+    for H in Hs:
+        cosets = G.left_cosets(H)
+        assert len(G) == len(cosets)*len(H)
+
+        hom = G.left_action(cosets)
+        assert hom.src is G
+        homs.append(hom)
+        assert len(hom.tgt.components())==1 # transitive
+        #print hom.tgt.perms
+        print "subgroup %d cosets %d action %d" %(len(H), len(cosets), len(hom.tgt))
+
+        if n==3:
+            if len(H)==1:
+                hom.name = "F"
+            elif len(H)==2:
+                hom.name = "P"
+            elif len(H)==3:
+                hom.name = "O"
+            else:
+                hom.name = "N"
+
+    f = quotient_rep(homs, Hom.isomorphic)
+    homs = list(set(f.values())) # uniq
+    print "homs:", len(homs)
+    #for hom in homs:
+    #    print hom.tgt
+
+    for i in range(len(homs)):
+        homs[i].name = string.uppercase[i]
+
+    for i in range(len(homs)):
+      for j in range(i, len(homs)):
+        A = homs[i]
+        B = homs[j]
+        C = A.pushout(B)
+        assert C.src is G
+        print "%s*%s ="%(A.name, B.name),
+        #print len(A.tgt.set_perms), len(B.tgt.set_perms), 
+        names = []
+        for hom in C.components():
+            assert hom.src is G
+            #print hom.tgt
+            name = '?'
+            for hom1 in homs:
+                if hom.isomorphic(hom1):
+                    name = hom1.name
+            names.append(name)
+            if name == '?':
+                assert 0
+
+        #print len(C.components())
+        names.sort()
+        print "+".join(names)
 
     return
 
-    homs = F.all_subactions()
-    for A in homs:
-      for B in homs:
-        print len(hom.G)
-        A1 = homFF * A
-        B1 = homFF * B
-
+    cosets = list(G.left_cosets())
+    cosets.sort()
+    for idx, coset in enumerate(cosets):
+        print idx, coset
     print
-#    for T1 in Ts:
-#      for T2 in Ts:
-#        print "%s * %s = %s" % (len(T1), len(T2), [len(T3) for T3 in (T1*T2).components()])
 
-    G = Action.symmetric(items, check=True)
+    perms = []
+    for g in G:
+        #print
+        print g
+        perm = {}
+        for coset in cosets:
+            coset1 = g.rightmul(coset)
+            assert coset1 in cosets
+            perm[coset] = coset1
+            #assert g.rightmul(coset) == coset1
+            #print coset, "->", coset1
+        perm = Perm(perm, cosets)
+        print perm
+        print
+        perms.append(perm)
+
+    action = Group(perms, cosets)
+
+    for G in action.components():
+        #print len(G)
+        for perm in G:
+            print perm, [cosets.index(c) for c in perm.items]
+        print
+            
+#    for coset in cosets:
+#        print coset.perms
+#        print len(coset),
+#    print
+
+
+    G = Group.symmetric(items, check=True)
     assert len(G.components()) == 1
 
     f = Hom.identity(G, check=True)
@@ -805,7 +1202,7 @@ def close_hom(hom):
 
 def find_all_homs(G, H, hom=None, remain=None):
     """
-        Iterate through all homomorphisms from Action G to Action H.
+        Iterate through all homomorphisms from Group G to Group H.
         Yield each homomorphism as a dict : Perm -> Perm.
     """
     if hom is None:
@@ -832,15 +1229,6 @@ def find_all_homs(G, H, hom=None, remain=None):
                     yield _hom
 
 
-#class Action(object):
-#    """
-#        A group action is a homomorphism from a Action to another Action.
-#    """
-#    def __init__(self, group, hom):
-#        self.group = group
-#        self.hom = dict(hom) # dict : Perm -> Perm
-
-
 
 def test():
 
@@ -858,7 +1246,7 @@ def test():
     assert h*h != g
     assert not (h*h == e)
 
-    S3 = Action.generate([g, h])
+    S3 = Group.generate([g, h])
     S3.check()
     assert len(S3) == 6
 
@@ -870,7 +1258,7 @@ def test():
     items4 = list('abcd')
     g = Perm((1, 2, 3, 0), items4)
     h = Perm((1, 0, 2, 3), items4)
-    S4 = Action.generate([g, h])
+    S4 = Group.generate([g, h])
     assert len(S4)==24
 
     S4_22 = S4.choice(2)
@@ -885,7 +1273,7 @@ def test():
     assert Z*Z==I
     assert Z*X != X*Z
     assert Z*X*Z*X == w
-    P1 = Action.generate([X, Z])
+    P1 = Group.generate([X, Z])
     assert len(P1)==8
 
     if 0:
@@ -922,7 +1310,7 @@ def test():
 
     assert ZI*IX == IX*ZI
 
-    P2 = Action.generate([XI, ZI, IX, IZ])
+    P2 = Group.generate([XI, ZI, IX, IZ])
     assert len(P2)==32
 
     #homs = [f for f in find_all_homs(P1, P2, {I:II, w:w2})] # 152 solutions
@@ -939,11 +1327,11 @@ def test():
         count += 1
     assert count==0, count
 
-    if 1:
+    if 0:
         #G1 = S4.choice(2)
         G1 = S4.choice(3, 2, 1)
         G2 = S4.choice(2)
-        group = G1.square(G2)
+        group = G1.square(G2) # <----- FAIL
         print "SxS:", len(group.items)
         print "orbits:", len(group.orbits())
         print
@@ -976,7 +1364,7 @@ def test():
 
     #print len(list(S4.all_homs(list('ab'))))
 
-    Z4 = Action.generate([Perm((1, 2, 3, 0), items4)])
+    Z4 = Group.generate([Perm((1, 2, 3, 0), items4)])
     Z4.check()
     assert len(Z4)==4
 
@@ -997,7 +1385,7 @@ def test():
     #for g in Z4:
     #    print g, g.fixed()
 
-    Z22 = Action.generate([Perm((1, 0, 3, 2), items4), Perm((2, 3, 0, 1), items4)])
+    Z22 = Group.generate([Perm((1, 0, 3, 2), items4), Perm((2, 3, 0, 1), items4)])
     assert len(Z22)==4
 
     assert len(list(Z22.all_homs_iso(Z22))) == 4
