@@ -21,7 +21,7 @@ from operator import mul
 
 import numpy
 
-from action import Perm, Action, mulclose
+from action import Perm, Group, mulclose
 from gelim import solve, array, identity, dot, shortstr, eq, dotx, kernel
 from gelim import Subspace
 from argv import argv
@@ -1203,6 +1203,8 @@ def main():
             G = Weyl.build_D(n)
 
         print "roots:", len(G.roots)
+        if argv.order:
+            print "order:", len(mulclose(G.gen))
 
     if G is None:
         return

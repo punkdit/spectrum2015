@@ -1359,9 +1359,9 @@ def test_toric_ground():
     from qupy.symbolic import groups
     if argv.cyclic:
         d = argv.get('d', 2)
-        G = groups.Action.cyclic(d)
+        G = groups.Group.cyclic(d)
     elif argv.sym:
-        G = groups.Action.symmetric(3)
+        G = groups.Group.symmetric(3)
     else:
         return
 

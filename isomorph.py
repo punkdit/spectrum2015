@@ -11,10 +11,7 @@ except ImportError:
     print "numpy not found"
 
 
-from code import texstr
-
 EPSILON = 1e-8
-scalar = numpy.float64
 
 def write(s):
     sys.stdout.write(str(s)+' ')

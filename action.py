@@ -3,7 +3,7 @@
 import sys
 import string
 
-from util import factorial, all_subsets
+from util import factorial, all_subsets, write
 from argv import argv
 
 import isomorph
@@ -432,7 +432,7 @@ class Group(object):
         self.set_items = set(items) # unordered
         self.set_perms = set(perms) # unordered
         for perm in perms:
-            assert isinstance(perm, Perm)
+            assert isinstance(perm, Perm), type(perm)
             assert perm.items == self.items, (perm.items, items)
         self._str = None # cache
 
@@ -664,7 +664,7 @@ class Group(object):
         # Cauchy-Frobenius lemma
         assert n == sum(len(g.fixed()) for g in group)
 
-    def subactions(self):
+    def Xsubgroups(self):
         "All subgroups, acting on the same items. Return as list of homs into self."
         # do the brute-force stupid algorithm
         n = len(self.perms)
@@ -687,12 +687,37 @@ class Group(object):
         #return actions
         return homs
 
+    def subgroups(self):
+        subs = set()
+        I = self.identity
+        items = self.items
+        group = Group([I], self.items)
+        subs = set([group, self])
+        bdy = set()
+        if len(self)>1:
+            bdy.add(group)
+        set_perms = self.set_perms
+        while bdy:
+            _bdy = set()
+            for group in bdy:
+                assert len(group)<len(self)
+                # XXX do something clever with cosets...
+                for perm in set_perms.difference(group.set_perms):
+                    perms = mulclose(group.perms + [perm])
+                    _group = Group(perms, items)
+                    if _group not in subs:
+                        _bdy.add(_group)
+                        subs.add(_group)
+            bdy = _bdy
+
+        return subs
+
     def left_cosets(self, H=None):
         cosets = set()
         if H is not None:
             Hs = [H]
         else:
-            Hs = [hom.src for hom in self.subactions()]
+            Hs = self.subgroups()
         for action in Hs:
             for g in self:
                 coset = Group([g*h for h in action], self.items)
@@ -722,35 +747,6 @@ class Group(object):
             if not g in self.perms:
                 return False
         return True
-
-    def is_conjugate(self, H1, H2):
-        "is subaction H1 conjugate to subaction H2?"
-        if len(H1) != len(H2):
-            return False
-        assert H1.items == self.items
-        assert H2.items == self.items
-        assert self.is_subaction(H1)
-        assert self.is_subaction(H2)
-        # BLAH
-
-#    def choice(group, k):
-#        "choose k elements"
-#    
-#        items = group.items
-#        _items = choose(items, k)
-#        #_group = set()
-#        _group = []
-#        for g in group:
-#            perm = g.perm
-#            _perm = {}
-#            for left, right in _items:
-#                _left = SetItem(tuple(perm[item] for item in left))
-#                _right = SetItem(tuple(perm[item] for item in right))
-#                _perm[left, right] = _left, _right
-#            _g = Perm(_perm, _items)
-#            #_group.add(_g)
-#            _group.append(_g)
-#        return Group(_group, _items)
 
     def choice(group, *ks):
         "choose k elements"
@@ -1048,12 +1044,45 @@ def test_hom():
     for G1 in hom.src.components():
         assert len(G1)==n
 
-    G = Group.dihedral(items, check=True)
-    assert len(G.components()) == 1
+    if argv.dihedral:
+        G = Group.dihedral(items, check=True)
+        assert len(G.components()) == 1
+
+    elif argv.symmetric:
+        G = Group.symmetric(items, check=True)
+        assert len(G.components()) == 1
+
+    elif argv.A_2:
+        G = Group.symmetric(range(3), check=True)
+
+    elif argv.A_3:
+        G = Group.symmetric(range(4), check=True)
+
+    elif argv.B_2:
+        items = range(8)
+        gen = [
+            Perm({0:0, 1:2, 2:1, 3:3, 4:6, 5:7, 6:4, 7:5}, items), 
+            Perm({0:1, 1:0, 2:3, 3:2, 4:4, 5:5, 6:7, 7:6}, items)]
+        perms = mulclose(gen)
+        G = Group(perms, items)
+
+    elif argv.B_3:
+        items = range(18)
+        gen = [
+            Perm({0:0, 1:2, 2:1, 3:3, 4:8, 5:9, 6:10, 7:11, 8:4, 9:5, 
+                10:6, 11:7, 12:14, 13:15, 14:12, 15:13, 16:16, 17:17}, items),
+            Perm({0:4, 1:5, 2:6, 3:7, 4:0, 5:1, 6:2, 7:3, 8:8, 9:10,
+                10:9, 11:11, 12:12, 13:13, 14:16, 15:17, 16:14, 17:15}, items),
+            Perm({0:0, 1:1, 2:2, 3:3, 4:5, 5:4, 6:7, 7:6, 8:9, 9:8,
+                10:11, 11:10, 12:12, 13:13, 14:14, 15:15, 16:17, 17:16}, items)]
+        perms = mulclose(gen)
+        G = Group(perms, items)
+
+    else:
+        return
 
     # Find all conjugacy classes of subgroups
-    homs = G.subactions()
-    Hs = [hom.src for hom in homs]
+    Hs = G.subgroups()
     equs = dict((H1, Equ(H1)) for H1 in Hs)
     for H1 in Hs:
         for g in G:
@@ -1068,9 +1097,11 @@ def test_hom():
 
     # get equivelance classes
     equs = set(equ.top for equ in equs.values())
-    print "equs:", len(equs)
     for equ in equs:
         print "equ:", [len(H) for H in equ.items]
+    print "total:", len(equs)
+
+    Hs = [equ.items[0] for equ in equs] # pick unique (up to conjugation)
 
     homs = []
     for H in Hs:
@@ -1084,24 +1115,16 @@ def test_hom():
         #print hom.tgt.perms
         print "subgroup %d cosets %d action %d" %(len(H), len(cosets), len(hom.tgt))
 
-        if n==3:
-            if len(H)==1:
-                hom.name = "F"
-            elif len(H)==2:
-                hom.name = "P"
-            elif len(H)==3:
-                hom.name = "O"
-            else:
-                hom.name = "N"
+    if 0:
+        # We don't need to do this again: isomorphic homs all
+        # come from conjugate subgroups.
+        f = quotient_rep(homs, Hom.isomorphic)
+        homs = list(set(f.values())) # uniq
+        print "homs:", len(homs)
 
-    f = quotient_rep(homs, Hom.isomorphic)
-    homs = list(set(f.values())) # uniq
-    print "homs:", len(homs)
-    #for hom in homs:
-    #    print hom.tgt
-
+    letters = string.uppercase + string.lowercase
     for i in range(len(homs)):
-        homs[i].name = string.uppercase[i]
+        homs[i].name = letters[i]
 
     for i in range(len(homs)):
       for j in range(i, len(homs)):
@@ -1119,6 +1142,7 @@ def test_hom():
             for hom1 in homs:
                 if hom.isomorphic(hom1):
                     name = hom1.name
+                    break
             names.append(name)
             if name == '?':
                 assert 0
@@ -1128,42 +1152,6 @@ def test_hom():
         print "+".join(names)
 
     return
-
-    cosets = list(G.left_cosets())
-    cosets.sort()
-    for idx, coset in enumerate(cosets):
-        print idx, coset
-    print
-
-    perms = []
-    for g in G:
-        #print
-        print g
-        perm = {}
-        for coset in cosets:
-            coset1 = g.rightmul(coset)
-            assert coset1 in cosets
-            perm[coset] = coset1
-            #assert g.rightmul(coset) == coset1
-            #print coset, "->", coset1
-        perm = Perm(perm, cosets)
-        print perm
-        print
-        perms.append(perm)
-
-    action = Group(perms, cosets)
-
-    for G in action.components():
-        #print len(G)
-        for perm in G:
-            print perm, [cosets.index(c) for c in perm.items]
-        print
-            
-#    for coset in cosets:
-#        print coset.perms
-#        print len(coset),
-#    print
-
 
     G = Group.symmetric(items, check=True)
     assert len(G.components()) == 1

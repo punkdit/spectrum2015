@@ -9,7 +9,7 @@ from solve import zeros2, enum2, row_reduce, span, shortstr, shortstrx, solve, r
 import isomorph
 from isomorph import Bag, Point, write
 from bruhat import BruhatMonoid
-from action import Perm, Action
+from action import Perm, Group
 from util import all_subsets, factorial, choose
 
 from argv import Argv
@@ -1032,7 +1032,7 @@ def hecke(self):
         write('.')
     print
 
-    g = Action(perms, items)
+    g = Group(perms, items)
 
     orbits = g.orbits()
     #print orbits

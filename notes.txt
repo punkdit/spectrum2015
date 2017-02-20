@@ -1,3 +1,77 @@
+20/2/17
+=======
+
+group isomorphisms
+https://rjlipton.wordpress.com/2011/10/08/an-annoying-open-problem/
+
+
+time ./action.py n=4
+equs: 8
+equ: [2, 2]
+equ: [1]
+equ: [4]
+equ: [4]
+equ: [2]
+equ: [4]
+equ: [2, 2]
+equ: [8]
+subgroup 2 cosets 4 action 4
+subgroup 4 cosets 2 action 2
+subgroup 2 cosets 4 action 8
+subgroup 4 cosets 2 action 2
+subgroup 8 cosets 1 action 1
+subgroup 2 cosets 4 action 8
+subgroup 4 cosets 2 action 2
+subgroup 2 cosets 4 action 8
+subgroup 1 cosets 8 action 8
+subgroup 2 cosets 4 action 8
+homs: 8
+A*A = A+A
+A*B = C
+A*C = C+C
+A*D = D+D
+A*E = E+E
+A*F = E
+A*G = C
+A*H = A
+B*B = B+B
+B*C = C+C
+B*D = E
+B*E = E+E
+B*F = E
+B*G = C
+B*H = B
+C*C = C+C+C+C
+C*D = E+E
+C*E = E+E+E+E
+C*F = E+E
+C*G = C+C
+C*H = C
+D*D = D+D+E
+D*E = E+E+E+E
+D*F = E+E
+D*G = E
+D*H = D
+E*E = E+E+E+E+E+E+E+E
+E*F = E+E+E+E
+E*G = E+E
+E*H = E
+F*F = E+F+F
+F*G = F+F
+F*H = F
+G*G = G+G
+G*H = G
+H*H = H
+
+
+from james:
+
+    octets:  e = frame
+    quartets:  d = corner, c = (long axis, short axis) pair, f = edge
+    duets:  g = long axis, b = orientation, a = short axis
+    solos:  h = nothing
+
+
 
 19/2/17
 =======
