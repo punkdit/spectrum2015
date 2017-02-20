@@ -4,8 +4,12 @@ import sys
 #from heapq import heappush, heappop, heapify
 from random import randint, choice, seed
 
-import numpy
-#import scipy.sparse.linalg as la
+try:
+    import numpy
+    #import scipy.sparse.linalg as la
+except ImportError:
+    print "numpy not found"
+
 
 from code import texstr
 
@@ -71,6 +75,13 @@ def parse(s):
 
 
 class Point(object):
+    """
+        A Point is a vertex in a Graph (an undirected graph).
+        Each Point has a "desc", this is any distinguishing 
+        characteristic (colour/type, etc.)
+        as respected by isomorphisms of Graph's.
+        The "desc" can be any string.
+    """
     def __init__(self, desc, idx, nbd=None, colour="", **kw):
         self.desc = desc
         self._colour = colour
@@ -118,15 +129,35 @@ class Point(object):
     #    return "Point(%s: %s)"%(self.desc, descs)
 
 
-class Bag(object):
-    def __init__(self, points, **attrs):
+class Graph(object):
+    """
+        Undirected graph.
+    """
+    def __init__(self, points=[], **attrs):
         self.__dict__.update(attrs)
         self.descs = {}  # cache, map point -> desc
         self.deps = None # map point -> list of points
         self.attrs = dict(attrs)
-        self.points = points
+        self.points = list(points)
         for i, point in enumerate(points):
             assert point.idx == i
+
+    def add(self, desc='', **kw):
+        "add a Point"
+        assert not self.descs
+        assert self.deps is None
+        i = len(self.points)
+        point = Point(desc, i, **kw)
+        self.points.append(point)
+        return point
+
+    def add_directed(self, pi, pj, desc='directed'):
+        "encode a directed edge using a path with two extra (coloured) Point's"
+        pa = self.add("%s_a"%desc)
+        pb = self.add("%s_b"%desc)
+        self.join(pi, pa)
+        self.join(pa, pb)
+        self.join(pb, pj)
 
     def __len__(self):
         return len(self.points)
@@ -134,12 +165,16 @@ class Bag(object):
     def __getitem__(self, idx):
         return self.points[idx]
 
-    def join(self, i, j):
+    def join(self, pi, pj):
         points = self.points
-        if points[i] not in points[j].nbd:
-            points[j].nbd.append(points[i])
-        if points[j] not in points[i].nbd:
-            points[i].nbd.append(points[j])
+        if type(pi) in [int, long]:
+            pi = points[pi]
+        if type(pj) in [int, long]:
+            pj = points[pj]
+        if pi not in pj.nbd:
+            pj.nbd.append(pi)
+        if pj not in pi.nbd:
+            pi.nbd.append(pj)
 
     @classmethod
     def build(cls, Gx):
@@ -210,8 +245,10 @@ class Bag(object):
         for p in self.deps[p]:
             self.descs[p] = None # clear cache
 
+Bag = Graph # backwards compat
 
-class Tanner(Bag):
+
+class Tanner(Graph):
     # This is the Tanner graph
 
     @classmethod
@@ -273,7 +310,7 @@ def from_sparse_ham(n, H):
     for i, j in H.keys():
         if i!=j:
             points[i].nbd.append(points[j])
-    bag = Bag(points)
+    bag = Graph(points)
     return bag
 
 
@@ -291,7 +328,7 @@ def from_ham(H, syndromes=None):
             continue
         if H[i, j]:
             points[i].nbd.append(points[j])
-    bag = Bag(points)
+    bag = Graph(points)
     return bag
 
 
@@ -317,7 +354,7 @@ def from_ham_syndromes(H, syndromes):
         if syndromes[i][j]:
             points[i].nbd.append(checks[j])
             checks[j].nbd.append(points[i])
-    bag = Bag(points+checks)
+    bag = Graph(points+checks)
     return bag
 
 
@@ -344,7 +381,9 @@ def search_recursive(bag0, bag1, fn=None, depth=1):
 
     if fn is None:
         fn = {}
-        assert len(bag0)==len(bag1)
+        if len(bag0)!=len(bag1):
+            return
+
         assert bag0 is not bag1
 
     orbits0 = bag0.get_orbits(depth)
@@ -490,6 +529,8 @@ class State(object):
 
 def search(bag0, bag1, depth=1, fn=None, verbose=False):
 
+    assert bag0 is not bag1
+
     if fn is None:
         fn = {}
 
@@ -607,7 +648,7 @@ def peterson_graph():
     inside = [Point('', i) for i in range(5)]
     outside = [Point('', i+5) for i in range(5)]
 
-    bag = Bag(inside+outside)
+    bag = Graph(inside+outside)
 
     for i in range(5):
 
@@ -619,6 +660,22 @@ def peterson_graph():
             bag.join(i+5, i+6)
         else:
             bag.join(i+5, i+1)
+
+    return bag
+
+
+def cyclic_graph():
+    n = 5
+
+    points = [Point('', i) for i in range(n)]
+    bag = Graph(points)
+
+#    for i in range(n):
+#        points[i].nbd.append(points[(i+1)%n])
+#        points[(i+1)%n].nbd.append(points[i])
+
+    for i in range(n):
+        bag.add_directed(points[i], points[(i+1)%n])
 
     return bag
 
@@ -661,6 +718,11 @@ def test():
     bag0 = peterson_graph()
     bag1 = peterson_graph()
     assert len(list(search(bag0, bag1, depth=1))) == 120
+
+    # directed graph
+    bag0 = cyclic_graph()
+    bag1 = cyclic_graph()
+    assert len(list(search(bag0, bag1))) == 5
 
 
 from argv import Argv 
