@@ -1015,6 +1015,38 @@ class Hom(object):
         return False
 
 
+r"""
+Here we calculate the Burnside Ring corresponding to a particular G-set.
+
+Klein geometry: 
+(1) a set of "points" and a group G acting on the set.
+(2) (conjugacy classes of) subgroups of G are the "geometric properties" 
+
+For example, a triangle.
+This has symmetry group of order 6, and lattice
+of subgroups:
+
+      6
+     / \
+    /   \
+    3    2
+    \   /
+     \ /
+      1
+
+We name the corresponding properties as:
+
+      Frames
+     / \
+    /   \
+Points  Orientations
+    \   /
+     \ /
+      Nothing
+"""
+
+
+
 def test_hom():
 
     n = argv.get("n", 3)
@@ -1096,7 +1128,8 @@ def test_hom():
                 equs[H1].merge(equs[H2])
 
     # get equivelance classes
-    equs = set(equ.top for equ in equs.values())
+    equs = list(set(equ.top for equ in equs.values()))
+    equs.sort(key = lambda equ : -len(equ.items[0]))
     for equ in equs:
         print "equ:", [len(H) for H in equ.items]
     print "total:", len(equs)

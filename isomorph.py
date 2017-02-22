@@ -11,64 +11,7 @@ except ImportError:
     print "numpy not found"
 
 
-EPSILON = 1e-8
-
-def write(s):
-    sys.stdout.write(str(s)+' ')
-    sys.stdout.flush()
-
-
-gcolor_gauge = """
-1111...........
-11..11.........
-1.1.1.1........
-..11..11.......
-.1.1.1.1.......
-....1111.......
-11......11.....
-1.1.....1.1....
-........1111...
-..11......11...
-.1.1.....1.1...
-1...1...1...1..
-........11..11.
-.1...1...1...1.
-....11......11.
-........1.1.1.1
-..1...1...1...1
-....1.1.....1.1
-"""
-
-gcolor_stab = """
-11111111.......
-1111....1111...
-11..11..11..11.
-1.1.1.1.1.1.1.1
-"""
-
-cube_ham = """
-6111....
-14..11..
-1.4.1.1.
-1..4.11.
-.11.2..1
-.1.1.2.1
-..11..21
-....1110
-"""
-
-
-def parse(s):
-    s = s.replace('.', '0') 
-    lines = s.split()
-    lines = [l.strip() for l in lines if l.strip()]
-    rows = [list(int(c) for c in l) for l in lines]
-    if rows:
-        n = len(rows[0])
-        for row in rows:
-            assert len(row)==n, "rows have varying lengths"
-    a = numpy.array(rows, dtype=numpy.int32)
-    return a
+from util import write
 
 
 class Point(object):
@@ -213,6 +156,13 @@ class Graph(object):
 
     def get_desc(self, depth=1):
         return [v.get_desc(depth) for v in self.points]
+
+    def get_stats(self, depth=1):
+        stats = {}
+        for point in self:
+            desc = point.get_desc(depth)
+            stats[desc] = stats.get(desc, 0) + 1
+        return stats
 
     def get_orbits(self, depth=1):
         orbits = {}
@@ -530,6 +480,10 @@ def search(bag0, bag1, depth=1, fn=None, verbose=False):
     if len(bag0) != len(bag1):
         return
 
+    # doesn't help any:
+    #if bag0.get_stats() != bag1.get_stats():
+    #    return
+
     if fn is None:
         fn = {}
 
@@ -680,6 +634,60 @@ def cyclic_graph():
         bag.add_directed(points[i], points[(i+1)%n])
 
     return bag
+
+
+
+gcolor_gauge = """
+1111...........
+11..11.........
+1.1.1.1........
+..11..11.......
+.1.1.1.1.......
+....1111.......
+11......11.....
+1.1.....1.1....
+........1111...
+..11......11...
+.1.1.....1.1...
+1...1...1...1..
+........11..11.
+.1...1...1...1.
+....11......11.
+........1.1.1.1
+..1...1...1...1
+....1.1.....1.1
+"""
+
+gcolor_stab = """
+11111111.......
+1111....1111...
+11..11..11..11.
+1.1.1.1.1.1.1.1
+"""
+
+cube_ham = """
+6111....
+14..11..
+1.4.1.1.
+1..4.11.
+.11.2..1
+.1.1.2.1
+..11..21
+....1110
+"""
+
+
+def parse(s):
+    s = s.replace('.', '0') 
+    lines = s.split()
+    lines = [l.strip() for l in lines if l.strip()]
+    rows = [list(int(c) for c in l) for l in lines]
+    if rows:
+        n = len(rows[0])
+        for row in rows:
+            assert len(row)==n, "rows have varying lengths"
+    a = numpy.array(rows, dtype=numpy.int32)
+    return a
 
 
 def test():
