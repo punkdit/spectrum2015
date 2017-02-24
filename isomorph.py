@@ -164,6 +164,7 @@ class Graph(object):
             stats[desc] = stats.get(desc, 0) + 1
         return stats
 
+    # ---------- HOTSPOT -----------------------------> 
     def get_orbits(self, depth=1):
         orbits = {}
         assert depth==1

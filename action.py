@@ -39,7 +39,7 @@ class Set(object):
 
 
 class Equ(object):
-    "Equivalence class for an _equivelance relation"
+    "Equivalence class for an _equivalance relation"
     def __init__(self, item):
         self.items = [item]
         self.parent = None 
@@ -82,8 +82,8 @@ class Equ(object):
 
 def quotient(items, relation=None):
     """ return a dict:item->items that sends each item 
-        to the list of equivelant items 
-        under the equivelance relation.
+        to the list of equivalant items 
+        under the equivalance relation.
     """
     if relation is None:
         relation = lambda a,b : (a==b)
@@ -104,8 +104,8 @@ def quotient(items, relation=None):
 
 def quotient_rep(items, relation=None):
     """ return a dict:item->item that sends each item 
-        to a representative equivelant item
-        under the equivelance relation.
+        to a representative equivalant item
+        under the equivalance relation.
     """
     hom = quotient(items, relation)
     hom = dict((item, items[0]) for (item, items) in hom.items()) # confused ?
@@ -228,13 +228,16 @@ class Perm(object):
         return action
 
     def __mul__(self, other):
+        # break this into three cases: 
         if isinstance(other, Group):
             perms = [self*perm for perm in other]
             action = Group(perms, self.items)
             return action # <----- return
+
         if not isinstance(other, Perm):
             item = self.perm[other]
             return item # <---- return
+
         assert self.items == other.items
         perm = {}
         #for item in self.items:
@@ -243,8 +246,10 @@ class Perm(object):
             perm[item] = self.perm[other.perm[item]]
         return Perm(perm, self.items, self.word+other.word)
 
+    # More strict than __mul__:
     def __call__(self, item):
         return self.perm[item]
+    __getitem__ = __call__
 
     def __pow__(self, n):
         assert int(n)==n
@@ -273,15 +278,36 @@ class Perm(object):
         assert self.items == other.items
         return self.perm != other.perm
 
-    def __getitem__(self, idx):
-        return self.perm[idx]
-
     def fixed(self):
         items = []
         for item in self.items:
             if self.perm[item] == item:
                 items.append(item)
         return items
+
+    def orbits(self):
+        remain = set(self.items)
+        orbits = []
+        while remain:
+            item = iter(remain).next()
+            orbit = [item]
+            item0 = item
+            while 1:
+                item = self.perm[item]
+                if item == item0:
+                    break
+                orbit.append(item)
+                assert len(orbit) <= len(remain)
+            remain = remain.difference(orbit)
+            orbits.append(orbit)
+        return orbits
+
+    def conjugacy_cls(self):
+        "this is a partition of len(items)"
+        orbits = self.orbits()
+        sizes = [len(orbit) for orbit in orbits]
+        sizes.sort() # uniq
+        return tuple(sizes)
 
 
 #class Species(object):
@@ -652,6 +678,22 @@ class Group(object):
         actions = [Group([perm.restrict(orbit) for perm in self.perms], orbit) for orbit in orbits]
         return actions
 
+    def shape_item(self):
+        shape_item = []
+        for item in self.items:
+            shape = []
+            for g in self:
+                gitem = item
+                n = 1
+                while 1:
+                    gitem = g(gitem)
+                    if gitem == item:
+                        break
+                    n += 1
+                shape.append(n)
+            shape_item.append(tuple(shape))
+        return shape_item
+
     def check(group):
         #print "check"
         orbits = group.orbits()
@@ -664,30 +706,8 @@ class Group(object):
         # Cauchy-Frobenius lemma
         assert n == sum(len(g.fixed()) for g in group)
 
-    def Xsubgroups(self):
-        "All subgroups, acting on the same items. Return as list of homs into self."
-        # do the brute-force stupid algorithm
-        n = len(self.perms)
-        permss = []
-        homs = []
-        send_items = identity(self.items)
-        for idxs in all_subsets(n):
-            if not idxs:
-                continue
-            perms = [self.perms[idx] for idx in idxs]
-            perms = set(mulclose(perms))
-            if perms in permss:
-                continue
-            permss.append(perms)
-            send_perms = identity(perms)
-            action = Group(perms, self.items)
-            hom = Hom(action, self, send_perms, send_items)
-            homs.append(hom)
-        #actions = [Group(perms, self.items) for perms in permss]
-        #return actions
-        return homs
-
     def subgroups(self):
+        "All subgroups, acting on the same items."
         subs = set()
         I = self.identity
         items = self.items
@@ -835,8 +855,9 @@ class Group(object):
 
 class Hom(object):
     """
-        A map of Group's is a map of the perms and a 
-        map of the inderlying items, such that these two maps commute.
+        XXX A map of Group's is a map of the perms and a 
+        XXX map of the inderlying items, such that these two maps commute.
+        FIX THIS DOC
     """
     def __init__(self, G, H, send_perms, send_items=None, check=False):
         assert isinstance(G, Group)
@@ -864,10 +885,12 @@ class Hom(object):
 
     # Equality on-the-nose:
     def __eq__(self, other):
+        assert isinstance(other, Hom)
         return (self.G==other.G and self.H==other.H and self.send_perms==other.send_perms 
             and self.send_items==other.send_items)
 
     def __ne__(self, other):
+        assert isinstance(other, Hom)
         return (self.G!=other.G or self.H!=other.H or self.send_perms!=other.send_perms 
             or self.send_items!=other.send_items)
 
@@ -990,14 +1013,29 @@ class Hom(object):
                 graph.add_directed(lookup[item], lookup[gitem])
         return graph
 
+    def get_shape(self):
+        src, tgt = self.src, self.tgt
+        send_perms = self.send_perms
+        shape = []
+        for perm in src:
+            perm = send_perms[perm]
+            shape.append(perm.conjugacy_cls())
+        return shape
+
     def isomorphisms(self, other):
         """ yield all isomorphisms in the category of G-sets.
             Each isomorphism is a dict:item->item mapping items
             on the tgt actions.
+
+            self  maps G -> H1
+            other maps G -> H2
+            an isomorphism maps H1.items -> H2.items
         """
         assert self.src == other.src
         n = len(self.tgt.items)
         if n != len(other.tgt.items):
+            return
+        if self.get_shape() != other.get_shape():
             return
         graph0 = self.get_graph()
         graph1 = other.get_graph()
@@ -1008,17 +1046,62 @@ class Hom(object):
                 send_items[self.tgt.items[i]] = other.tgt.items[fn[i]]
             yield send_items
 
+    def shape_item(self):
+        shape_item = []
+        send_perms = self.send_perms
+        for item in self.tgt.items:
+            shape = []
+            for g in self.src:
+                g = send_perms[g]
+                gitem = item
+                n = 1
+                while 1:
+                    gitem = g(gitem)
+                    if gitem == item:
+                        break
+                    n += 1
+                shape.append(n)
+            shape_item.append(tuple(shape))
+        return shape_item
+
     def isomorphic(self, other):
         "is isomorphic in the category of G-sets"
+
         for send_items in self.isomorphisms(other):
             return True
         return False
+
+    def isomorphic(self, other):
+
+        shape1 = self.shape_item()
+        shape2 = other.shape_item()
+
+        if set(shape1) != set(shape2):
+            return False
+
+        send_items = {}
+        remain = set(other.tgt.items)
+        #for shape, item in shape1.items():
+        for s1, item1 in zip(shape1, self.tgt.items):
+          for s2, item2 in zip(shape2, other.tgt.items):
+            if s1 != s2:
+                continue
+            if item2 not in remain:
+                continue
+            send_items[item1] = item2
+            remain.remove(item2)
+            break
+          else:
+            return False
+        #yield send_items
+        return True
+            
 
 
 r"""
 Here we calculate the Burnside Ring corresponding to a particular G-set.
 
-Klein geometry: 
+Finite kleinian geometry: 
 (1) a set of "points" and a group G acting on the set.
 (2) (conjugacy classes of) subgroups of G are the "geometric properties" 
 
@@ -1043,6 +1126,36 @@ Points  Orientations
     \   /
      \ /
       Nothing
+
+
+More details:
+
+We consider the group G = S_3 the permutation group on three things.
+This is also the symmetry group of the triangle.
+
+This group has 6 elements, and has 6 subgroups.
+These subgroups have orders: 1, 2, 2, 2, 3 and 6.
+
+Each subgroup preserves (stabilizes) something, which we
+think of as a type of figure. 
+The one element subgroup preserves any FRAME (which we call F)
+Each 2 element subgroup preserves a POINT (P) 
+The 3 element subgroup preserves any ORIENTATION (O)
+The 6 element subgroup preserves any NOTHING (N)
+
+The 2 element subgroups are all conjugates of
+each other, so these three subgroups are all considered the "same" subgroup.
+Conjugate subgroups correspond to
+isomorphic objects in the category of G-sets.
+
+Now, an actual thing of type F, P, O, or N corresponds to
+a coset of the subgroup for that type.
+
+Therefore, we have 6 things of type FRAME,
+3 things of type POINT,
+2 things of type ORIENTATION,
+and 1 thing of type NOTHING.
+
 """
 
 
@@ -1113,6 +1226,21 @@ def test_hom():
     else:
         return
 
+
+    if 0:
+        shapes = list(G.shape_item())
+        print len(shapes), len(set(shapes))
+        for shape in shapes:
+            print shape
+        return
+
+    if 0:
+        hom = Hom.identity(G)
+        for iso in hom.isomorphisms(hom):
+            print iso
+    
+        return
+
     # Find all conjugacy classes of subgroups
     Hs = G.subgroups()
     equs = dict((H1, Equ(H1)) for H1 in Hs)
@@ -1127,7 +1255,7 @@ def test_hom():
                 #print len(H1), "~", len(H2)
                 equs[H1].merge(equs[H2])
 
-    # get equivelance classes
+    # get equivalance classes
     equs = list(set(equ.top for equ in equs.values()))
     equs.sort(key = lambda equ : -len(equ.items[0]))
     for equ in equs:
@@ -1135,6 +1263,7 @@ def test_hom():
     print "total:", len(equs)
 
     Hs = [equ.items[0] for equ in equs] # pick unique (up to conjugation)
+    Hs.sort(key = lambda H : (-len(H), H.str()))
 
     homs = []
     for H in Hs:
@@ -1452,7 +1581,12 @@ def test():
 
 if __name__ == "__main__":
 
-    test_hom()
+    if argv.profile:
+        import cProfile as profile
+        profile.run("test_hom()")
+    else:
+
+        test_hom()
 
     if argv.test:
         test()
