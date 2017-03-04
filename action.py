@@ -2,11 +2,12 @@
 
 import sys
 import string
+from random import randint
 
 from util import factorial, all_subsets, write
 from argv import argv
-
 import isomorph
+from smap import SMap
 
 
 def mulclose(els, verbose=False, maxsize=None):
@@ -26,6 +27,26 @@ def mulclose(els, verbose=False, maxsize=None):
                         return list(els)
                     changed = True
     return els
+
+
+def mulclose_fast(els, bdy=None):
+    els = set(els)
+    if bdy is None:
+        bdy = [(i, j) for i in els for j in els]
+
+    while bdy:
+        _bdy = []
+        for i, j in bdy:
+            k = i*j
+            if k not in els:
+                _bdy.append((k, k))
+                for kk in els:
+                    _bdy.append((k, kk))
+                    #_bdy.append((kk, k)) # i don't think we need this
+                els.add(k)
+        bdy = _bdy
+    return els
+
 
 def identity(items):
     return dict((i, i) for i in items)
@@ -457,7 +478,7 @@ class Group(object):
     def __init__(self, perms, items, check=False):
         perms = list(perms)
         self.perms = perms # ordered 
-        self.items = list(items) # ordered 
+        self.items = list(items)
         self.set_items = set(items) # unordered
         self.set_perms = set(perms) # unordered
         for perm in perms:
@@ -473,10 +494,14 @@ class Group(object):
         return self._str
 
     def __eq__(self, other): # HOTSPOT 
-        return (self.items == other.items and self.set_perms == other.set_perms)
+        if len(self.perms) != len(other.perms):
+            return False
+        return (self.set_items == other.set_items and self.set_perms == other.set_perms)
 
     def __ne__(self, other):
-        return (self.items == other.items and self.set_perms == other.set_perms)
+        if len(self.perms) != len(other.perms):
+            return True
+        return (self.set_items != other.set_items or self.set_perms != other.set_perms)
 
     def __hash__(self):
         return hash(self.str())
@@ -701,7 +726,7 @@ class Group(object):
         # Cauchy-Frobenius lemma
         assert n == sum(len(g.fixed()) for g in group)
 
-    def subgroups(self): # XXX SLOW
+    def subgroups_slow(self): # XXX SLOW
         "All subgroups, acting on the same items."
         subs = set()
         I = self.identity
@@ -725,6 +750,58 @@ class Group(object):
                         subs.add(_group)
             bdy = _bdy
 
+        return subs
+
+    def subgroups(self, verbose=False):
+        I = self.identity
+        items = self.items
+        trivial = Group([I], items)
+        # find all cyclic subgroups
+        cyclic = set()
+        for g0 in self:
+            if g0==I:
+                continue
+            perms = [g0]
+            g1 = g0
+            while 1:
+                g1 = g0*g1
+                if g1==g0:
+                    break
+                perms.append(g1)
+            group = Group(perms, self.items)
+            assert len(group)>1
+            cyclic.add(group)
+        if verbose:
+            print "Group.subgroups: cyclic:", len(cyclic)
+        n = len(self) # order
+        subs = set(cyclic)
+        subs.add(trivial)
+        subs.add(self)
+        bdy = set(G for G in cyclic if len(G)<n)
+        while bdy:
+            _bdy = set()
+            # consider each group in bdy
+            for G in bdy:
+                # enlarge by a cyclic subgroup
+                for H in cyclic:
+                    perms = set(G.perms+H.perms)
+                    k = len(perms)
+                    if k==n or k==len(G) or k==len(H):
+                        continue
+                    #perms = mulclose(perms)
+                    perms = mulclose_fast(perms)
+                    K = Group(perms, items)
+                    if K not in subs:
+                        _bdy.add(K)
+                        subs.add(K)
+                        if verbose:
+                            write('.')
+                    #else:
+                    #    write('/')
+            bdy = _bdy
+            if verbose:
+                print "subs:", len(subs)
+                print "bdy:", len(bdy)
         return subs
 
     def left_cosets(self, H=None):
@@ -1107,29 +1184,37 @@ and 1 thing of type NOTHING.
 """
 
 
+def test_action():
 
-def test_hom():
+    for n in range(3, 6):
+        items = range(n)
+
+        G = Group.trivial(items, check=True)
+        assert len(G.components()) == len(items)
+    
+        action = Action.identity(G)
+        assert len(list(action.isomorphisms(action))) == factorial(n)
+    
+        G = Group.cyclic(items, check=True)
+        assert len(G.components()) == 1
+    
+        action = Action.identity(G)
+        assert len(list(action.isomorphisms(action))) == n
+    
+        H = Group.cyclic(list("abcdef"[:n]))
+        send_perms = dict((G[i], H[i]) for i in range(len(G)))
+        action1 = Action(G, send_perms, H.items)
+        assert len(list(action.isomorphisms(action1))) == n
+
+        G = Group.symmetric(items, check=True)
+        assert len(G.components()) == 1
+
+
+def main():
 
     n = argv.get("n", 3)
     items = range(n)
 
-    G = Group.trivial(items, check=True)
-    assert len(G.components()) == len(items)
-
-    hom = Action.identity(G)
-    assert len(list(hom.isomorphisms(hom))) == factorial(n)
-
-    G = Group.cyclic(items, check=True)
-    assert len(G.components()) == 1
-
-    hom = Action.identity(G)
-    assert len(list(hom.isomorphisms(hom))) == n
-
-    if n<=6:
-        H = Group.cyclic(list("abcdef"[:n]))
-        send_perms = dict((G[i], H[i]) for i in range(len(G)))
-        hom1 = Action(G, send_perms, H.items)
-        assert len(list(hom.isomorphisms(hom1))) == n
 
     if argv.dihedral:
         G = Group.dihedral(items, check=True)
@@ -1176,7 +1261,6 @@ def test_hom():
         perms = [f for f in g.get_symmetry()]
         perms = [Perm(f, items) for f in perms]
         G = Group(perms, items)
-        print "perms:", len(perms)
 
     else:
         return
@@ -1191,14 +1275,31 @@ def test_hom():
         return
 
     if 0:
-        hom = Action.identity(G)
-        for iso in hom.isomorphisms(hom):
+        action = Action.identity(G)
+        for iso in action.isomorphisms(action):
             print iso
     
         return
 
+    print "G:", len(G)
+
+    if argv.subgroups:
+        Hs = G.subgroups()
+        print "subgroups:", len(Hs)
+        sizes = [len(H) for H in Hs]
+        sizes.sort()
+        print "\t", sizes
+
+    if argv.burnside:
+        burnside(G)
+
+
+def burnside(G):
+
     # Find all conjugacy classes of subgroups
     Hs = G.subgroups()
+    print "subgroups:", len(Hs)
+
     equs = dict((H1, Equ(H1)) for H1 in Hs)
     for H1 in Hs:
         for g in G:
@@ -1243,8 +1344,12 @@ def test_hom():
         print "homs:", len(homs)
 
     letters = string.uppercase + string.lowercase
+    letters = letters[:len(homs)]
     for i in range(len(homs)):
         homs[i].name = letters[i]
+
+    table = {}
+    width = 0
 
     for i in range(len(homs)):
       for j in range(i, len(homs)):
@@ -1277,21 +1382,40 @@ def test_hom():
                 assert 0
 
         #print len(C.components())
+        uniq = set(names)
+        counts = dict((name, 0) for name in uniq)
+        for name in names:
+            counts[name] += 1
+        #print "+".join(names)
+        names = list(uniq)
         names.sort()
-        print "+".join(names)
+        ss = []
+        for name in names:
+            c = counts[name]
+            ss.append(name if c==1 else "%s*%s"%(c, name))
+        s = '+'.join(ss)
+        print s
+        width = max(width, len(s)+2)
+        table[A.name, B.name] = s
 
-    return
+    smap = SMap()
+    for i in range(len(homs)):
+        smap[i+2, 0] = homs[i].name + " |"
 
-    G = Group.symmetric(items, check=True)
-    assert len(G.components()) == 1
+        smap[0, i*width+4] = homs[i].name
+        smap[1, i*width+4] = '-'*width
 
-    f = Action.identity(G, check=True)
-    ff = f*f
-    ff.check()
-    assert ff == f
+    smap[0, 0] = '  | '
+    smap[1, 0] = '--+-'
 
-    print "OK"
-
+    for i in range(len(homs)):
+      for j in range(i, len(homs)):
+        value = table[homs[i].name, homs[j].name]
+        smap[i+2, j*width+4] = value
+        if i<j:
+            smap[j+2, i*width+4] = value
+    print
+    print smap
 
 
 def is_hom(hom):
@@ -1545,17 +1669,43 @@ def test():
     print "OK"
 
 
+def test_mul():
+
+    n = argv.get("n", 5)
+    items = range(n)
+
+    for i in range(100):
+
+        perms = []
+        for count in range(3):
+            perm = dict((i, i) for i in items)
+            for _ in range(1):
+                i = randint(0, n-1)
+                j = randint(0, n-1)
+                perm[i] = j
+                perm[j] = i
+            perms.append(Perm(perm, items))
+
+        perms = mulclose_fast(perms)
+        for g in perms:
+          for h in perms:
+            assert g*h in perms
+        #write(".")
+
+#test_mul()
+
+
 
 if __name__ == "__main__":
 
     if argv.profile:
         import cProfile as profile
-        profile.run("test_hom()")
+        profile.run("main()")
     else:
-
-        test_hom()
+        main()
 
     if argv.test:
+        test_action()
         test()
 
 
