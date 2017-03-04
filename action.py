@@ -752,8 +752,7 @@ class Group(object):
         f = quotient_rep(perms)
         send_perms = dict((k, f[v]) for (k, v) in send_perms.items())
         perms = list(f.values())
-        action = Group(perms, items)
-        hom = Action(self, action, send_perms)
+        hom = Action(self, send_perms, items)
         return hom
 
     def is_subaction(self, H):
@@ -851,16 +850,14 @@ class Group(object):
 class Action(object):
     """
         A Group acting on a set.
-        For each perm in the source Group G we map to a perm in the target Group H.
-        (Maybe we shouldn't actually keep H around, but just use send_perms and
-        remember H's items?)
+        For each perm in the source Group G we map to a perm of items.
     """
-    def __init__(self, G, H, send_perms, check=False):
+    def __init__(self, G, send_perms, items, check=False):
         assert isinstance(G, Group)
-        assert isinstance(H, Group)
         self.G = G
-        self.H = H
+        assert isinstance(send_perms, dict)
         self.send_perms = dict(send_perms) # map G.perms to H.perms
+        self.items = list(items)
         if check:
             self.check()
 
@@ -868,35 +865,33 @@ class Action(object):
     def src(self):
         return self.G
 
-    @property
-    def tgt(self):
-        return self.H
-
-    def attrs(self):
-        return (self.G, self.H, self.send_perms)
-
     # Equality on-the-nose:
     def __eq__(self, other):
         assert isinstance(other, Action)
-        return (self.G==other.G and self.H==other.H and self.send_perms==other.send_perms)
+        return (self.G==other.G and self.send_perms==other.send_perms)
 
     def __ne__(self, other):
         assert isinstance(other, Action)
-        return (self.G!=other.G or self.H!=other.H or self.send_perms!=other.send_perms)
+        return (self.G!=other.G or self.send_perms!=other.send_perms)
 
     def __hash__(self):
         send_perms = self.send_perms
         send_perms = tuple((perm, send_perms[perm]) for perm in self.G)
-        return hash((self.G, self.H, send_perms))
+        return hash((self.G, send_perms))
 
     @classmethod
     def identity(cls, G, check=False):
         send_perms = dict((g, g) for g in G)
-        return cls(G, G, send_perms, check=check)
+        return cls(G, send_perms, G.items, check=check)
 
     def check(self):
-        G, H, send_perms = self.G, self.H, self.send_perms
+        G, items, send_perms = self.G, self.items, self.send_perms
+
         assert len(send_perms)==len(G.perms)
+        for perm in G.perms:
+            assert perm in send_perms
+            perm = send_perms[perm]
+            assert perm.items == items
 
         # Here we check that we have a homomorphism of groups.
         for g1 in G.perms:
@@ -905,16 +900,12 @@ class Action(object):
             h2 = send_perms[g2]
             assert send_perms[g1*g2] == h1*h2
 
-        for perm in G.perms:
-            assert perm in send_perms
-            assert send_perms[perm] in H.perms
-
     def pushout(self, other): # HOTSPOT
         assert self.src == other.src
         items = []
         perms = []
-        for a1 in self.tgt.items:
-          for a2 in other.tgt.items:
+        for a1 in self.items:
+          for a2 in other.items:
             items.append((a1, a2))
         send_perms = {}
         for g in self.src:
@@ -926,12 +917,29 @@ class Action(object):
             perm = Perm(perm, items)
             perms.append(perm)
             send_perms[g] = perm
-        group = Group(perms, items)
-        return Action(self.src, group, send_perms)
+        return Action(self.src, send_perms, items)
+
+    def orbits(self):
+        #print "orbits"
+        #print self.perms
+        #print self.items
+        G = self.G
+        send_perms = self.send_perms
+        remain = set(self.items)
+        orbits = []
+        while remain:
+            #print "remain:", remain
+            item = iter(remain).next()
+            orbit = set(send_perms[g](item) for g in G.perms)
+            #print "orbit:", orbit
+            for item in orbit:
+                remain.remove(item)
+            orbits.append(orbit)
+        return orbits
 
     def components(self):
-        src, tgt = self.src, self.tgt
-        orbits = tgt.orbits() # argghh, may not be surjective..
+        src = self.src
+        orbits = self.orbits()
         homs = []
         for orbit in orbits:
             send_perms = {}
@@ -940,15 +948,14 @@ class Action(object):
                 perm1 = self.send_perms[perm].restrict(orbit)
                 send_perms[perm] = perm1
                 perms.append(perm1)
-            G = Group(perms, orbit)
-            homs.append(Action(src, G, send_perms))
+            homs.append(Action(src, send_perms, orbit))
         return homs
 
     def get_graph(self):
         graph = isomorph.Graph()
-        src, tgt = self.src, self.tgt
+        src = self.src
         send_perms = self.send_perms
-        items = tgt.items
+        items = self.items
         n = len(items)
         # fibres are all the same:
         fibres = [graph.add("fibre") for item in items]
@@ -968,7 +975,7 @@ class Action(object):
         return graph
 
     def get_shape(self):
-        src, tgt = self.src, self.tgt
+        src = self.src
         send_perms = self.send_perms
         shape = []
         for perm in src:
@@ -978,16 +985,16 @@ class Action(object):
 
     def isomorphisms(self, other):
         """ yield all isomorphisms in the category of G-sets.
-            Each isomorphism is a dict:item->item mapping items
-            on the tgt actions.
+            Each isomorphism is a dict:item->item 
 
             self  maps G -> H1
             other maps G -> H2
             an isomorphism maps H1.items -> H2.items
         """
+        assert isinstance(other, Action)
         assert self.src == other.src
-        n = len(self.tgt.items)
-        if n != len(other.tgt.items):
+        n = len(self.items)
+        if n != len(other.items):
             return
         if self.get_shape() != other.get_shape():
             return
@@ -997,20 +1004,22 @@ class Action(object):
         #for fn in isomorph.search_recursive(graph0, graph1):
             send_items = {}
             for i in range(n):
-                send_items[self.tgt.items[i]] = other.tgt.items[fn[i]]
+                send_items[self.items[i]] = other.items[fn[i]]
             yield send_items
 
     def check_isomorphism(self, other, send_items):
+        assert isinstance(other, Action)
         for perm in self.src:
             perm1 = self.send_perms[perm]
             perm2 = other.send_perms[perm]
-            for item1 in self.tgt.items:
+            for item1 in self.items:
                 item2 = send_items[perm1[item1]]
                 assert item2 == perm2[send_items[item1]]
 
     def isomorphic(self, other, check=False):
         "is isomorphic in the category of G-sets"
 
+        assert isinstance(other, Action)
         for send_items in self.isomorphisms(other):
             self.check_isomorphism(other, send_items)
             return True
@@ -1018,9 +1027,10 @@ class Action(object):
 
     def refute_isomorphism(self, other):
         "return True if it is impossible to find an isomorphism"
+        assert isinstance(other, Action)
         assert self.src == other.src
-        n = len(self.tgt.items)
-        if n != len(other.tgt.items):
+        n = len(self.items)
+        if n != len(other.items):
             return True
 
         n = len(self.src)
@@ -1118,7 +1128,7 @@ def test_hom():
     if n<=6:
         H = Group.cyclic(list("abcdef"[:n]))
         send_perms = dict((G[i], H[i]) for i in range(len(G)))
-        hom1 = Action(G, H, send_perms)
+        hom1 = Action(G, send_perms, H.items)
         assert len(list(hom.isomorphisms(hom1))) == n
 
     if argv.dihedral:
@@ -1221,9 +1231,9 @@ def test_hom():
         hom = G.left_action(cosets)
         assert hom.src is G
         homs.append(hom)
-        assert len(hom.tgt.components())==1 # transitive
+        assert len(hom.components())==1 # transitive
         #print hom.tgt.perms
-        print "subgroup %d cosets %d action %d" %(len(H), len(cosets), len(hom.tgt))
+        print "subgroup %d cosets %d" %(len(H), len(cosets))
 
     if 0:
         # We don't need to do this again: isomorphic homs all
@@ -1243,11 +1253,9 @@ def test_hom():
         C = A.pushout(B)
         assert C.src is G
         print "%s*%s ="%(A.name, B.name),
-        #print len(A.tgt.set_perms), len(B.tgt.set_perms), 
         names = []
         for hom in C.components():
             assert hom.src is G
-            #print hom.tgt
             name = '?'
 
             # We know it must be one of these possibilities:
