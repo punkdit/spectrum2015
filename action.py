@@ -526,6 +526,26 @@ class Group(object):
         return G
 
     @classmethod
+    def alternating(cls, items_or_n, check=False):
+        if type(items_or_n) in (int, long):
+            items = range(items_or_n)
+        else:
+            items = list(items_or_n)
+        n = len(items)
+        gen = []
+        for i in range(n-2):
+            perm = dict((j, j) for j in items)
+            perm[items[i]] = items[i+1]
+            perm[items[i+1]] = items[i+2]
+            perm[items[i+2]] = items[i]
+            perm = Perm(perm, items)
+            gen.append(perm)
+        perms = mulclose(gen)
+        G = Group(perms, items)
+        assert len(G)==factorial(n)//2
+        return G
+
+    @classmethod
     def cyclic(cls, items_or_n, check=False):
         if type(items_or_n) in (int, long):
             items = range(items_or_n)
@@ -1110,19 +1130,8 @@ def test_hom():
         assert len(G.components()) == 1
 
     elif argv.alternating:
-        items = range(n)
-        gen = []
-        for i in range(n-2):
-            perm = dict((j, j) for j in items)
-            perm[i] = i+1
-            perm[i+1] = i+2
-            perm[i+2] = i
-            perm = Perm(perm, items)
-            gen.append(perm)
-        
-        perms = mulclose(gen)
-        G = Group(perms, items)
-        assert len(G)==factorial(n)//2
+        G = Group.alternating(items, check=True)
+        assert len(G.components()) == 1
 
     elif argv.A_2:
         G = Group.symmetric(range(3), check=True)
