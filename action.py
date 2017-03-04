@@ -614,34 +614,6 @@ class Group(object):
         group = Group(perms, items)
         return group
 
-#    def square(self, other=None):
-#        if other is None:
-#            other = self
-#        assert self.isomorphic(other) # bit of a hack...
-#        items = [(i, j) for i in self.items for j in other.items]
-#        perms = []
-#        send_perms = {}
-#        send_items = dict((i, (i, i)) for i in self.items) # the diagonal
-#        diagonal = [(i, i) for i in self.items]
-#        for i in range(len(self)):
-#            g = self[i]
-#            h = other[i]
-#            perm = {}
-#            for i, j in items:
-#                perm[i, j] = g[i], h[j]
-#            perm = Perm(perm, items)
-#            perms.append(perm)
-#            #send_perms[g] = perm.restrict(diagonal)
-#            send_perms[g] = perm
-#        action = Group(perms, items)
-#        #print len(send_perms), len(self)
-#        #print self
-#        #print action
-#        #print send_perms
-#        hom = Action(self, action, send_perms, send_items)
-#        hom.check()
-#        return hom
-
     def fixed(self):
         fixed = {}
         for el in self.perms:
@@ -1008,24 +980,6 @@ class Action(object):
                 send_items[self.tgt.items[i]] = other.tgt.items[fn[i]]
             yield send_items
 
-#    def shape_item(self):
-#        shape_item = []
-#        send_perms = self.send_perms
-#        for item in self.tgt.items:
-#            shape = []
-#            for g in self.src:
-#                g = send_perms[g]
-#                gitem = item
-#                n = 1
-#                while 1:
-#                    gitem = g(gitem)
-#                    if gitem == item:
-#                        break
-#                    n += 1
-#                shape.append(n)
-#            shape_item.append(tuple(shape))
-#        return shape_item
-
     def check_isomorphism(self, other, send_items):
         for perm in self.src:
             perm1 = self.send_perms[perm]
@@ -1057,55 +1011,9 @@ class Action(object):
             if perm1.conjugacy_cls() != perm2.conjugacy_cls():
                 return True
 
-#        if self.get_shape() != other.get_shape():
-#            return True
-
-#        shape1 = self.shape_item()
-#        shape2 = other.shape_item()
-#
-#        if set(shape1) != set(shape2):
-#            return True
-
         # Not able to refute
         return False
 
-#    def Xisomorphic(self, other, check=False):
-#
-#        assert self.src == other.src
-#        n = len(self.tgt.items)
-#        if n != len(other.tgt.items):
-#            return False
-#
-#        #if self.get_shape() != other.get_shape():
-#        #    return False
-#
-#        shape1 = self.shape_item()
-#        shape2 = other.shape_item()
-#
-#        if set(shape1) != set(shape2):
-#            return False
-#
-#        send_items = {}
-#        remain = set(other.tgt.items)
-#        #for shape, item in shape1.items():
-#        for s1, item1 in zip(shape1, self.tgt.items):
-#          for s2, item2 in zip(shape2, other.tgt.items):
-#            if s1 != s2:
-#                continue
-#            if item2 not in remain:
-#                continue
-#            send_items[item1] = item2
-#            remain.remove(item2)
-#            break
-#          else:
-#            return False
-#        #yield send_items
-#
-#        if check:
-#            self.check_isomorphism(other, send_items) # FAIL
-#
-#        return True
-            
 
 
 r"""
@@ -1193,12 +1101,6 @@ def test_hom():
         hom1 = Action(G, H, send_perms)
         assert len(list(hom.isomorphisms(hom1))) == n
 
-#    hom = G.square()
-#    hom.check()
-#    assert len(hom.src) == len(G)
-#    for G1 in hom.src.components():
-#        assert len(G1)==n
-
     if argv.dihedral:
         G = Group.dihedral(items, check=True)
         assert len(G.components()) == 1
@@ -1247,6 +1149,15 @@ def test_hom():
                 10:11, 11:10, 12:12, 13:13, 14:14, 15:15, 16:17, 17:16}, items)]
         perms = mulclose(gen)
         G = Group(perms, items)
+
+    elif argv.projective:
+        import geometry
+        g = geometry.projective(3)
+        items = range(14)
+        perms = [f for f in g.get_symmetry()]
+        perms = [Perm(f, items) for f in perms]
+        G = Group(perms, items)
+        print "perms:", len(perms)
 
     else:
         return

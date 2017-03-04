@@ -1,7 +1,86 @@
+
+24/2/17
+=======
+
+
+See:
+http://schmidt.ucg.ie/~goetz/pub/marks/node1.html
+
+time nice ./action.py alternating n=5
+equ: [60]
+equ: [12, 12, 12, 12, 12]
+equ: [10, 10, 10, 10, 10, 10]
+equ: [6, 6, 6, 6, 6, 6, 6, 6, 6, 6]
+equ: [5, 5, 5, 5, 5, 5]
+equ: [4, 4, 4, 4, 4]
+equ: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+equ: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+equ: [1]
+total: 9
+
+A subgroup 60 cosets 1 action 1  = A_5
+B subgroup 12 cosets 5 action 60 = A_4
+C subgroup 10 cosets 6 action 60 = D_10
+D subgroup 6 cosets 10 action 60 = S_3
+E subgroup 5 cosets 12 action 60 = 5
+F subgroup 4 cosets 15 action 60 = 2x2
+G subgroup 3 cosets 20 action 60 = 3
+H subgroup 2 cosets 30 action 60 = 2
+I subgroup 1 cosets 60 action 60 = 1
+
+A*A = A A*B = B A*C = C A*D = D A*E = E A*F = F A*G = G A*H = H A*I = I
+
+B*B = B+G
+B*C = H
+B*D = G+H
+B*E = I
+B*F = F+I
+B*G = G+G+I
+B*H = H+I+I
+B*I = 5*I
+
+C*C = C+H
+C*D = H+H
+C*E = E+I
+C*F = H+H+H
+C*G = I+I
+C*H = H+H+I+I
+C*I = 6*I
+
+D*D = D+H+I
+D*E = I+I
+D*F = H+H+H+I
+D*G = G+I+I+I
+D*H = H+H+I+I+I+I
+D*I = 10*I
+
+E*E = E+E+I+I
+E*F = I+I+I
+E*G = I+I+I+I
+E*H = I+I+I+I+I+I
+E*I = 12*I
+
+F*F = F+F+F+I+I+I          
+F*G = I+I+I+I+I          
+F*H = H+H+H+I+I+I+I+I+I          
+F*I = 15*I
+
+G*G = G+G+I+I+I+I+I+I          
+G*H = I+I+I+I+I+I+I+I+I+I          
+G*I = 20*I
+
+H*H = H+H+I+I+I+I+I+I+I+I+I+I+I+I+I+I          
+H*I = 30*I
+
+I*I = 60*I
+
+
+
+
 20/2/17
 =======
 
-group isomorphisms
+isomorphic groups
 https://rjlipton.wordpress.com/2011/10/08/an-annoying-open-problem/
 
 

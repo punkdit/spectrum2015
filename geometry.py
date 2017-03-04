@@ -5,7 +5,7 @@ import os, sys
 import numpy
 import networkx as nx
 
-from solve import zeros2, enum2, row_reduce, span, shortstr, shortstrx, solve, rank, find_kernel, find_logops
+from solve import zeros2, enum2, row_reduce, span, shortstr, shortstrx, solve, rank, find_kernel, find_logops, identity2
 import isomorph
 from isomorph import Bag, Point, write
 from bruhat import BruhatMonoid
@@ -1017,6 +1017,11 @@ def hecke(self):
     #items = [(a.idx, b.idx) for a in points for b in points]
     items = [(a, b) for a in flags for b in flags]
 
+    # fixing two points gives the Klein four group, Z_2 x Z_2:
+    #for f in isomorph.search(bag0, bag1):
+    #    if f[0]==0 and f[1]==1:
+    #        print f
+
     perms = []
     for f in isomorph.search(bag0, bag1):
         #print f
@@ -1033,13 +1038,19 @@ def hecke(self):
     print
 
     g = Group(perms, items)
+    print "group:", len(g)
 
     orbits = g.orbits()
     #print orbits
     print "orbits:", len(orbits)
 
+    eq = numpy.allclose
+    dot = numpy.dot
+
     n = len(flags)
     basis = []
+    gen = []
+    I = identity2(n)
     for orbit in orbits:
         A = zeros2(n, n)
         #print orbits
@@ -1048,23 +1059,23 @@ def hecke(self):
         #print shortstr(A)
         print A.sum()
         #print
+
         basis.append(A)
+        if A.sum()==42:
+            gen.append(A)
 
-
-    I = basis[0]
-    L = basis[1]
-    P = basis[-1]
+    assert len(gen)==2
+    L = gen[0]
+    P = gen[1]
     q = 2
-
-    eq = numpy.allclose
-    dot = numpy.dot
 
     assert eq(dot(L, L), L+q*I)
     assert eq(dot(P, P), P+q*I)
     assert eq(dot(L, dot(P, L)), dot(P, dot(L, P)))
-    print shortstr(dot(L, dot(P, L)))
-    print
-    print shortstr(dot(P, dot(L, P)))
+
+    #print shortstr(dot(L, dot(P, L)))
+    #print
+    #print shortstr(dot(P, dot(L, P)))
 
 
 
