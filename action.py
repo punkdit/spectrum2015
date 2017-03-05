@@ -1399,6 +1399,7 @@ def burnside(G):
 
             else:
                 assert 0
+                return
                 #write('/')
                 for hom1 in possible:
                     if hom.isomorphic(hom1):
