@@ -41,6 +41,39 @@ class SMap(object):
         return '\n'.join(lines)
 
 
+
+def tabulate(table, rows, cols, space):
+    # table keys are (row, col)
+
+    m, n = len(rows), len(cols)
+    width = 4
+    widths = []
+    for j in range(n):
+        widths.append(width)
+        width += max(len(table[rows[i], cols[j]]) for i in range(m))+space
+
+    smap = SMap()
+    smap[0, 0] = '  | '
+    for j in range(width):
+        smap[1, j] = '+' if j==2 else '-'
+
+    for i in range(m):
+        smap[i+2, 0] = rows[i] + " |"
+
+    for j in range(n):
+        width = widths[j]
+        smap[0, width] = cols[j]
+
+    for i in range(m):
+      for j in range(n):
+        value = table[rows[i], cols[j]]
+        width = widths[j]
+        smap[i+2, width] = value
+
+    return smap
+
+
+
 def get_cols():
     fd = 0 # stdin
     cr = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
@@ -132,7 +165,6 @@ def test():
 
 if __name__=="__main__":
     test()
-
 
 
 

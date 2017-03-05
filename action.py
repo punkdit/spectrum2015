@@ -7,7 +7,7 @@ from random import randint
 from util import factorial, all_subsets, write
 from argv import argv
 import isomorph
-from smap import SMap
+from smap import SMap, tabulate
 
 
 def mulclose(els, verbose=False, maxsize=None):
@@ -1220,6 +1220,10 @@ def main():
         G = Group.dihedral(items, check=True)
         assert len(G.components()) == 1
 
+    elif argv.cyclic:
+        G = Group.cyclic(items, check=True)
+        assert len(G.components()) == 1
+
     elif argv.symmetric:
         G = Group.symmetric(items, check=True)
         assert len(G.components()) == 1
@@ -1343,7 +1347,9 @@ def burnside(G):
         homs = list(set(f.values())) # uniq
         print "homs:", len(homs)
 
-    letters = string.uppercase + string.lowercase
+    letters = list(string.uppercase + string.lowercase)
+    letters = letters + [l+"'" for l in letters] + [l+"''" for l in letters]
+    assert len(letters) >= len(homs)
     letters = letters[:len(homs)]
     for i in range(len(homs)):
         homs[i].name = letters[i]
@@ -1357,7 +1363,7 @@ def burnside(G):
         B = homs[j]
         C = A.pushout(B)
         assert C.src is G
-        print "%s*%s ="%(A.name, B.name),
+        write("%s*%s ="%(A.name, B.name))
         names = []
         for hom in C.components():
             assert hom.src is G
@@ -1394,28 +1400,48 @@ def burnside(G):
             c = counts[name]
             ss.append(name if c==1 else "%s*%s"%(c, name))
         s = '+'.join(ss)
-        print s
+        write(s+' ')
         width = max(width, len(s)+2)
         table[A.name, B.name] = s
+        table[B.name, A.name] = s # commutative
+      print
 
-    smap = SMap()
-    for i in range(len(homs)):
-        smap[i+2, 0] = homs[i].name + " |"
+    space = 2
+    if argv.compact:
+        table = dict((k, v.replace("*", "")) for (k, v) in table.items())
+        space = 1
 
-        smap[0, i*width+4] = homs[i].name
-        smap[1, i*width+4] = '-'*width
-
-    smap[0, 0] = '  | '
-    smap[1, 0] = '--+-'
-
-    for i in range(len(homs)):
-      for j in range(i, len(homs)):
-        value = table[homs[i].name, homs[j].name]
-        smap[i+2, j*width+4] = value
-        if i<j:
-            smap[j+2, i*width+4] = value
+    rows = cols = [hom.name for hom in homs]
     print
-    print smap
+    print tabulate(table, rows, cols, space)
+    print
+    print latex_table(table, rows, cols)
+
+
+r"""
+\begin{array}{c|lcr}
+n & \text{Left} & \text{Center} & \text{Right} \\
+\hline
+1 & 0.24 & 1 & 125 \\
+2 & -1 & 189 & -8 \\
+3 & -20 & 2000 & 1+10i
+\end{array}
+"""
+
+def latex_table(table, rows, cols):
+    lines = []
+    m, n = len(rows), len(cols)
+    lines.append(r"\begin{array}{r|%s}"%('r'*n))
+    lines.append(r"* & %s \\" % (' & '.join(cols)))
+    lines.append(r"\hline")
+    for i in range(m):
+        row = rows[i]
+        line = r"%s & %s \\" % (row, ' & '.join(table[row, col] for col in cols))
+        line = line.replace("*", '')
+        lines.append(line)
+    lines.append(r"\end{array}")
+    s = '\n'.join(lines)
+    return s
 
 
 def is_hom(hom):

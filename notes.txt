@@ -1,4 +1,126 @@
 
+5/3/17
+======
+
+Burnside rings
+~~~~~~~~~~~~~~
+
+A_2:
+  | A    B    C    D    
+--+---------------------
+A | A    B    C    D    
+B | B    2*B  D    2*D  
+C | C    D    C+D  3*D  
+D | D    2*D  3*D  6*D  
+
+A_3:
+  | A        B        C        D        E        F        G        H        I        J        K        
+--+----------------------------------------------------------------------------------------------------
+A | A        B        C        D        E        F        G        H        I        J        K        
+B | B        2*B      F        H        J        2*F      J        2*H      K        2*J      2*K      
+C | C        F        C+F      I        E+J      3*F      G+J      K        I+K      3*J      3*K      
+D | D        H        I        D+I      2*I      K        K        H+K      2*I+K    2*K      4*K      
+E | E        J        E+J      2*I      2*E+K    3*J      J+K      2*K      2*I+2*K  2*J+2*K  6*K      
+F | F        2*F      3*F      K        3*J      6*F      3*J      2*K      3*K      6*J      6*K      
+G | G        J        G+J      K        J+K      3*J      2*G+K    2*K      3*K      2*J+2*K  6*K      
+H | H        2*H      K        H+K      2*K      2*K      2*K      2*H+2*K  4*K      4*K      8*K      
+I | I        K        I+K      2*I+K    2*I+2*K  3*K      3*K      4*K      2*I+5*K  6*K      12*K     
+J | J        2*J      3*J      2*K      2*J+2*K  6*J      2*J+2*K  4*K      6*K      4*J+4*K  12*K     
+K | K        2*K      3*K      4*K      6*K      6*K      6*K      8*K      12*K     12*K     24*K     
+
+B_2:
+  | A      B      C      D      E      F      G      H      
+--+---------------------------------------------------------
+A | A      B      C      D      E      F      G      H      
+B | B      2*B    G      G      2*E    H      2*G    2*H    
+C | C      G      2*C    G      H      2*F    2*G    2*H    
+D | D      G      G      2*D    H      H      2*G    2*H    
+E | E      2*E    H      H      2*E+H  2*H    2*H    4*H    
+F | F      H      2*F    H      2*H    2*F+H  2*H    4*H    
+G | G      2*G    2*G    2*G    2*H    2*H    4*G    4*H    
+H | H      2*H    2*H    2*H    4*H    4*H    4*H    8*H    
+
+
+./action.py  B_3 burnside compact
+  | A B  C  D  E   F    G  H  I     J     K     L     M     N     O     P     Q     R     S     T      U     V   W     X     Y     Z       a     b     c      d     e   f      g   
+--+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+A | A B  C  D  E   F    G  H  I     J     K     L     M     N     O     P     Q     R     S     T      U     V   W     X     Y     Z       a     b     c      d     e   f      g   
+B | B 2B G  G  H   Q    2G 2H R     U     U     V     R     V     a     a     2Q    2R    d     e      2U    2V  d     d     d     b       2a    2b    g      2d    2e  g      2g  
+C | C G  2C G  N   P    2G V  Y     Y     S     V     S     2N    a     2P    a     d     2S    f      d     2V  d     d     2Y    f       2a    g     g      2d    g   2f     2g  
+D | D G  G  2D L   O    2G V  W     X     W     2L    X     V     2O    a     a     d     d     c      d     2V  2W    2X    d     c       2a    g     2c     2d    g   g      2g  
+E | E H  N  L  E+H T    V  3H I+R   J+U   K+U   L+V   M+R   N+V   c     f     e     3R    S+d   T+e    3U    3V  W+d   X+d   Y+d   Z+b     g     3b    c+g    3d    3e  f+g    3g  
+F | F Q  P  O  T   F+T  a  e  e     c     f     c     2T    f     O+c   P+f   Q+e   2e    2f    2T+e   g     g   g     2c    g     c+f     a+g   2g    2c+g   2g    4e  2f+g   4g  
+G | G 2G 2G 2G V   a    4G 2V d     d     d     2V    d     2V    2a    2a    2a    2d    2d    g      2d    4V  2d    2d    2d    g       4a    2g    2g     4d    2g  2g     4g  
+H | H 2H V  V  3H  e    2V 6H 3R    3U    3U    3V    3R    3V    g     g     2e    6R    3d    3e     6U    6V  3d    3d    3d    3b      2g    6b    3g     6d    6e  3g     6g  
+I | I R  Y  W  I+R e    d  3R 2I+e  Y+b   W+b   W+d   R+e   Y+d   g     g     2e    2R+2e d+g   3e     2b+d  3d  2W+g  d+g   2Y+g  b+g     2g    2b+2g 3g     2d+2g 6e  3g     6g  
+J | J U  Y  X  J+U c    d  3U Y+b   2J+b  U+b   X+d   X+b   Y+d   2c    g     g     2b+d  d+g   c+g    2U+2b 3d  d+g   2X+g  2Y+g  2b+c    2g    4b+g  2c+2g  2d+2g 3g  3g     6g  
+K | K U  S  W  K+U f    d  3U W+b   U+b   2K+b  W+d   S+b   S+d   g     2f    g     2b+d  2S+g  f+g    2U+2b 3d  2W+g  d+g   d+g   2b+f    2g    4b+g  3g     2d+2g 3g  2f+2g  6g  
+L | L V  V  2L L+V c    2V 3V W+d   X+d   W+d   2L+2V X+d   3V    2c    g     g     3d    3d    c+g    3d    6V  2W+2d 2X+2d 3d    c+g     2g    3g    2c+2g  6d    3g  3g     6g  
+M | M R  S  X  M+R 2T   d  3R R+e   X+b   S+b   X+d   2M+e  S+d   2c    2f    2e    2R+2e 2S+g  2T+2e  2b+d  3d  d+g   2X+g  d+g   2Z+g    2g    2b+2g 2c+2g  2d+2g 6e  2f+2g  6g  
+N | N V  2N V  N+V f    2V 3V Y+d   Y+d   S+d   3V    S+d   2N+2V g     2f    g     3d    2S+2d f+g    3d    6V  3d    3d    2Y+2d f+g     2g    3g    3g     6d    3g  2f+2g  6g  
+O | O a  a  2O c   O+c  2a g  g     2c    g     2c    2c    g     2O+2c a+g   a+g   2g    2g    2c+g   2g    2g  2g    4c    2g    2c+g    2a+2g 4g    4c+2g  4g    4g  4g     8g  
+P | P a  2P a  f   P+f  2a g  g     g     2f    g     2f    2f    a+g   2P+2f a+g   2g    4f    2f+g   2g    2g  2g    2g    2g    2f+g    2a+2g 4g    4g     4g    4g  4f+2g  8g  
+Q | Q 2Q a  a  e   Q+e  2a 2e 2e    g     g     g     2e    g     a+g   a+g   2Q+2e 4e    2g    4e     2g    2g  2g    2g    2g    2g      2a+2g 4g    4g     4g    8e  4g     8g  
+R | R 2R d  d  3R  2e   2d 6R 2R+2e 2b+d  2b+d  3d    2R+2e 3d    2g    2g    4e    4R+4e 2d+2g 6e     4b+2d 6d  2d+2g 2d+2g 2d+2g 2b+2g   4g    4b+4g 6g     4d+4g 12e 6g     12g 
+S | S d  2S d  S+d 2f   2d 3d d+g   d+g   2S+g  3d    2S+g  2S+2d 2g    4f    2g    2d+2g 4S+2g 2f+2g  2d+2g 6d  2d+2g 2d+2g 2d+2g 2f+2g   4g    6g    6g     4d+4g 6g  4f+4g  12g 
+T | T e  f  c  T+e 2T+e g  3e 3e    c+g   f+g   c+g   2T+2e f+g   2c+g  2f+g  4e    6e    2f+2g 2T+5e  3g    3g  3g    2c+2g 3g    c+f+2g  4g    6g    2c+5g  6g    12e 2f+5g  12g 
+U | U 2U d  d  3U  g    2d 6U 2b+d  2U+2b 2U+2b 3d    2b+d  3d    2g    2g    2g    4b+2d 2d+2g 3g     4U+4b 6d  2d+2g 2d+2g 2d+2g 4b+g    4g    8b+2g 6g     4d+4g 6g  6g     12g 
+V | V 2V 2V 2V 3V  g    4V 6V 3d    3d    3d    6V    3d    6V    2g    2g    2g    6d    6d    3g     6d    12V 6d    6d    6d    3g      4g    6g    6g     12d   6g  6g     12g 
+W | W d  d  2W W+d g    2d 3d 2W+g  d+g   2W+g  2W+2d d+g   3d    2g    2g    2g    2d+2g 2d+2g 3g     2d+2g 6d  4W+2g 2d+2g 2d+2g 3g      4g    6g    6g     4d+4g 6g  6g     12g 
+X | X d  d  2X X+d 2c   2d 3d d+g   2X+g  d+g   2X+2d 2X+g  3d    4c    2g    2g    2d+2g 2d+2g 2c+2g  2d+2g 6d  2d+2g 4X+2g 2d+2g 2c+2g   4g    6g    4c+4g  4d+4g 6g  6g     12g 
+Y | Y d  2Y d  Y+d g    2d 3d 2Y+g  2Y+g  d+g   3d    d+g   2Y+2d 2g    2g    2g    2d+2g 2d+2g 3g     2d+2g 6d  2d+2g 2d+2g 4Y+2g 3g      4g    6g    6g     4d+4g 6g  6g     12g 
+Z | Z b  f  c  Z+b c+f  g  3b b+g   2b+c  2b+f  c+g   2Z+g  f+g   2c+g  2f+g  2g    2b+2g 2f+2g c+f+2g 4b+g  3g  3g    2c+2g 3g    2Z+b+2g 4g    4b+4g 2c+5g  6g    6g  2f+5g  12g 
+a | a 2a 2a 2a g   a+g  4a 2g 2g    2g    2g    2g    2g    2g    2a+2g 2a+2g 2a+2g 4g    4g    4g     4g    4g  4g    4g    4g    4g      4a+4g 8g    8g     8g    8g  8g     16g 
+b | b 2b g  g  3b  2g   2g 6b 2b+2g 4b+g  4b+g  3g    2b+2g 3g    4g    4g    4g    4b+4g 6g    6g     8b+2g 6g  6g    6g    6g    4b+4g   8g    8b+8g 12g    12g   12g 12g    24g 
+c | c g  g  2c c+g 2c+g 2g 3g 3g    2c+2g 3g    2c+2g 2c+2g 3g    4c+2g 4g    4g    6g    6g    2c+5g  6g    6g  6g    4c+4g 6g    2c+5g   8g    12g   4c+10g 12g   12g 12g    24g 
+d | d 2d 2d 2d 3d  2g   4d 6d 2d+2g 2d+2g 2d+2g 6d    2d+2g 6d    4g    4g    4g    4d+4g 4d+4g 6g     4d+4g 12d 4d+4g 4d+4g 4d+4g 6g      8g    12g   12g    8d+8g 12g 12g    24g 
+e | e 2e g  g  3e  4e   2g 6e 6e    3g    3g    3g    6e    3g    4g    4g    8e    12e   6g    12e    6g    6g  6g    6g    6g    6g      8g    12g   12g    12g   24e 12g    24g 
+f | f g  2f g  f+g 2f+g 2g 3g 3g    3g    2f+2g 3g    2f+2g 2f+2g 4g    4f+2g 4g    6g    4f+4g 2f+5g  6g    6g  6g    6g    6g    2f+5g   8g    12g   12g    12g   12g 4f+10g 24g 
+g | g 2g 2g 2g 3g  4g   4g 6g 6g    6g    6g    6g    6g    6g    8g    8g    8g    12g   12g   12g    12g   12g 12g   12g   12g   12g     16g   24g   24g    24g   24g 24g    48g 
+
+
+
+alternating n=4:
+
+  | A  B    C    D        E     
+--+-----------------------------
+A | A  B    C    D        E     
+B | B  3*B  E    3*D      3*E   
+C | C  E    C+E  2*E      4*E   
+D | D  3*D  2*E  2*D+2*E  6*E   
+E | E  3*E  4*E  6*E      12*E  
+
+
+alternating n=5:
+  | A  B      C        D        E        F        G        H         I     
+--+------------------------------------------------------------------------
+A | A  B      C        D        E        F        G        H         I     
+B | B  B+G    H        G+H      I        F+I      2*G+I    H+2*I     5*I   
+C | C  H      C+H      2*H      E+I      3*H      2*I      2*H+2*I   6*I   
+D | D  G+H    2*H      D+H+I    2*I      3*H+I    G+3*I    2*H+4*I   10*I  
+E | E  I      E+I      2*I      2*E+2*I  3*I      4*I      6*I       12*I  
+F | F  F+I    3*H      3*H+I    3*I      3*F+3*I  5*I      3*H+6*I   15*I  
+G | G  2*G+I  2*I      G+3*I    4*I      5*I      2*G+6*I  10*I      20*I  
+H | H  H+2*I  2*H+2*I  2*H+4*I  6*I      3*H+6*I  10*I     2*H+14*I  30*I  
+I | I  5*I    6*I      10*I     12*I     15*I     20*I     30*I      60*I  
+
+
+
+>>> from gelim import *
+>>> A = [[1,-1,0],[0,1,-1],[-1,0,1]]
+>>> C = [[2,-1,-1],[-2,3,-1],[-1,-3,4]]
+>>> A = array(A)
+>>> C = array(C)
+>>> D = pseudo_inverse(C.transpose())
+>>> dot(C, D)
+array([[Fraction(1, 1), Fraction(0, 1), Fraction(0, 1)],
+       [Fraction(0, 1), Fraction(1, 1), Fraction(0, 1)],
+       [Fraction(-9, 4), Fraction(-7, 4), Fraction(0, 1)]], dtype=object)
+
+
+
+
+
 24/2/17
 =======
 
