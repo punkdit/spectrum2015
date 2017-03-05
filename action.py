@@ -1379,7 +1379,7 @@ def burnside(G):
             else:
                 #write('/')
                 for hom1 in possible:
-                    if hom.isomorphic(hom1, check=check):
+                    if hom.isomorphic(hom1):
                         name = hom1.name
                         break
 
