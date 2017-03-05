@@ -933,7 +933,7 @@ class Action(object):
         assert isinstance(G, Group)
         self.G = G
         assert isinstance(send_perms, dict)
-        self.send_perms = dict(send_perms) # map G.perms to H.perms
+        self.send_perms = dict(send_perms)
         self.items = list(items)
         if check:
             self.check()
@@ -1102,7 +1102,20 @@ class Action(object):
             return True
         return False
 
-    def refute_isomorphism(self, other):
+    def fixed_points(self, H):
+        send_perms = self.send_perms
+        fixed = set(self.items)
+        for g in H:
+            g = send_perms[g]
+            fixed = fixed.intersection(g.fixed())
+            if not fixed:
+                break
+        return fixed
+
+    def signature(self, Hs):
+        return [len(self.fixed_points(H)) for H in Hs]
+
+    def _refute_isomorphism(self, other, Hs):
         "return True if it is impossible to find an isomorphism"
         assert isinstance(other, Action)
         assert self.src == other.src
@@ -1111,7 +1124,6 @@ class Action(object):
             return True
 
         n = len(self.src)
-        send_perms = self.send_perms
         for perm in self.src:
             perm1 = self.send_perms[perm]
             perm2 = other.send_perms[perm]
@@ -1120,6 +1132,15 @@ class Action(object):
 
         # Not able to refute
         return False
+
+    def refute_isomorphism(self, other, Hs):
+        # see: http://math.stackexchange.com/a/1891096/360303
+        ref = self._refute_isomorphism(other, Hs)
+        if ref==True:
+            assert self.signature(Hs) != other.signature(Hs)
+        elif self.signature(Hs) != other.signature(Hs):
+            ref = True
+        return ref
 
 
 
@@ -1370,13 +1391,14 @@ def burnside(G):
             name = '?'
 
             # We know it must be one of these possibilities:
-            possible = [hom1 for hom1 in homs if not hom.refute_isomorphism(hom1)]
+            possible = [hom1 for hom1 in homs if not hom.refute_isomorphism(hom1, Hs)]
             assert possible
             if len(possible)==1:
                 name = possible[0].name
                 #write('.')
 
             else:
+                assert 0
                 #write('/')
                 for hom1 in possible:
                     if hom.isomorphic(hom1):
