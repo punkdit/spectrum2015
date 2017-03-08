@@ -1,4 +1,143 @@
 
+9/3/17
+======
+
+https://en.wikipedia.org/wiki/Catalan_number
+https://en.wikipedia.org/wiki/Associahedron
+
+From Klein to Hecke:
+https://golem.ph.utexas.edu/category/2007/10/geometric_representation_theor_4.html
+https://golem.ph.utexas.edu/category/2007/11/geometric_representation_theor_5.html
+
+Categorified Gram-Schmidt:
+https://ncatlab.org/nlab/show/Gram-Schmidt+process
+
+
+G-sets, Galois objects and the discrete Tannakian reconstruction:
+http://math.stackexchange.com/a/382664/360303
+
+G-sets are determined up to isomorphism by 
+the number of fixed points for every subgroup of G
+http://math.stackexchange.com/a/1891096/360303
+
+Orbit-stabilizer theorem:
+https://qchu.wordpress.com/2009/06/15/gila-ii-orbits-stabilizers-and-classifying-group-actions/
+
+Zippers
+http://chris-taylor.github.io/blog/2013/02/13/the-algebra-of-algebraic-data-types-part-iii/
+
+“The Derivative of a Regular Type is its Type of One-Hole Contexts”
+http://strictlypositive.org/diff.pdf
+
+Mathjax reference cheatsheet:
+http://meta.math.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference
+
+Self-referential Paradoxes, Incompleteness and Fixed Points
+https://topologicalmusings.wordpress.com/2010/07/11/self-referential-paradoxes-incompleteness-and-fixed-points/
+Yanofsky Paper:
+https://arxiv.org/pdf/math/0305282.pdf
+Trackbacks for 0305282:
+https://arxiv.org/tb/math/0305282
+Cantor’s ‘negative’ use of diagonalization to prove that infinite bit strings cannot be enumerated, versus Curry’s ‘positive’ use of diagonalization to get a fixed point for any lambda-term in the untyped lambda calculus:
+https://golem.ph.utexas.edu/category/2006/12/classical_vs_quantum_computati_8.html
+The fixed point theorem and the diagonal argument:
+http://math.ucr.edu/home/baez/qg-fall2006/f06week08b.pdf
+
+
+Categorification:
+https://www.google.com.au/search?q=euler+characteristic+categorification
+http://mathoverflow.net/questions/43579/examples-of-categorification
+
+Klein's j-invariant:
+https://en.wikipedia.org/wiki/J-invariant
+https://en.wikipedia.org/wiki/Monster_vertex_algebra
+
+Galois theory, James Dolan etc:
+LECTURES ON n-CATEGORIES AND COHOMOLOGY
+TALKS BY JOHN BAEZ, NOTES BY MICHAEL SHULMAN
+https://arxiv.org/pdf/math/0608420.pdf
+
+
+Git: Copy a file or directory from another repository preserving the history
+http://blog.neutrino.es/2012/git-copy-a-file-or-directory-from-another-repository-preserving-history/
+
+mkdir /tmp/mergepatchs
+cd ~/repo/org
+export reposrc=myfile.c #or mydir
+git format-patch -o /tmp/mergepatchs $(git log $reposrc|grep ^commit|tail -1|awk '{print $2}')^..HEAD $reposrc
+cd ~/repo/dest
+git am /tmp/mergepatchs/*.patch
+
+Markdown:
+http://daringfireball.net/projects/markdown/syntax#code
+https://pythonhosted.org/Markdown/
+https://github.com/mayoff/python-markdown-mathjax
+https://pypi.python.org/pypi/markdown2latex
+
+
+
+
+6/3/17
+======
+
+G: 168
+subgroups: 179
+equ: [168]
+equ: [24, 24, 24, 24, 24, 24, 24]
+equ: [24, 24, 24, 24, 24, 24, 24]
+equ: [21, 21, 21, 21, 21, 21, 21, 21]
+equ: [12, 12, 12, 12, 12, 12, 12]
+equ: [12, 12, 12, 12, 12, 12, 12]
+equ: [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]
+equ: [7, 7, 7, 7, 7, 7, 7, 7]
+equ: [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]
+equ: [4, 4, 4, 4, 4, 4, 4]
+equ: [4, 4, 4, 4, 4, 4, 4]
+equ: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+equ: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+equ: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+equ: [1]
+total: 15
+
+A subgroup 168 cosets 1
+B subgroup 24 cosets 7
+C subgroup 24 cosets 7
+D subgroup 21 cosets 8
+E subgroup 12 cosets 14
+F subgroup 12 cosets 14
+G subgroup 8 cosets 21
+H subgroup 7 cosets 24
+I subgroup 6 cosets 28
+J subgroup 4 cosets 42
+K subgroup 4 cosets 42
+L subgroup 4 cosets 42
+M subgroup 3 cosets 56
+N subgroup 2 cosets 84
+P subgroup 1 cosets 168
+
+G*G = G+K+L+2*N+P
+
+
+  | A B     C     D     E      F      G          H     I       J       K        L        M      N      P    
+--+---------------------------------------------------------------------------------------------------------
+A | A B     C     D     E      F      G          H     I       J       K        L        M      N      P    
+B | B B+L   G+I   M     E+N    L+M    G+L+N      P     I+2N    J+N+P   K+3N     3L+P     M+2P   3N+2P  7P   
+C | C G+I   C+K   M     K+M    F+N    G+K+N      P     I+2N    J+N+P   3K+P     L+3N     M+2P   3N+2P  7P   
+D | D M     M     D+M   2M     2M     P          H+P   M+P     2P      2P       2P       2M+2P  4P     8P   
+E | E E+N   K+M   2M    2E+P   2M+N   K+N+P      2P    M+2N+P  N+3P    2K+3P    3N+2P    2M+4P  2N+6P  14P  
+F | F L+M   F+N   2M    2M+N   2F+P   L+N+P      2P    M+2N+P  N+3P    3N+2P    2L+3P    2M+4P  2N+6P  14P  
+G | G G+L+N G+K+N P     K+N+P  L+N+P  G+K+L+2N+P 3P    5N+P    J+2N+4P 3K+3N+3P 3L+3N+3P 7P     5N+8P  21P  
+H | H P     P     H+P   2P     2P     3P         3H+3P 4P      6P      6P       6P       8P     12P    24P  
+I | I I+2N  I+2N  M+P   M+2N+P M+2N+P 5N+P       4P    I+3N+3P 2N+6P   6N+4P    6N+4P    M+9P   4N+12P 28P  
+J | J J+N+P J+N+P 2P    N+3P   N+3P   J+2N+4P    6P    2N+6P   2J+10P  3N+9P    3N+9P    14P    2N+20P 42P  
+K | K K+3N  3K+P  2P    2K+3P  3N+2P  3K+3N+3P   6P    6N+4P   3N+9P   6K+9P    9N+6P    14P    6N+18P 42P  
+L | L 3L+P  L+3N  2P    3N+2P  2L+3P  3L+3N+3P   6P    6N+4P   3N+9P   9N+6P    6L+9P    14P    6N+18P 42P  
+M | M M+2P  M+2P  2M+2P 2M+4P  2M+4P  7P         8P    M+9P    14P     14P      14P      2M+18P 28P    56P  
+N | N 3N+2P 3N+2P 4P    2N+6P  2N+6P  5N+8P      12P   4N+12P  2N+20P  6N+18P   6N+18P   28P    4N+40P 84P  
+P | P 7P    7P    8P    14P    14P    21P        24P   28P     42P     42P      42P      56P    84P    168P 
+
+
+
 5/3/17
 ======
 
