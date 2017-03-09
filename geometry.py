@@ -1056,7 +1056,7 @@ def hecke(self):
         #print orbits
         for a, b in orbit:
             A[flags.index(a), flags.index(b)] = 1
-        #print shortstr(A)
+        print shortstr(A)
         print A.sum()
         #print
 

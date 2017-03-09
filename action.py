@@ -1245,11 +1245,11 @@ def main():
         G = Group.cyclic(items, check=True)
         assert len(G.components()) == 1
 
-    elif argv.symmetric:
+    elif argv.symmetric or argv.sym:
         G = Group.symmetric(items, check=True)
         assert len(G.components()) == 1
 
-    elif argv.alternating:
+    elif argv.alternating or argv.alt:
         G = Group.alternating(items, check=True)
         assert len(G.components()) == 1
 
@@ -1349,17 +1349,23 @@ def burnside(G):
     Hs = [equ.items[0] for equ in equs] # pick unique (up to conjugation)
     Hs.sort(key = lambda H : (-len(H), H.str()))
 
+    letters = list(string.uppercase + string.lowercase)
+    letters = letters + [l+"'" for l in letters] + [l+"''" for l in letters]
+    assert len(letters) >= len(Hs)
+    letters = letters[:len(Hs)]
+
     homs = []
-    for H in Hs:
+    for i, H in enumerate(Hs):
         cosets = G.left_cosets(H)
         assert len(G) == len(cosets)*len(H)
 
         hom = G.left_action(cosets)
         assert hom.src is G
+        hom.name = letters[i]
         homs.append(hom)
         assert len(hom.components())==1 # transitive
         #print hom.tgt.perms
-        print "subgroup %d cosets %d" %(len(H), len(cosets))
+        print "%s subgroup size = %d, number of cosets = %d" %(hom.name, len(H), len(cosets))
 
     if 0:
         # We don't need to do this again: isomorphic homs all
@@ -1367,13 +1373,6 @@ def burnside(G):
         f = quotient_rep(homs, Action.isomorphic)
         homs = list(set(f.values())) # uniq
         print "homs:", len(homs)
-
-    letters = list(string.uppercase + string.lowercase)
-    letters = letters + [l+"'" for l in letters] + [l+"''" for l in letters]
-    assert len(letters) >= len(homs)
-    letters = letters[:len(homs)]
-    for i in range(len(homs)):
-        homs[i].name = letters[i]
 
     table = {}
     width = 0

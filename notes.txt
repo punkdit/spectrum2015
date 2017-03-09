@@ -75,6 +75,13 @@ https://github.com/mayoff/python-markdown-mathjax
 https://pypi.python.org/pypi/markdown2latex
 
 
+FastText, word2vec
+https://news.ycombinator.com/item?id=13771292
+https://blog.acolyer.org/2016/04/21/the-amazing-power-of-word-vectors/
+https://radimrehurek.com/gensim/index.html
+
+
+
 
 
 6/3/17
@@ -99,21 +106,21 @@ equ: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
 equ: [1]
 total: 15
 
-A subgroup 168 cosets 1
-B subgroup 24 cosets 7
-C subgroup 24 cosets 7
-D subgroup 21 cosets 8
-E subgroup 12 cosets 14
-F subgroup 12 cosets 14
-G subgroup 8 cosets 21
-H subgroup 7 cosets 24
-I subgroup 6 cosets 28
-J subgroup 4 cosets 42
-K subgroup 4 cosets 42
-L subgroup 4 cosets 42
-M subgroup 3 cosets 56
-N subgroup 2 cosets 84
-P subgroup 1 cosets 168
+    A subgroup 168 cosets 1    # Nothing
+    B subgroup 24 cosets 7     # Points
+    C subgroup 24 cosets 7     # Lines
+    D subgroup 21 cosets 8
+    E subgroup 12 cosets 14
+    F subgroup 12 cosets 14
+    G subgroup 8 cosets 21     # complete flags
+    H subgroup 7 cosets 24
+    I subgroup 6 cosets 28
+    J subgroup 4 cosets 42
+    K subgroup 4 cosets 42
+    L subgroup 4 cosets 42
+    M subgroup 3 cosets 56
+    N subgroup 2 cosets 84
+    P subgroup 1 cosets 168
 
 G*G = G+K+L+2*N+P
 
@@ -144,7 +151,8 @@ P | P 7P    7P    8P    14P    14P    21P        24P   28P     42P     42P      
 Burnside rings
 ~~~~~~~~~~~~~~
 
-A_2:
+A_2 = S_3
+
   | A    B    C    D    
 --+---------------------
 A | A    B    C    D    
@@ -152,20 +160,55 @@ B | B    2*B  D    2*D
 C | C    D    C+D  3*D  
 D | D    2*D  3*D  6*D  
 
-A_3:
-  | A        B        C        D        E        F        G        H        I        J        K        
---+----------------------------------------------------------------------------------------------------
-A | A        B        C        D        E        F        G        H        I        J        K        
-B | B        2*B      F        H        J        2*F      J        2*H      K        2*J      2*K      
-C | C        F        C+F      I        E+J      3*F      G+J      K        I+K      3*J      3*K      
-D | D        H        I        D+I      2*I      K        K        H+K      2*I+K    2*K      4*K      
-E | E        J        E+J      2*I      2*E+K    3*J      J+K      2*K      2*I+2*K  2*J+2*K  6*K      
-F | F        2*F      3*F      K        3*J      6*F      3*J      2*K      3*K      6*J      6*K      
-G | G        J        G+J      K        J+K      3*J      2*G+K    2*K      3*K      2*J+2*K  6*K      
-H | H        2*H      K        H+K      2*K      2*K      2*K      2*H+2*K  4*K      4*K      8*K      
-I | I        K        I+K      2*I+K    2*I+2*K  3*K      3*K      4*K      2*I+5*K  6*K      12*K     
-J | J        2*J      3*J      2*K      2*J+2*K  6*J      2*J+2*K  4*K      6*K      4*J+4*K  12*K     
-K | K        2*K      3*K      4*K      6*K      6*K      6*K      8*K      12*K     12*K     24*K     
+A_3 = S_4
+~~~~~~~~~
+
+                          # group              structure                   conjugates           
+A subgroup 24 cosets  1   parabolic S_4        partition (4) "nothing"     1             
+B subgroup 12 cosets  2   even permutations    orientation (checkerboard)                    
+C subgroup  8 cosets  3   Z_2*Z_2*Z_2 ?        any 3-colouring of edges                    
+D subgroup  6 cosets  4   parabolic S_3        partition (31)                    
+E subgroup  4 cosets  6   parabolic            partition (22)                    
+F subgroup  4 cosets  6   Z_2*Z_2              pair of disjoint edges
+G subgroup  4 cosets  6   C_4                  4-cycle 
+H subgroup  3 cosets  8   C_3                  oriented face                    
+I subgroup  2 cosets 12   parabolic S_2        partition (211)                    
+J subgroup  2 cosets 12   double swap (12)(34) two relativly oriented disjoint edges
+K subgroup  1 cosets 24   parabolic I          partition (1111)                    
+
+
+Burnside ring of parabolic subgroups
+  | A  D    E     I     K   
+--+-------------------------
+A | A  D    E     I     K   
+D | D  D+I  2I    2I+K  4K  
+E | E  2I   2E+K  2I+2K 6K  
+I | I  2I+K 2I+2K 2I+5K 12K 
+K | K  4K   6K    12K   24K 
+
+For example, I*I shows the ways that an ordered pair
+can relate to an ordered pair:
+https://golem.ph.utexas.edu/category/2007/11/geometric_representation_theor_5.html#c013224
+
+see also:
+https://ncatlab.org/nlab/show/Gram-Schmidt+process#categorified_gramschmidt_process
+
+
+  | A B  C   D    E     F  G     H     I     J     K   
+--+----------------------------------------------------
+A | A B  C   D    E     F  G     H     I     J     K   
+B | B 2B F   H    J     2F J     2H    K     2J    2K  
+C | C F  C+F I    E+J   3F G+J   K     I+K   3J    3K  
+D | D H  I   D+I  2I    K  K     H+K   2I+K  2K    4K  
+E | E J  E+J 2I   2E+K  3J J+K   2K    2I+2K 2J+2K 6K  
+F | F 2F 3F  K    3J    6F 3J    2K    3K    6J    6K  
+G | G J  G+J K    J+K   3J 2G+K  2K    3K    2J+2K 6K  
+H | H 2H K   H+K  2K    2K 2K    2H+2K 4K    4K    8K  
+I | I K  I+K 2I+K 2I+2K 3K 3K    4K    2I+5K 6K    12K 
+J | J 2J 3J  2K   2J+2K 6J 2J+2K 4K    6K    4J+4K 12K 
+K | K 2K 3K  4K   6K    6K 6K    8K    12K   12K   24K 
+
+
 
 B_2:
   | A      B      C      D      E      F      G      H      
@@ -220,6 +263,12 @@ g | g 2g 2g 2g 3g  4g   4g 6g 6g    6g    6g    6g    6g    6g    8g    8g    8g
 
 
 alternating n=4:
+
+A subgroup size = 12, number of cosets = 1
+B subgroup size = 4, number of cosets = 3
+C subgroup size = 3, number of cosets = 4
+D subgroup size = 2, number of cosets = 6
+E subgroup size = 1, number of cosets = 12
 
   | A  B    C    D        E     
 --+-----------------------------
@@ -953,6 +1002,157 @@ time ./geometry.py projective hecke n=4
 orbits: 7
 real 1439m56.663s
 user 1440m2.229s
+
+
+7/2/17
+======
+
+ $ ./geometry.py projective hecke
+[Point(0, 7), Point(0, 8), Point(0, 9), Point(0, 10), Point(0, 11), Point(0, 12), Point(0, 13)]
+[Point(1, 0), Point(1, 1), Point(1, 2), Point(1, 3), Point(1, 4), Point(1, 5), Point(1, 6)]
+Point(0, 7) [Point(1, 0), Point(1, 1), Point(1, 6)]
+Point(0, 8) [Point(1, 2), Point(1, 0), Point(1, 4)]
+Point(0, 9) [Point(1, 0), Point(1, 5), Point(1, 3)]
+Point(0, 10) [Point(1, 2), Point(1, 3), Point(1, 1)]
+Point(0, 11) [Point(1, 5), Point(1, 1), Point(1, 4)]
+Point(0, 12) [Point(1, 2), Point(1, 6), Point(1, 5)]
+Point(0, 13) [Point(1, 6), Point(1, 4), Point(1, 3)]
+flags: 21
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+group: 168
+orbits: 6
+...1.1.11............
+.........11.1.1......
+...............1.1.11
+..........11....11...
+.11....11............
+............11....1.1
+.111.1...............
+.............1111....
+.........1.1......11.
+....11..........11...
+......11..........11.
+1.1.........1.1......
+......1.1......11....
+1.1......11..........
+...11.............1.1
+....11....11.........
+11.................11
+......1.1....11......
+11.............1.1...
+...11.......11.......
+......11.1.1.........
+84
+1....................
+.1...................
+..1..................
+...1.................
+....1................
+.....1...............
+......1..............
+.......1.............
+........1............
+.........1...........
+..........1..........
+...........1.........
+............1........
+.............1.......
+..............1......
+...............1.....
+................1....
+.................1...
+..................1..
+...................1.
+....................1
+21
+.........11.1.11.1.11
+...1.1.11......1.1.11
+...1.1.1111.1.1......
+.11....11...11....1.1
+..........1111..111.1
+.11....11.11....11...
+.........1.1.1111.11.
+.111.1...1.1......11.
+.111.1.......1111....
+1.1...11....1.1...11.
+1.1.11......1.1.11...
+....1111........1111.
+1.111....11.......1.1
+...11.1.1......11.1.1
+1.1...1.111....11....
+11....1.1....11....11
+....111.1.11.11......
+11..11....11.......11
+...11.11.1.111.......
+11....11.1.1...1.1...
+11.11.......11.1.1...
+168
+...........1.1..1.1..
+....1.1.........1.1..
+....1.1....1.1.......
+1.....1.......1....1.
+.........1....11...1.
+1.....1..1.....1.....
+..........1.1....1..1
+1...1.....1.........1
+1...1.......1....1...
+.1......1....1......1
+.1.1.........1.1.....
+...1....1......1....1
+.1...1.....1.......1.
+.....1.1.........1.1.
+.1.....1...1.....1...
+..1....1....1.....1..
+...1...1.1..1........
+..11.....1........1..
+.....1..1.1...1......
+..1.....1.1.....1....
+..1..1........1.1....
+84
+....1.1..............
+...........1.1.......
+................1.1..
+.........1.....1.....
+1.....1..............
+..............1....1.
+1...1................
+............1....1...
+..........1.........1
+...1...........1.....
+........1...........1
+.1...........1.......
+.......1.........1...
+.1.........1.........
+.....1.............1.
+...1.....1...........
+..1...............1..
+.......1....1........
+..1.............1....
+.....1........1......
+........1.1..........
+42
+.11..................
+1.1..................
+11...................
+....11...............
+...1.1...............
+...11................
+.......11............
+......1.1............
+......11.............
+..........11.........
+.........1.1.........
+.........11..........
+.............11......
+............1.1......
+............11.......
+................11...
+...............1.1...
+...............11....
+...................11
+..................1.1
+..................11.
+42
 
 
 
