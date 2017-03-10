@@ -33,7 +33,8 @@ class Point(object):
         self.__dict__.update(kw)
 
     def __str__(self):
-        return "Point(%s, %s)"%(self.desc, self.idx)
+        return "Point(desc=%s, idx=%s, nbd=%s)"%(
+            self.desc, self.idx, [p.idx for p in self.nbd])
     __repr__ = __str__
 
     def get_colour(self):
@@ -98,6 +99,9 @@ class Graph(object):
         self.join(pi, pa)
         self.join(pa, pb)
         self.join(pb, pj)
+
+    def __str__(self):
+        return "Graph(%s)"%(self.points,)
 
     def __len__(self):
         return len(self.points)

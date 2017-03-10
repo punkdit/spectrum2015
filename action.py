@@ -2,7 +2,7 @@
 
 import sys
 import string
-from random import randint
+from random import randint, shuffle
 
 from util import factorial, all_subsets, write
 from argv import argv
@@ -196,7 +196,7 @@ class Perm(object):
         self._str = s
         return s
 
-    def __str__(self):
+    def cycle_str(self):
         remain = set(self.set_items)
         s = []
 #        print "__str__", self.perm, self.items
@@ -752,11 +752,10 @@ class Group(object):
 
         return subs
 
-    def subgroups(self, verbose=False):
-        I = self.identity
-        items = self.items
-        trivial = Group([I], items)
+    def cyclic_subgroups(self, verbose=False):
         # find all cyclic subgroups
+        I = self.identity
+        trivial = Group([I], self.items)
         cyclic = set()
         for g0 in self:
             if g0==I:
@@ -771,6 +770,13 @@ class Group(object):
             group = Group(perms, self.items)
             assert len(group)>1
             cyclic.add(group)
+        return cyclic
+
+    def subgroups(self, verbose=False):
+        I = self.identity
+        items = self.items
+        trivial = Group([I], items)
+        cyclic = self.cyclic_subgroups()
         if verbose:
             print "Group.subgroups: cyclic:", len(cyclic)
         n = len(self) # order
@@ -832,12 +838,25 @@ class Group(object):
         hom = Action(self, send_perms, items)
         return hom
 
-    def is_subaction(self, H):
+    def is_subgroup(self, H):
         assert H.items == self.items
         for g in H.perms:
             if not g in self.perms:
                 return False
         return True
+
+    def is_abelian(self):
+        pairs = [(g, h) for g in self for h in self]
+        shuffle(pairs)
+        for g, h in pairs:
+            if g*h != h*g:
+                return False
+        return True
+
+    @classmethod
+    def product(cls, H, J):
+        perms = list(set(H.perms+J.perms))
+        return cls.generate(perms)
 
     def choice(group, *ks):
         "choose k elements"
@@ -1308,15 +1327,51 @@ def main():
 
     print "G:", len(G)
 
-    if argv.subgroups:
-        Hs = G.subgroups()
+    if argv.test_projective:
+        test_projective(G)
+
+    if argv.subgroups or argv.cyclic_subgroups:
+        if argv.cyclic_subgroups:
+            Hs = G.cyclic_subgroups()
+        else:
+            Hs = G.subgroups()
         print "subgroups:", len(Hs)
-        sizes = [len(H) for H in Hs]
-        sizes.sort()
-        print "\t", sizes
+        Hs = list(Hs)
+        Hs.sort(key = lambda H : len(H))
+        for H in Hs:
+            #if len(H)==len(G) or len(H)==1:
+            #    continue
+            print "subgroup order=%d:"%len(H)
+            perms = [perm.perm for perm in H]
+            print perms
 
     if argv.burnside:
         burnside(G)
+
+
+def test_projective(G):
+
+    Hs = G.cyclic_subgroups()
+
+    print [len(H) for H in Hs]
+    H2s = [H for H in Hs if len(H)==2]
+    H3s = [H for H in Hs if len(H)==3]
+
+    pairs = list(zip(H2s, H3s))
+    print "pairs:", len(pairs)
+    shuffle(pairs)
+    for H2, H3 in pairs:
+        H = Group.product(H2, H3)
+        if len(H)!=6:
+            write('.')
+            continue
+    else:
+        assert 0
+
+    print
+    print H.is_abelian()
+    for perm in H:
+        print perm.cycle_str()
 
 
 def burnside(G):
