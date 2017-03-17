@@ -665,11 +665,21 @@ class Group(object):
             fixed[el] = el.fixed()
         return fixed
 
-    def stab(self, item):
-        "stabilizer subgroup"
+    def stabilizer(self, *items):
+        "subgroup that fixes every point in items"
         perms = []
         for g in self.perms:
-            if g[item]==item:
+            if len([item for item in items if g[item]==item])==len(items):
+                perms.append(g)
+        return Group(perms, self.items)
+
+    def invariant(self, *items):
+        "subgroup that maps set of items to itself"
+        perms = []
+        items = set(items)
+        for g in self.perms:
+            items1 = set(g[item] for item in items)
+            if items1.issubset(items):
                 perms.append(g)
         return Group(perms, self.items)
 
@@ -720,7 +730,7 @@ class Group(object):
         assert sum(len(orbit) for orbit in orbits) == len(group.items)
 
         # orbit stabilizer theorem
-        n = sum(len(group.stab(item)) for item in group.items)
+        n = sum(len(group.stabilizer(item)) for item in group.items)
         assert n == len(group) * len(orbits)
 
         # Cauchy-Frobenius lemma
@@ -1394,7 +1404,7 @@ def burnside(G):
 
     # get equivalance classes
     equs = list(set(equ.top for equ in equs.values()))
-    equs.sort(key = lambda equ : -len(equ.items[0]))
+    equs.sort(key = lambda equ : (-len(equ.items[0]), equ.items[0].str()))
     for equ in equs:
         print "equ:", [len(H) for H in equ.items]
     print "total:", len(equs)
@@ -1402,7 +1412,7 @@ def burnside(G):
     #return
 
     Hs = [equ.items[0] for equ in equs] # pick unique (up to conjugation)
-    Hs.sort(key = lambda H : (-len(H), H.str()))
+    #Hs.sort(key = lambda H : (-len(H), H.str()))
 
     letters = list(string.uppercase + string.lowercase)
     letters = letters + [l+"'" for l in letters] + [l+"''" for l in letters]
@@ -1484,7 +1494,7 @@ def burnside(G):
       print
 
     space = 2
-    if argv.compact:
+    if argv.compact or 1:
         table = dict((k, v.replace("*", "")) for (k, v) in table.items())
         space = 1
 
