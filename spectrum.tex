@@ -1,22 +1,27 @@
+%thesis.tex 
+%Model LaTeX file for Ph.D. thesis at the 
+%School of Mathematics, University of Edinburgh
 
-%\documentclass[12pt,notitlepage,aps,pra,longbibliography,nofootinbib,tightenlines]{revtex4}
-%\documentclass[12pt,notitlepage,longbibliography,nofootinbib,tightenlines]{revtex4-1}
+%\documentclass[11pt,twoside,openright]{report} 
+\documentclass[12pt,oneside]{article} 
 
-\documentclass[12pt]{article}
+%% \titleformat{command}[shape]{format}{label}{sep}{before}[after]
 
-%\documentclass[12pt,a4]{revtex4}
-%\documentclass[12pt]{article}
-%\documentclass[11pt, twocolumn]{article}
+% bug in titlesec:
+% https://bugs.launchpad.net/ubuntu/+source/texlive-extra/+bug/1574052
+\usepackage{titlesec}
+%\usepackage[tracking=true]{microtype}
+%\titleformat{\chapter}[display]
+%  {\normalfont\huge\bfseries}
+%  {\filcenter\underline{\MakeUppercase{\textls[400]{\chaptertitlename}}\ \thechapter}}
+%  {20pt}{\Huge}
 
 %\usepackage{epsf}
 \usepackage{amsmath}
 \usepackage{color}
 \usepackage{natbib}
-%\usepackage{cite}
-\usepackage{fullpage} % uses 20 percent less pages.
-
 \usepackage{framed}
-
+%\usepackage{cite}
 \usepackage{tikz}
 \usepackage{tikz-cd}
 
@@ -28,22 +33,228 @@
 %\RequirePackage{theorem}
 %\RequirePackage{eucal}
 \RequirePackage{color}
-\RequirePackage{xcolor}
 \RequirePackage{url}
 \RequirePackage{mdwlist}
 
 \RequirePackage[all]{xy}
 \CompileMatrices
-\RequirePackage{hyperref}
+%\RequirePackage{hyperref}
 \RequirePackage{graphicx}
 %\RequirePackage[dvips]{geometry}
+
+\usepackage{xcolor}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{graphicx}
+\usepackage[caption=false]{subfig}
+\usepackage{enumerate}
+\usepackage{mathrsfs}
+
+
+%\titleformat{\chapter}[display]
+%{\normalfont\Large\filcenter\sffamily}
+%{\titlerule[1pt]%
+%\vspace{1pt}%
+%\titlerule
+%\vspace{1pc}%
+%\LARGE\MakeUppercase{\chaptertitlename} \thechapter}
+%{1pc}
+%{\titlerule
+%\vspace{1pc}%
+%\Huge}
+%[
+%%\begin{center}
+%%%\includegraphics[width=0.8\columnwidth]{pic-deco.pdf}
+%%\includegraphics{pic-deco.pdf}
+%%%\includegraphics{plot-011-tt.pdf}
+%%\end{center}
+%%\newpage
+%]
+
+
+%\usepackage{epstopdf} % to include .eps graphics files with pdfLaTeX
+
+%\usepackage[pdfpagelabels,pdftex,bookmarks,breaklinks]{hyperref}
+
+\definecolor{darkblue}{RGB}{0,0,127} % choose colors
+\definecolor{darkgreen}{RGB}{0,150,0}
+%\hypersetup{colorlinks, linkcolor=darkblue, citecolor=darkgreen, filecolor=red, urlcolor=blue}
+%\hypersetup{pdfauthor={Simon Burton}}
+%\hypersetup{pdftitle={Foo Foo}}
+
+\usepackage[normalem]{ulem}
+
+\usepackage{setspace}   %Allows double spacing with the \doublespacing command
+
+\newcommand{\todo}[1]{\ \textcolor{red}{\{#1\}}\ }
+\newcommand{\danbrowne}[1]{\ \textcolor{red}{\{#1\}}\ }
+
+\newcommand{\Eref}[1]{(\ref{#1})}
+\newcommand{\Fref}[1]{Fig.~\ref{#1}}
+%\newcommand{\Aref}[1]{Appendix~\ref{#1}}
+\newcommand{\SRef}[1]{section~\ref{#1}}
+
+
+\def\Complex{\mathbb{C}}
+\def\C{\mathbb{C}}
+\def\R{\mathbb{R}}
+\def\Z{\mathbb{Z}}
+%\def\Ham{\mathcal{H}} % meh..
+\def\Ham{H}
+\def\Pauli{\mathcal{P}}
+\def\Spec{\mbox{Spec}}
+\def\Proveit{{\it (Proof??)}}
+\def\GL{\mathrm{GL}}
+\def\half{\frac{1}{2}}
+\def\Stab{S}
+
+
+
+\newcommand{\ket}[1]{|{#1}\rangle}
+\newcommand{\expect}[1]{\langle{#1}\rangle}
+\newcommand{\bra}[1]{\langle{#1}|}
+\newcommand{\ketbra}[2]{\ket{#1}\!\bra{#2}}
+\newcommand{\braket}[2]{\langle{#1}|{#2}\rangle}
+
+\newcommand{\bket}[1]{\bigl|\,{#1}\,\bigr\rangle}
+\newcommand{\bbra}[1]{\bigl\langle\,{#1}\,\bigr|}
+\newcommand{\bketbra}[2]{\bket{#1}\!\bra{#2}}
+\newcommand{\bbraket}[2]{\bigl\langle\,{#1}\,\bigr|\,{#2}\,\bigr\rangle}
+
+\def\Span#1{\langle #1 \rangle}
+
+%\newcommand{\todo}[1]{\textcolor{red}{#1}}
+
+\def\smbox#1{\ \ \mbox{#1}\ \ }
+
 
 
 \newcommand{\Field}{\mathcal{F}}
 \def\Im{\mathrm{im}}
 \def\Ker{\mathrm{ker}}
 \def\Dim{\mathrm{dim}}
+%\def\euler{\chi}
+\def\euler{\mu}
 
+
+\title{Representations and Spectra of Gauge Code Hamiltonians}
+
+\author{Simon Burton\\
+Centre for Engineered Quantum Systems,\\
+School of Physics,\\
+The University of Sydney}
+
+
+\date{\today}
+
+\flushbottom
+
+\begin{document}
+
+\maketitle
+
+%\doublespacing
+%\onehalfspacing
+
+\begin{abstract}
+hoo hoo
+\end{abstract}
+
+%\setcounter{chapter}{-1}
+%\chapter{Overview}
+
+%\danbrowne{motivate the research area and summarise key results}
+
+An error correcting code aims to store information
+that can survive the effects of noise.
+A classical code will store bits of information,
+robust against bitflip noise.
+A quantum code stores qubits of information,
+robust against quantum noise.
+
+Presented as a code we have a set of check operators:
+measuring these gives the syndrome which is used to 
+diagnose the noise and hopefully restore the system
+in such a way as to preserve the encoded information.
+This is active error correction.
+But we can also put the check operators in a Hamiltonian.
+Now the protected state is found in the groundstate of
+the system, and we can ask how this state is effected
+by thermal noise.
+This is passive error correction, where the
+encoded information is protected energetically.
+
+In Chapter 1 we introduce 
+the quantum stabilizer codes.
+These are abelian quantum codes: the check operators
+all commute with each other.
+When we turn the check operators into the terms of a
+Hamiltonian, we can easily find all the eigenvectors and the spectrum.
+In this chapter, we connect quantum codes to classical
+(linear) codes using the viewpoint of homology theory. 
+
+The remainder of this thesis aims to generalise these
+ideas to the non-abelian case, 
+and is made up of two parts.
+The first part is Chapter 2, which investigates
+qubit Hamiltonian models with non-commuting terms.
+The second part is Chapter 3 and 4, where we study
+topological systems without reference to any underlying spins.
+As Hamiltonians these will have
+commuting terms, but the associated algebra of observables
+is non-commutative.
+
+In Chapter 2 we study the spectra of 
+Hamiltonians built from Pauli spin (qubit) operators.
+These spin operators lead a double life:
+both as the energetic terms of a Hamiltonian model, and as
+the operators in a quantum error correcting code.
+When these operators commute, the code is known as a stabilizer code.
+When they don't commute, the code is known as a subsystem code or gauge code.
+The resulting Hamiltonian groundstate becomes frustrated.
+For such a Hamiltonian to have any ability to act as a quantum
+code we would expect a spectral gap between the
+groundspace and first excited states.
+The goal of Chapter 2 is to study this spectral gap.
+
+In Section 2.1 we show graphical depictions of
+some simple Hamiltonions and introduce the action of
+the Pauli $X$ and $Z$ operators.
+In Section 2.2 we study the group representation theory
+of subgroups of the (real) Pauli group on $n$ qubits.
+We apply this to the 2D compass model and the
+Kitaev honeycomb model in section 2.3. 
+In Section 2.4 we find the 
+irreducible representations of an arbitrary CSS gauge (subsystem) code.
+This is a new result, and involves solving a quadratic 
+system of equations over a finite field.
+
+In the computational basis, 
+CSS gauge code Hamiltonians have positive off-diagonal
+entries and so can be viewed as the adjacency matrix
+of a weighted graph.
+This motivates the ideas in Section 2.6, where 
+we use Perron-Frobenius theory to
+describe the low energy spectrum of such Hamiltonians.
+These are new results.
+In Section 2.7 we introduce the 3D gauge color code Hamiltonian.
+Sections 2.8 and 2.9 discuss further ideas of
+symmetry in these Hamiltonians: the orbigraph and
+the structure of finite dimensional semi-simple Lie algebras.
+Using this we find that the gauge color code Hamiltonian
+decomposes into six mutually commuting ideals.
+This gives an exponential reduction in the numerical
+difficulty of exactly diagonalizing this Hamiltonian,
+results of which we present in Section 2.10.
+These numerics show some evidence of a spectral
+gap, which is contrasted against models that are known
+to be gapless: the two and three dimensional compass model,
+the one dimensional $XY$-model and the one dimensional
+transverse field Ising model.
+The chapter concludes with Section 2.11 where
+we suggest a relation between the size of
+stabilizers and the gapped nature of the Hamiltonian.
+This is further application of the Perron-Frobenius 
+theory in the context of Cheeger inequalities.
 
 
 
@@ -51,8 +262,6 @@
 %\def\FrameCommand{{\color{black}\vrule width 3pt}\hspace{0pt}\fboxsep=\FrameSep\colorbox{lightgray}}%
 %\MakeFramed{\hsize0.8\linewidth\advance\hsize-\width\FrameRestore}}
 %{\endMakeFramed}
-
-
 
 \renewenvironment{framed}
 {\begin{samepage}
@@ -64,6 +273,12 @@
 %{\endMakeFramed}
 
 
+\newcommand\dolemma[1]{\vskip 5pt \noindent{\bf \underline{Lemma #1}\ }}
+\newcommand\doproposition[1]{\vskip 5pt \noindent {\bf \underline{Proposition #1}\ }}
+\newcommand\dotheorem[1]{\vskip 5pt \noindent {\bf \underline{Theorem #1}\ }}
+\newcommand\doproof{\vskip 5pt \noindent{\bf \underline{Proof:}\ }}
+
+\newcommand\tombstone{\rule{.36em}{2ex}\vskip 5pt}
 
 
 %\def\Complex{\mathbb{C}}
@@ -89,97 +304,6 @@
 
 %\def\smbox#1{\ \ \mbox{#1}\ \ }
 
-
-\begin{document}
-
-%\title{Representations of Pauli Operator Hamiltonians}
-\title{Representations and Spectra of Gauge Code Hamiltonians}
-
-\author{Simon Burton\\
-Centre for Engineered Quantum Systems,\\
-School of Physics,\\
-The University of Sydney}
-
-\date{\today}
-
-%\begin{abstract}
-%\end{abstract}
-
-\maketitle
-
-\begin{abstract}
-%    Highly frustrated systems tend to be gapless. Or are they?
-%    Even beyond the lattice symmetries of the spin model,
-%    these things have an extensive number of integrals of motion, 
-%    which are called \emph{stabilizers} in the code literature.
-%    This extensive growth of symmetry
-%    makes the representation theory interesting.
-%    In exploring the spectra we specialize to ``CSS'' models,
-%    and exploit the Perron-Frobenius theory.
-%    Even though there is strong evidence that the 2d
-%    compass model is gapless, 
-%    %we provide the first rigorous proof of this.
-%    there is no rigorous proof of this. We provide some
-%    heuristics as to why this is so.
-%    Finally, we conjecture the excitations in
-%    the gauge color code model are gapped.
-%    Some numerics and intuition provided.
-
-%What is an operator?
-%From the perspective of a quantum code these are the
-%things that we use to diagnose errors and perform error correction.
-%We can also interpret these operators as the terms of a Hamiltonian, whose
-%groundspace corresponds to the energetically protected codespace.
-%In the case of mutually commuting operators we can easily diagonalize the
-%Hamiltonian, but for gauge (subsystem) codes this does not hold.
-%From the mathematical perspective we examine three different notions of
-%representation theory, with a view to extracting
-%spectral information about the Hamiltonian.
-%Group theory representations give
-%a block diagonalisation of the Hamiltonian as labeled by stabilizer eigenvalues.
-%The coarser tool of Perron-Frobenius theory gives information about the
-%spectral layout of these blocks in the case of CSS gauge codes.
-%At the finest level, the operators in each of these blocks form a semisimple Lie
-%algebra and ideals in this algebra correspond to tensor products of
-%representations.
-%Using all of these tools we
-%perform exact diagonalisation on some
-%large instances of the 3-dimensional gauge color code Hamiltonian.
-%These numerics support the conjecture that these models are gapped,
-%which in turn lends weight to the possibility that these may
-%be self-correcting quantum memories.
-\end{abstract}
-
-%\newpage
-%\tableofcontents
-%\newpage
-
-
-\def\Complex{\mathbb{C}}
-\def\C{\mathbb{C}}
-\def\R{\mathbb{R}}
-\def\Z{\mathbb{Z}}
-%\def\Ham{\mathcal{H}} % meh..
-\def\Ham{H}
-\def\Pauli{\mathcal{P}}
-\def\Spec{\mbox{Spec}}
-\def\Proveit{{\it (Proof??)}}
-\def\GL{\mathrm{GL}}
-\def\half{\frac{1}{2}}
-\def\Stab{S}
-
-\newcommand{\ket}[1]{|{#1}\rangle}
-\newcommand{\expect}[1]{\langle{#1}\rangle}
-\newcommand{\bra}[1]{\langle{#1}|}
-\newcommand{\ketbra}[2]{\ket{#1}\!\bra{#2}}
-\newcommand{\braket}[2]{\langle{#1}|{#2}\rangle}
-
-\newcommand{\todo}[1]{\textcolor{red}{#1}}
-
-\def\smbox#1{\ \ \mbox{#1}\ \ }
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -187,67 +311,73 @@ The University of Sydney}
 
 \section{Introduction}
 
-%Physicists often like to solve Hamiltonians 
-%using a change of basis, or spin transform.
-%But we can also work with transformations on the level of a
-%group of operators,
-%and later on figure out the spin transform (if needed).
-%This is in line with the thinking of 
-%Gottesman and Heisenberg \cite{Gottesman1998}, where states are
-%specified by the operators that act on them, instead of
+Physicists often like to solve Hamiltonians 
+using a change of basis, or spin transform.
+But we can also work with transformations on the level of a
+group of operators,
+and later on figure out the spin transform (if needed).
+This is in line with the thinking of 
+Gottesman who proposed a Heisenberg picture for quantum computing \cite{Gottesman1998}.
+Here states are specified by the operators that act on them, instead of
 %actually performing operations on states.
-%This is often times harder than just manipulating the
-%states themselves, but when it works it can yield
-%new perspectives on the dynamics of the system.
-%This is also
-%the philosophy of category theory, where the goal is to lift
-%information about elements of some mathematical object
-%up to the level of the operators (morphisms) on the
-%objects themselves.
-%However, forgetting about the meaning of the symbols in this way 
-%leaves one with the question:
-%``What is an operator?''
-%
-%From the perspective of a quantum code these are the
-%things that we use to diagnose errors and perform error correction.
-%We can also interpret these operators as the terms of a Hamiltonian, whose
-%groundspace corresponds to the energetically protected codespace.
-%In the case of mutually commuting operators we can easily diagonalize the
-%Hamiltonian, but for other systems of interest this does not hold.
-%
-%The mathematicians have a name for this question ``what is an operator?''
-%This is known as \emph{representation theory.}
-%We examine three different notions of
-%such representations, with a view to extracting
-%spectral information about the Hamiltonian.
-%Group theory representations give 
-%a block diagonalization of the Hamiltonian as labeled by stabilizer eigenvalues.
-%The coarser tool of Perron-Frobenius theory gives information about the
-%spectral layout of these blocks in the case of CSS gauge codes.
-%At the finest level, the operators in each of these blocks form a semisimple Lie
-%algebra and ideals in this algebra correspond to tensor products of
-%representations. 
-%
-%While there are
-%some hints of this theory in the literature 
-%\cite{Bacon2006quantum,Yoshida2010} %,Brzezicki2013}
-%here we spell out in detail how this works and much more.
-%Partly it's because these models are new and we don't have
-%many examples.
-%
-%Using all of these tools we 
-%perform exact diagonalization on some 
-%large instances of the 3-dimensional gauge color code 
-%Hamiltonian \cite{Bombin2015,Bombin2015single,Kubica2015}.
-%These numerics support the conjecture that these models are gapped,
-%which in turn lends weight to the possibility that these may
-%be self-correcting quantum memories.
-%%Then we turn to examine the low energy spectra.
-%%In particular we are interested in the gap between
-%%the energy of the groundstate and the first excited state.
-%Having a constant gap (bound from below)
-%is part of the story of topologically ordered phases
-%\cite{Kitaev2003,Brown2016}.
+expicitly working with the states themselves.
+%\danbrowne{This sentence doesn't quite make sense.}
+This is often harder than just manipulating the
+states themselves, but when it works it can yield
+new perspectives on the dynamics of the system.
+This is also
+the philosophy of category theory, where the goal is to lift
+information about elements of some mathematical object
+up to the level of the operators (morphisms) on the
+objects themselves.
+However, forgetting about the meaning of the symbols in this way 
+leaves one with the question:
+``What is an operator?''
+
+From the perspective of a quantum code these are the
+things that we use to diagnose errors and perform error correction.
+We can also interpret these operators as the terms of a Hamiltonian, whose
+groundspace corresponds to the energetically protected codespace.
+In the case of mutually commuting operators we can easily diagonalize the
+Hamiltonian, but for other systems of interest this does not hold.
+
+The mathematicians have a name for this question ``what is an operator?''
+This is known as \emph{representation theory.}
+We examine three different notions of
+such representations, with a view to extracting
+spectral information about the Hamiltonian.
+Group theory representations give 
+a block diagonalization of the Hamiltonian:
+these are the \emph{irreducible representations} and in
+our case can be labelled by stabilizer eigenvalues.
+%\danbrowne{Only true for stabiliser hamiltonians?}
+The coarser tool of Perron-Frobenius theory \cite{Perron1907, Frobenius1912, Baez2012}
+gives information about the
+spectral layout of these blocks in the case of CSS gauge codes.
+At the finest level, the operators in each of these blocks form a semisimple Lie
+algebra and ideals in this algebra correspond to tensor products of
+representations. 
+
+While there are
+some hints of this theory in the literature 
+\cite{Bacon2006quantum,Yoshida2010} %,Brzezicki2013}
+here we spell out in detail how this works and much more.
+Partly it's because these models are new and we don't have
+many examples.
+
+Using all of these tools we 
+perform exact diagonalization on some 
+large instances of the 3-dimensional gauge color code 
+Hamiltonian \cite{Bombin2015,Bombin2015single,Kubica2015}.
+These numerics support the conjecture that these models are gapped,
+which in turn lends weight to the possibility that these may
+be self-correcting quantum memories.
+%Then we turn to examine the low energy spectra.
+%In particular we are interested in the gap between
+%the energy of the groundstate and the first excited state.
+Having a constant gap (bound from below)
+is part of the story of topologically ordered phases
+\cite{Kitaev2003,Brown2016}.
 
 %\cite{Wen1991} % 
 
@@ -273,6 +403,1004 @@ The University of Sydney}
 %correcting quantum memory seems to be hard to achieve in 2D even in the presence of
 %effective long-range interactions [LCYPP15].
 
+\subsection{Some motivating examples}
+
+\underline{\bf Example 1.}
+We start our journey considering a two-dimensional state space.
+This space is blessed with two basis vectors $\ket{0}$ and $\ket{1}.$
+The $Z$ and $X$ operators act on these states as:
+\begin{center}
+\includegraphics[]{pic-zx.pdf}
+\end{center}
+From this picture we can see that $Z$ acts by \emph{stabilizing} the
+state $\ket{0}$ and anti-stabilizing the $\ket{1}$ state.
+The $Z$ operator has been reduced 
+to two operators each acting on a one dimensional subspace:
+$Z = +1 \oplus -1.$
+The $X$ operator serves to ``bitflip'' the state between
+these two subspaces.
+
+But what happens if we get confused and end up swapping
+the $X$ and $Z$ operators? We would like to see the $X$ operator
+as stabilizing / anti-stabilizing two subspaces, together with the
+$Z$ operator as bitflipping between these.
+The trick is to consider the \emph{orbits} of the operator
+we hope to act as a stabilizer.
+In this case there is only one orbit, $\ket{0}+\ket{1}$
+and indeed, the $Z$ operator bitflips this to another state
+$\ket{0}-\ket{1}$ that is anti-stabilized by $X.$
+
+We are going to be considering Hamiltonians built from
+summing operators of this form.
+In this paper we use a ``neg-Hamiltonian'' convention,
+to save complicating expressions with negative signs.
+The ground space corresponds to the \emph{highest} eigenvalue.
+
+So building a Hamiltonian from a single $X$ or $Z$ term,
+we find the ground space as the stabilized space
+by summing over the orbit of that term.
+The other operator,
+which we call the \emph{adjacent operator}, acts to bitflip
+between the eigenspaces.
+
+\underline{\bf Example 2.}
+To further elucidate this idea we turn to another example,
+which is a Hamiltonian built from three commuting and
+independent operators:
+$$
+    \Ham = XXI + IXX + ZZZ.
+$$
+%We start with $\ket{000}$ and sum over the orbit of
+%the terms in $\Ham.$ 
+Starting with $\ket{000}$
+the terms of the Hamiltonian generate an orbit
+given by $$\mathrm{Orbit}(\ket{000}) = \{\ket{000}, \ket{011}, \ket{110}, \ket{101}\}.$$
+Notice that the $ZZZ$ term fixes all these states.
+Summing over this orbit we get the following ground state:
+$$\mathrm{GS} = \ket{000}+\ket{011}+\ket{110}+\ket{101}.$$
+%(Notice that the $ZZZ$ operator has no effect here.)
+%\danbrowne{How do you compute this? ZZZ doesn't seem to play a role in generating this orbit. Why not?}
+
+We select three adjacent operators
+$ZII, IIZ,$ and $IXI,$
+one for each of the stabilizer operators:
+\begin{align*}
+    ZII : \mbox{GS} &\mapsto \ket{000}+\ket{011}-\ket{110}-\ket{101} 
+        \ \mbox{anti-stabilized by}\  XXI,\\
+    IIZ : \mbox{GS} &\mapsto \ket{000}-\ket{011}+\ket{110}-\ket{101} 
+        \ \mbox{anti-stabilized by}\  IXX,\\
+    IXI : \mbox{GS} &\mapsto \ket{010}+\ket{001}+\ket{100}+\ket{111} 
+        \ \mbox{anti-stabilized by}\  ZZZ.
+\end{align*}
+
+%For example, $ZII$ sends the ground state to
+%$\ket{000}+\ket{011}-\ket{110}-\ket{101}$
+%which is anti-stabilized by $XXI.$
+These adjacent operators form an abelian group
+%\danbrowne{It doesn't seem that it is necessary for this to be abelian via your definition. Are you demanding that it be abelian? If so, you should modify your definition. }
+of order $2^3 = 8$ and by applying each element of
+this group to the ground state we get a basis
+of our state space, which we call a \emph{symmetry
+invariant basis.}
+
+The adjacent operators are not unique in general. 
+For this example we could have also chosen $IZZ, ZZI, XXX.$
+
+\underline{\bf Example 3.}
+Now we consider a four qubit example:
+$$
+    \Ham = XXII + IIXX + ZIZI + IZIZ.
+$$
+This time the terms of the Hamiltonian do not generate 
+an abelian group.
+We will call this group, as generated by the terms in the Hamiltonian,
+the \emph{gauge group}, $G$.
+The \emph{stabilizer} subgroup of $G$ will be the elements of $G$
+that commute with every other element in $G.$
+By inspection we see this group is generated by $\Stab_0=\{XXXX, ZZZZ\}.$
+%\danbrowne{What sets the phases of these operators? Are they arbitrarily chosen?}
+We can extend these generators to a complete independent generating
+set for $G$ using the operators  $R_0=\{XXII, ZIZI\}.$
+These $R_0$ operators generate the \emph{reduced gauge group} $R.$
+The operators adjacent to $\Stab_0$ we
+call the \emph{error operators} $T_0$. 
+We choose $T_0 = \{ZZZI, IIIX\}.$
+(Once again, these are not unique.)
+%\danbrowne{There's no unique choice here, so it's a bit misleading to call them "the adjacent operators". }
+The \emph{logical operators} are the $n$-qubit 
+Pauli operators outside of the group
+$G$ that commute with $G.$
+In this case they are generated by $L_0 = \{XIXI, ZZII\}.$
+All of this can be summarized in a table of adjacent pairs:
+\begin{center}
+\includegraphics[]{pic-gauge4.pdf}
+\end{center}
+where the number of rows equals $n,$ 
+each operator commutes with operators on other rows,
+and anticommutes with the operator on the same row. 
+There is no need to include any phases ($\pm I$) in these tables
+because phases commute with everything.
+If we take all the entries in the left column
+we get the operators 
+$\{ ZZII, XXXX, ZZZZ, ZIZI \}.$ 
+These generate an abelian group 
+that stabilizes the
+state $\ket{\psi} = \ket{0000}+\ket{1111}.$
+Let $r$ be the gauge operator $XXII$ adjacent to the 
+stabilizer $ZIZI$,
+The state $\ket{\psi}$ then lies in the $G-$orbit 
+$$
+\{\ket{\psi}, r\ket{\psi}\} = \{\ket{0000}+\ket{1111}, \ket{1100}+\ket{0011}\}.
+$$
+We use the $T_0$ operators $t_1=ZZZI$ and $t_2=IIIX$
+to list three other $G-$orbits:
+$$
+\{t_1 \ket{\psi}, t_1 r\ket{\psi}\}, 
+\{t_2 \ket{\psi}, t_2 r\ket{\psi}\}, 
+\{t_1 t_2 \ket{\psi}, t_1 t_2 r\ket{\psi}\}.
+$$
+So now we have sixteen vectors, forming an orthogonal basis for the state space.
+This is the symmetry invariant basis for this Hamiltonian.
+
+We can now arrange these basis vectors on the vertices of a four dimensional hypercube,
+such that each dimension corresponds to one of the adjacent $\tilde{X}_i$ bitflip
+operators.
+%drawn poorly with only two dimensions below.
+Such an arrangement has a cartesian product
+structure which induces a tensor product decomposition of
+the original state space that corresponds to the $\tilde{X}_i:$
+\begin{center}
+\includegraphics[width=0.7\columnwidth]{pic-operators.pdf}
+\end{center}
+The Hamiltonian acts on states by left multiplication.
+Because this action
+is a sum of gauge group elements,
+it will decompose into blocks,
+one for each $G-$orbit.
+We depict this action as a weighted graph, where we omit edges
+with zero weight:
+\begin{center}
+\includegraphics[width=0.7\columnwidth]{pic-orbit.pdf}
+\end{center}
+
+\def\Xt{\tilde{X}}
+\def\Zt{\tilde{Z}}
+
+Equivalently we use this basis to 
+write the matrix for the Hamiltonian in
+block diagonal form:
+$$
+\Ham = 
+\left( \begin{array}{cccc}
+2(X+Z) & 0 & 0 & 0 \\
+0  & 2X & 0 & 0 \\
+0  & 0 & 2Z & 0 \\
+0  & 0 & 0 & 0 \\
+\end{array} \right) \otimes I
+$$
+This block diagonal form will be worked out for
+general gauge group $G$ below and summarized in Section 2.2.6.
+
+%\todo{XXX and now for another formula}
+%\begin{align*}
+%\Ham &= XXII + IIXX + ZIZI + IZIZ \\
+%  &= \Xt_4 + \Zt_2\Xt_4 + \Zt_4 + \Zt_3\Zt_4 \\
+%  &= (I+\Zt_2)\Xt_4 + (I+\Zt_3) \Zt_4.
+%\end{align*}
+
+\section{Group representations}\label{GroupReps}
+
+\subsection{The Pauli group}
+
+The Pauli group $\Pauli_1$ is normally 
+defined as a set of matrices closed under
+matrix multiplication,\footnote{The original definition of the Pauli
+group also includes an imaginary unit $i$, which we
+do not include. So perhaps this should be called the
+\emph{real} Pauli group.}
+but we can define it abstractly
+as the group generated
+by the (abstract) elements $\{\omega, X, Z\}$ with
+relations as follows:
+$$
+\omega^2=I,\ X^2=I,\ Z^2=I,\ \omega X\omega X=I,\ \omega Z\omega Z=I,\ \mbox{and}\  \omega ZXZX=I,
+$$
+where $I$ is the group identity.
+Actually, $\omega $ is generated by $X$ and $Z$,
+%\danbrowne{Perhaps mention that omega represents -1 here.  You should also mention that this is not the standard definition of the Pauli group, as you have neglected i.  In particular XY is not hermitian. Does it matter?}
+so it is not necessary to include $\omega $ in the generating set,
+but here it simplifies the relations.
+%\footnote{We leave out $Y$ because...}
+This group has eight elements, and is isomorphic to the dihedral group $D_4$,
+the symmetry group of a square.
+
+To define
+the {\it $n$-qubit Pauli group} $\Pauli_n$, 
+we use the $2n+1$ element 
+generating set 
+$$\{\omega , X_1, .., X_n, Z_1, .., Z_n\}$$
+with relation $\omega^2=I$ as before, and
+\begin{equation}\label{presentation}
+\begin{array}{c}
+X_i^2=I,\ Z_i^2=I,\ \omega X_i\omega X_i=I,\ \omega Z_i\omega Z_i=I,\ \omega Z_iX_iZ_iX_i=I, 
+\mbox{\ for\ } i=1,...n,\\
+X_iX_jX_iX_j=I,\ 
+Z_iZ_jZ_iZ_j=I,\ 
+Z_iX_jZ_iX_j=I, \mbox{\ for\ } i, j = 1,..,n,\ i\ne j.
+\end{array}
+\end{equation}
+
+This abstract approach to the definition of a group is known as
+a group \emph{presentation}. In general, this is a set of
+generators together with a set of relations satisfied
+by these generators.
+
+Note that each of the generators squares to the identity,
+and of these, only $\omega$ commutes with every element of $\Pauli_n.$
+%Note that $\omega$ commutes with all elements of $\Pauli_n$
+%and squares to the idenity, 
+Therefore we will write $\omega$ as $-I,$
+similarly $\pm I$ will denote the
+set $\{\omega, I\},$ and $-X$ is $\omega X$, etc.
+
+We write the group commutator as
+$[[g, h]]:=ghg^{-1}h^{-1}$
+and note the important commutation relation:
+$$
+    [[Z_i, X_j]] = 
+    \left\{ \begin{array}{ll}
+ -I &\mbox{if}\ i=j,\\
+ I &\mbox{if}\ i\ne j.\end{array}\right.
+$$
+If we take an arbitrary $g\in \Pauli_n$
+written as a product of the generators,
+it follows that we can rewrite this
+product uniquely as %in an ordered fashion:
+$ g = \pm g_1 ... g_n $
+where each $g_i$ is one of $I, Z_i, X_i$ or $X_i Z_i$
+for $i=1,..,n.$
+Therefore, the size of the
+Pauli group is 
+$$
+    |\Pauli_n| = 2^{2n+1}.
+$$
+
+%Elements of $\Pauli_n$ that consist of
+%products of only $I$ or $X$ will
+%be call $X$-type elements (or operators)
+%and similarly $Z$-type elements are 
+%products of only $I$ or $Z$.
+The subgroup of $\Pauli_n$ generated by
+the elements $\{X_1,...,X_n\}$ % $\{X_i\}_{i=1,..,n}$ 
+is denoted $\Pauli_n^X.$ These are the $X$-type
+elements. Similarly,
+ $\{Z_1,...,Z_n\}$ generates % $\{Z_i\}_{i=1,..,n}$ 
+the subgroup of $Z$-type elements $\Pauli_n^Z$.
+
+\subsection{Subgroups of the Pauli group}
+
+We now define an {\it $n-$qubit gauge group} to be 
+any non-abelian subgroup $G$ of $\Pauli_n,$
+defined by a set of generators $G_0\subset \Pauli_n,$
+%for some subgroup $G$ of $\Pauli_n:$
+$$ G := \langle G_0\rangle.$$
+%We will assume $G$ is not abelian, which 
+%%is equivalent to the condition that $-I\in G.$ % No! {-I, I} is abelian...
+%implies that $-I\in G.$
+Because $G$ is not abelian, it follows that $-I\in G.$
+We also restrict $G_0$ to only contain Hermitian operators,
+which is equivalent to requiring that $g^2=I$ for all $g\in G_0.$
+
+Now let $\Stab$ be the largest subgroup of $G$ not containing
+$-I.$
+$\Stab$ is then an abelian subgroup,
+also known as the {\it stabilizer} subgroup.
+%(Note that each of the stabilizers commutes with the Hamiltonian.)
+$G$ decomposes as a direct product:
+$$G = \Stab\times R,$$
+where $R\cong \Pauli_r$ for some $1\le r\le n,$
+and $\Stab\cong \Z_2^{m}$ for $0\le m<n.$
+Therefore, 
+$$|G| = |\Stab| |R| = 2^{m+2r+1}.$$
+We call $R$ the {\it reduced gauge group}.
+We consider both $\Stab$ and $R$ to be subgroups of $G.$
+%Let $\phi:\Pauli_r\to R$ be a group isomorphism,
+Let $\phi:R\to \Pauli_r$ be a group isomorphism,
+%then $R_0 := \{\phi(X_i), \phi(Z_i)\}_{1\le i\le r}$
+%then $R_0 := \{\phi(X_i), \phi(Z_i)\}_{i=1,..,r}$
+then $R_0 := \{\phi^{-1}(X_i), \phi^{-1}(Z_i)\}_{i=1,..,r}$
+is a set of independent generators of $R.$
+We also let $\Stab_0$ be a set of $m$ independent generators of $\Stab.$
+
+To find the cosets of $G$ in $\Pauli_n$ we take
+the group closure of $\Pauli_n-G$; when this is non-empty
+we only need to add $I$ and $-I.$
+This is another
+gauge group, whose reduced gauge group is known as
+the {\it logical} operators $L$, and whose 
+stabilizer subgroup is known as the {\it error} operators $T.$
+Now any coset of $G$ can be written as $ltG$ with
+$l\in L$ and $t\in T.$
+The size of $T$ equals the size of $\Stab$: $|T|=|\Stab|=2^m.$
+If we let $L_0$ be an independent generating set for $L$
+then we have the important formula:
+\begin{align}
+n &= \frac{1}{2}|L_0| + |\Stab_0| + \frac{1}{2}|R_0|\\
+  &= k + m + r
+\end{align}
+We summarize the information in this section in a table
+of Pauli group elements arranged in
+two columns and $n$ rows:
+\begin{center}
+\includegraphics[]{pic-canonical.pdf}
+\end{center}
+Here we show the $2n$ generators of $\Pauli_n$ arranged 
+so that each row contains a pair of generators,
+where each such generator anti-commutes with the operator on the same row and
+commutes with all the other operators in the table.
+Note that this is exactly the definition of the Pauli group
+via a presentation given in the previous section.
+Furthermore, the table shows $2k$ generators
+of $L$, $m$ generators each for $S$ and $T,$ and $2r$
+generators of $R.$
+The gauge group $G$ encloses $R$ and $S$, and one can
+immediately see how $L$ and $T$ also form a gauge group.
+
+
+\subsection{Representations of the Pauli group}
+
+We now define the
+{\it Pauli representation} 
+of the Pauli group as a group homomorphism:
+$$
+    \rho_{\mathrm{pauli}} : \Pauli_n \to \GL(\Complex[2^n])
+$$
+where $\Complex[2^n]$ is the $2^n$-dimensional state space of $n$ qubits.
+On the independent generators 
+$\{X_1, .., X_n, Z_1, .., Z_n\},\ \rho_{\mathrm{pauli}}$
+is defined as the following tensor product of $2\times 2$ matrices:
+
+%$$
+%\rho_{\mathrm{pauli}}(X_i) := \bigotimes_{j=1}^n \left\{ \begin{array}{ll}
+%\left( \begin{array}{ll}
+%1&0\\
+%0&1\end{array} \right) &\mbox{for $j\ne i$,}\\
+%\\
+%\left( \begin{array}{ll}
+%0&1\\
+%1&0\end{array} \right) &\mbox{for $j=i$} \end{array}
+%\right\},\ 
+%\rho_{\mathrm{pauli}}(Z_i) := \bigotimes_{j=1}^n \left\{ \begin{array}{ll}
+%\left( \begin{array}{ll}
+%1&0\\
+%0&1\end{array} \right) &\mbox{for $j\ne i$,}\\
+%\\
+%\left( \begin{array}{rr}
+%1&0\\
+%0&-1\end{array} \right) &\mbox{for $j=i$}\end{array}
+%\right\}.
+%$$
+
+\begin{align*}
+\rho_{\mathrm{pauli}}(X_i) := &\bigotimes_{j=1}^n \left\{ \begin{array}{ll}
+\left( \begin{array}{ll}
+0&1\\
+1&0\end{array} \right) &\mbox{for $j=i$}\\
+\\
+\left( \begin{array}{ll}
+1&0\\
+0&1\end{array} \right) &\mbox{for $j\ne i$} \end{array}
+\right.\\
+\rho_{\mathrm{pauli}}(Z_i) := &\bigotimes_{j=1}^n \left\{ \begin{array}{ll}
+\left( \begin{array}{ll}
+1&0\\
+0&-1\end{array} \right) &\mbox{for $j=i$}\\
+\\
+\left( \begin{array}{rr}
+1&0\\
+0&1\end{array} \right) &\mbox{for $j\ne i$}\end{array}
+\right.
+\end{align*}
+
+%on $n$ qubits, $\Pauli_n,$
+%as the set of $n$-fold tensor products
+%of the matrices $\pm I, X, Z:$
+%$$
+%I = \left( \begin{array}{ll}
+%1&0\\
+%0&1\end{array} \right),\quad
+%X = \left( \begin{array}{ll}
+%0&1\\
+%1&0\end{array} \right),\quad
+%Z = \left( \begin{array}{ll}
+%1&0\\
+%0&-1\end{array} \right).
+%$$
+
+Normally the image of 
+$\rho_{\mathrm{pauli}}$ is thought of as the
+Pauli group itself, and we are indeed free to think
+that way because $\rho_{\mathrm{pauli}}$ is a group
+isomorphism.
+
+Given a group representation $\rho:G\to GL(V)$
+the {\it character} of $\rho$ is a function
+$\chi_\rho:G\to \Complex$ given by
+$$
+    \chi_\rho(g) = \mbox{Tr}\ \rho(g).
+$$
+
+Given two functions $u,v : G \to \Complex$ 
+we define the following inner product:
+$$
+    \langle u, v \rangle := \frac{1}{|G|} \sum_{g\in G} u(g) \overline{v(g)}.
+$$
+
+The character of the Pauli representation, $\chi_{{pauli}}:\Pauli_n\to\Complex$
+is given by:
+$$
+\chi_{{pauli}}(g) = \sum_{v \in basis} \langle v | \rho_{{pauli}}(g) | v \rangle
+    = \left\{ \begin{array}{ll}
+ \pm 2^n &\mbox{if}\ g=\pm I\\
+ 0 &\mbox{otherwise}\end{array}\right.
+$$
+
+Since $|\Pauli_n|=2^{2n+1}$ it follows that
+$\langle\chi_{pauli},\chi_{pauli}\rangle = 1$ and
+so $\rho_{pauli}$ is an irreducible representation of $\Pauli_n.$
+
+%It turns out %(see Appendix for details)
+%that $\rho_{\mathrm{pauli}}$ is an
+%irreducible representation ({\it irrep}) of $\Pauli_n$. 
+The only other irreps of $\Pauli_n$ are 
+the $1$-dimensional irreps $\rho:\Pauli_n\to\Complex$
+defined on the independent generators as:
+    $$ \rho(X_i) = \pm 1,\quad \rho(Z_i) = \pm 1.$$
+
+So we have $2^{2n}$ many $1$-dimensional irreps,
+and a single $2^n$-dimensional irrep.
+Summing the squares of the dimensions
+shows that we have a complete set of irreps of $\Pauli_n.$
+
+%\subsection{Representations of stabilizer groups}
+%
+%Any abelian subgroup $\Stab\subset \Pauli_n$
+%that does not contain $-I$ we call a stabilizer group.
+%The reason for this name is...
+
+
+\subsection{Representations of gauge groups}
+
+%Our next job will be to find the irreps of {\it subgroups} of $\Pauli_n.$
+Although $\rho_{\mathrm{pauli}}$
+restricted to a gauge group $G\subset\Pauli_n$ serves as a representation
+of $G$ it is no longer irreducible.
+Our aim will be to decompose $\rho_{\mathrm{pauli}}$ into irreps of $G.$
+
+The $1$-dimensional irreps $\rho:G\to \Complex,$
+are now defined by
+specifying the action of $\rho$ on the independent generators:
+$$
+    \rho(h)=\pm 1\ \mbox{for}\ h\in \Stab_0,
+    \quad \rho(\phi^{-1}(X_i)) = \pm 1,\quad \rho(\phi^{-1}(Z_i)) = \pm 1.
+$$
+This gives all $2^{m+2r}$ of the $1$-dimensional irreps.
+%These will turn out not to be used below.
+
+The $2^r$-dimensional irreps are given by:
+$$
+    \rho(h) = \pm I^{\otimes r}\ \mbox{for}\ h\in \Stab_0,
+    \quad \rho(\phi^{-1}(X_i)) = X_i,\quad \rho(\phi^{-1}(Z_i)) = Z_i.
+$$
+We are free to choose the signs of the $\rho(h)$ for each $h\in \Stab_0.$
+Hence there are $2^m$ many of these irreps.
+Each such choice corresponds to the choice of a {\it syndrome} vector $s(h)=\pm 1$, for $h \in \Stab_0,$
+or alternatively, choice of an element $t\in T:$
+$$
+    \rho^1_t(h) = \left\{ \begin{array}{ll}
+ I^{\otimes r}\ &\mbox{if $th=ht$}\\
+ -I^{\otimes r}\ &\mbox{if $th=-ht$}\end{array} \right. %\right\}\mbox{for}\ h\in \Stab_0.
+$$
+
+%Finally, there are $2^m$ many $2^r$-dimensional irreps $\rho_t$
+%which are labeled by $t\in T$ and defined as
+%$$
+%    %\rho_t(h)=\pm I^{\otimes 2^r}\ \mbox{for}\ h\in \Stab_0,
+%    %\rho_t(h)= [t,h] = th^{-1}th^{-1} = \pm I^{\otimes 2^r}\ \mbox{for}\ h\in \Stab_0,
+%    \rho_t(h) = \left\{ \begin{array}{ll}
+% I^{\otimes 2^r}\ &\mbox{if $th=ht$}\\
+% -I^{\otimes 2^r}\ &\mbox{if $th=-ht$}\end{array} \right\}\mbox{for}\ h\in \Stab_0,
+%    \quad \rho_t(\phi^{-1}(X_i)) = X_i,\quad \rho_t(\phi^{-1}(Z_i)) = Z_i.
+%$$
+
+%For $G$ a subgroup of $\Pauli_n$, and decomposition
+Because $G$ decomposes 
+into a direct product $G=\Stab\times \Pauli_r$ we have the
+following representations:
+$$
+    \rho_t(g) = \rho^1_t(h) \rho^r_{pauli}(g'),
+$$
+where $g=hg'$, $h\in \Stab$, $g'\in \Pauli_r$ 
+%and $\rho_1(h)$ is a $1$-dimensional representation of $\Stab$.
+and $\rho^r_{pauli}$ is the $r$-qubit Pauli representation.
+The character for this representation is:
+$$
+\chi_{t}(hg') = \rho_t^1(h) \sum_{v \in basis} \langle v | \rho^r_{{pauli}}(g') | v \rangle
+    = \left\{ \begin{array}{ll}
+ \pm 2^r\rho_t^1(h) &\mbox{if}\ g'=\pm I\\
+ 0 &\mbox{otherwise}\end{array}\right.
+$$
+
+We have that $|G|=2^{2r+m+1}$ and so
+$\langle\chi_{t},\chi_{t}\rangle = 1$ and
+$\rho_t$ is an irreducible representation of $G.$
+We now count the occurrences of 
+this representation in $\rho^r_{pauli}$:
+\begin{align*}
+\langle\chi^r_{pauli},\chi_{t}\rangle &= \frac{1}{|G|}\sum_{g\in G} \chi^r_{pauli}(g)\overline{\chi_{t}(g)} \\
+&= \frac{1}{2^{2r+m+1}} \sum_{g=\pm I} 2^n 2^r = \frac{2^{n+1+r}}{2^{2r+m+1}} = 2^k
+\end{align*}
+where $k$ is the number of logical qubits so that $n=r+m+k.$
+
+%\noindent{\bf Theorem.}
+%Using characters one can show that
+%on a subgroup $G$ of $\Pauli_n$ the
+In summary, the Pauli representation decomposes into 
+$2^m$ many irreps $\rho_t,$ 
+each with dimension $2^r,$ 
+and appearing with multiplicity $2^k:$
+$$
+    \rho_{\mathrm{pauli}} = 
+        \bigoplus_{t\in T}\ \rho_t \otimes I^{\otimes k}
+$$
+%where we label the $2^r$-dimensional irreps by $t\in T.$
+%See appendix for details.
+
+\subsection{Symmetry invariant basis}
+
+In general, given a representation $\rho:G\to \GL(V)$
+and the character of some irreducible representation $\chi:G\to \C$
+the following operator 
+$P:V\to V$
+projects onto the subspace on which
+this irreducible representation acts:
+$$
+    P := \frac{d}{|G|} \sum_{g\in G} {\overline{\chi(g)}} \rho(g).
+$$
+where $d$ is the dimension of the irreducible representation.
+We can use this to calculate projectors onto the irreps $\rho_t$ in $\rho_{pauli}$:
+\begin{align*}
+P_t &= \frac{d}{|G|} \sum_{g\in G} \overline{\chi_t(g)} \rho_{pauli}(g) \\
+    &= \frac{d}{|G|} \sum_{h\in \Stab}\sum_{g\in R} \overline{\chi_t(hg)} \rho_{pauli}(hg) \\
+    &= \frac{d}{|G|} 2^{2r} \sum_{h\in \Stab} {\rho^1_t(h)} \rho_{pauli}(h) \\
+    &= \frac{1}{2^m} \sum_{h\in \Stab} {\rho^1_t(h)} \rho_{pauli}(h).
+\end{align*}
+
+We can also write this as a product of projectors onto
+the $\pm 1$ eigenspaces of stabilizers $\rho_{pauli}(h)$ for $h\in \Stab.$
+Choose generators $h_1,...,h_m$ of $S$
+and then the projectors onto the $\pm 1$ eigenspace of $\rho_{pauli}(h_i)$ are
+$$
+P^i_t = \frac{1}{2} \bigl(I^{\otimes n} \pm \rho_{pauli}(h_i) \bigr)
+$$
+and we see that 
+$$
+P_t = \prod_{i=1,...,m} P^i_t 
+    = \frac{1}{2^m} \bigl(I^{\otimes n} \pm \rho_{pauli}(h_1)\bigr)
+    ...\bigl(I^{\otimes n} \pm \rho_{pauli}(h_m)\bigr).
+$$
+This projector will have rank $2^{k+r}$ and
+$$
+U := \sum_{t\in T} P_t
+$$
+is a unitary transformation that sends
+physical qubits to encoded qubits.
+
+
+\subsection{The Hamiltonian}
+
+The Hamiltonian of interest is 
+an operator $\Ham:\Complex[2^n]\to\Complex[2^n]$:
+%and normally defined
+%as the negative sum of terms from $G_0,$ but here
+%we will reverse the sign:
+$$ \Ham := \sum_{g\in G_0} \rho_{\mathrm{pauli}}(g).$$
+Using the above decomposition we find:
+\begin{align*}
+    \Ham &= \sum_{g\in G_0}\ \bigoplus_{l\in L, t\in T}\ \rho_t(g)\\
+         &= \bigoplus_{l\in L, t\in T} \sum_{g\in G_0}\ \rho_t(g).
+\end{align*}
+%The goal is to decompose $\Ham$ into blocks as
+%$$
+%    \Ham = \bigoplus_{\mathrm{irrep}\rho} \sum_{g\in G_0}\ \rho(g),
+%$$
+We will notate each block as
+$\Ham_t := \sum_{g\in G_0}\rho_t(g)$
+for each irrep $\rho_t$ appearing in $\Ham.$
+\begin{framed}
+\noindent
+The Hamiltonian is block diagonalized, with blocks indexed by operators $t$ in
+the abelian group $T$ and multiplicity $2^k:$
+$$
+    \Ham =  \bigoplus_{t\in T}\ \Ham_t \otimes I^{\otimes k}.
+$$
+\end{framed}
+%Writing $I$ for the identity element of $T$ we write the corresponding
+%block of the Hamiltonian as $\Ham_{0,0}.$
+
+More generally, we can assign real valued weights
+$J_g\in\R$
+to each operator $g\in G_0,$
+\begin{align*}
+    \Ham = \sum_{g\in G_0} J_g \rho_{\mathrm{pauli}}(g)
+            = \bigoplus_{l\in L, t\in T} \sum_{g\in G_0}\ J_g \rho_t(g).
+\end{align*}
+In other words, using weights does not change the block structure of $\Ham.$
+
+In the following sections we will forget the distinction 
+between $g$ and $\rho_{\mathrm{pauli}}(g)$,
+so terms such as $Z$ and $X$ can be understood
+as the corresponding Pauli linear operators.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+\section{Applications}
+
+We now use the tools built so far
+to analyze two examples of gauge code Hamiltonians.
+The above procedure is not entirely automatic,
+it relies on extracting the isomorphism $\phi$,
+but when this can be made to work it works surprisingly well.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+\subsection{The 2D compass model}
+
+Here we consider the two-dimensional compass model \cite{Bacon2006}.
+We coordinatize the qubits on a square 
+lattice of\ $l\times l$\ sites,
+$(i, j)$\ for\ $1\le i, j\le l.$
+This gives $n = l^2.$
+For the single qubit Pauli operators acting on site
+$(i, j)$ we coordinatize with subscripts $ij$, 
+with $i$ and $j$ understood modulo $l$.
+The generators of the gauge group are
+$$
+    G_0 = \big\{ X_{ij}X_{i,j+1},\ Z_{ij}Z_{i+1,j}\ \mbox{for}\ 1\le i, j\le l\big\}.
+$$
+We write generators of the reduced
+gauge group in anti-commuting pairs:
+$$
+    R_0 = \big\{ X_{i1}X_{ij},\ Z_{1j}Z_{ij}\ \mbox{for}\ 2\le i, j\le l\big\}.
+$$
+This makes it clear the isomorphism $\phi : R \to \Pauli_r$ to use,
+and we again use pairs $i,j$ to coordinatize $\Pauli_r$:
+$$
+    \phi(X_{i1}X_{ij}) = X_{i-1,j-1}, \ \ \phi(Z_{1j}Z_{ij}) = Z_{i-1,j-1},\ \mbox{for}\ 2\le i, j\le l.
+$$
+The generators for the stabilizers are
+$$
+    \Stab_0 = \big\{ \prod_{i=1}^l X_{ij}X_{i,j+1},\ \prod_{i=1}^l Z_{ji}Z_{j+1,i}\ \mbox{for}\ 1\le j\le l-1\big\}.
+$$
+The logical operators are generated by $L_0 = \big\{ \prod_i X_{i1}, \prod_j Z_{1j} \}.$
+These sets have cardinalities:
+$$|G_0|=2l^2,\ |R_0| = 2(l-1)^2,\ |\Stab_0| = 2(l-1).$$
+%And we note that $\frac{1}{2}|L_0| + |\Stab_0| + \frac{1}{2}|R_0| = n.$
+And we note that $k+m+r=n$ is satisfied.
+%Now we can define the irreps of $G$.
+Now we write down the values of the
+irreps on the gauge operators.
+Here we define each irrep using a pair 
+of syndrome vectors $s_X$ and $s_Z:$
+\begin{align*}
+\rho(X_{i1} X_{i2}) &= X_{i-1,1} &
+%\rho(Z_{1i} Z_{2i}) &= Z_{1,i-1} &\mbox{for}\ 2\le i\le l\\
+\rho(Z_{1i} Z_{2i}) &= Z_{1,i-1} \\&&&\mbox{for}\ 2\le i\le l\\
+\rho(X_{il} X_{i1}) &= X_{i-1,l-1} &
+%\rho(Z_{li} Z_{1i}) &= Z_{l-1,i-1} &\mbox{for}\ 2\le i\le l\\
+\rho(Z_{li} Z_{1i}) &= Z_{l-1,i-1} \\&&&\mbox{for}\ 2\le i\le l\\
+\rho(X_{ij} X_{i,j+1}) &= X_{i-1,j-1} X_{i-1,j} &
+%\rho(Z_{ji} Z_{j,i+1}) &= Z_{j-1,i-1}Z_{j,i-1} &\mbox{for}\ 2\le i\le l, 2\le j<l\\
+\rho(Z_{ji} Z_{j,i+1}) &= Z_{j-1,i-1}Z_{j,i-1} \\&&&\mbox{for}\ 2\le i\le l, 2\le j<l\\
+\rho(X_{1j} X_{1,j+1}) &= s_X(j-1) \prod_{i=1}^{l-1} X_{i,j-1} X_{ij} &
+%\rho(Z_{j1} Z_{j+1,1}) &= s_Z(j-1) \prod_{i=1}^{l-1} Z_{j-1,i} Z_{ji} &\mbox{for}\ 2\le j<l\\
+\rho(Z_{j1} Z_{j+1,1}) &= s_Z(j-1) \prod_{i=1}^{l-1} Z_{j-1,i} Z_{ji} \\&&&\mbox{for}\ 2\le j<l\\
+\rho(X_{11} X_{12}) &= \prod_{j=1}^{l-1}s_X(j) \prod_{i=1}^{l-1} X_{i1} &
+\rho(Z_{11} Z_{21}) &= \prod_{j=1}^{l-1}s_Z(j) \prod_{i=1}^{l-1} Z_{1i}.
+\end{align*}
+Note the transposition symmetry between the $X$ and $Z$-type operators.
+We sum all these terms to find 
+the form of the Hamiltonian in each block:
+$$
+\Ham_\rho = \sum_{g\in G_0} \rho(g) = \sum_{1\le i,j<l} \rho(X_{ij}X_{i,j+1}) + \rho(Z_{ij}Z_{i+1,j}).
+$$
+We note that in \cite{Brzezicki2013},
+they perform a
+spin transformation of the compass model
+which also results in an $(l-1)\times(l-1)$ lattice
+of spins and identical Hamiltonian up to some signs.
+
+%Note that the form of each of the Hamiltonian blocks $H_t$
+%comes from another gauge code.
+%In this case it has some non-local operators, as well as $\pm 1$ factors
+%which can be subsumed into the gauge code as operators $\pm I.$
+
+%We have the following important fact which we will prove in section \ref{spectra} below:
+%\begin{framed}
+%\noindent{\bf Fact 1:}
+%The blocks $H_t$ of a CSS gauge code Hamiltonian are also CSS.
+%\end{framed}
+%
+%By counting dimensions we can conclude the following:
+%\begin{framed}
+%\noindent{\bf Fact 2:}
+%Each block $H_t$ has non-degenerate groundspace.
+%\end{framed}
+%
+%\emph{!! check what happens with weights $\pm 1.$}
+
+%\fbox{\parbox[b]{5cm}{This is long text that will be wrapped once it reaches five centimeters.}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+%\subsection{The 1D models}
+%
+%We define the \emph{Jordan-Wigner presentation} of $\Pauli_n$
+%using the following set of $2n$ independent generators \cite{Jordan1928}:
+%$$
+%%\mathrm{JW}_Z :=
+%\big\{c_{2j}^Z:=Z_1...Z_{j-1} X_j,\ c_{2j+1}^Z:=Z_1...Z_{j-1} Y_j\ \ 
+%\mbox{for}\ 1\le j\le n\big\}.
+%$$
+%That these operators are independant and
+%generate $\Pauli_n$ can be seen by considering
+%the abelianization of $\Pauli_n$ which is the group $\Z_2^{2n}.$
+%There are two other ways of writing this presentation:
+%\begin{align*}
+%%\mathrm{JW}_X &:=
+%\big\{c_{2j}^X:=X_1...X_{j-1} Y_j,\ c_{2j+1}^X:=X_1...X_{j-1} Z_j\ \ 
+%\mbox{for}\ 1\le j\le n\big\},\\
+%%\mathrm{JW}_Y &:=
+%\big\{c_{2j}^Y:=Y_1...Y_{j-1} X_j,\ c_{2j+1}^Y:=Y_1...X_{j-1} Z_j\ \ 
+%\mbox{for}\ 1\le j\le n\big\}.
+%\end{align*}
+%
+%%This example shares features of both the previous and the next examples.
+%The $XY$-model 
+%lives on a one dimensional chain of $n$ qubits.
+%We write the gauge group generators as
+%$$
+%    G_0 = \{ X_i X_{i+1}, Z_i Z_{i+1}\ \ \mbox{for}\ \ i=1,...,n \}
+%$$
+%with periodic boundary conditions.
+%For $n$ even this model has no logical operators, one 
+%$X$-type stabilizer and one $Z$-type stabilizer.
+%With $n$ odd, there are no stabilizers and $k=1.$
+%Normally the gauge operators are written as 
+%$\{ X_i X_{i+1}, Y_i Y_{i+1} \ \mbox{for}\ i=1,...,n \}$
+%but note that there is an automorphism of the Pauli group
+%that sends $G_0$ to these operators.
+%For $n$ even, this model is exactly solvable,
+%and the gap goes to zero
+%as the system size grows \cite{Lieb1961}.
+%
+%For the one dimensional transverse field
+%Ising model, we have 
+%$$
+%    G_0 = \{ X_i, Z_i Z_{i+1}\ \ \mbox{for}\ \ i=1,...,n \},
+%$$
+%with periodic boundary conditions.
+%This model has one 
+%$X$-type stabilizer and no logical operators.
+%This model is also exactly solvable, with gap going to zero
+%as the system size grows \cite{Pfeuty1970}.
+
+
+%http://arxiv.org/pdf/1504.01444 page 86.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+\subsection{The Kitaev honeycomb model}
+
+
+%\begin{figure*}[th!]
+%\begin{center}
+%        \includegraphics[width=0.6\columnwidth]{fig_00.pdf}
+%\caption{
+%Gauge generators have support on the edges of the honeycomb lattice.
+%Qubits here are depicted as circles.
+%}
+%\label{honeycomb}
+%\end{center}
+%\end{figure*}
+
+
+The Kitaev honeycomb model \cite{Kitaev2006} is built from spins on
+the sites of a hexagonal lattice. 
+The lattice of linear size $l$ has $n=2l^2$ sites
+which we coordinatize using integer triples $i, j, k$
+with $1\le j, k\le l$ and $k=1, 2.$
+We use periodic boundary conditions so $i, j$ are
+to be taken modulo $l$.
+Gauge generators have support on the edges of the honeycomb lattice,
+and we depict qubits here as circles:
+\begin{center}
+\includegraphics[width=0.6\columnwidth]{fig_00.pdf}
+\end{center}
+%See figure \ref{honeycomb}.
+The edges of the lattice are in one-to-one
+correspondence with the generators $G_0$:
+$$
+G_0 := \big\{X_{ij1}X_{ij2},\ Z_{ij2}Z_{i+1,j1},\ Y_{ij1}Y_{i-1,j+1,2}
+\ \mbox{for}\ 1\le i,j\le l\big\}.
+$$
+Note that we make the definition $Y:=XZ$ for each site.\footnote{
+This operator $Y$ is not Hermitian, but it only appears in a tensor pair in
+the Hamiltonian and so these terms will be Hermitian.}
+%\danbrowne{Can you do this? Please justify it? (Presumably ok since Y only occurs as a tensor pair). } 
+Stabilizers are generated from closed strings of
+gauge operators. 
+For example, each hexagon gives a stabilizer
+\begin{align*}
+h_{ij}:&= 
+X_{ij1}X_{ij2}
+Z_{ij2}Z_{i+1,j1}
+Y_{i+1,j1}Y_{i,j+1,2}
+X_{i,j+1,2}X_{i,j+1,1}
+Z_{i,j+1,1}Z_{i-1,j+1,2}
+Y_{i-1,j+1,2}Y_{ij1}
+\\
+&= 
+Z_{ij1} Y_{ij2} X_{i+1,j1}
+Z_{i,j+1,2} Y_{i,j+1,1} X_{i-1,j+1,2}.
+\end{align*}
+
+And the two homologically non-trivial loops
+give stabilizers:
+$$
+h_v := \prod_{i=1}^l Y_{i11} Y_{i12},\ \ 
+h_h := \prod_{j=1}^l X_{1j2} X_{2j1}.
+$$
+
+This gives independent stabilizer generators $\Stab_0$
+from each hexagon, less one, as well as $h_v$ and $h_h.$
+%two homologically non-trivial loops.
+The number of hexagons is $\frac{1}{2}n$ and
+so we find $|\Stab_0|=\half n+1.$
+There are no logical operators, so we
+must have $|R_0|=n-2.$
+
+%\begin{figure*}[th!]
+%\begin{center}
+%        \includegraphics[width=0.5\columnwidth]{fig_01.pdf}
+%%\caption{Two elements $g_{341}$ and $g_{342}$ of the set $R_0$}
+%\caption{Two elements of the set $R_0$ corresponding
+%to $i=3$, $j=4$ and $k=1,2.$}
+%\label{jaws}
+%\end{center}
+%\end{figure*}
+
+Now we construct a set of string operators $R_0$,
+one for each site on the lattice, except for
+the two sites $(1,1,1)$ and $(1,1,2).$
+Each string $g_{ijk}\in R_0$
+is constructed as the product of
+gauge operators along a path starting at
+$(1,1,1)$ and terminating at $(i,j,k).$
+%See figure \ref{jaws}.
+
+Two elements of the set $R_0$ corresponding
+to $i=3$, $j=4$ and $k=1,2.$
+\begin{center}
+\includegraphics[width=0.5\columnwidth]{fig_01.pdf}
+\end{center}
+
+Each such path is built from two ``straight''
+path segments, first in the $i$ direction
+and then in the $j$ direction. 
+The paths for operators $g_{ij1}$ and
+$g_{ij2}$ coincide along the $i$ direction
+but become disjoint in the $j$ direction:
+the $g_{ij1}$ path goes around the bottom
+of the hexagons and the $g_{ij2}$ path
+goes around the top.
+With periodic boundary conditions $R_0$ forms an
+independent generating set of $R$ of size $n-2.$
+
+We construct an isomorphism $\phi: R\to \Pauli_r$
+by sending elements of $R_0$ bijectively
+to the following independent generating
+set of $\Pauli_r$:
+$$
+\big\{c_{2j}:=Z_1...Z_{j-1} X_j,\ c_{2j+1}:=Z_1...Z_{j-1} Y_j\ \ \mbox{for}\ 1\le j\le r\big\}.
+$$
+The bijection is constrained 
+by setting $\phi(g_{ij1}):=c_{2j'+1}$
+and $\phi(g_{ij2}):=c_{2j'}$
+where $j'$ is chosen uniquely for each $i, j.$
+The $c_j$ are paired Majorana fermion operators  \cite{Jordan1928, Kitaev2006}.
+
+%We construct an isomorphism $\phi: R\to \Pauli_r$
+%by setting $\phi(g_{ij1}):=c_{2j'}$
+%and $\phi(g_{ij2}):=c_{2j'+1}$
+%%we map 
+%%elements of $R_0$ to the following independent generating
+%where the $c_j$ form the following independent generating
+%set of $\Pauli_r$:
+%$$
+%%\big\{\prod_{i=1}^{j-1} Z_i X_j,\ \prod_{i=1}^{j-1} Z_i Y_j\ \mbox{for}\ 1\le j\le r\big\}.
+%\big\{c_{2j}:=Z_1...Z_{j-1} X_j,\ c_{2j+1}:=Z_1...Z_{j-1} Y_j\ \ \mbox{for}\ 1\le j\le r\big\}.
+%$$
+
+We check this is a group homomorphism by showing that relations
+satisfied by elements of $R_0$ are satisfied by
+their images under $\phi.$
+All such relations are either of the form
+$g^2=~\pm~I$, $gg'=\pm~g'g$, or
+products thereof.
+So it is sufficient to check squares of
+elements and commutation relations.
+Every element of $R_0$ anticommutes with
+every other element of $R_0$, and this is true also
+of the $c_j.$
+Also, $g_{ij1}^2=-I$ and $g_{ij2}^2=I$ 
+is preserved by $\phi$ because $c_{2j}^2=I$ and $c_{2j+1}^2=-I$.
+Finally, $\phi$ is an isomorphism
+because it is a bijection of two independent
+generating sets.
+
+The next step is to write each element of $G_0$
+as a product of reduced gauge operators and stabilizers.
+The key thing to note is that the product of two
+operators $g_{ijk}, g_{i'j'k'}\in R_0$ gives a string
+operator between the sites $(i,j,k)$ and $(i',j',k')$.
+And {\it any} string operator between these
+two sites can then be generated by using stabilizers to
+``deform'' the string $g_{ijk}g_{i'j'k'}.$
+For example, taking the product
+of two operators from $R_0$ that differ
+by one path segment gives the following:
+\begin{align*}
+Z_{ij2}Z_{i+1,j,1} &= g_{ij2} g_{i+1,j,1} \\
+%&\mbox{for}\ \  1\le i<l,\ 1\le j\le l, \ \ \mbox{except}\ \  (i,j)=(1,1) \ \ \mbox{or}\ \ (l,1)\\
+Y_{i+1,j,1}Y_{i,j+1,2} &= g_{i+1,j,1}g_{i,j+1,2}
+%&\mbox{for}\ \  1\le i,j\le l, \ \ \mbox{except}\ \  (i,j)=(1,1) \ \ \mbox{or}\ \ (l,1).
+\end{align*}
+We need the homologically non-trivial stabilizers to get these:
+\begin{align*}
+Z_{lj2}Z_{1j1} &= h_v g_{lj2} g_{1j1} &\mbox{for}\ \  2\le j\le l
+\end{align*}
+And the $X_{ij1}X_{ij2}$
+gauge operators can be generated
+by the product of 
+$g_{ij1}g_{ij2}$ and the enclosed hexagon stabilizers:
+$$X_{ij1}X_{ij2}=g_{ij1}g_{ij2}\prod_{j'=1}^{j-1} h_{ij'}.$$
+
+The only $G_0$ operators that are not 
+quadratic in $R_0$ operators are the five
+operators that touch either of the sites
+$(1,1,1)$ or $(1,1,2)$.
+
+So each block in the Hamiltonian
+is seen to be quadratic in the $c_j$ plus
+five other Pauli operator terms which we denote as $\Lambda_\rho$:
+$$
+    \Ham_\rho = \sum_{ij} \Gamma_{ij}(\rho) c_i c_j + \Lambda_\rho
+$$
+The coefficients $\Gamma_{ij}$ are dependant on the irrep $\rho.$
+
+In \cite{Kells2009} they introduce a similar set of
+mutually anti-commuting string operators $R_0.$
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
@@ -295,7 +1423,7 @@ The University of Sydney}
 %\def\Im{\mathrm{im}}
 %\def\Ker{\mathrm{ker}}
 %\def\Span#1{\mathrm{span}(#1)}
-\def\Span#1{\langle #1 \rangle}
+%\def\Span#1{\langle #1 \rangle}
 
 %\section{Representations over the finite field $\Field$}
 \section{Symplectic representations}
@@ -304,7 +1432,7 @@ This is a way of ``brute-forcing'' the representations when
 we cannot find a way of writing them down in a closed form expression.
 For finite systems this yields an algorithm that is efficiently implementable.
 
-In this section, and the remainder of this paper,
+In this section, and the remainder of this chapter,
 we restrict our
 attention to gauge groups formed from terms 
 in $\Pauli_n^X\cup\Pauli_n^Z.$
@@ -362,7 +1490,7 @@ indicate a primal (column) vector.
 It doesn't make sense to add an $X$-type operator and
 a $Z$-type operator:
 $$
-    g_Z + g_X \ \ \ \mbox{\emph{no no!!!}}
+    g_Z + g_X \ \ \ \mbox{\emph{don't do this!!!}}
 $$
 but it does make sense to take the inner product:
 $$
@@ -397,7 +1525,7 @@ we are going to rewrite the gauge group generators
 as a union of stabilizer generators $S_0 = S_X \cup S_Z$
 and reduced gauge generators $R_0 = R_X \cup R_Z.$
 Similarly, the error operators
-will be split into $X$ and $Z$ type
+will be split into $X$-type and $Z$-type
 operators $T_X$ and $T_Z$ and
 finally the logical operators
 $L_X$ and $L_Z.$
@@ -632,16 +1760,17 @@ $$
 \Complex[\{vR_X+t_X\}_{v\in\Frd}]
 \cong \Complex[\Frd].
 $$
-This will allow us to write the components
+This will allow us to write the matrix entries
 of each block $H_t$ of the Hamiltonian
 as $\bra{u}H_t\ket{v}$ for $u,v\in\Frd.$
 We make this identification of affine subspaces
 not out of laziness but because it will
 help us to compare each of
 the Hamiltonian blocks $H_t$ below.
+%\danbrowne{I'd suggest you introduce Ht and Htx,tz more prominently. }
 
 \begin{framed}
-\noindent{\bf Important:}
+\noindent
 The computational basis identifies
 basis vectors of $\Complex[2^n]$
 with elements of a finite vector space $\Fnd$:
@@ -654,7 +1783,8 @@ $$
     \{ v R_X + t_X + l_X \}_{v\in\Frd}
 $$
 for each $t_X \in \Span{T_X}, l_X \in \Span{L_X}.$
-Each such affine subspace forms a basis
+Each such affine subspace forms a
+symmetry invariant basis
 for the irreducible blocks $H_{t_X,t_Z}$ of $H$,
 and can be naturally identified with $\Frd:$
 $$
@@ -700,12 +1830,12 @@ In summary, we have the following contributions from the
 $G_X$ terms of the Hamiltonian:
 $$
 %    H_{0,0}(v, v+g_X  R_Z^\top) \ne 0,\ \ \mbox{for}\ g_X\in G_X, v\in \Frd
-    \bra{v} H_{0,0} \ket{v+g_X  R_Z^\top} 
+    \bbra{v} H_{0,0} \bket{v+g_X  R_Z^\top} 
         \pluseq 1,\ \ \mbox{for}\ g_X\in G_X, v\in \Frd
 $$
 where we use the $\pluseq$ notation
 because there may be other contributions to the
-same component.
+same entry.
 These terms will always be off
 the diagonal unless $g_X$ is a stabilizer.
 
@@ -719,7 +1849,7 @@ $$
     \mbox{syndrome}(u) = G_Z u^\top
 $$
 for $u^\top \in \Fn.$
-This is an $\Field$-vector that has one component for
+This is an $\Field$-vector that has one entry for
 each row of $G_Z.$
 Writing $|G_Z|$ for the number of these rows, and 
 using a \emph{weight} function $w$ that just counts
@@ -727,53 +1857,61 @@ the number of non-zero entries in any $\Field$-vector
 we have the following contributions to
 the Hamiltonian:
 $$
-    \bra{v} H_{0,0} \ket{v} 
+    \bbra{v} H_{0,0} \bket{v} 
         \pluseq |G_Z| - 2w(G_Z R_X^\top v^\top),
 $$
 for $v\in \Frd.$
 
 Adding up all of the above we
 have in summary,
-$$
+\begin{equation}\label{hamblockgs}
 H_{0,0} = \sum_{\substack{v\in\Frd\\g_X\in G_X } }
-  \ket{v+g_X  R_Z^\top}\bra{v} 
+  \bket{v+g_X  R_Z^\top}\bbra{v} 
   + \sum_{v\in\Frd} \bigl(|G_Z| - 2w(G_Z R_X^\top v^\top)
-    \bigr) \ \ket{v}\bra{v}.
-$$
+    \bigr) \ \bket{v}\bbra{v}.
+\end{equation}
 
 For any $t_X\in \Span{T_X}$ the Hamiltonian block $H_{t_X,0}$
-has components indexed by basis vectors:
+has entries indexed by basis vectors:
 $$
     u = v R_X + t_X
 $$
 this means that the $G_X$ gauge terms
 have the same effect on $H_{t_X,0}$
 as $H_{0,0}$ and only the diagonal has changed:
-$$
+\begin{equation}\label{hamblocktx}
 H_{t_X,0} = \sum_{\substack{v\in\Frd\\g_X\in G_X } }
-  \ket{v+g_X  R_Z^\top}\bra{v} 
+  \bket{v+g_X  R_Z^\top}\bbra{v} 
   + \sum_{v\in\Frd} \bigl(
     |G_Z| - 2w(G_Z R_X^\top v^\top + G_Z t_X^\top)
-    \bigr) \ \ket{v}\bra{v}.
-$$
+    \bigr) \ \bket{v}\bbra{v}
+\end{equation}
 %Writing the difference explicitly:
 %$$
 %    H_{0,0} - H_{t_X,0} = 
 %  \sum_{v\in\Frd} 2\bigl(
 %    w(G_Z R_X^\top v^\top + G_Z t_X^\top)
 %    -w(G_Z R_X^\top v^\top)
-%    \bigr) \ \ket{v}\bra{v}.
+%    \bigr) \ \bket{v}\bbra{v}.
 %$$
 The general form of
-each the Hamiltonian block is:
-\begin{align*}
-H_{t_X,t_Z} = &\sum_{\substack{v\in\Frd\\g_X\in G_X } }
+each Hamiltonian block is:
+%\begin{align*}
+%H_{t_X,t_Z} = &\sum_{\substack{v\in\Frd\\g_X\in G_X } }
+%    \eta(t_Z g_X^\top)
+%  \ \bket{v+g_X  R_Z^\top}\bbra{v} \\
+%  &+ \sum_{v\in\Frd} \bigl(
+%    |G_Z| - 2w(G_Z R_X^\top v^\top + G_Z t_X^\top)
+%    \bigr) \ \bket{v}\bbra{v}
+%\end{align*}
+\begin{equation}\label{hamblockgen}
+H_{t_X,t_Z} = \sum_{\substack{v\in\Frd\\g_X\in G_X } }
     \eta(t_Z g_X^\top)
-  \ \ket{v+g_X  R_Z^\top}\bra{v} \\
-  &+ \sum_{v\in\Frd} \bigl(
+  \ \bket{v+g_X  R_Z^\top}\bbra{v} 
+  + \sum_{v\in\Frd} \bigl(
     |G_Z| - 2w(G_Z R_X^\top v^\top + G_Z t_X^\top)
-    \bigr) \ \ket{v}\bra{v}.
-\end{align*}
+    \bigr) \ \bket{v}\bbra{v}
+\end{equation}
 Here we use $\eta$ to send 
 $t_Zg_X^\top$ which is an $\Field$ value
 to the multiplicative subgroup $\{\pm1\}$
@@ -784,11 +1922,11 @@ $$
 The $\eta(t_Zg_X^\top)$ term
 is a kind of parity check that
 picks up one phase flip for (some of)
-the $X$ type stabilizers found in $g_X.$
+the $X$-type stabilizers found in $g_X.$
 This works because $T_Z$ is a left inverse
 of $S_X^\top.$
 The $t_Z\in\Span{T_Z}$ selects which
-$X$ type stabilizers act as $-1$ in this irrep.
+$X$-type stabilizers act as $-1$ in this irrep.
 
 In summary, we have the complete representation
 theory for $CSS$ gauge code Hamiltonians.
@@ -804,7 +1942,7 @@ theory for $CSS$ gauge code Hamiltonians.
 In this section we briefly introduce two important
 one dimensional models that fit into the CSS gauge code framework.
 
-The $XY$-model 
+The $XY$-model \cite{Pfeuty1970}
 lives on a one dimensional chain of $n$ qubits.
 We write the gauge group generators as
 $$
@@ -835,6 +1973,74 @@ as the system size grows \cite{Pfeuty1970}.
 
 \section{Perron-Frobenius theory}
 
+%\danbrowne{You need to make it clearer how much of this is newly defined and how much is developing previous work. Is the Perron-Frobenius construction your own?}
+In this section we present 
+applications of Perron-Frobenius theory to finding bounds on the spectrum of
+CSS gauge code Hamiltonians. These are new results.
+
+A \emph{non-negative matrix} is a real matrix
+$\Gamma$ with entries $\Gamma_{ij}\ge 0.$
+A \emph{positive vector} $\ket{v}$ is a real vector 
+with all-positive entries. Similarly, a \emph{non-negative vector}
+has all entries real and non-negative.
+
+Given a non-negative matrix 
+$\Gamma : \Complex[V] \to \Complex[V]$
+we will also view this as a \emph{weighted graph} on a set of vertices $V.$
+This associates a directed edge $i\mapsto j$ for every positive
+entry $\Gamma_{ij}>0.$
+
+A non-negative matrix 
+$\Gamma : \Complex[V] \to \Complex[V]$
+is called \emph{irreducible} if the following holds:
+for any pair $u, v\in V$ with $u\ne v$ there is
+a sequence $\{u_i \}_{i=1,...,n}$ such that $u_1=u$
+and $u_n=v$ and
+$$
+    \bra{u_{i+1}}\Gamma\ket{u_i} > 0\ \ \ \mbox{for}\ \ i=1,...,n-1.
+$$
+This says that viewed as a weighted graph, $\Gamma$ is ``connected''.
+That is, we can find a directed path in $\Gamma$
+from any vertex $u$ to any other vertex $v$.
+In general, this is a coarser notion than
+the (vector space) reducibility used in the representation theory above.
+The reason why is that when reducing a matrix we work
+with a fixed basis.
+
+The following theorem originally appeared
+in the work of Frobenius \cite{Frobenius1912}, who
+was building on previous results of Perron \cite{Perron1907}.
+See also the recent book \cite{Baez2012}.
+
+\dotheorem{(Perron-Frobenius)}
+Let $\Gamma$ be a non-negative irreducible matrix.
+Then $\Gamma$ has a positive real eigenvalue
+$\lambda$ equal to its spectral radius,
+this eigenvalue is non-degenerate and can be associated 
+with a positive eigenvector $\ket{v}$.
+Furthermore, any other non-negative eigenvector of 
+$\Gamma$ is a scalar multiple of $\ket{v}.$
+\tombstone
+
+Therefore, when $\Gamma$ is a symmetric non-negative irreducible matrix,
+we see that this theorem implies that the top eigenvalue of $\Gamma$ is
+non-degenerate and associated with a positive eigenvalue.
+
+Given a matrix $\Gamma$ with $\Gamma_{ij}\ge 0, i\ne j$ we can
+find a spectral shift operator which is a constant multiple of the identity $+cI$,
+such that $\Gamma+cI$ is a non-negative matrix. 
+We refer to such a matrix $\Gamma$ as \emph{stoquastic} \cite{Bravyi2008,Bravyi2015}.
+When $\Gamma$ is also irreducible we can therefore apply the Perron-Frobenius
+theorem with the proviso that the eigenvalues are shifted by some constant.
+
+For a linear operator $A$ we will use notation 
+$\lambda_1(A)$, $\lambda_2(A),$ etc., to denote the (real) eigenvalues of $A$,
+ordered as:
+$$
+    \lambda_1(A) \ge \lambda_2(A) \ge ...
+$$
+Similarly, the notation $v_1(A), v_2(A),$ etc., refers to the associated eigenvectors.
+
 %We restrict our attention to Hamiltonians whose off-diagonal entries
 %are non-negative (in some basis).
 %These are also known as \emph{stoquastic} Hamiltonians \cite{Bravyi2006}.
@@ -854,41 +2060,24 @@ as the system size grows \cite{Pfeuty1970}.
 %This is another kind of representation theory of $\Pauli_n.$
 %We are representing either $G_X$ or $G_Z$ as a permutation representation (?)
 %It has the ability to extract irreps of $G$ corresponding to
-%the $X$ type operators as affine subspaces $\{vR_X+t\}$ of $\Fn.$
+%the $X$-type operators as affine subspaces $\{vR_X+t\}$ of $\Fn.$
 %For the $Z$ representations we will still need the complex
 %representation theory to build states on $\Complex[\{vR_X+t\}]$
 %that look like ``waves''.
 %These (stationary) waves do indeed have a geometric interpretation,
 %with the wavefront nodes being identified with so-called Cheeger cuts.
-%To switch back and forth between the $X$ and $Z$ type
+%To switch back and forth between the $X$ and $Z$-type
 %representations 
 
-We begin this section with the following two definitions.
-A CSS gauge code is \emph{self-dual} when the $X$ and $Z$ type
-gauge generators are equal: $$G_X = G_Z.$$
-The $XY$-model is an example of a self-dual CSS gauge code.
-A CSS gauge code is \emph{weakly self-dual}
-when there is a permutation $P$ on the set of $n$ qubits
-that induces equality of the gauge generators:
-$$
-    G_X P = G_Z,
-$$
-where we write $P$ as an $n\times n$ permutation matrix.
-The compass model is then weakly self-dual when we transpose
-the square lattice of $l\times l$ qubits.
-
-We now turn to another notion of reducibility, coarser than
-the group theoretic reducibility.
-One way to understand this is via graph theory.
 Given a CSS gauge code Hamiltonian $H,$ 
-we see that 
-the diagonal terms (working in the computational basis)
-come from the $Z$ operators and the off-diagonal terms
-come from $X$ type operators.
-We think of the $Z$ operators as potential energy, and the
-$X$ operators as kinetic terms.
-This suggests the following definition.
-We define a graph $\Gamma$ with vertices the $2^n$ computational
+let the matrix for $H$ in the computational basis be $\Gamma.$
+We see that the diagonal entries of $\Gamma$
+come from the $Z$-type operators and the off-diagonal entries 
+come from $X$-type operators.
+Therefore, the off-diagonal entries of $\Gamma$ are non-negative 
+and so this matrix is stoquastic.
+In the language of graph theory,
+$\Gamma$ has vertices the $2^n$ computational
 basis elements, and edges:
 $$
     \ket{v} \mapsto g_X \ket{v}, \smbox{for all} v\in\Fnd, g_X\in G_X.
@@ -898,28 +2087,82 @@ We also add weighted loops corresponding to the $Z$-type gauge operators:
 $$
     \ket{v} \mapsto \sum_{g_Z\in G_Z} g_Z \ket{v}, \smbox{for all} v\in\Fnd.
 $$
-In this way we can consider $H$ and $\Gamma$ interchangeably,
-as either a matrix or a graph.
-An irreducible matrix is one whose corresponding graph is connected.
-Using the $\Field$-linear $(L,S,T,R)$-decomposition of the gauge group
-we then have the following:
-\begin{framed}
-\noindent In the computational basis, any CSS gauge code
-Hamiltonian $H$ is the direct sum of $2^{m_Z}$
-irreducible matrices $\Gamma_{t_X}$
+%In this way we can consider $H$ and $\Gamma$ interchangeably,
+%as either a matrix or a graph.
+%The examples with diagrams in section 2.1.1 are meant to illustrate this
+%graph picture.
+%An \emph{irreducible matrix} is one whose corresponding graph is connected.
+
+We can think of the $Z$-type operators as potential energy,
+and the $X$-type operators as kinetic energy.
+This is consistent with the classical use of the (real) symplectic group,
+where dynamical variables come in position and momentum pairs.
+
+\dolemma{2.1}
+Given a CSS gauge code Hamiltonian $H$, writing
+the matrix for $H$ in the computational basis as $\Gamma,$
+this matrix decomposes into irreducible
+stoquastic matrices $\Gamma_{t_X}$ 
 indexed by $t_X\in\Span{T_X}$
 with multiplicity $2^k$:
 $$
-    H = \bigoplus_{
+    \Gamma = \bigoplus_{
     \substack{t_X\in\Span{T_X}\\l_X\in\Span{L_X}}}
         \Gamma_{t_X}.
 $$
-\end{framed}
-A basis for each $\Gamma_{t_X}$ is given by a coset
-of $G_X$ in $\Fnd:$
+
+\doproof
+Once again, we identify the computational basis with
+the elements of $\Field_n.$
+As a graph, $\Gamma$ has vertices 
+$\ket{v} $ for $v\in\Field_n$, and edges 
+$ \ket{v} \mapsto g \ket{v}$ for  $v\in\Fnd, g\in G_X.$
+This means that paths starting from $\ket{v}$ are given by
+words $g_i...g_1$ built from the elements of the group $G_X:$
 $$
-    \{ v S_X + u R_X + t_X \}_{v\in \Field_{m_X}, u\in\Frd}.
+    \ket{v} \mapsto g_1 \ket{v} \mapsto ... \mapsto g_i...g_1 \ket{v}.
 $$
+Switching to the additive $\Field_n$ notation, we
+therefore have that 
+vertices $\ket{v}$ and $\ket{u}$ are in the
+same component of $\Gamma$ iff $\ket{u} = \ket{v+g_X}$ for some $g_X\in\Span{G_X}.$
+%We write $\Gamma_0$ for the component of the vector $\ket{0}$
+The vertices
+$$\Bigl\{ \bket{t_X + l_X} \Bigr\}_{t_X\in\Span{T_X},\ l_X\in\Span{L_X}}$$
+each live in one component of $\Gamma$,
+and each component of $\Gamma$ contains one of these vertices.
+This shows that these components are in bijective correspondence with
+pairs $(t_X, l_X)$ where $t_X\in\Span{T_X},\ l_X\in\Span{L_X}$.
+We write each such component as $\Gamma_{t_X,l_X}$.
+%A basis for each $\Gamma_{t_X,l_X}$ is given by a coset
+The vertices contained in the $\Gamma_{t_X,l_X}$ component
+are given by a coset of $G_X$ in $\Fnd:$
+$$
+    \Bigl\{ \bket{v S_X + u R_X + t_X + l_X} \Bigr\}_{v\in \Field_{m_X}, u\in\Frd}.
+$$
+When comparing these different components of $\Gamma$, we will
+identify these cosets, and so consider $\Gamma_{t_X,l_X}$ as an
+operator:
+$$
+    \Gamma_{t_X,l_X} : \Complex[\Field_{m_X}\oplus\Field_r] \to \Complex[\Field_{m_X}\oplus\Field_r].
+$$
+Because each of these components is independant of $l_X$ we write it as $\Gamma_{t_X}.$
+\tombstone
+
+%Using the $\Field$-linear $(L,S,T,R)$-decomposition of the gauge group
+%we then have the following:
+%\begin{framed}
+%\noindent In the computational basis, any CSS gauge code
+%Hamiltonian $H$ is the direct sum of $2^{m_Z}$
+%irreducible matrices $\Gamma_{t_X}$
+%indexed by $t_X\in\Span{T_X}$
+%with multiplicity $2^k$:
+%$$
+%    H = \bigoplus_{
+%    \substack{t_X\in\Span{T_X}\\l_X\in\Span{L_X}}}
+%        \Gamma_{t_X}.
+%$$
+%\end{framed}
 
 %See \cite{Baez2012}
 %We return to the investigation of Hamiltonians
@@ -929,63 +2172,143 @@ $$
 %raising and lowering operators, and the diagonal
 %terms measure the energy of each level.
 
-The off-diagonal entries of $H$ are all positive.
-If we use a spectral shift operator, a constant multiple of the identity $+cI$,
-we find that $H+cI$ is a non-negative matrix. 
-We call such a matrix \emph{Perron-Frobenius.}
-These are also known as \emph{Stoquastic} Hamiltonians
-in the literature~\cite{Bravyi2008}.
-%Now we invoke the Peron-Frobenius theorem.
-Each of the blocks $\Gamma_{t_X}$ is also Perron-Frobenius
-and in combination with their irreducibility, the Perron-Frobenius
-theorem gives:
-\begin{framed}
-\noindent For each $t_X\in\Span{T_X}$
-the largest eigenvalue 
-of $\Gamma_{t_X},$
-$$\lambda_1(\Gamma_{t_X})
-$$
-is non-degenerate,
+
+%Using \Eref{hamblockgen}
+%we have that 
+%\begin{align*}
+%    \Gamma_{0} - \Gamma_{t_X}
+%    &= \sum_{t_Z\in\Span{T_Z}} H_{0,t_Z} - H_{t_X,t_Z} \\
+%    &= \sum_{t_Z\in\Span{T_Z}} \sum_{u\in\Field_r}
+%        \bigl( 2w(G_Z R_X^\top v^\top + G_z t_X^\top)
+%        - 2w(G_Z R_X^\top v^\top)\bigr)
+%        \ket{v}\bra{v}
+%\end{align*}
+
+\dolemma{2.2}
+Given a CSS gauge code Hamiltonian $H$, 
+and matrix $\Gamma$ in the computational basis 
+with irreducible
+components $\Gamma_{t_X}$,
+with $t_X\in\Span{T_X}$,
+%components $\{\Gamma_{t_X}\}_{t_X\in\Span{T_X}}$,
+%for each $t_X\in\Span{T_X}$
+the first eigenvalue 
+of each $\Gamma_{t_X}$
+%$\lambda_1(\Gamma_{t_X})$
+is non-degenerate
 and is associated with an eigenvector 
-$$v_1(\Gamma_{t_X})
+%$v_1(\Gamma_{t_X})$
+with positive entries.
+
+\doproof
+We already established that $\Gamma$ and therefore
+$\Gamma_{t_X}$ is stoquastic.
+By the previous lemma $\Gamma_{t_X}$ is irreducible.
+We apply the Perron-Frobenius theorem and the result follows.
+\tombstone
+
+Any stabilizer that acts as $-1$ in a given block of
+the Hamiltonian we will call a \emph{frustrated stabilizer}
+(with respect to the given block.)
+Similarly, a \emph{satisfied stabilizer} acts as $+1$ in a given
+block of the Hamiltonian.
+We will call a
+vector \emph{stabilized} if it is a $+1$ eigenvector 
+of every stabilizer in the given gauge group.
+
+\dolemma{2.3}
+Given a CSS gauge code Hamiltonian $H$,
+every groundstate of $H$ is stabilized.
+
+\doproof
+%Our goal will be to show that the
+%groundspace of $H$ is spanned
+%by vectors which are stabilized.
+%To begin, let $v_1$ be the top
+%eigenvector of $\Gamma_{t_X}$ with $t_X\in\Span{T_X}.$
+%Because $v_1$ has all positive entries
+%it will be fixed by  any operator
+%$s\in\Span{S_Z}$.
+%To show that the $X$-type stabilizers
+%also fix $v_1$ 
+%we use weak self-duality
+%and see that by change of basis
+%we can swap the roles of the $X$ and $Z$-type operators.
+%We will construct a basis for the groundspace consisting of
+%vectors that are stabilized.
+The set of top eigenvectors 
 $$
-with positive components.
-\end{framed}
+    \bigl\{ v_1(\Gamma_{t_X}) \bigr\}_{t_X\in\Span{T_X}}
+$$
+must contain a basis for the groundspace of $H.$
+Let such a basis vector be $\ket{v} = v_1(\Gamma_{t_X})$ for some $t_X.$
+This vector is positive by Lemma 2.2.
+Any stabilizer commutes with
+every element of the gauge group and so
+must have $\ket{v}$ as an eigenvector.
+%acts as a symmetry of the graph $\Gamma_{t_X}:$
+%$$
+%    \Gamma_{t_X} s_X = s_X \Gamma_{t_X}.
+%$$
+%Therefore $\ket{v}$ is an eigenvector of $s_X.$
+%But the eigenvalue must be $+1$ 
+Because any
+$X$-type operator acts by permuting the computational basis elements 
+and $\ket{v}$ is positive it must be stabilized by the
+$X$-type stabilizers.
+Therefore, we can find a basis for the groundspace of
+$H$ consisting of vectors that are fixed by $X$-type
+stabilizers.
+%We have that
+%$$
+%    \Gamma_{t_X} = \bigoplus_{t_Z\in\Span{T_Z}} H_{t_X,t_Z}
+%$$
+%\todo{why?} 
+%and so $\ket{v}$ must be an eigenvector of
+%the $Z-$type stabilizers.
+%And therefore, if $t_X\ne 0:$
+%$$
+%    \bra{v} \Gamma_0 \ket{v} > \bra{v} \Gamma_{t_X} \ket{v}
+%$$
+%so we must have that $t_X=0$. Therefore 
+%$\ket{v}$ is stabilized by the $Z-$type stabilizers.
 
-Now we make the restriction that $H$
-comes from a weakly self-dual gauge code.
-Our goal will be to show that the
-groundspace of $H$ is spanned
-by vectors which are stabilized.
-This will imply that $\lambda_1(H)=\lambda_1(H_{0,0}).$
-To begin, let $v_1$ be the top
-eigenvector of $\Gamma_{t_X}$ with $t_X\in\Span{T_X}.$
-Because $v_1$ has all positive components
-it will be fixed by  any operator
-$s\in\Span{S_Z}$.
-To show that the $X$ type stabilizers
-also fix $v_1$ 
-we use weak self-duality
-and see that by change of basis
-we can swap the roles of the $X$ and $Z$ type operators.
-\begin{framed}
-\noindent{\bf Fact 1:}
+We repeat this argument for $H$ switching to the
+$\ket{\pm}$ basis. This will give a basis for the groundspace
+consisting of vectors that are fixed by the $Z$-type
+stabilizers.
+% Perhaps another argument:
+%    A stabilizer $s\in\Pauli^Z$ acts trivially
+%    on $\ket{0...0}$ and therefore must also fix any groundstate.
+Therefore the entire groundspace must be stabilized.
+\tombstone
 
-For any weakly self-dual gauge code Hamiltonian $\Ham$
-every groundstate is stabilized 
-and so $$\lambda_1(\Ham) = \lambda_1(\Ham_{0,0})$$
+\doproposition{2.4}
+For any CSS gauge code Hamiltonian $\Ham$
+we have:
+$$\lambda_1(\Ham) = \lambda_1(\Ham_{0,0})$$
 and for $t_X\in\Span{T_X}, t_Z\in\Span{T_Z}$
-with $t_X\ne 0$ or $t_Z\ne 0$
+with $t_X\ne 0$ or $t_Z\ne 0$,
 $$
 \lambda_1(\Ham) > \lambda_1(H_{t_X,t_Z}).
 $$
-\end{framed}
-Notice that 
-$H_{0,0}$ is also Perron-Frobenius (in the computational basis)
-and so has non-degenerate
-groundspace, but it appears with multiplicity $2^k$ within
-the Hamiltonian $H$ and this accounts for the degeneracy of the
-groundspace of $H$.
+
+\doproof
+The vectors in the space that 
+$H_{t_X,t_Z}$ operates on 
+are stabilized iff $t_X=0$ and $t_Z=0$,
+and so the result follows as a 
+consequence of the previous lemma.
+\tombstone
+
+%\danbrowne{This is a key result and you speed through it too quickly. Can you write this as a lemma with a formal proof?}
+
+%From equation \Eref{hamblockgs} we see that 
+%$H_{0,0}$ is also irreducible stoquastic 
+%and so has non-degenerate
+%groundspace, but it appears with multiplicity $2^k$ within
+%the Hamiltonian $H$ and this accounts for the degeneracy of the
+%groundspace of $H$.
 
 %Taken together, these eigenvectors form a basis for the
 %groundspace of the system.
@@ -1004,39 +2327,118 @@ groundspace of $H$.
 %(this is the Perron-Frobenius theorem)
 %and therefore is stabilized:
 
-The next goal is to search for
-the second eigenvalue of $H$,
-$\lambda_2(H).$
-Using a basis change and the
-above equation for $H_{t_X,0}$
-we have
-\begin{framed}
-\noindent{\bf Fact 2:}
-Given a weakly self-dual
-gauge code Hamiltonian $\Ham$ and
-$t_X\in \Span{T_X},\  t_X\in \Span{T_Z}$
-the blocks $\Ham_{t_X,0}$ and 
-$\Ham_{0,t_Z}$ are Perron-Frobenius.
-\end{framed}
+The following lemma is used in section 2.8 below.
 
-We extend the above argument:
-\begin{framed}
-\noindent For a weakly self-dual gauge code
-Hamiltonian,
+%\noindent{\bf Fact 2:}
+\dolemma{2.5}
+Given a 
+CSS gauge code Hamiltonian $\Ham$ and
+$t_X\in \Span{T_X},$
+the matrices for $\Ham_{t_X,0}$ 
+in the symmetry invariant basis 
+are irreducible stoquastic.
+
+\doproof
+From equation \Eref{hamblocktx} we see that 
+the nonzero, nondiagonal entries of the matrices
+$\Ham_{t_X,0}$ are $+1,$ and so this matrix is stoquastic.
+This matrix is irreducible because as an operator it is
+irreducible.
+\tombstone
+
+So far, the Perron-Frobenius theory has been fruitful,
+telling us that the first eigenvalue of $H$ resides in
+the spectrum of the block $H_{0,0}$.
+The next goal is to search for
+the second eigenvalue of $H$.
+
+
+\dolemma{2.6}
+Let $H$ be a CSS gauge code Hamiltonian,
+with matrix $\Gamma$ in the computational basis 
+and irreducible components $\Gamma_{t_X}$.
+We have
+$$
+    \Gamma_{t_X} = \bigoplus_{t_Z\in\Span{T_Z}}
+        H_{t_X,t_Z}.
+$$
+
+\doproof
+%The irreducible matrix blocks contain the irreducible
+%representations 
+Irreducibility of matrices is a coarser property than irreducibility of 
+representations. 
+The result follows by considering eigenspaces of stabilizers.
+\tombstone
+
+\doproposition{2.7}
+For a gauge code Hamiltonian $H$,
 \begin{align*}
-\lambda_1(\Ham_{t_X,0}) &< 
+\lambda_1(\Ham_{t_X,0}) &> 
     \lambda_1(\Ham_{t_X,t_Z}) \ \smbox{and}\\
-\lambda_1(\Ham_{0,t_Z}) &< 
+\lambda_1(\Ham_{0,t_Z}) &> 
     \lambda_1(\Ham_{t_X,t_Z}),
 \end{align*}
 where $t_X\ne 0$ and $t_Z\ne 0.$
-\end{framed}
 
-In summary, 
-to find the spectral gap of a weakly self-dual gauge code Hamiltonian,
-which is the difference of the top two eigenvalues of the Hamiltonian,
+\doproof
+Let $H$ be a CSS gauge code Hamiltonian.
+Let $\Gamma$ be the matrix for $H$ in the computational basis,
+with $\Gamma_{t_X}$ the irreducible matrix components.
+From Lemma 2.6,
+$$
+    \Gamma_{t_X} = \bigoplus_{t_Z\in\Span{T_Z}}
+        H_{t_X,t_Z}.
+$$
+%By the previous Lemma we apply the Perron-Frobenius theorem
+%to find that the top eigenvector of $\Gamma_{t_X}$ is positive.
+And, by Lemma 2.2 the first eigenvector of $\Gamma_{t_X}$ is 
+non-degerate and positive.
+This will be an eigenvector of each stabilizer, and in particular
+must be fixed by the $X$-type stabilizers.
+Therefore, this eigenvalue is in the spectrum of $H_{t_X,0}$ and
+no other $H_{t_X,t_Z}$ with $t_Z\ne 0.$
+This shows 
+$\lambda_1(\Ham_{t_X,0}) > \lambda_1(\Ham_{t_X,t_Z}).$
+We switch to the $\ket{\pm}$ basis and repeat this argument
+to obtain the second inequality.
+\tombstone
+
+%\danbrowne{Please spell out the argument more clearly. It isn't immediate that this follows from your two facts. }
+A CSS gauge code is \emph{self-dual} when the $X$-type and $Z$-type
+gauge generators are equal: $$G_X = G_Z.$$
+The $XY$-model is an example of a self-dual CSS gauge code.
+A CSS gauge code is \emph{weakly self-dual}
+when there is a permutation $P$ on the set of $n$ qubits
+that induces equality of the gauge generators:
+$$
+    G_X P = G_Z,
+$$
+where we write $P$ as an $n\times n$ permutation matrix.
+The compass model is then weakly self-dual when we transpose
+the square lattice of $l\times l$ qubits.
+
+To find the spectral gap of a weakly self-dual gauge code Hamiltonian $H$,
+%which is the difference of the top two eigenvalues of the Hamiltonian,
 we need only examine the top two eigenvalues of $H_{0,0}$ and 
 the top eigenvalue of $H_{t_X,0}$ for each $t_X\in T_X.$ 
+We summarize this in the theorem:
+
+\dotheorem{2.8}
+For a weakly self-dual gauge code Hamiltonian $H$,
+the spectral gap is given by:
+$$
+    \min \bigl\{ \lambda_1(H_{0,0}) - \lambda_2(H_{0,0}),
+        \min_{t_X\in\Span{T_X}} 
+         \{ \lambda_1(H_{0,0}) - \lambda_2(H_{t_X,0}) \} \bigr\}
+$$
+\doproof
+Combine Proposition 2.4 with Proposition 2.7.
+By weak self-duality, the spectrum of $H_{t_X,t_Z}$ equals
+the spectrum of $H_{t'_X,t'_Z}$ for some 
+$t'_X\in\Span{T_X}, t'_Z\in\Span{T_Z}.$
+\tombstone
+
 
 \section{The gauge color code model}
 
@@ -1050,7 +2452,7 @@ the top eigenvalue of $H_{t_X,0}$ for each $t_X\in T_X.$
 %\end{center}
 
 We now turn to the central animal that motivated
-the theory developed in this paper.
+the theory developed in this chapter.
 
 The three dimensional gauge color code \cite{Bombin2015,Bombin2015single,Kubica2015}
 is a self-dual CSS gauge code. 
@@ -1118,10 +2520,11 @@ Using this cellulation we now construct the gauge code.
 Qubits are associated with the $n$ vertices.
 We associate operators to other cells, or union of cells,
 by using the contained vertices as support.
+%\danbrowne{Is this correct? All the operators here are built from faces, not cells. }
 Because this is a self-dual code, the same goes for
-both the $X$ and $Z$ type operators.
+both the $X$-type and $Z$-type operators.
 %and we confuse the distinction between union of cells
-%and the corresponding $X$ or $Z$ type operator.
+%and the corresponding $X$ or $Z$-type operator.
 The $X/Z-$type gauge group is generated by
 $X/Z-$type operators supported on each face.
 The $X/Z-$type stabilizer group is generated by
@@ -1129,6 +2532,804 @@ $X/Z-$type operators supported on each body.
 There is one $X/Z-$type logical operator and these
 are generated by
 $X/Z-$type operators supported on any region.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+
+\section{The orbigraph}
+
+So far we have seen how the group structure of a gauge code 
+Hamiltonian gives rise to operators that commute with
+the Hamiltonian. These are symmetries of the system given
+by stabilizers and logical operators.
+Performing numerics on small gauge code Hamiltonians makes
+it evident that there is a great deal more symmetry to be found.
+In particular, the entries of eigenvectors 
+often have repeated values.
+This motivates investigating the symmetries of the 
+Hamiltonian that permute the basis vectors.
+
+The orbigraph idea is also found in the
+spectral graph theory literature, see Ref. \cite{Daly2017}.
+The orbigraph also appears in disguise in Ref. \cite{Cvetkovic1980} chapter 5, 
+see in particular the example on page 148-149.
+Lemma 2.11 and Theorem 2.12 below appear to be new results.
+
+\def\auto{\mathcal{A}}
+
+Let $\Gamma$ be a weighted graph on a set of vertices $V$:
+$$
+    \Gamma : \Complex[V] \to \Complex[V].
+$$
+Given a permutation of the vertices $\sigma:V\to V$ we
+extend by linearity to form the permutation matrix:
+$$
+    \Complex[\sigma] : \Complex[V] \to \Complex[V].
+$$
+A \emph{graph automorphism} of $\Gamma$ is a permutation
+$\sigma:V\to V$ that ``commutes'' with $\Gamma:$
+$$
+    \Gamma \Complex[\sigma] = \Complex[\sigma] \Gamma.
+$$
+The set of all such graph automorphisms of $\Gamma$ is denoted $\auto$.
+The set of \emph{orbits} of $\auto$ is written $ V / \auto.$
+These are equivalence classes on $V,$ where two vertices $v_1, v_2$ are
+deemed equivalent iff there is a graph automorphism that sends $v_1$ to $v_2.$
+%Let $\auto$ be the group of \emph{graph automorphisms} of $\Gamma:$
+%$$
+%    \auto := \mbox{Aut}(\Gamma) =
+%        \bigl\{ P\ \bigl|\ \Gamma P = P \Gamma,\ 
+%        \mbox{where $P$ is a permutaion matrix} \bigr\}.
+%$$
+
+An \emph{$\auto$-invariant} vector $\ket{v}\in\Complex[V]$
+is such that $\Complex[\sigma]\ket{v}=\ket{v}$ for all $\sigma\in\auto.$
+These vectors are characterized as those vectors that are constant
+on the $\auto$-orbits.
+In other words, an $\auto$-invariant vector is
+defined by its value on each $\auto$-orbit.
+Let $C:\Complex[V/\auto]\to\Complex[V]$ be
+this defining map, and 
+$D:\Complex[V]\to\Complex[V/\auto]$ any left inverse of $C$:
+$$
+    DC = I.
+$$
+We define the \emph{orbigraph} of $\Gamma$ as:
+$$
+    \Gamma/\auto := D\Gamma C.
+$$
+As a commutative square we have:
+\[
+\begin{tikzcd}
+\Complex[V] \arrow{r}{\Gamma} & \Complex[V] \arrow{d}{D} \\
+\Complex[V/\auto] \arrow{u}{C} \arrow{r}{\Gamma/\auto} & \Complex[V/\auto] 
+\end{tikzcd}
+\]
+
+%A \emph{graph automorphism} is a permutation matrix $P$
+%such that 
+%$$P^T \Ham P = \Ham.$$
+%The set of all such graph automorphisms 
+%form a group $\auto$.
+%The goal here is to find eigenvectors of $H$ that are
+%invariant under the action of $\auto.$
+%Such an eigenvector will have entries that
+%are constant on the orbits of $\auto,$
+%so therefore it will live naturally on the
+%vector space whose basis is these orbits.
+%We can do better than this, and actually 
+%project the graph itself down onto this space.
+%We do this by constructing a new graph
+%which we call the \emph{orbigraph}.
+%%form a group $\auto(H)$ or just $\auto$ when the graph is understood.
+%%We now define a new matrix $\Ham/\auto$
+%The matrix for the orbigraph is written $\Ham/\auto$
+%and acts on the vector space with basis consisting
+%of the orbits of $\auto.$
+%It follows that the off-diagonal matrix entries of $\Ham/\auto$,
+%indexed by a pair of $\auto-$orbits $i$ and $j$,
+%$i\ne j$,
+%are defined by
+%$$
+%    (\Ham/\auto)_{ij} = \bigl|\bigl\{ g\in G \smbox{s.t.} gv \in j \bigr\}\bigr| \smbox{where}v\in i.
+%$$
+%In other words, 
+%$(\Ham/\auto)_{ij}$ with $i\ne j,$ counts the number of gauge group
+%elements that sends any particular element $v$ of the 
+%$\auto-$orbit $i$ to the $\auto-$orbit $j.$
+
+%Note that the orbigraph is no longer Hermitian,
+%and in general will not even be normal.
+
+%The automorphisms of the gauge group, $Aut(G)$ will induce an
+%automorphism of the graph by \todo{XXX}...
+%In particular, elements of the stabilizer group $\Stab$ induce graph 
+%automorphisms by \todo{XXX}...
+%In general there may be more symmetry in the graph that
+%we cannot access via a group automorphism.
+
+%We will apply this orbigraph construction
+%to each of the blocks $H_{t_X,0}$.
+%From Lemma 2.5 above, and using the fact that we are
+%summing over a trivial representation of $\auto$ we have the following:
+
+In the proofs below we make repeated use of the fact that if
+$\ket{v}\in\Complex[V]$ is $\auto$-invariant, then $\Gamma\ket{v}$
+is also $\auto$-invariant.
+We first show that the apparent arbitrariness in the choice of $D$ does
+not lead to different orbigraphs.
+
+\dolemma{2.9}
+The definition of the orbigraph $\Gamma/\auto = D\Gamma C$ does not depend on the
+choice of $D$, a left inverse of $C$.
+\doproof
+Let $D$ and $D'$ be left inverses of $C,$ so that $DC=I$ and $D'C=I.$
+Then 
+$ (D'-D)C = 0,$ which means that $\Im(C)\le \Ker(D-D').$
+This says that any $\auto$-invariant vector $\ket{v}\in\Complex[V]$
+is in the kernel of $D'-D.$
+Since $\Gamma$ preserves the $\auto$-invariant property,
+$\Im(\Gamma C)\le \Ker(D-D')$. That is, $(D'-D)\Gamma C=0$ and so
+$D'\Gamma C=D\Gamma C$ and the result follows.
+\tombstone
+
+The following lemma is demonstrated in the numerics in section 2.8.1 and
+section 2.8.2.
+
+\dolemma{2.10}
+Given a weighted graph $\Gamma$ with graph automorphism group $\auto:$
+$$
+    \Spec(\Gamma/\auto) \subseteq \Spec(\Gamma).
+$$
+\doproof
+Let $\ket{u}$ be an eigenvector of the orbigraph with eigenvalue $\lambda$,
+$$
+    D\Gamma C\ket{u} = \lambda\ket{u}.
+$$
+Then $\Gamma C\ket{u}$ is $\auto$-invariant because $C\ket{u}$ is $\auto$-invariant.
+Let $\ket{u'}\in\Complex[V/\auto]$ be such that
+$$
+    \Gamma C\ket{u} = C\ket{u'}.
+$$
+Multiplying on the left by $D$,
+$$
+    D \Gamma C\ket{u} = DC\ket{u'} = \ket{u'},
+$$
+and so $\ket{u'}=\lambda{u}$, and
+$$
+    \Gamma C\ket{u} = \lambda C\ket{u}
+$$
+showing that $\lambda\in\Spec(\Gamma)$.
+\tombstone
+
+In the next lemma we make use of an explicit formula
+for the orbigraph.
+%for the linear operators $C$ and $D.$
+The definition of $C$ gives 
+$$
+    C = \sum_{a\in V/\auto, v\in a} \ket{v}\bra{a},
+$$
+where we treat the orbits $a\in V/\auto$ as equivalence classes of vertices
+so the notation $v\in a$ makes sense.
+Another way to write this uses the function 
+$$
+    f : V \to V/\auto
+$$
+that sends each vertex to the $\auto$-orbit containing it.
+This gives 
+\begin{equation}\label{eqforC}
+    C = \sum_{v\in V} \ket{v}\bra{f(v)}.
+\end{equation}
+We also let the function 
+$$
+    g : V/\auto \to V
+$$
+be a right inverse of $f.$ In other words, $g$ picks a
+representative vertex from each $\auto$-orbit.
+We now let  
+\begin{equation}\label{eqforD}
+    %D = \sum_{i\in V/\auto} \ket{i}\bra{v_i}
+    D = \sum_{a\in V/\auto} \ket{a}\bra{g(a)},
+\end{equation}
+%where $v_i\in i$ for each $i\in V/\auto$.
+and the equation $DC=I$ follows from $fg$ being the identity on $V/\auto.$
+A direct computation gives a formula for the orbigraph as
+\begin{equation}\label{eqforOrbi}
+    D\Gamma C = \sum_{a\in V/\auto, v\in V} \bra{g(a)} \Gamma \ket{v}\ \ket{a}\bra{f(v)}.
+\end{equation}
+
+\dolemma{2.11}
+The orbigraph of an irreducible stoquastic matrix is also
+irreducible stoquastic.
+\doproof
+Let $\Gamma:\Complex[V]\to\Complex[V]$ be an irreducible stoquastic matrix
+with graph automorphism group $\auto.$
+%    Let $i\in V/\auto$ be an $\auto$-orbit.
+%    Then $C\ket{i}$ is $\auto$-invariant
+%    and so $\Gamma C\ket{i}$ is also $\auto$-invariant.
+%    Let $\ket{u}\in\Complex[V/A]$ be such that
+%    $$
+%    \Gamma C\ket{i} = C\ket{u}.
+%    $$
+%    Now we let $j\in V/\auto$ and compute
+%    \begin{align*}
+%    \braket{j}{u} 
+%        &= \bra{j} D C \ket{u} \\
+%        &= \bra{j} D \Gamma C \ket{i} \\
+%        &= \bra{j} D \Gamma \sum_{v\in i} \ket{v} \ \ \ \mbox{using eq. \Eref{eqforC}}\\
+%        &= \sum_{v\in i} \bra{v'} \Gamma \ket{v} \ \ \ \mbox{using eq. \Eref{eqforD}, with $v'\in j$.}\\
+%        %&\ge 0 \ \ \ \mbox{if $i\ne j$.}
+%    \end{align*}
+%    And so $\braket{j}{u}\ge 0$ if $i\ne j$ because $\Gamma$ is stoquastic.
+We first show that the orbigraph of $\Gamma$ is stoquastic.
+Let $a, b\in V/\auto$, be distinct $\auto$-orbits. We use equation \Eref{eqforOrbi}:
+\begin{align*}
+   \bra{a} D\Gamma C \ket{b}
+        &= \sum_{v\in V} \bra{g(a)}\Gamma \ket{v}\braket{f(v)}{b} \\
+        &= \sum_{v\in b} \bra{g(a)}\Gamma \ket{v} \\
+        &\ge 0
+\end{align*}
+because $\Gamma$ is stoquastic.
+To show that the orbigraph is irreducible we need to construct a sequence of orbits
+$\{ a_1=a,a_2,...,a_n=b \}$ such that 
+$$
+    \bra{a_{i+1}}D\Gamma C\ket{a_{i}}>0\ \ \mbox{ for $i=1,...,n-1.$}
+$$
+Using the fact that $\Gamma$ is irreducible, there is a sequence
+in $V$,
+$$
+    \{ u_1=g(a), u_2, ..., u_n=g(b) \},
+$$ such that 
+$$
+    \bra{u_{i+1}}\Gamma \ket{u_{i}}>0\ \ \mbox{ for $i=1,...,n-1.$}
+$$
+Now we examine the sequence $\{f(u_i)\in V/\auto\}$.
+We already see that $f(u_1)=a$ and $f(u_n)=b$. By passing to
+a subsequence if necessary, we can assume that $f(u_i)\ne f(u_{i+1}).$
+Computing as follows 
+\begin{align*}
+    \bra{f(u_{i+1})} D\Gamma C \ket{f(u_i)} 
+        &= \sum_{v\in f(u_i)} \bra{gf(u_{i+1})} \Gamma \ket{v} \ \ \ 
+        \mbox{by equation \Eref{eqforOrbi}}\\
+        &= \sum_{v\in f(u_i)} \bra{u_{i+1}} \Gamma \ket{v}\ \ \ 
+        \mbox{using $\sigma\in\auto$, $\sigma:gf(u_{i+1})\mapsto u_{i+1}$} \\
+        &\ge \bra{u_{i+1}} \Gamma \ket{u_i}\ \ \ 
+        \mbox{because $\Gamma$ is stoquastic}\\
+        &> 0
+\end{align*}
+by assumption,
+and so $D\Gamma C$ is irreducible.
+There is a slight wrinkle in the above argument in that we passed
+to a subsequence of the $\{u_i\}$ in order to assume $f(u_i)\ne f(u_{i+1}).$ 
+This is no obstruction because $\auto$ is transitive on its orbits.
+In the term 
+$$
+        \sum_{v\in f(u_i)} \bra{u_{i+1}} \Gamma \ket{v}
+$$
+we sum over an orbit $f(u_i)$ and so 
+we may replace the vertex $u_{i+1}$ by any other vertex in its orbit.
+\tombstone
+
+\dotheorem{2.12}
+%The spectrum of the orbigraph of $\Ham_{t_X,0}$ contains the top eigenvalue of $\Ham_{t_X,0}.$
+The top eigenvalue of 
+an irreducible stoquastic matrix 
+$$\Gamma:\Complex[V]\to\Complex[V]$$
+equals the top eigenvalue of its orbigraph:
+$$
+    \lambda_1(\Gamma) = \lambda_1(\Gamma/\auto).
+$$
+\doproof
+We apply the Perron-Frobenius theorem to the matrix
+$\Gamma$ to find the top eigenvalue $\lambda$ is non-degenerate
+with eigenvector $\ket{v}:$
+$$
+    \Gamma\ket{v} = \lambda \ket{v}.
+$$
+This vector is positive and the automorphisms of $\Gamma$
+act by permuting basis vectors, so $\ket{v}$ must be constant on
+the orbits of $\auto.$
+Therefore, there is a vector $\ket{u}\in\Complex[V/\auto]$ such that
+$$
+    C\ket{u} = \ket{v}.
+$$
+Then we have,
+\begin{align*}
+    D\Gamma C\ket{u} 
+    &= D\Gamma\ket{v} \\
+    &= \lambda D\ket{v} \\
+    &= \lambda DC\ket{u} \\
+    &= \lambda \ket{u}
+\end{align*}
+%where we used the fact that $D$ is a left inverse for $C$.
+This shows $\lambda$ is an eigenvalue for $\Gamma/\auto.$
+By the previous lemma $\Gamma/\auto$ is irreducible
+stoquastic and since $\ket{u}$ is positive it must correspond to the
+top eigenvalue of $\Gamma/\auto$ by the Perron-Frobenius theorem.
+%Graph automorphisms act by permuting vertices, which
+%correspond to symmetry invariant basis vectors for $\Ham_{t_X,0}.$
+%By Lemma 2.5, the top eigenvector for this operator is
+%positive and non-degenerate.
+%This eigenvector must be fixed by
+%every graph automorphism
+%of $\Ham_{t_X,0}$.
+%$F$ because $F$ commutes with $\Ham_{t_X,0}.$
+\tombstone
+
+%\danbrowne{Please prove this.}
+
+Here is a simple example. % potential only depends on hamming weight: Jarret
+We take as gauge group 
+$$G = \{XII, IXI, IIX, ZII, IZI, IIZ\}.$$
+The Hamiltonian $H = \sum_{g\in G} g$ has matrix:
+$$
+\Gamma = \left(\begin{array}{rrrrrrrr}
+ 3 &  1 &  1 &  1 &  . &  . &  . &  . \cr
+  1 &  1 &  . &  . &  1 &  1 &  . &  . \cr
+  1 &  . &  1 &  . &  1 &  . &  1 &  . \cr
+  1 &  . &  . &  1 &  . &  1 &  1 &  . \cr
+  . &  1 &  1 &  . & -1 &  . &  . &  1 \cr
+  . &  1 &  . &  1 &  . & -1 &  . &  1 \cr
+  . &  . &  1 &  1 &  . &  . & -1 &  1 \cr
+  . &  . &  . &  . &  1 &  1 &  1 & -3
+\end{array}\right)
+$$
+where we indicate zero entries with a dot.
+The graph automorphisms come from permuting the
+three qubits, and so this group is $\auto=S_3.$
+There are four $\auto-$orbits, and
+$$
+C = 
+\left(\begin{array}{rrrr}
+ 1 &  . &  . &  . \cr
+  . &  1 &  . &  . \cr
+  . &  1 &  . &  . \cr
+  . &  1 &  . &  . \cr
+  . &  . &  1 &  . \cr
+  . &  . &  1 &  . \cr
+  . &  . &  1 &  . \cr
+  . &  . &  . &  1
+\end{array}\right),\ \ \ 
+D = 
+\left(\begin{array}{rrrrrrrr}
+ 1 &  . &  . &  . &  . &  . &  . &  . \cr
+  . &  1 &  . &  . &  . &  . &  . &  . \cr
+  . &  . &  . &  . &  1 &  . &  . &  . \cr
+  . &  . &  . &  . &  . &  . &  . &  1
+\end{array}\right).
+$$
+Each column of $C$ sums over an orbit,
+and each row of $D$ chooses one member from each orbit.
+This gives orbigraph
+$$
+\Gamma/\auto = D\Gamma C = \left(\begin{array}{rrrr}
+ 3 &  3 &  . &  . \cr
+  1 &  1 &  2 &  . \cr
+  . &  2 & -1 &  1 \cr
+  . &  . &  3 & -3
+\end{array}\right).
+$$
+We see here that even though $\Gamma$ is Hermitian,
+the orbigraph is not Hermition, and not even a normal operator.
+
+%In this case the automorphism group $\auto$ of the graph
+%is the same as the automorphism group 
+%$Aut(G)$ of the gauge group.
+%In general it is true that $Aut(G) \le \auto.$
+
+%We can also write $H/\auto = EHF$ using the following two matrices for $F$ and $E:$
+%See also \cite{Cvetkovic1980} chapter 5.
+
+
+For the remainder of this section 2.8,
+we will be applying Theorem 2.12 to the
+Hamiltonian blocks $\Ham_{t_X,0}$ which are irreducible stoquastic by 
+Lemma 2.5.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\subsection{The compass model}
+For the next example we take the $l=3$ compass model.
+$\Ham_{0,0}$ acts on a 16 dimensional space.
+The order of $\auto$ is $72$, and we find three $\auto-$orbits.
+% This time $Aut(G) = \auto$ ???
+The orbigraph method can be applied in the case
+where the Hamiltonian weights for $X$ and $Z$ are uniform as $w_X$ and $w_Z.$
+We separate the $X$ and $Z$ terms of the orbigraph to show
+how this works:
+$$
+\Ham_{0,0}/\auto = 
+\left(\begin{array}{rrr}
+ . &  9 &  . \cr
+  1 &  4 &  4 \cr
+  . &  6 &  3
+\end{array}\right) + 
+\left(\begin{array}{rrr}
+ 9 &  . &  . \cr
+  . &  1 &  . \cr
+  . &  . &  -3
+\end{array}\right)
+=
+\left(\begin{array}{rrr}
+ 9 &  9 &  . \cr
+  1 &  5 &  4 \cr
+  . &  6 &  .
+\end{array}\right)
+$$
+This can be solved analytically and we find $\lambda_1 = 4+2\sqrt{13} \cong 11.21110255.$
+Keep in mind that the original state space has dimension $2^9=512$ so we
+have come a long way down to 3.
+
+By exact %\footnote{Exact in this context means that we do not do any
+%perturbative approxiamations to the operator in question.}
+numerical diagonalization
+we get the spectrum of $\Ham_{0,0}$ and note that the orbigraph lifts
+all degeneracy as well as missing some excited eigenspaces:
+\begin{center}
+\begin{tabular}{ c|c|c } 
+$\lambda$ & $\Ham_{0,0}$ degeneracy & $\Ham_{0,0}/\auto$ degeneracy \\
+\hline
+    11.2111025509 & 1 & 1 \\
+    6.0 & 1 & 1 \\
+    2.0 & 4 &   \\
+    0.0 & 4 &   \\
+    -3.21110255093 & 1 & 1 \\
+    -4.0 & 4 &   \\
+    -6.0 & 1 &   
+\end{tabular}
+\end{center}
+The reason we miss some excited spaces is that they do not contain
+any trivial irrep of $\auto.$
+Note that we miss the eigenspace with $\lambda = -6$
+even though this is one dimensional. It must contain some other non-trivial
+one dimensional irrep. 
+%This cannot happen with the groundspace because
+%those eigenvectors are all positive.
+If we want to make an orbigraph for these other spaces we would construct
+the orbigraph by
+summing over orbits using different characters of $\auto$
+(these are \emph{momenta} in the abelian terminology).
+See \cite{Cvetkovic1980} chapter 5 for more details.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+\subsection{The gauge color code model}
+The smallest gauge color code has $n=15$ qubits,
+$G_0$ has $18$ each of X/Z-type gauge operators,
+and $4$ each of X/Z-type stabilizer generators.
+$\Ham_{0,0}$ acts on a 64 dimensional space, and $\auto$ has
+order 720. We find 7 orbits:
+$$
+\Ham_{0,0}/\auto = 
+\left(\begin{array}{rrrrrrr}
+18 & 18 &  . &  . &  . &  . &  . \cr
+  3 & 12 & 15 &  . &  . &  . &  . \cr
+  . &  6 &  6 & 12 &  . &  . &  . \cr
+  . &  . &  9 &  . &  9 &  . &  . \cr
+  . &  . &  . & 12 & -6 &  6 &  . \cr
+  . &  . &  . &  . & 15 & -12 &  3 \cr
+  . &  . &  . &  . &  . & 18 & -18
+\end{array}\right)
+$$
+The eigenvalue equation results in
+the recurrence relation:
+$$
+    \lambda a_k = 3ka_{k-1} + (18-6k)a_k + (18-3k)a_{k+1},
+$$
+which has largest solution 
+$\lambda_1 = 18\sqrt{2} \cong 25.4558441.$
+
+% RP^3 is homeomorphic to the solid ball with antipodal points identified
+% http://math.stackexchange.com/questions/507783/mathbbrp3-is-homeomorphic-to-the-solid-ball-with-antipodal-points-identifi
+% http://topospaces.subwiki.org/wiki/Homology_of_real_projective_space
+
+Numerics give the full spectrum of $\Ham_{0,0}$ and we note that the orbigraph lifts
+all degeneracy as well as preserving every eigenvalue:
+\begin{center}
+\begin{tabular}{ c|c|c } 
+$\lambda$ & $\Ham_{0,0}$ degeneracy & $\Ham_{0,0}/\auto$ degeneracy \\
+\hline
+    25.4558441227 & 1 & 1 \\
+    16.9705627485 & 6 & 1 \\
+    8.48528137424 & 15 & 1 \\
+    0.0 & 20 & 1 \\
+    -8.48528137424 & 15 & 1 \\
+    -16.9705627485 & 6 & 1 \\
+    -25.4558441227 & 1 & 1 \\
+\end{tabular}
+\end{center}
+
+The second eigenvalue of $H$ comes from a recurrence
+relation in two variables which has solution
+$\lambda_2 = 9\sqrt{2} + 3\sqrt{10} \cong 22.21475504.$
+So the gap for this Hamiltonian  is 
+$$\lambda_1 - \lambda_2 = 9\sqrt{2} - 3\sqrt{10} \cong 3.24108908.$$
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\subsection{A table of orbigraphs}\label{OrbigraphTable}
+
+Here we tabulate the order of the graph automorphism group $\auto$ of $H_{t_X,0}$
+and the resulting orbigraph sizes, which is the number of $\auto-$orbits.
+We use the software library {\tt nauty}\cite{McKay2014} for computing graph automorphisms.
+
+%\begin{center}
+%\begin{tabular}{ l|c|c|c|l|c|c|c } 
+%model &\ $n$\ &\ $r$\ &\ $t_X$\ & $\auto$ & $|\auto|$ & $|\auto-\mathrm{orbits}|$ & 
+%$|\mathrm{Aut(code)}|$ \\
+%\hline
+%%    1D $XY$ & 4 &  2& 0 & 2 & 3 & 8 \\
+%%       & 5 &  4& 0 & 10 & 4 & 10 \\
+%%       & 6 &  4& 0 & 72 & 3 & 12 \\
+%%       & 7 &  6& 0 & 14 & 9 & 14 \\
+%%       & 8 &  6& 0 & 4608 & 10 & 16 \\
+%  1D $XY$ & 9 &  8& 0   & $\Z_2\ltimes\Z_9$                   & 18 & 23 & 18  \\
+%        & 10 & 8& 0   & $\Z_2\ltimes(\Z_{10}\times\Z_{10})$ & 200 & 10 & 20  \\
+%        & 11 & 10 & 0 & $\Z_2\ltimes\Z_{11}$                & 22 & 63 & 22  \\
+%        & 12 & 10 & 0 & $\Z_2\ltimes(\Z_{12}\times\Z_{12})$ & 288 & 36 & 24  \\
+%%\hline
+%%    1D Ising &   &   &   &   &   &   \\
+%\hline
+%    2D compass & 9 & 4 & 0 & & 72 & 3 & 36 \\
+%            & 9 & 4 &    & & 12 & 4 &  \\
+%            & 16 & 9  & 0 & & 128 & 24 & 64 \\
+%            & 16 & 9  &    & & 16 & 48 &  \\
+%            & 25 & 16 & 0 & & 200 & 430 & 100 \\
+%            & 25 & 16 &    & & 20  & 3418 &  \\
+%\hline
+%    3D compass & 27 & 22 & 0     & & 216  & 20609  &     \\
+%               & 27 & 22 &    & &  72 & 60283   &  \\
+%\hline
+%    3D gauge color & 15 & 6  & 0 & $S_6$ & 720 & 7 & $|S_4|=24$ \\
+%                & 15 & 6  &  & & 36 & 16 &  \\
+%                & 39 & 18 & 0 & & 36 & 14400 & $|\Z_3|=3$  \\
+%                & 65 & 32 & 0 & &    &       & $|\Z_4|=4$ \\
+%\end{tabular}
+%\end{center}
+
+\begin{center}
+\begin{tabular}{ l|c|c|c|c|c|c } 
+model &\ $n$\ &\ $r$\ &\ $t_X$\ & $|\auto|$ & $|\auto-\mathrm{orbits}|$ & 
+$|\mathrm{Aut(code)}|$ \\
+\hline
+%    1D $XY$ & 4 &  2& 0 & 2 & 3 & 8 \\
+%       & 5 &  4& 0 & 10 & 4 & 10 \\
+%       & 6 &  4& 0 & 72 & 3 & 12 \\
+%       & 7 &  6& 0 & 14 & 9 & 14 \\
+%       & 8 &  6& 0 & 4608 & 10 & 16 \\
+  1D $XY$ & 9 &  8& 0   & 18 & 23 & 18  \\
+        & 10 & 8& 0   & 200 & 10 & 20  \\
+        & 11 & 10 & 0 & 22 & 63 & 22  \\
+        & 12 & 10 & 0 & 288 & 36 & 24  \\
+%\hline
+%    1D Ising &   &   &   &   &   &   \\
+\hline
+    2D compass & 9 & 4 & 0 & 72 & 3 & 36 \\
+            & 9 & 4 &    & 12 & 4 &  \\
+            & 16 & 9  & 0 & 128 & 24 & 64 \\
+            & 16 & 9  &    & 16 & 48 &  \\
+            & 25 & 16 & 0 & 200 & 430 & 100 \\
+            & 25 & 16 &    & 20  & 3418 &  \\
+\hline
+    3D compass & 27 & 22 & 0     & 216  & 20609  &     \\
+               & 27 & 22 &    &  72 & 60283   &  \\
+\hline
+    3D gauge color & 15 & 6  & 0 & 720 & 7 & $|S_4|=24$ \\
+                & 15 & 6  &  & 36 & 16 &  \\
+                & 39 & 18 & 0 & 36 & 14400 & $|\Z_3|=3$  \\
+                & 65 & 32 & 0 &    &       & $|\Z_4|=4$ \\
+\end{tabular}
+\end{center}
+
+The rows without $t_X$ specified correspond to a choice of $t_X\ne 0$ 
+such that a single stabilizer generator is frustrated.
+We also show the order of Aut(code) which is
+the automorphism group of the gauge code, defined as follows.
+Elements of this group act by permuting the $n$ qubits.
+Such an action is given by the $\Field$-linear
+permutation matrices
+$P_n, P_Z$ and $P_X,$ such that the following $\Field$-linear equations hold:
+\begin{align*}
+    P_X G_X P_n &= G_X, \\
+    P_Z G_Z P_n &= G_Z.
+\end{align*}
+This implies that the action of Aut(code)
+commutes with the Hamiltonian and so preserves eigenvalues of
+the stabilizers. Therefore this group action restricts to an action
+on $H_{0,0}.$
+%For $t_X\ne0$ we take the subgroup of Aut(code) that preserves
+%the stabilizer eigenvalues for $H_{t_X,0}.$ \todo{do this}
+%Once again, trivial reps for this group survive on the groundspace of $H_{t_X,0}$
+%because these are all stoquastic.
+
+\begin{framed}
+\noindent{\bf Mystery:} 
+the graph automorphism group is
+often bigger, sometimes much bigger, than the automorphism group of
+the underlying code.
+So where is the extra symmetry coming from?
+\end{framed}
+
+A crucial hint is provided by the fact that these graph
+symmetries respect the symplectic structure in the following sense.
+Recall that we defined graph symmetries via permutation
+matrices $P$ such that $P^{\top}HP=H.$
+In other words, $P$ is a permutation on the set
+of basis vectors $\Field^n.$
+It turns out that not only
+are these maps $\Field$-linear, but they also 
+preserve syndromes. 
+By this we mean we can find an $\Field$-linear
+map $Q$ such that the following diagram commutes:
+\[
+\begin{tikzcd}
+\Field^n \arrow{r}{G_z} \arrow[swap]{d}{P} & \Field^{|G_Z|} \arrow{d}{Q} \\
+\Field^n \arrow{r}{G_z} & \Field^{|G_Z|} 
+\end{tikzcd}
+\]
+That $P$ has this extra $\Field$-linear behaviour 
+is not true in general, but it holds for the orbigraphs in the above
+table.
+
+All this suggests a further examination of the commutation structure
+of the code.
+Indeed, this is captured by the notion of a Lie algebra, which we turn to next.
+
+%From this table it looks like $H_{0,0}$ for the compass model $|\auto| = 8l^2.$
+%Note that for large graphs, numerically finding the orbigraph has comparable
+%difficulty to just (numerically) solving the original eigenvalue problem.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+\section{Lie algebra theory}
+
+
+\def\lie{\mathfrak{g}}
+\def\lieh{\mathfrak{h}}
+\def\sl{\mathfrak{sl}}
+
+%We now turn to a finer notion of representation theory,
+%being the representation theory of semi-simple Lie algebras.
+We outline the classification 
+of finite-dimensional semi-simple Lie algebras \cite{Fulton2013} and show
+how this applies to CSS gauge code Hamiltonians.
+
+An abstract 
+%(finite-dimensional)
+\emph{Lie algebra} $\lie$ is 
+a vector space together with a bilinear form:
+$$
+    [\ ,\  ] : \lie \times \lie \to \lie
+$$
+such that $[A,B] = -[B,A]$ and
+$[A,[B,C]+[B,[C,A]]+[C,[A,B]]=0.$
+%Representations of the Lie algebra $\mathfrak{sl}_2(\Complex)$, see
+%\cite{Fulton2013} chapter 11.
+
+A \emph{representation} of a Lie algebra $\lie$
+on a vector space $V$ 
+is a linear map
+$$
+    \rho : \lie \to \GL(V)
+$$
+that sends the abstract bracket to the concrete one:
+$$
+    \rho([A, B]) = \rho(A)\rho(B) - \rho(B)\rho(A).
+$$
+%Once again $\rho_{\mathrm{pauli}}$ furnishes us with
+%a 
+
+A Lie algebra requires us to ``forget'' about
+multiplication of operators, and only allow the taking of brackets
+(and linear combinations.)
+This is not as crazy as it may at first seem.
+The fundamental calculation in the theory of
+quantum stabilizer codes is actually
+a Lie algebra calculation.
+Consider a state $\ket{\psi}$
+that is stabilized by some operator $s\in S:$
+$$
+    s\ket{\psi} = \ket{\psi},
+$$
+We wish to understand the effect of an error operator $t\in T$
+on our state $\ket{\psi}$, where we have $st = -ts:$
+$$
+    st\ket{\psi} = ts\ket{\psi} + [s, t]\ket{\psi} = -ts\ket{\psi} = -t\ket{\psi},
+$$
+which shows that $t\ket{\psi}$ is a $-1$ eigenvalue of $s.$
+The key point here is that nowhere did we need to multiply (compose) two operators,
+it was all done using the bracket.
+%This calculation is basically the same as the fundamental
+%calculation used in the representation theory of Lie algebras.
+
+We continue the analysis of CSS gauge code Hamiltonians.
+The terms of the Hamiltonian block $H_{t_X,t_Z}$
+form a Lie algebra which we denote $\lie_{t_X,t_Z}.$
+%The way we do this is to take the closure under bracket
+The basis for this Lie algebra is formed from all iterated 
+brackets of the terms in $H_{t_X,t_Z}.$
+This is a concrete Lie algebra, or in other words, it comes
+with a representation on the vector space $\Complex[\Frd].$
+
+The simplest such example of this is the one qubit Lie algebra
+which is generated by $X$ and $Z.$
+This will have basis $\{X, Z, 2XZ = [X, Z]\}$
+and so is a three dimensional Lie algebra. In fact, it is isomorphic
+to $\mathfrak{sl}_2(\Complex)$ the Lie algebra of traceless two by two
+matrices.
+Notice that we do not include $I$ in these algebras as
+this is associated to the multiplicative (group) structure
+of the operators. Moreover we never need consider Hamiltonians
+with such terms as these just shift the spectrum by a constant.
+Notice also that if we try to build a larger Lie algebra
+from taking iterated brackets of
+the $n$-qubit operators $\{X_i, Z_i\}$ we still only get
+a direct sum of $n$ copies of $\mathfrak{sl}_2(\Complex).$
+So while the group generated by products of $\{X_i, Z_i\}$ is the
+whole Pauli group $\Pauli_n$, as a Lie algebra we get something finer.
+This reflects the fact that these terms break up into $n$
+commuting ``pieces'', which motivates the following definition. 
+
+An \emph{ideal} of a Lie algebra $\lie$
+is a Lie subalgebra $\lieh\subset\lie$ that ``consumes''
+%\danbrowne{a bit too colloquial. Explain what eating means in this context!}
+all the other elements of $\lie:$
+$$
+    [A, B] \in \lieh, \smbox{for all} A\in\lieh, B\in\lie.
+$$
+
+In general the structure of the Lie algebra $\lie_{t_X,t_Z}$ 
+will be more complicated than the corresponding group structure.
+But we do have the following:
+\begin{framed}
+%\noindent{\bf Important:}
+The Lie algebra $\lie_{t_X,t_Z}$ is a semi-simple Lie algebra.
+%subalgebra of $\sl_{2^n}(\Complex).$
+\end{framed}
+This follows from the characterization of
+semi-simple Lie algebras as those having no
+nonzero abelian ideals.
+Any such ideal would correspond to the existence of 
+stabilizers, and we already got rid of these.
+
+We also have a ready made \emph{Cartan subalgebra} of $\lie_{t_X,t_Z}.$ 
+This is the algebra $\lieh_{t_X,t_Z}$ generated by the $Z-$type terms of $H_{t_X,t_Z}.$
+The \emph{weight spaces} are the simultaneous eigenspaces
+of the operators in the Cartan subalgebra. These
+eigenspaces are labeled by what we called syndromes previously,
+and these are all one dimensional because the span of $R_X$ does
+not intersect the kernel of $R_Z.$
+Therefore the representation of 
+$\lie_{t_X,t_Z}$ on $\Complex[\Frd]$ is irreducible.
+
+Note that a decomposition of a Lie algebra
+into disjoint (apart from zero)
+ideals will give a direct sum decomposition of
+the Lie algebra.
+Also, any irreducible representation of a direct sum of Lie algebras can
+be considered as the tensor product of irreducible representations of the
+individual summands.
+This is key to the numerical algorithms below:
+%when the Lie algebra $\lie_{t_X,t_Z}$ can be writt
+we examine the ideals generated by
+the terms in the Hamiltonian block $H_{t_X,t_Z}.$
+Each such ideal corresponds to a direct summand of $\lie_{t_X,t_Z}$ 
+and so the spectrum of  $H_{t_X,t_Z}$
+can be written as a sum over spectra of smaller gauge code Hamiltonians
+corresponding to each ideal.
+%\todo{... formula?}
+%whose representation is a factor in a 
+
+% See also: \cite{Barnum2003} where they use theory of semi-simple
+% lie algebra representations to characterize entanglement.
 
 \subsection{Ideal structure of gauge codes}
 
@@ -1146,7 +3347,7 @@ the terms $X_{2i}X_{2i+1}$ and $Z_{2i+1}Z_{2i+2}$
 generate one ideal, and the other ideal comes from switching $X$ and $Z.$
 
 We next examine the Lie algebra ideal structure of the gauge color code.
-Two faces operators, of $X$ and $Z$ type,
+Two faces operators, of $X$-type and $Z$-type,
 will anti-commute only when
 they intersect on a single vertex.
 This only happens when such faces have disjoint coloring.
@@ -1157,7 +3358,7 @@ Here we show an example of this in the $n=39$ model:
 There are three of these arrangements,
 each corresponding to the three ways of
 partitioning the set of colors into two sets of two.
-It follows that $\mathfrak{g}_{t_X,t_Z}$ 
+It follows that $\lie_{t_X,t_Z}$ 
 is the direct sum of 6 disjoint ideals,
 and specifically, that each Hamiltonian term in $H_{t_X,t_Z}$
 lies in a single one of these ideals.
@@ -1168,7 +3369,7 @@ diagonalization numerical results below.
 %The (bare) logical operators are derived in \cite{Bombin2015single} proposition 23.
 %gauge fixing: \cite{Bombin2015}...
 %error correction: \cite{Brown2015fault}
-%equivelance to toric: \cite{Kubica2015unfolding}
+%equivalence to toric: \cite{Kubica2015unfolding}
 
 %A complex lie algebra is the direct sum of simple ideals iff it is semisimple
 %http://math.stackexchange.com/questions/405261/a-complex-lie-algebra-is-the-direct-sum-of-simple-ideals-iff-it-is-semisimple
@@ -1178,6 +3379,170 @@ diagonalization numerical results below.
 
 %\todo{XXX How do ideals in the entire gauge group carry over into the semi-simple parts?}
 
+\subsection{Lie algebra classification}
+
+Here we explicitly compute decompositions of $\lie_{0,0}$
+into the direct sum of simple Lie algebras.
+First we review the classificiation of simple Lie algebras.
+
+Let $n$ be the rank of a simple lie algebra $\mathfrak{g}.$
+This is the dimension of the Cartan subalgebra $\mathfrak{h}.$
+%This $n$ is also the subscript on the following Dynkin diagrams. 
+%Dynkin used these to classify simple Lie algebras in 1947.
+%The Cartan subalgebra $\mathfrak{h}$ is a maximal abelian Lie subalgebra 
+%of $\mathfrak{g}.$
+
+%Simple Lie algebras have connected Dynkin diagrams.
+The simple Lie algebras are classified into four infinite series
+$A_n, B_n, C_n, D_n$ as well as five other exceptional Lie
+algebras that we will not need.
+
+The $A_n$ series can be
+constructed as 
+$\mathfrak{sl}_{n+1}$ which are the traceless $(n+1)\times (n+1)$ matrices. 
+Therefore the algebra dimension is $n^2 + 2n.$
+%Number of roots is $n(n+1).$
+
+For $n\ge 2$ the $B_n$ series 
+comes from the Lie algebras
+$\mathfrak{so}_{2n+1}$.
+These can be constructed as $(2n+1)\times(2n+1)$ matrices
+in block form 
+$$
+\left(\begin{array}{lll}
+P & Q & T\\
+R & S & U\\
+V & W & 0\\
+\end{array}\right)
+$$
+with $Q,R$ anti-symmetric and 
+$P^{\top}=-S,T=-W^{\top},U=-V^{\top}.$
+This algebra therefore has dimension $2n^2 + n.$
+%Number of roots is $2n^2,$ number of short roots $2n.$
+
+For $n\ge 3$ the $C_n$ series
+comes from the Lie algebras
+$\mathfrak{sp}_{2n}$.
+These can be constructed as $2n\times2n$ matrices
+in block form 
+$$
+\left(\begin{array}{ll}
+P & Q \\
+R & S
+\end{array}\right)
+$$
+with 
+$Q,R$ symmetric and $P^{\top}=-S.$
+It follows that this algebra has dimension $2n^2 + n.$
+%Number of roots is $2n^2,$ number of short roots $2n(n-1).$
+
+For $n\ge 4$ the $D_n$ series
+is $\mathfrak{so}_{2n}$.
+These can be constructed as $2n\times2n$ matrices
+in block form 
+$$
+\left(\begin{array}{ll}
+P & Q \\
+R & S
+\end{array}\right)
+$$
+with $Q,R$ anti-symmetric and $P^{\top}=-S.$
+Therefore this algebra has dimension $2n^2 - n.$
+%Number of roots is $2n(n-1).$
+
+%For $n\ge 1:$
+%  \begin{tikzpicture}[scale=.4]
+%    \draw (-1,0) node[anchor=east]  {$A_n$};
+%    \foreach \x in {0,...,5}
+%    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
+%    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
+%    \foreach \y in {1.15,...,4.15}
+%    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
+%  \end{tikzpicture}
+%
+%For $n\ge 2:$
+%  \begin{tikzpicture}[scale=.4]
+%    \draw (-1,0) node[anchor=east]  {$B_n$};
+%    \foreach \x in {0,...,4}
+%    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
+%    \draw[xshift=5 cm,thick,fill=black] (5 cm, 0) circle (.3 cm);
+%    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
+%    \foreach \y in {1.15,...,3.15}
+%    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
+%    \draw[thick] (8.3 cm, .1 cm) -- +(1.4 cm,0);
+%    \draw[thick] (8.3 cm, -.1 cm) -- +(1.4 cm,0);
+%  \end{tikzpicture}
+%
+%For $n\ge 3:$
+%  \begin{tikzpicture}[scale=.4]
+%    \draw (-1,0) node[anchor=east]  {$C_n$};
+%    \foreach \x in {0,...,4}
+%    \draw[xshift=\x cm,thick,fill=black] (\x cm,0) circle (.3cm);
+%    \draw[xshift=5 cm,thick] (5 cm, 0) circle (.3 cm);
+%    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
+%    \foreach \y in {1.15,...,3.15}
+%    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
+%    \draw[thick] (8.3 cm, .1 cm) -- +(1.4 cm,0);
+%    \draw[thick] (8.3 cm, -.1 cm) -- +(1.4 cm,0);
+%  \end{tikzpicture}
+%
+%For $n\ge 4:$
+%  \begin{tikzpicture}[scale=.4]
+%    \draw (-1,0) node[anchor=east]  {$D_n$};
+%    \foreach \x in {0,...,4}
+%    \draw[xshift=\x cm,thick] (\x cm,0) circle (.3cm);
+%    \draw[xshift=8 cm,thick] (30: 17 mm) circle (.3cm);
+%    \draw[xshift=8 cm,thick] (-30: 17 mm) circle (.3cm);
+%    \draw[dotted,thick] (0.3 cm,0) -- +(1.4 cm,0);
+%    \foreach \y in {1.15,...,3.15}
+%    \draw[xshift=\y cm,thick] (\y cm,0) -- +(1.4 cm,0);
+%    \draw[xshift=8 cm,thick] (30: 3 mm) -- (30: 14 mm);
+%    \draw[xshift=8 cm,thick] (-30: 3 mm) -- (-30: 14 mm);
+%  \end{tikzpicture}
+
+\subsection{A table of gauge code Lie algebras}
+
+Using brute-force computation
+we now find the dimension of the ideals in $\lie_{0,0}$
+and therefore which simple Lie algebra these correspond to.
+Note that here we switch back to
+using $n$ to denote the number of qubits,
+which in general is not the rank of the Lie algebra.
+\begin{center}
+\begin{tabular}{ l|c|c|c|l } 
+model &\ $n$\ &\ $r$\ &\ $t_X$\ & $\mathfrak{g}_{t_X,0}$   \\
+\hline
+%    1D $XY$    &  7 &  6 & 0 & $D_7$   \\
+%             &  8 &  6 & 0 & $D_4\oplus D_4$   \\
+     1D $XY$  &  9 &  8 & 0 & $D_9$   \\
+             & 10 &  8 & 0 & $D_5\oplus D_5$   \\
+             & 11 &  10 & 0 & $D_{11}$   \\
+             & 12 &  10 & 0 & $D_6\oplus D_6$   \\
+\hline
+    1D Ising & $4,...,16$  & $n-1$  & 0  & $D_n$   \\
+\hline
+    2D compass & 9 & 4 & 0 &  $A_{15}$  \\
+            & 16 & 9 & 0 & $D_{256}$ \\
+\hline
+    3D gauge color & 15 & 6  & 0 & $6A_1$  \\
+                & 39 & 18 & 0 & $6A_{7}$ \\
+                & 65 & 32 & 0 & $4A_{31}\oplus 2A_{63} $  \\
+\end{tabular}
+\end{center}
+
+This verifies the ideal decompositions we found in the
+previous section, and also corroborates the large
+amount of symmetry found with the orbigraph method.
+For example, the $S_6$ symmetry of
+the $n=15$ gauge color code corresponds to
+%permutations of the six $\mathfrak{sl}_2$ ideals.
+permutations of the six $A_1$ ideals.
+
+There is a remaining mystery of where
+the extra $\Z_2$ symmetry of the 2D compass model is coming from.
+This symmetry was found with the orbigraph method in section~\ref{OrbigraphTable}.
+%It would be interesting if this symmetry turns out to be an element
+%of the Weyl group of the Lie algebra $\lie_{t_X,0}.$
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -1201,9 +3566,13 @@ The eigenvalue closest to $\lambda_1(H_{0,0})$ is marked
 with a tick, along with the value of the gap, $\lambda_1-\lambda_2.$
 We only show the results for a single frustrated
 stabilizer generator,
+%\danbrowne{What is a frustrated stabiliser? You haven't explained what this is or how it is relevant.}
 as it was confirmed numerically that 
+%\danbrowne{Can you confirm something like this numerically? Or is a weaker statement true?}
 adding further frustrated stabilizers never 
 produces a better candidate for $\lambda_2.$
+(This involved performing exact diagonalization on 
+the top eigenvalues of every $H_{t_X,0}$ block in the Hamiltonian.)
 Also, we only show non-isomorphic stabilizer generators,
 under the lattice symmetry of the model.
 We use the iterative solvers in software library 
@@ -1303,7 +3672,7 @@ for each Hamiltonian block $H_{t_X,0}$
 of the 3D gauge color code models of sizes $n=15,$ $n=65$ and $n=175.$
 This gap is defined as $\lambda_1(H) - \lambda_1(H_{t_X,0}).$
 Each point is colored according to the weight of the
-frustrated stabilizer.
+frustrated stabilizer generator.
 }
 \label{PicGapStabs}
 \end{center}
@@ -1313,12 +3682,20 @@ The gap of the 3D gauge color code is clearly far more
 robust than the other models, see Figure \ref{PicGap}.
 %This is solely due to the geometry of the code...
 It does decrease with $n$, but note also that the
-stabilizers in the code are also growing.
-%They do not get any bigger after this.
-For larger codes in this family the stabilizers do not get
-bigger than weight at most 24.
+stabilizers in the code are also growing, up to weight 24.
 To emphasize this point we show in Figure \ref{PicGapStabs}
 the ground eigenvalues of all of these blocks $H_{t_X,0}.$
+For larger codes in this family the stabilizers do not get
+bigger than weight 24.
+%They do not get any bigger after this.
+It is not clear to what extent these results are
+representative of larger code sizes, but we
+can already see from Figure \ref{PicGapStabs} 
+evidence that 
+the weight of the frustrated stabilizer generator plays a more
+important role than the size of the code itself.
+
+%\danbrowne{Does this mean that small codes are not representative of generic codes?}
 
 There are two main points to make about these numerics.
 The first is that the gap of the compass model 
@@ -1342,15 +3719,28 @@ This would suggest that if this is the mechanism for
 gapless behaviour that the gauge color model may
 be gapped.
 
+The above numerics reach the limit of presently available 
+computational resources.
+To find eigenvalues for each Hamiltonian block $H_{t_X,0}$
+%and for the compass code and gauge color codes we found ...)
+%For simulation purposes, these numerics are constrained by
+we need to operate on wavefunctions with $2^r$ real coefficients.
+The iterative solvers in {\tt SLEPc} need to store at least two,
+but ideally more, of these wavefunctions.
+For $r=32$ this is about 32 Gigabytes for one wavefunction (using double
+precision coefficients) and so this value for $r$ is roughly the
+upper limit on these numerical techniques.
+Without decomposing the gauge color code into six disjoint ideals
+it would be impossible to obtain the results for the $n=175$ code,
+as this code has $r=94$.
+%\danbrowne{Very nice results. Why did you stop at n=175? What computational resources were required to achieve that?}
+
 \section{Cheeger cuts}
 
-In this final section 
+In this final section of Chapter 2 
 we give some heuristic
 arguments for why the size of the stabilizers is
-related to the gap of the code. 
-%This does not lead to 
-%definitive conclusions. It appears that much more 
-%work is required.
+related to the gap of the Hamiltonian. 
 
 The Perron-Frobenius structure theory places
 strong constraints on the first and second
@@ -1360,7 +3750,8 @@ the first eigenvector has all positive entries,
 and therefore all vectors orthogonal to the first
 eigenvector will have both positive and negative entries.
 In general, the set of edges of $\Gamma_{t_X}$ where
-such a vector changes sign we call a Cheeger cut.
+such a vector changes sign we call a Cheeger cut 
+\cite{Cheeger1970,Chung1997}.
 (We ignore the possibility that this vector
 may have zero entries.)
 The Cheeger cut associated to the second eigenvector
@@ -1392,7 +3783,7 @@ and $U$ is a diagonal potential energy term.
 For $d\gg 1$, the largest
 eigenvalue is $\lambda_1 \cong \frac{5}{2}$.
 The corresponding eigenvector $\ket{v_1}$
-has all positive components that
+has all positive entries that
 decay exponentially away from the well sites
 at $\ket{1}$ and $\ket{d}:$
 $$
@@ -1471,7 +3862,7 @@ but it is exponentially small.
 %In summary, we note the important
 %features of this model.
 %The groundstate wavefunction has all
-%positive components, which implies
+%positive entries, which implies
 %that the size of the gap is controlled
 %by the ``weight'' of a cut.
 %Also, we are hinting at the role
@@ -1494,7 +3885,7 @@ that is, one for every $s_X\in \Span{S_X}.$
 This is clear from examining the basis vectors for $\Gamma_{t_X}.$
 These are 
 $$
-    v S_X + u R_X + t_X, \smbox{where} v\in \Field_{m_X}, u\in\Frd
+    \ket{v S_X + u R_X + t_X}, \smbox{where} v\in \Field_{m_X}, u\in\Frd
 $$
 and those that satisfy the most $G_Z$ terms are
 precisely those with $u=0.$
@@ -1502,7 +3893,7 @@ precisely those with $u=0.$
 We already know this is either the second eigenvector of $H_{0,0}$
 or otherwise the first eigenvector of $H_{t_X,0}$ for some $t_X \ne 0.$
 To relate this to the Perron-Frobenius theory we note the 
-decomposition:
+decomposition from Lemma 2.6:
 $$
     \Gamma_{t_X} = \bigoplus_{t_Z\in\Span{T_Z}} H_{t_X, t_Z}.
 $$
@@ -1513,7 +3904,7 @@ We focus on $\Gamma_0.$
 This must contain the second eigenvector of $H$ by weak self-duality of the code.
 %The matrices $H_{0,t_Z)}$ are Perron-Frobenius (by a change of basis)
 %and so the first eigenvector $v_1(H_{0,t_Z})$ can be taken to be positive.
-$X$ type stabilizers $s_X\in S_X$ act on the $0,t_Z$ irreps in $\Gamma_0$
+$X$-type stabilizers $s_X\in S_X$ act on the $0,t_Z$ irreps in $\Gamma_0$
 by $\pm 1$ according to the commutator $[[s_X, t_Z]].$
 Suppose the second eigenvector of $H$ lives in
 $H_{0,t_Z}$ for $t_Z\ne 0$. 
@@ -1586,7 +3977,7 @@ v_2 = \left( \begin{array}{l}
 x\\
 y\end{array} \right)\quad
 $$
-with $x\ge 0$ and $y\le 0,$ component-wise.
+with $x\ge 0$ and $y\le 0,$ entry-wise.
 Let the blocks of $\Ham$ under the same partition be:
 $$
 \Ham = \left( \begin{array}{ll}
@@ -1616,6 +4007,108 @@ $$
 %For any unit vector $v$ orthogonal to the top eigenspace of $\Ham$ we
 %have $v^\top \Ham v \le \lambda_2.$
 
+\section{Discussion}
+
+%\danbrowne{Needs a concluding section summarising results and discussing open questions and potential research directions. }
+
+The goal of this chapter is to understand the spectra of
+certain frustrated qubit Hamiltonians. Of particular interest is
+to understand how 
+the gap between the first two eigenvalues behaves as we 
+increase the number of qubits.
+For a system to maintain a topologically ordered groundstate
+we would expect this gap to be bounded away from zero, or ``gapped''.
+
+The numerical results obtained show some evidence for
+this gapped behaviour for the 3D gauge color code Hamiltonian.
+To get these numerics we rely on several key results.
+The first is to decompose the Hamiltonian into a direct sum
+of operators labelled by stabilizer eigenvalues.
+This is essentially group representation theory as applied to
+gauge codes.
+The second result was obtained using Perron-Frobenius theory, as the
+Hamiltonians of interest are stoquastic.
+This theory shows where the first and second eigenvalue
+is to be found in the block decomposition of the Hamiltonian
+which leads to a polynomial reduction in the numeric workload.
+Also, the Perron-Frobenius theory gives geometric reasons as to
+why the size of stabilizers is related to the gap.
+
+The third main result of this chapter is the decomposition of
+each Hamiltonian block into mutually commuting ``pieces''.
+This is explained using the theory of finite-dimensional semi-simple
+Lie algebras.
+In the case of the 3D gauge color code Hamiltonian, this
+decomposition yields an exponential reduction in 
+the numeric workload, by dividing the number of qubits by 6.
+
+Finally, the connection between stabilizer size and the gap is further 
+investigated via the idea of the Cheeger cut. 
+This builds on the Perron-Frobenius theory results.
+If the groundstate wavefunction is sufficiently concentrated
+into potential wells, then we can construct an excited state
+that has eigenvalue close to the ground eigenvalue.
+And the distance between potential wells is controlled by
+the size of stabilizers.
+The conjecture we would like to make would state 
+how this spectral gap is controlled by the size of the frustrated
+stabilizers: large stabilizers lead to gappless behaviour while
+small stabilizers maintain a gap.
+However, it is not clear how to formulate this conjecture, and
+even less clear how to prove it. 
+More numerics need to be performed, with the specific
+goal of understanding the shape of the groundspace wavefunction,
+and how this relates to the geometry of the underlying code.
+
+%In section 1 we apply general principles of group
+%representation theory to block diagonalize Hamiltonians.
+%The terms of the Hamiltonian generate a group (by multiplication),
+%and we also have a ....
+%\todo{fixme}
+%
+%In summary, we have the complete representation
+%theory for $CSS$ gauge code Hamiltonians.
+%
+%analyse spectrum of weakly self-dual $CSS$ gauge code
+%Hamiltonians using Perron-Frobenius theory.
+%
+%It is clear from numerics that nothing as simple as the proto-fact
+%holds. Roughly speaking, larger stabilizers lead to gapless behaviour,
+%but 
+%
+%more models need to be considered,  numerics obtained,
+%including codes chosen from random ensembles.
+%
+%The Cheeger inequalities are a first attempt to
+%relate the gap to the geometric structure of the
+%graph $\Gamma$, in particular the size of stabilizers.
+%This analysis is too weak to show any result, and so
+%further work is needed.
+%If this approach is to succeed, a much sharper
+%bound on the shape of groundspace wavefunctions is needed.
+%
+%The perturbation theory for stabilizer Hamiltonians has good
+%results, we would also want something like this for gapped
+%gauge code Hamiltonians, to establish physicality.
+%
+%We leave as an open problem 
+%to extend the representation theory of
+%CSS gauge codes in section 2.4 to arbitrary gauge codes
+%(not necessarily satisfying the CSS condition).
+%We do not need this in the present work.
+%
+%On an algebraic level, there are plenty of other questions
+%to ask. Such as monoid representation theory, locally commuting
+%projector Hamiltonians, Kitaev's quantum double construction...
+%
+%Can you hear the sound of a semi-simple Lie algebra?
+
+% The spin transform for the symmetry invariant basis involves
+% non-local spin operators, and results in another gauge code
+% Hamiltonian (in general with fewer qubits) for each block. 
+% Is there anything further to be learned from examining these spin transforms,
+% or the resulting Hamiltonian operators?
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -1640,7 +4133,36 @@ $$
 %
 %FAIL
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+%\subsection{Perturbation of the Perron vector}
+%
+%Here we note the relation of
+%perturbations to the Perron-Frobenius theory.
+%
+%Let $A$ be non-negative irreducible $n\times n$ matrix.
+%Let $v\ne 0$ be a non-negative $n$ vector, and $B = A + \ket{e_i}\bra{v}.$
+%Then 
+%$$
+%\frac{y_i}{x_i} > \frac{y_j}{x_j} \ \ \mbox{for}\ \ j \ne i,
+%$$
+%where $x, y$ are the Perron eigenvectors of $A, B$ respectively
+%\cite{Elsner1982}.
+%
+%Let $H(t)$ be non-negative irreducible matrix, continuously
+%differentiable wrt $t.$
+%Let $v(t)$ and $\lambda(t)$ be the Perron eigenvector and value of $H(t)$
+%with $\braket{v}{v}=1.$
+%Then
+%$$
+%    \lambda' = \bra{v}H'\ket{v}
+%$$
+%and
+%$$
+%    \ket{v'} = -(H-\lambda)^{-1}(H' - \lambda')\ket{v}.
+%$$
+%where $(H-\lambda)^{-1}$ is the Moore-Penrose inverse of $H-\lambda.$ See \cite{Meyer1988}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1710,18 +4232,6 @@ $$
 %These operators also form a group and would
 %have a corresponding representation theory.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-
-\section{Random codes}
-
-Here we consider random ensembles of CSS gauge codes and
-the spectra of the corresponding Hamiltonian.
-
-
-
 
 %% CUT HERE
 %\appendix
@@ -1729,12 +4239,10 @@ the spectra of the corresponding Hamiltonian.
 
 %\label{appendix}
 
-\bibliography{refs}{}
+
+\bibliography{refs3}{}
 \bibliographystyle{abbrv}
 
-% journal: Foundations of Computational Mathematics
 
 
 \end{document}
-
-
