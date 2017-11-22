@@ -1,15 +1,4 @@
 
-19/4/17
-=======
-
-Anton Kapustin: 
-https://www.youtube.com/watch?v=UQYQMLterRs&app=desktop
-    TQFT's classify gapped phases of quantum systems
-    Dijkgraaf-Witten 
-    2-Groups
-
-flat G-connection == G-bundle
-
 
 
 18/1/17

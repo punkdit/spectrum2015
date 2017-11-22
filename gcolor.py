@@ -73,7 +73,7 @@ def test():
                 graph.add_edge(i, j)
 
     equs = nx.connected_components(graph)
-    assert len(equs) == 3, len(equs)
+    assert len(list(equs)) == 3, len(equs)
     assert bipartite.is_bipartite(graph)
 
     color = bipartite.color(graph)
