@@ -197,19 +197,19 @@ the operators in a quantum error correcting code.
 When these operators commute, the code is known as a stabilizer code.
 When they don't commute, the code is known as a subsystem code or gauge code.
 The resulting Hamiltonian groundstate becomes frustrated.
-For such a Hamiltonian to have any ability to act as a quantum
-code we would expect a spectral gap between the
+For such a Hamiltonian to have any ability to act as 
+a quantum memory we would expect a spectral gap between the
 groundspace and first excited states.
 The goal of this paper is to study this spectral gap.
 
-In Section ??? we show graphical depictions of
+In Section \ref{Sec2} we show graphical depictions of
 some simple Hamiltonions and introduce the action of
 the Pauli $X$ and $Z$ operators.
-In Section ??? we study the group representation theory
+In Section \ref{Sec3} we study the group representation theory
 of subgroups of the (real) Pauli group on $n$ qubits.
-We apply this to the 2D compass model and the
-Kitaev honeycomb model in section ???. 
-In Section ??? we find the 
+%We apply this to the 2D compass model and the
+%Kitaev honeycomb model in section \ref{Sec2} 
+In Section \ref{Sec37} we find the 
 irreducible representations of an arbitrary CSS gauge (subsystem) code.
 This is a new result, and involves solving a quadratic 
 system of equations over a finite field.
@@ -218,25 +218,24 @@ In the computational basis,
 CSS gauge code Hamiltonians have positive off-diagonal
 entries and so can be viewed as the adjacency matrix
 of a weighted graph.
-This motivates the ideas in Section ???, where 
+This motivates the ideas in Section \ref{Sec5}, where 
 we use Perron-Frobenius theory to
 describe the low energy spectrum of such Hamiltonians.
 These are new results.
-In Section ??? we introduce the 3D gauge color code Hamiltonian.
-Sections ??? and ??? discuss further ideas of
-symmetry in these Hamiltonians: the orbigraph and
-the structure of finite dimensional semi-simple Lie algebras.
-Using this we find that the gauge color code Hamiltonian
-decomposes into six mutually commuting ideals.
+
+In Section \ref{Sec44} we introduce the 3D gauge color code Hamiltonian.
+We find that the gauge color code Hamiltonian
+decomposes into six mutually commuting ideals in Section \ref{Sec45}.
 This gives an exponential reduction in the numerical
 difficulty of exactly diagonalizing this Hamiltonian,
-results of which we present in Section ???.
+results of which we present in Section \ref{Sec6}.
 These numerics show some evidence of a spectral
 gap, which is contrasted against models that are known
 to be gapless: the two and three dimensional compass model,
 the one dimensional $XY$-model and the one dimensional
 transverse field Ising model.
-The paper concludes with Section ??? where
+
+The paper concludes with Section \ref{Sec7} where
 we suggest a relation between the size of
 stabilizers and the gapped nature of the Hamiltonian.
 This is further application of the Perron-Frobenius 
@@ -248,7 +247,7 @@ theory in the context of Cheeger inequalities.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-\section{Introduction}
+%\section{Introduction}
 
 Physicists often like to solve Hamiltonians 
 using a change of basis, or spin transform.
@@ -340,7 +339,7 @@ is part of the story of topologically ordered phases
 %correcting quantum memory seems to be hard to achieve in 2D even in the presence of
 %effective long-range interactions [LCYPP15].
 
-\section{Some motivating examples}
+\section{Some motivating examples}\label{Sec2}
 
 %\underline{\bf Example \ritem{Ex1}.}
 \doexample{\ritem{Ex1}.}
@@ -517,8 +516,7 @@ $$
 \end{array} \right) \otimes I
 $$
 This block diagonal form will be worked out for
-general gauge group $G$ below and summarized in Section ????.
-\todo{fixme}
+general gauge group $G$ below and summarized in Section \ref{Sec35}.
 \tombstone
 
 %\todo{XXX and now for another formula}
@@ -528,9 +526,9 @@ general gauge group $G$ below and summarized in Section ????.
 %  &= (I+\Zt_2)\Xt_4 + (I+\Zt_3) \Zt_4.
 %\end{align*}
 
-\section{Gauge code Hamiltonians}
+\section{Gauge code Hamiltonians}\label{Sec3}
 
-\subsection{The Pauli group}
+\subsection{The Pauli group}\label{Sec31}
 
 The Pauli group $\Pauli_1$ is normally 
 defined as a set of matrices closed under
@@ -648,7 +646,7 @@ is defined as the following tensor product of $2\times 2$ matrices:
 \right.
 \end{align*}
 
-\subsection{Subgroups of the Pauli group}
+\subsection{Subgroups of the Pauli group}\label{Sec32}
 
 We now define an {\it $n-$qubit gauge group} to be 
 any non-abelian subgroup $G$ of $\Pauli_n,$
@@ -719,7 +717,7 @@ immediately see how $L$ and $T$ also form a gauge group.
 
 %\section{Gauge group representations}\label{GroupReps}
 
-\subsection{Representations of the Pauli group}
+\subsection{Representations of the Pauli group}\label{Sec33}
 
 We now define the
 {\it Pauli representation} 
@@ -813,14 +811,14 @@ and a single $2^n$-dimensional irrep.
 Summing the squares of the dimensions
 shows that we have a complete set of irreps of $\Pauli_n.$
 
-%\subsection{Representations of stabilizer groups}
+%\subsection{Representations of stabilizer groups}\label{Sec2}
 %
 %Any abelian subgroup $\Stab\subset \Pauli_n$
 %that does not contain $-I$ we call a stabilizer group.
 %The reason for this name is...
 
 
-\subsection{Representations of gauge groups}
+\subsection{Representations of gauge groups}\label{Sec34}
 
 %Our next job will be to find the irreps of {\it subgroups} of $\Pauli_n.$
 Although $\rho_{\mathrm{pauli}}$
@@ -948,7 +946,7 @@ $$
 %physical qubits to encoded qubits.
 
 
-\subsection{Block diagonalizing the Hamiltonian}
+\subsection{Block diagonalizing the Hamiltonian}\label{Sec35}
 
 The Hamiltonian of interest is 
 an operator $\Ham:\Complex[2^n]\to\Complex[2^n]$:
@@ -999,7 +997,7 @@ as the corresponding Pauli linear operators.
 %
 
 
-%\subsection{The 1D models}
+%\subsection{The 1D models}\label{Sec2}
 %
 %We define the \emph{Jordan-Wigner presentation} of $\Pauli_n$
 %using the following set of $2n$ independent generators \cite{Jordan1928}:
@@ -1025,7 +1023,7 @@ as the corresponding Pauli linear operators.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %\section{Representations over the finite field $\Field$}
-\subsection{Symplectic structure of CSS gauge codes}
+\subsection{Symplectic structure of CSS gauge codes}\label{Sec36}
 
 %This is a way of ``brute-forcing'' the representations when
 %we cannot find a way of writing them down in a closed form expression.
@@ -1313,7 +1311,7 @@ an $(L,S,T,R)$-decomposition of the gauge group.
 In general this will not be unique for
 any given gauge group.
 
-\subsection{CSS gauge code Hamiltonians}
+\subsection{CSS gauge code Hamiltonians}\label{Sec37}
 
 The complex Hilbert state space of our
 Hamiltonian has $2^n$ dimensions and we
@@ -1535,7 +1533,7 @@ theory for $CSS$ gauge code Hamiltonians.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-\section{Models}
+\section{Models}\label{Sec4}
 
 A CSS gauge code is \emph{self-dual} when the $X$-type and $Z$-type
 gauge generators are equal: $$G_X = G_Z.$$
@@ -1548,7 +1546,7 @@ $$
 $$
 where we write $P$ as an $n\times n$ permutation matrix.
 
-\subsection{$XY$-model}
+\subsection{$XY$-model}\label{Sec41}
 
 The $XY$-model \cite{Pfeuty1970}
 lives on a one dimensional chain of $n$ qubits.
@@ -1569,7 +1567,7 @@ For $n$ even, this model is exactly solvable,
 and the gap goes to zero
 as the system size grows \cite{Lieb1961}.
 
-\subsection{Transverse field Ising model}
+\subsection{Transverse field Ising model}\label{Sec42}
 
 For the one dimensional transverse field
 Ising model, we have 
@@ -1582,7 +1580,7 @@ $X$-type stabilizer and no logical operators.
 This model is also exactly solvable, with gap going to zero
 as the system size grows \cite{Pfeuty1970}.
 
-\subsection{Compass model}
+\subsection{Compass model}\label{Sec43}
 
 Here we consider the two-dimensional compass model \cite{Bacon2006}.
 We coordinatize the qubits on a square 
@@ -1611,7 +1609,7 @@ the square lattice of $l\times l$ qubits.
 
 \todo{3D compass model}
 
-\subsection{Gauge color code model}
+\subsection{Gauge color code model}\label{Sec44}
 
 The three dimensional gauge color code \cite{Bombin2015,Bombin2015single,Kubica2015}
 is a self-dual CSS gauge code. 
@@ -1691,7 +1689,7 @@ There is one $X/Z-$type logical operator and these
 are generated by
 $X/Z-$type operators supported on any region.
 
-\subsection{Ideal structure of gauge codes}
+\subsection{Commuting ideal structure of gauge codes}\label{Sec45}
 
 \todo{explain this without mentioning Lie algebras?}
 
@@ -1744,7 +1742,7 @@ diagonalization numerical results below.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-\section{Perron-Frobenius theory}
+\section{Perron-Frobenius theory}\label{Sec5}
 
 In this section we present 
 applications of Perron-Frobenius theory to finding bounds on the spectrum of
@@ -2186,7 +2184,7 @@ $t'_X\in\Span{T_X}, t'_Z\in\Span{T_Z}.$
 %\section{Spectra}
 %\label{spectra}
 
-\section{Numerical results}
+\section{Numerical results}\label{Sec6}
 
 Here we show tables for the first and
 second eigenvalues of the compass and gauge color code models.
@@ -2366,7 +2364,7 @@ it would be impossible to obtain the results for the $n=175$ code,
 as this code has $r=94$.
 
 
-\section{Cheeger cuts}
+\section{Cheeger cuts}\label{Sec7}
 
 In this final section of this paper 
 we give some heuristic
@@ -2389,7 +2387,7 @@ The Cheeger cut associated to the second eigenvector
 is particularly important, and we next show an
 example of how this cut relates to the gap.
 
-\subsection{The double well model is gapless}
+\subsection{The double well model is gapless}\label{Sec71}
 
 We consider a linear graph Hamiltonian
 with a ``double-well'' potential.
@@ -2503,7 +2501,7 @@ but it is exponentially small.
 %we consider.
 
 
-\subsection{The cut and symmetry}
+\subsection{The cut and symmetry}\label{Sec72}
 
 We now study 
 the cut associated to the second eigenvector of a 
@@ -2581,10 +2579,10 @@ Perhaps double well behaviour can still be imitated even without
 stabilizers: merely having a large region of almost-stabilizer
 behaviour (large shallow well) could be enough to send the gap to zero.
 
-There are also results that state that generic 
-local Hamiltonians are gapless \cite{Movassagh2016}.
+%There are also results that state that generic 
+%local Hamiltonians are gapless \cite{Movassagh2016}.
 
-\subsection{Cheeger inequalities}
+\subsection{Cheeger inequalities}\label{Sec73}
 
 We saw above how the Cheeger cut gives a variational ansatz
 for building a second eigenvector to the Hamiltonian and hence
@@ -2638,7 +2636,7 @@ $$
 %have $v^\top \Ham v \le \lambda_2.$
 
 
-\section{Discussion}
+\section{Discussion}\label{Sec8}
 
 
 The goal of this paper is to understand the spectra of
@@ -2659,18 +2657,16 @@ gauge codes.
 The second result was obtained using Perron-Frobenius theory, as the
 Hamiltonians of interest are stoquastic.
 This theory shows where the first and second eigenvalue
-is to be found in the block decomposition of the Hamiltonian
+is to be found in the block decomposition of the Hamiltonian,
 which leads to a polynomial reduction in the numeric workload.
-Also, the Perron-Frobenius theory gives geometric reasons as to
-why the size of stabilizers is related to the gap.
+%Also, the Perron-Frobenius theory gives geometric reasons as to
+%why the size of stabilizers is related to the gap.
 
 The third main result of this paper is the decomposition of
-each Hamiltonian block into mutually commuting ``pieces''.
-This is explained using the theory of finite-dimensional semi-simple
-Lie algebras.
+each Hamiltonian block into mutually commuting ideals.
 In the case of the 3D gauge color code Hamiltonian, this
 decomposition yields an exponential reduction in 
-the numeric workload, by dividing the number of qubits by 6.
+the numeric workload, by dividing the number of qubits by six.
 
 Finally, the connection between stabilizer size and the gap is further 
 investigated via the idea of the Cheeger cut. 
@@ -2690,118 +2686,6 @@ More numerics need to be performed, with the specific
 goal of understanding the shape of the groundspace wavefunction,
 and how this relates to the geometry of the underlying code.
 
-%In section 1 we apply general principles of group
-%representation theory to block diagonalize Hamiltonians.
-%The terms of the Hamiltonian generate a group (by multiplication),
-%and we also have a ....
-%\todo{fixme}
-%
-%In summary, we have the complete representation
-%theory for $CSS$ gauge code Hamiltonians.
-%
-%analyse spectrum of weakly self-dual $CSS$ gauge code
-%Hamiltonians using Perron-Frobenius theory.
-%
-%It is clear from numerics that nothing as simple as the proto-fact
-%holds. Roughly speaking, larger stabilizers lead to gapless behaviour,
-%but 
-%
-%more models need to be considered,  numerics obtained,
-%including codes chosen from random ensembles.
-%
-%The Cheeger inequalities are a first attempt to
-%relate the gap to the geometric structure of the
-%graph $\Gamma$, in particular the size of stabilizers.
-%This analysis is too weak to show any result, and so
-%further work is needed.
-%If this approach is to succeed, a much sharper
-%bound on the shape of groundspace wavefunctions is needed.
-%
-%The perturbation theory for stabilizer Hamiltonians has good
-%results, we would also want something like this for gapped
-%gauge code Hamiltonians, to establish physicality.
-%
-%We leave as an open problem 
-%to extend the representation theory of
-%CSS gauge codes in section 2.4 to arbitrary gauge codes
-%(not necessarily satisfying the CSS condition).
-%We do not need this in the present work.
-%
-%On an algebraic level, there are plenty of other questions
-%to ask. Such as monoid representation theory, locally commuting
-%projector Hamiltonians, Kitaev's quantum double construction...
-%
-%Can you hear the sound of a semi-simple Lie algebra?
-
-% The spin transform for the symmetry invariant basis involves
-% non-local spin operators, and results in another gauge code
-% Hamiltonian (in general with fewer qubits) for each block. 
-% Is there anything further to be learned from examining these spin transforms,
-% or the resulting Hamiltonian operators?
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-
-%\subsection{The compass model is gapless}
-%
-%Although there is strong evidence that the gap dissapears as the lattice size
-%$l$ grows, it is still worthwhile considering the exact reasons for this.
-%
-%We use a variational argument to show that $\lambda_1(H_{t_X,0})$
-%is close to $\lambda_1(H_{0,0}).$
-%Given the similarity of the form of these two blocks, we
-%take the ground eigenvector $v_1$ of $H_{0,0}$ and apply it
-%to $H_{t_X,0}$. % where $t_X$ has low weight.
-%Recall that we identified the bases of these two Hamiltonian blocks.
-%\begin{align*}
-%    \lambda_1 - \lambda_2 &\le \bra{v_1}H_{0,0}\ket{v_1} - \bra{v_1}H_{t_X,0}\ket{v_1}  \\
-%            &= \bra{v_1}(H_{0,0} - H_{t_X,0})\ket{v_1}  \\
-%    &= \sum_{v\in\Frd} 2\bigl(w(G_Z R_X^\top v^\top + G_Z t_X^\top) -w(G_Z R_X^\top v^\top)\bigr) 
-%    |\braket{v}{v_1}|^2.
-%\end{align*}
-%
-%FAIL
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-
-%\subsection{Perturbation of the Perron vector}
-%
-%Here we note the relation of
-%perturbations to the Perron-Frobenius theory.
-%
-%Let $A$ be non-negative irreducible $n\times n$ matrix.
-%Let $v\ne 0$ be a non-negative $n$ vector, and $B = A + \ket{e_i}\bra{v}.$
-%Then 
-%$$
-%\frac{y_i}{x_i} > \frac{y_j}{x_j} \ \ \mbox{for}\ \ j \ne i,
-%$$
-%where $x, y$ are the Perron eigenvectors of $A, B$ respectively
-%\cite{Elsner1982}.
-%
-%Let $H(t)$ be non-negative irreducible matrix, continuously
-%differentiable wrt $t.$
-%Let $v(t)$ and $\lambda(t)$ be the Perron eigenvector and value of $H(t)$
-%with $\braket{v}{v}=1.$
-%Then
-%$$
-%    \lambda' = \bra{v}H'\ket{v}
-%$$
-%and
-%$$
-%    \ket{v'} = -(H-\lambda)^{-1}(H' - \lambda')\ket{v}.
-%$$
-%where $(H-\lambda)^{-1}$ is the Moore-Penrose inverse of $H-\lambda.$ See \cite{Meyer1988}.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-
-
-%\subsection{Discussion}
 %
 %In \cite{AlShimary2010}, they 
 %build a kind of graph laplacian from a known ground state:
@@ -2837,22 +2721,6 @@ and how this relates to the geometry of the underlying code.
 %Suzuki-Trotter expansions
 %https://en.wikipedia.org/wiki/Baker%E2%80%93Campbell%E2%80%93Hausdorff_formula
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-
-%\section{Outlook}
-%
-%A family of topological subsystem codes,
-%from the code perspective  \cite{Bombin2010,Bombin2014,Suchara2011},
-%from the cond-mat (integrals of motion!) perspective:
-%\cite{Kargarian2010,Bombin2009}
-%Topological subsystem Codes: \cite{Suchara2011}
-%Structure of 2D Topological Stabilizer Codes: \cite{Bombin2014}
-%Gauge color codes, gauge fixing: \cite{Bombin2015}
-%Gauge color codes, single shot: \cite{Bombin2015single}
-%
 %A generalization of this is the 
 %monomial formalism \cite{Van2011}. 
 %These operators also form a group and would
@@ -2860,7 +2728,6 @@ and how this relates to the geometry of the underlying code.
 % Also: LCPC Hamiltonians
 
 
-%\appendix
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
