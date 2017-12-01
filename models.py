@@ -176,32 +176,6 @@ def build_compass3(li, lj=None, lk=None):
     return Gx, Gz, Hx, Hz
 
 
-def build_xy(n):
-
-    m = n
-    Gx = zeros2(m, n)
-    Gz = zeros2(m, n)
-    for i in range(m):
-        Gx[i, i] = 1
-        Gx[i, (i+1)%n] = 1
-        
-        Gz[i, i] = 1
-        Gz[i, (i+1)%n] = 1
-
-    if n%2 == 0:
-        Hx = zeros2(1, n)
-        Hz = zeros2(1, n)
-    
-        Hx[:] = 1
-        Hz[:] = 1
-
-    else:
-        Hx = Hz = None
-
-
-    return Gx, Gz, Hx, Hz
-
-
 def build_random(n):
 
     weight = argv.get("weight", 3)
@@ -413,6 +387,32 @@ def build_hex(li, lj=None):
     return Gx, Gz, None, None
 
 
+def build_xy(n):
+
+    m = n
+    Gx = zeros2(m, n)
+    Gz = zeros2(m, n)
+    for i in range(m):
+        Gx[i, i] = 1
+        Gx[i, (i+1)%n] = 1
+        
+        Gz[i, i] = 1
+        Gz[i, (i+1)%n] = 1
+
+    if n%2 == 0:
+        Hx = zeros2(1, n)
+        Hz = zeros2(1, n)
+    
+        Hx[:] = 1
+        Hz[:] = 1
+
+    else:
+        Hx = Hz = None
+
+
+    return Gx, Gz, Hx, Hz
+
+
 def build_xy2(li, lj=None):
     if lj is None:
         lj = li
@@ -440,6 +440,52 @@ def build_xy2(li, lj=None):
         g[coords[i,   j+1]] = 1 
         g[coords[i+1, j]] = 1 
         g[coords[i+1, j+1]] = 1 
+        Gx.append(g)
+
+    Gx = array2(Gx)
+
+    Gz = Gx.copy()
+
+    return Gx, Gz, None, None
+
+
+def build_xy3(li, lj=None, lk=None):
+    if lj is None:
+        lj = li
+    if lk is None:
+        lk = li
+    n = li*lj*lk
+
+    keys = [(i, j, k) for i in range(li) for j in range(lj) for k in range(lk)]
+    coords = {}  
+    for i, j, k in keys:
+        for di in range(-li, li+1):
+          for dj in range(-lj, lj+1):
+            for dk in range(-lk, lk+1):
+              coords[i+di, j+dj, k+dk] = keys.index(((i+di)%li, (j+dj)%lj, (k+dk)%lk))
+
+    Gx = []
+    if argv.open:
+        idxs = range(li-1)
+        jdxs = range(lj-1)
+        kdxs = range(lk-1)
+    else:
+        idxs = range(li)
+        jdxs = range(lj)
+        kdxs = range(lk)
+
+    for i in idxs:
+     for j in jdxs:
+      for k in kdxs:
+        g = zeros2(n)
+        g[coords[i,   j,   k]] = 1 
+        g[coords[i,   j+1, k]] = 1 
+        g[coords[i+1, j,   k]] = 1 
+        g[coords[i+1, j+1, k]] = 1 
+        g[coords[i,   j,   k+1]] = 1 
+        g[coords[i,   j+1, k+1]] = 1 
+        g[coords[i+1, j,   k+1]] = 1 
+        g[coords[i+1, j+1, k+1]] = 1 
         Gx.append(g)
 
     Gx = array2(Gx)
@@ -642,15 +688,22 @@ def build(name=""):
         lj = argv.get('lj', l)
         Gx, Gz, Hx, Hz = build_hex(li, lj)
 
+    elif argv.xy:
+        n = argv.get('n', 4)
+        Gx, Gz, Hx, Hz = build_xy(n)
+
     elif argv.xy2:
         l = argv.get('l', 3)
         li = argv.get('li', l)
         lj = argv.get('lj', l)
         Gx, Gz, Hx, Hz = build_xy2(li, lj)
 
-    elif argv.xy:
-        n = argv.get('n', 4)
-        Gx, Gz, Hx, Hz = build_xy(n)
+    elif argv.xy3:
+        l = argv.get('l', 3)
+        li = argv.get('li', l)
+        lj = argv.get('lj', l)
+        lk = argv.get('lk', l)
+        Gx, Gz, Hx, Hz = build_xy3(li, lj, lk)
 
     elif argv.ising:
         n = argv.get('n', 4)
@@ -734,7 +787,8 @@ class Model(object):
         self.Qx = self.Rz.transpose() # backwards compat
 
     def __str__(self):
-        return "Model(Lx/z: %d, Gx: %d, Gz: %d, Hx: %d, Hz: %d, Rx/z: %d)" % (
+        return "Model(n=%d, Lx/z: %d, Gx: %d, Gz: %d, Hx: %d, Hz: %d, Rx/z: %d)" % (
+            self.n,
             len(self.Lx), len(self.Gx), len(self.Gz), 
             len(self.Hx), len(self.Hz), len(self.Rx))
 

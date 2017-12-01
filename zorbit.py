@@ -11,7 +11,7 @@ from scipy.sparse.linalg import eigs, eigsh
 from solve import shortstr, shortstrx, parse, eq2, dot2, zeros2, array2, identity2
 from solve import row_reduce, RowReduction, span, get_reductor
 from solve import u_inverse, find_logops, solve, find_kernel, linear_independent
-from solve import System, Unknown, pseudo_inverse
+from solve import System, Unknown, pseudo_inverse, enum2
 from solve import find_errors, find_stabilizers, check_commute
 
 from isomorph import Tanner, search, from_sparse_ham, search_recursive, Backtrack, from_ham
@@ -1199,6 +1199,160 @@ def do_chainmap(Gx, Gz):
     #print shortstrx(Qx, P, Qz)
 
 
+def minweight(Hz):
+    m, n = Hz.shape
+
+    best = None
+    weight = n
+    for u in enum2(m):
+        v = dot2(u, Hz)
+        w = v.sum()
+        if w==0:
+            continue
+        if w < weight:
+            weight = w
+            best = u
+    return best
+
+
+def minweightall(Hz):
+    m, n = Hz.shape
+
+    best = []
+    weight = n
+    for u in enum2(m):
+        v = dot2(u, Hz)
+        w = v.sum()
+        if w==0:
+            continue
+        if w < weight:
+            weight = w
+            best = [u]
+        elif w==weight:
+            best.append(u)
+    return best
+
+
+def find_ideals(Gx, Gz, Hx, Hz):
+    import networkx as nx
+    from models import build_model
+
+    model = build_model(Gx, Gz, Hx, Hz)
+    if argv.verbose:
+        print model
+        print
+    print(shortstrx(Hx, Hz))
+
+    Rx, Rz = model.Rx, model.Rz
+    Rxt = Rx.transpose()
+    Rzt = Rz.transpose()
+
+    Px, Pz = model.Px, model.Pz
+    Pxt = Px.transpose()
+    Pzt = Pz.transpose()
+
+    r, n = Rx.shape
+
+    assert eq2(dot2(Rx, Pxt), Rx)
+
+#    print shortstrx(Gx, Gz)
+#    print
+
+    PGx = dot2(Gx, Pxt)
+    PGz = dot2(Gz, Pzt)
+    
+#    print shortstrx(PGx, PGz)
+#    print
+
+    if 0:
+        ng = len(PGx)
+
+        graph = nx.Graph()
+        for i in range(ng):
+            graph.add_node(i)
+    
+        for i, gi in enumerate(PGx):
+            for j, gj in enumerate(PGz):
+                if (gi*gj).sum()%2:
+                    graph.add_edge(i, j)
+
+    mx = len(Gx)
+    mz = len(Gz)
+    graph = nx.Graph()
+    for i in range(mx+mz):
+        graph.add_node(i)
+
+    for ix in range(mx):
+        for iz in range(mz):
+            if (Gx[ix]*Gz[iz]).sum()%2:
+                graph.add_edge(ix, mx+iz)
+
+#    excite = argv.excite
+#    if type(excite) is int: 
+#        _excite = [0]*len(model.Tx)
+#        _excite[excite] = 1
+#        excite = tuple(_excite)
+#    #elif excite is None:
+#    print("excite:", excite)
+
+    equs = nx.connected_components(graph)
+    equs = list(equs)
+
+    print(model)
+    print("find_ideals:", len(equs))
+
+    models = []
+    for equ in equs:
+        equ = list(equ)
+        equ.sort()
+        print(equ)
+        gxs = []
+        gzs = []
+        for i in equ:
+            if i<mx:
+                gxs.append(Gx[i])
+            else:
+                gzs.append(Gz[i-mx])
+        _model = build_model(array2(gxs), array2(gzs))
+        print(_model)
+        U = solve(model.Hz.transpose(), _model.Hz.transpose())
+        _model.U = U
+        models.append(_model)
+
+    if argv.excite:
+        excites = minweightall(Hz)
+        #print("excite", excite)
+        print("excites", len(excites))
+    else:
+        excites = [None]
+
+    _excite = None
+    top = None
+    for excite in excites:
+        print("excite:", excite)
+        total = 0.
+        gaps = []
+
+        for _model in models:
+            #print(_model)
+            #print(shortstrx(U))
+            if excite is not None:
+                _excite = dot2(excite, _model.U)
+                #print(shortstrx(_excite))
+    
+            assert len(_model.Rx)<12
+            H = _model.build_ham(_excite) #weights=weights1)
+            vals, vecs = numpy.linalg.eigh(H)
+            vals = list(vals)
+            vals.sort(reverse=True)
+            total += vals[0]
+            gaps.append(vals[0]-vals[1])
+    
+        if top is None or total > top:
+            top = total
+        print("eval_1:", total)
+        print("eval_2:", total-min(gaps))
+    print("top:", top)
 
 
 def main():
@@ -1207,6 +1361,10 @@ def main():
     Gx, Gz, Hx, Hz = models.build()
 
     assert not argv.orbiham, "it's called orbigraph now"
+
+    if argv.find_ideals:
+        find_ideals(Gx, Gz, Hx, Hz)
+        return
 
     if argv.chainmap:
         do_chainmap(Gx, Gz)
