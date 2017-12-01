@@ -1,4 +1,8 @@
 
+1/12/17
+=======
+
+
 
 
 18/1/17
@@ -7,7 +11,7 @@
 
 self-dual code on 2d square lattice. gauge ops are the squares
 
-time ./zorbit.py quad l=6 nev=5 slepc 
+time ./zorbit.py xy2 l=6 nev=5 slepc 
 (2, 36) (36, 36)
 n = 36
 Lx Lz:
@@ -35,7 +39,7 @@ EPSSolve
 /\       29.211102            4.30912e-05
  ---------------------- --------------------
 
-time ./zorbit.py quad l=6 nev=5 slepc excite=0
+time ./zorbit.py xy2 l=6 nev=5 slepc excite=0
 (2, 36) (36, 36)
 n = 36
 Lx Lz:
@@ -64,7 +68,7 @@ EPSSolve
 /\       29.968667            4.54468e-05
  ---------------------- --------------------
 
-time ./zorbit.py quad l=6 nev=5 slepc excite=1
+time ./zorbit.py xy2 l=6 nev=5 slepc excite=1
 (2, 36) (36, 36)
 n = 36
 Lx Lz:
@@ -94,7 +98,7 @@ EPSSolve
  ---------------------- --------------------
 
 
-time ./zorbit.py quad li=6 lj=7 nev=5 slepc 
+time ./zorbit.py xy2 li=6 lj=7 nev=5 slepc 
 no pyx module found
 (6, 42) (42, 42)
 n = 42
@@ -127,7 +131,7 @@ EPSSolve
 /\       42.563657            8.54252e-05
  ---------------------- --------------------
 
-time ./zorbit.py quad li=6 lj=7 nev=3 slepc excite=0
+time ./zorbit.py xy2 li=6 lj=7 nev=3 slepc excite=0
 no pyx module found
 (6, 42) (42, 42)
 n = 42

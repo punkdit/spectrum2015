@@ -413,7 +413,7 @@ def build_hex(li, lj=None):
     return Gx, Gz, None, None
 
 
-def build_quad(li, lj=None):
+def build_xy2(li, lj=None):
     if lj is None:
         lj = li
     n = li*lj
@@ -642,11 +642,11 @@ def build(name=""):
         lj = argv.get('lj', l)
         Gx, Gz, Hx, Hz = build_hex(li, lj)
 
-    elif argv.quad:
+    elif argv.xy2:
         l = argv.get('l', 3)
         li = argv.get('li', l)
         lj = argv.get('lj', l)
-        Gx, Gz, Hx, Hz = build_quad(li, lj)
+        Gx, Gz, Hx, Hz = build_xy2(li, lj)
 
     elif argv.xy:
         n = argv.get('n', 4)
