@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+"""
+draw some pictures of the gauge color code
+"""
+
 import sys, os
 
 import numpy

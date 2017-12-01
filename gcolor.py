@@ -73,7 +73,8 @@ def test():
                 graph.add_edge(i, j)
 
     equs = nx.connected_components(graph)
-    assert len(list(equs)) == 3, len(equs)
+    equs = list(equs)
+    assert len(equs) == 3, len(equs)
     assert bipartite.is_bipartite(graph)
 
     color = bipartite.color(graph)
@@ -177,7 +178,10 @@ def do_slepc(model, weights=None):
     from zorbit import slepc
 
     name = "ex3.tmp"
-    os.unlink(name)
+    try:
+        os.unlink(name)
+    except OSError:
+        pass
 
     slepc(weights=weights, **model.__dict__)
 

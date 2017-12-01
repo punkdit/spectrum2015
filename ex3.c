@@ -85,7 +85,7 @@ PetscErrorCode MatMult_Hamiltonian(Mat A,Vec x,Vec y)
 #undef __FUNCT__
 
 void
-dump(nx)
+dump(int nx)
 {
     PetscScalar *px, *py;
     long i, j;
@@ -124,13 +124,13 @@ int main(int argc,char **argv)
   if (size != 1) SETERRQ(PETSC_COMM_WORLD,1,"This is a uniprocessor example only");
 
     cutoff = 99999;
-    ierr = PetscOptionsGetInt(NULL, NULL, "-cutoff", &cutoff, NULL);CHKERRQ(ierr);
+    ierr = PetscOptionsGetInt(NULL, "-cutoff", &cutoff, NULL);CHKERRQ(ierr);
     if(cutoff != 99999)
         printf("setting cutoff to %d\n", (int)cutoff);
 
     char filename[256];
     PetscBool set_filename;
-    ierr = PetscOptionsGetString(NULL, NULL, "-load", filename, sizeof(filename), &set_filename);CHKERRQ(ierr);
+    ierr = PetscOptionsGetString(NULL, "-load", filename, sizeof(filename), &set_filename);CHKERRQ(ierr);
 
   ierr = PetscPrintf(PETSC_COMM_WORLD,"Hamiltonian Eigenproblem (matrix-free version), n=%D\n",n);CHKERRQ(ierr);
   ierr = MatCreateShell(PETSC_COMM_WORLD,n,n,n,n,&n,&A);CHKERRQ(ierr);

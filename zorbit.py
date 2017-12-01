@@ -920,13 +920,15 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     host = socket.gethostname()
     if host == "bucket":
         cmd = "gcc MATCH.c -O3 -o MATCH -I/home/simon/local/petsc/arch-linux2-c-debug/include -I/home/simon/local/petsc/include/petsc/mpiuni -I/home/simon/local/petsc/include -I/home/simon/local/slepc-3.7.1/include -I/home/simon/local/slepc-3.7.1/arch-linux2-c-debug/include/ -L/home/simon/local/petsc/arch-linux2-c-debug/lib -L/home/simon/local/slepc-3.7.1/arch-linux2-c-debug/lib -lpetsc -lslepc"
+    elif host == "hero":
+        cmd = "gcc MATCH.c -O3 -o MATCH -I/usr/include/openmpi -I/usr/include/petsc -I/usr/include/slepc -lpetsc -lslepc -lmpi"
     else:
         cmd = "gcc -O3 MATCH.c -I/suphys/sburton/include/ -o MATCH -lpetsc -L$PETSC_DIR/$PETSC_ARCH/lib -L$SLEPC_DIR/$PETSC_ARCH/lib -lslepc"
+
     cmd = cmd.replace("MATCH.c", name)
     stem = name[:-2]
     cmd = cmd.replace("MATCH", stem)
 
-    #print cmd
     rval = os.system(cmd)
     assert rval == 0
 
