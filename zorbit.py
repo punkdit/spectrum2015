@@ -128,6 +128,7 @@ def build_orbigraph(H, syndromes=None):
         write_gap(fs)
 
     equs = nx.connected_components(graph)
+    equs = list(equs)
     m = len(equs)
 
     print "components:", m
@@ -833,9 +834,9 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
 
     mz = len(Gz)
     t = None
-    excite = argv.excite
-    if excite is None:
-        excite = kw.get("excite")
+    #excite = argv.excite
+    #if excite is None:
+    excite = kw.get("excite") or argv.excite
 
     if excite is not None:
         print "excite:", excite
@@ -844,10 +845,11 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
             for i in range(1, len(excite)):
                 t = (t + Tx[excite[i]])%2
         else:
+            assert type(excite) in (int, long)
             t = Tx[excite]
-        #print "t:", shortstr(t)
+        print "t:", shortstr(t)
         Gzt = dot2(Gz, t)
-        #print "Gzt:", shortstr(Gzt)
+        print "Gzt:", shortstr(Gzt)
 
     weights = kw.get("weights")
     if weights is not None:
@@ -913,6 +915,8 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
     src = src.replace(match, s)
     assert name and name.endswith(".c")
     f = open(name, 'w')
+    tag = hash(src)
+    print("hash(src):", tag)
     f.write(src)
     f.close()
 
@@ -931,6 +935,7 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
 
     rval = os.system(cmd)
     assert rval == 0
+    #print("exec:", hash(open(stem).read()))
 
     nev = argv.get("nev", 1)
     cmd = "./%s -eps_nev %d -eps_ncv %d -eps_largest_real" 
@@ -945,11 +950,28 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
 
     #cmd += " -eps_type arnoldi -info -eps_monitor -eps_tol 1e-3"
     print cmd
-    rval = os.system(cmd)
-    assert rval == 0
+    #rval = os.system(cmd)
+    #assert rval == 0
+    f = os.popen(cmd)
+    s = f.read()
+    #print(s)
+    lines = s.split('\n')
+    vals = []
+    for line in lines:
+        line = line.strip()
+        flds = line.split()
+        #print("parse", flds)
+        try:
+            a, b = flds
+            a = float(a)
+            b = float(b)
+            vals.append(a)
+        except:
+            pass
 
     if not argv.plot:
-        return
+        print("vals:", vals)
+        return vals
 
     assert argv.plot.endswith(".pdf")
 
@@ -1241,7 +1263,7 @@ def find_ideals(Gx, Gz, Hx, Hz):
     if argv.verbose:
         print model
         print
-    print(shortstrx(Hx, Hz))
+    #print(shortstrx(Hx, Hz))
 
     Rx, Rz = model.Rx, model.Rz
     Rxt = Rx.transpose()
@@ -1305,7 +1327,7 @@ def find_ideals(Gx, Gz, Hx, Hz):
     for equ in equs:
         equ = list(equ)
         equ.sort()
-        print(equ)
+        #print(equ)
         gxs = []
         gzs = []
         for i in equ:
@@ -1319,9 +1341,19 @@ def find_ideals(Gx, Gz, Hx, Hz):
         _model.U = U
         models.append(_model)
 
+    if not argv.solve:
+        return
+
     if argv.excite:
-        excites = minweightall(Hz)
-        #print("excite", excite)
+        if argv.minweightall:
+            excites = minweightall(Hz)
+            #print("excite", excite)
+        else:
+            excites = []
+            for i in range(len(Hz)):
+                excite = array2([0]*len(Hz))
+                excite[i] = 1
+                excites.append(excite)
         print("excites", len(excites))
     else:
         excites = [None]
@@ -1340,11 +1372,36 @@ def find_ideals(Gx, Gz, Hx, Hz):
                 _excite = dot2(excite, _model.U)
                 #print(shortstrx(_excite))
     
-            assert len(_model.Rx)<12
-            H = _model.build_ham(_excite) #weights=weights1)
-            vals, vecs = numpy.linalg.eigh(H)
-            vals = list(vals)
-            vals.sort(reverse=True)
+            r = len(_model.Rx)
+            if r <= 12 and not argv.slepc and not argv.sparse:
+
+                H = _model.build_ham(_excite) #weights=weights1)
+                if argv.orbigraph:
+                    H1 = build_orbigraph(H)
+                
+                vals, vecs = numpy.linalg.eigh(H)
+                vals = list(vals)
+                vals.sort(reverse=True)
+
+            elif argv.sparse and r <= 19:
+
+                vals, vecs = _model.sparse_ham_eigs(_excite) #weights=weights1)
+                vals = list(vals)
+                vals.sort(reverse=True)
+
+            elif r <= 27:
+                #for i in range(len(_excite)):
+                #    _excite[i] = 1
+                #print("excite:", tuple(_excite))
+                #vals = slepc(excite=tuple(_excite), **_model.__dict__)
+                if _excite is not None:
+                    _excite = tuple(_excite)
+                vals = slepc(excite=_excite, **_model.__dict__)
+                #vals = [0, 0]
+
+            else:
+                assert 0, "r=%d too big"%r
+
             total += vals[0]
             gaps.append(vals[0]-vals[1])
     

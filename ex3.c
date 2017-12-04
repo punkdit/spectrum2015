@@ -73,9 +73,9 @@ PetscErrorCode MatMult_Hamiltonian(Mat A,Vec x,Vec y)
   ierr = VecGetArrayRead(x,&px);CHKERRQ(ierr);
   ierr = VecGetArray(y,&py);CHKERRQ(ierr);
 
-    printf("/"); fflush(stdout);
+    fprintf(stderr, "/"); fflush(stderr);
     matmult(py, px, nx);
-    printf("\\"); fflush(stdout);
+    fprintf(stderr, "\\"); fflush(stderr);
 
   ierr = VecRestoreArrayRead(x,&px);CHKERRQ(ierr);
   ierr = VecRestoreArray(y,&py);CHKERRQ(ierr);
@@ -184,6 +184,8 @@ int main(int argc,char **argv)
   ierr = EPSDestroy(&eps);CHKERRQ(ierr);
   ierr = MatDestroy(&A);CHKERRQ(ierr);
   ierr = SlepcFinalize();
+
+    fprintf(stderr, "\n");
   return ierr;
 }
 

@@ -5,6 +5,7 @@ from random import seed
 
 import numpy
 from numpy import concatenate
+from scipy import sparse
 
 from solve import shortstr, shortstrx, parse, eq2, dot2, zeros2, array2, identity2
 from solve import row_reduce, RowReduction, span, get_reductor
@@ -387,6 +388,46 @@ def build_hex(li, lj=None):
     return Gx, Gz, None, None
 
 
+def build_hex2(li, lj=None):
+    if lj is None:
+        lj = li
+    n = li*lj
+
+    keys = [(i, j) for i in range(li) for j in range(lj)]
+    coords = {}  
+    for i, j in keys:
+        for di in range(-li, li+1):
+          for dj in range(-lj, lj+1):
+            coords[i+di, j+dj] = keys.index(((i+di)%li, (j+dj)%lj))
+
+    Gx = []
+    Gz = []
+    if argv.open:
+        idxs = range(li-1)
+        jdxs = range(lj-1)
+    else:
+        idxs = range(li)
+        jdxs = range(lj)
+
+    for i in idxs:
+      for j in jdxs:
+        g = zeros2(n)
+        g[coords[i,   j]] = 1 
+        g[coords[i,   j+1]] = 1 
+        g[coords[i+1, j+1]] = 1 
+        Gx.append(g)
+
+        g = zeros2(n)
+        g[coords[i,   j]] = 1 
+        g[coords[i+1, j]] = 1 
+        g[coords[i+1, j+1]] = 1 
+        Gz.append(g)
+    Gx = array2(Gx)
+    Gz = array2(Gz)
+
+    return Gx, Gz, None, None
+
+
 def build_xy(n):
 
     m = n
@@ -449,7 +490,91 @@ def build_xy2(li, lj=None):
     return Gx, Gz, None, None
 
 
+def build_xy21(li, lj=None):
+    if lj is None:
+        lj = li
+    n = li*lj
+
+    keys = [(i, j) for i in range(li) for j in range(lj)]
+    coords = {}  
+    for i, j in keys:
+        for di in range(-li, li+1):
+          for dj in range(-lj, lj+1):
+            coords[i+di, j+dj] = keys.index(((i+di)%li, (j+dj)%lj))
+
+    Gx = []
+    if argv.open:
+        idxs = range(li-1)
+        jdxs = range(lj-1)
+    else:
+        idxs = range(li)
+        jdxs = range(lj)
+
+    for i in idxs:
+      for j in jdxs:
+        g = zeros2(n)
+        g[coords[i,   j]] = 1 
+        g[coords[i,   j+1]] = 1 
+        Gx.append(g)
+
+        g[coords[i+1, j]] = 1 
+        g[coords[i+1, j+1]] = 1 
+        Gx.append(g)
+
+    Gx = array2(Gx)
+
+    Gz = Gx.copy()
+
+    return Gx, Gz, None, None
+
+
 def build_xy3(li, lj=None, lk=None):
+    if lj is None:
+        lj = li
+    if lk is None:
+        lk = li
+    n = li*lj*lk
+
+    keys = [(i, j, k) for i in range(li) for j in range(lj) for k in range(lk)]
+    coords = {}  
+    for i, j, k in keys:
+        for di in range(-li, li+1):
+          for dj in range(-lj, lj+1):
+            for dk in range(-lk, lk+1):
+              coords[i+di, j+dj, k+dk] = keys.index(((i+di)%li, (j+dj)%lj, (k+dk)%lk))
+
+    Gx = []
+    if argv.open:
+        idxs = range(li-1)
+        jdxs = range(lj-1)
+        kdxs = range(lk-1)
+    else:
+        idxs = range(li)
+        jdxs = range(lj)
+        kdxs = range(lk)
+
+    for i in idxs:
+     for j in jdxs:
+      for k in kdxs:
+        g = zeros2(n)
+        g[coords[i,   j,   k]] = 1 
+        g[coords[i,   j+1, k]] = 1 
+        g[coords[i+1, j,   k]] = 1 
+        g[coords[i+1, j+1, k]] = 1 
+        g[coords[i,   j,   k+1]] = 1 
+        g[coords[i,   j+1, k+1]] = 1 
+        g[coords[i+1, j,   k+1]] = 1 
+        g[coords[i+1, j+1, k+1]] = 1 
+        Gx.append(g)
+
+    Gx = array2(Gx)
+
+    Gz = Gx.copy()
+
+    return Gx, Gz, None, None
+
+
+def build_xy32(li, lj=None, lk=None):
     if lj is None:
         lj = li
     if lk is None:
@@ -660,6 +785,10 @@ def build(name=""):
         seed(_seed)
 
     size = argv.get("size", 1)
+    l = argv.get('l', 4)
+    li = argv.get('li', l)
+    lj = argv.get('lj', l)
+    lk = argv.get('lk', l)
 
     if argv.gcolor2 or (argv.gcolor and size==1.5):
         Gx, Gz, Hx = build_gcolor2()
@@ -670,60 +799,46 @@ def build(name=""):
         Hz = Hx.copy()
 
     elif argv.compass:
-        l = argv.get('l', 3)
-        li = argv.get('li', l)
-        lj = argv.get('lj', l)
         Gx, Gz, Hx, Hz = build_compass(li, lj)
 
     elif argv.compass3:
-        l = argv.get('l', 3)
-        li = argv.get('li', l)
-        lj = argv.get('lj', l)
-        lk = argv.get('lk', l)
         Gx, Gz, Hx, Hz = build_compass3(li, lj, lk)
 
     elif argv.hex:
-        l = argv.get('l', 3)
-        li = argv.get('li', l)
-        lj = argv.get('lj', l)
         Gx, Gz, Hx, Hz = build_hex(li, lj)
 
+    elif argv.hex2:
+        Gx, Gz, Hx, Hz = build_hex2(li, lj)
+
     elif argv.xy:
-        n = argv.get('n', 4)
-        Gx, Gz, Hx, Hz = build_xy(n)
+        Gx, Gz, Hx, Hz = build_xy(l)
 
     elif argv.xy2:
-        l = argv.get('l', 3)
-        li = argv.get('li', l)
-        lj = argv.get('lj', l)
         Gx, Gz, Hx, Hz = build_xy2(li, lj)
 
+    elif argv.xy21:
+        Gx, Gz, Hx, Hz = build_xy21(li, lj)
+
     elif argv.xy3:
-        l = argv.get('l', 3)
-        li = argv.get('li', l)
-        lj = argv.get('lj', l)
-        lk = argv.get('lk', l)
         Gx, Gz, Hx, Hz = build_xy3(li, lj, lk)
 
+    elif argv.xy32:
+        Gx, Gz, Hx, Hz = build_xy32(li, lj, lk)
+
     elif argv.ising:
-        n = argv.get('n', 4)
-        Gx, Gz, Hx, Hz = build_ising(n)
+        Gx, Gz, Hx, Hz = build_ising(l)
 
     elif argv.random:
-        n = argv.get('n', 4)
-        Gx, Gz, Hx, Hz = build_random(n)
+        Gx, Gz, Hx, Hz = build_random(l)
 
     elif argv.random_nostabs:
-        n = argv.get('n', 4)
-        Gx, Gz, Hx, Hz = build_random_nostabs(n)
+        Gx, Gz, Hx, Hz = build_random_nostabs(l)
 
     elif argv.random_selfdual:
-        n = argv.get('n', 4)
-        Gx, Gz, Hx, Hz = build_random_selfdual(n)
+        Gx, Gz, Hx, Hz = build_random_selfdual(l)
 
     elif argv.pauli:
-        n = argv.get('n', 2)
-        Gx, Gz, Hx, Hz = build_pauli(n)
+        Gx, Gz, Hx, Hz = build_pauli(l)
 
     elif argv.projective:
         n = argv.get('n', 3)
@@ -847,6 +962,79 @@ class Model(object):
                 #A[i, k] = A.get((i, k), 0) + 1
 
         return H
+
+    def sparse_ham_eigs(self, excite=None, weights=None, Jx=1., Jz=1.):
+        Gx, Gz = self.Gx, self.Gz        
+        Rx, Rz = self.Rx, self.Rz        
+        Hx, Hz = self.Hx, self.Hz        
+        Tx, Tz = self.Tx, self.Tz        
+        Px, Pz = self.Px, self.Pz
+
+        gz = len(Gz)
+        r = len(Rx)
+        n = self.n
+
+        verts = []
+        lookup = {}
+        for i, v in enumerate(span(Rx)): # XXX does not scale well
+            #if v0 is not None:
+            #    v = (v+v0)%2
+            #    v = dot2(Px, v)
+            lookup[v.tostring()] = i
+            verts.append(v)
+        print "span:", len(verts)
+        assert len(lookup) == len(verts)
+    
+        mz = len(Gz)
+        n = len(verts)
+
+        print "building H",
+        H = {} # adjacency
+        U = [] # potential
+
+        #if offset is None:
+        offset = mz + 1 # make H positive definite
+
+        for i, v in enumerate(verts):
+            if i%1000==0:
+                write('.')
+            count = dot2(Gz, v).sum()
+            #H[i, i] = mz - 2*count
+            U.append(offset + mz - 2*count)
+            for g in Gx:
+                v1 = (g+v)%2
+                v1 = dot2(Px, v1)
+                j = lookup[v1.tostring()]
+                H[i, j] = H.get((i, j), 0) + 1
+
+        print "\nnnz:", len(H)
+        for i in range(len(U)):
+            H[i, i] = H.get((i, i), 0) + U[i] 
+        N = len(U)
+        del U
+        #H1 = sparse.lil_matrix(N, N)
+        keys = H.keys()
+        keys.sort()
+        data = [] 
+        rows = [] 
+        cols = [] 
+        for idx in keys:
+            #H1[idx] = H[idx]
+            data.append(H[idx])
+            rows.append(idx[0])
+            cols.append(idx[1])
+        del H
+        H1 = sparse.coo_matrix((data, (rows, cols)), (N, N))
+        H1 = sparse.csr_matrix(H1, dtype=numpy.float64)
+    
+        #print "do_lanczos: eigsh"
+        vals, vecs = sparse.linalg.eigsh(H1, k=min(N-5, 40), which="LM")
+    
+        vals -= offset
+        return vals, vecs 
+        return H1
+
+
 
 #        H = numpy.zeros((n, n))
 #        syndromes = [] 

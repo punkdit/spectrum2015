@@ -1,6 +1,223 @@
 
-1/12/17
+
+
+4/12/17
 =======
+
+time ./zorbit.py find_ideals xy21 l=8
+Model(n=64, Lx/z: 2, Gx: 128, Gz: 128, Hx: 13, Hz: 13, Rx/z: 36)
+('find_ideals:', 4)
+Model(n=64, Lx/z: 41, Gx: 32, Gz: 32, Hx: 7, Hz: 7, Rx/z: 9)
+Model(n=64, Lx/z: 41, Gx: 32, Gz: 32, Hx: 7, Hz: 7, Rx/z: 9)
+Model(n=64, Lx/z: 41, Gx: 32, Gz: 32, Hx: 7, Hz: 7, Rx/z: 9)
+Model(n=64, Lx/z: 41, Gx: 32, Gz: 32, Hx: 7, Hz: 7, Rx/z: 9)
+('excite:', None)
+('eval_1:', 152.10322633365521)
+('eval_2:', 146.74882904979077)
+('top:', 152.10322633365521)
+
+
+time ./zorbit.py find_ideals xy21 l=8 excite
+Model(n=64, Lx/z: 2, Gx: 128, Gz: 128, Hx: 13, Hz: 13, Rx/z: 36)
+('find_ideals:', 4)
+Model(n=64, Lx/z: 41, Gx: 32, Gz: 32, Hx: 7, Hz: 7, Rx/z: 9)
+Model(n=64, Lx/z: 41, Gx: 32, Gz: 32, Hx: 7, Hz: 7, Rx/z: 9)
+Model(n=64, Lx/z: 41, Gx: 32, Gz: 32, Hx: 7, Hz: 7, Rx/z: 9)
+Model(n=64, Lx/z: 41, Gx: 32, Gz: 32, Hx: 7, Hz: 7, Rx/z: 9)
+('excites', 56)
+('top:', 149.52881242878544)
+
+lots of identities among gauge elements: 
+makes potential wells appear closer ?
+
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+time ./zorbit.py find_ideals xy2 l=10 nev=2
+Model(n=100, Lx/z: 2, Gx: 100, Gz: 100, Hx: 17, Hz: 17, Rx/z: 64)
+('find_ideals:', 4)
+Model(n=100, Lx/z: 66, Gx: 25, Gz: 25, Hx: 9, Hz: 9, Rx/z: 16)
+Model(n=100, Lx/z: 66, Gx: 25, Gz: 25, Hx: 9, Hz: 9, Rx/z: 16)
+Model(n=100, Lx/z: 66, Gx: 25, Gz: 25, Hx: 9, Hz: 9, Rx/z: 16)
+Model(n=100, Lx/z: 66, Gx: 25, Gz: 25, Hx: 9, Hz: 9, Rx/z: 16)
+('excite:', None)
+slepc: name=ex3.tmp.c
+./ex3.tmp -eps_nev 2 -eps_ncv 4 -eps_largest_real -eps_tol 0.0001 
+/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+Hamiltonian Eigenproblem (matrix-free version), n=65536
+EPSSetInitialSpace
+EPSSolve
+ Solution method: krylovschur
+
+ Number of requested eigenvalues: 2
+ Linear eigensolve converged (2 eigenpairs) due to CONVERGED_TOL; iterations 16
+ ---------------------- --------------------
+            k             ||Ax-kx||/||kx||
+ ---------------------- --------------------
+       29.076200            6.77232e-05
+       27.597280             4.9203e-05
+ ---------------------- --------------------
+...
+
+('eval_1:', 116.3048)
+('eval_2:', 114.82588)
+('top:', 116.3048)
+
+
+
+('eval_1:', 114.578612)
+('eval_2:', 112.588497)
+('top:', 114.578612)
+
+time ./zorbit.py find_ideals xy2 l=10 nev=2 excite
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+time ./zorbit.py find_ideals gcolor size=4
+metro module failed to load
+guage ops: 448
+qubits: 369
+stabs: 80
+Lattice(3:369, 2:736, 1:448, 0:80)
+Model(n=369, Lx/z: 1, Gx: 448, Gz: 448, Hx: 80, Hz: 80, Rx/z: 208)
+('find_ideals:', 6)
+Model(n=369, Lx/z: 259, Gx: 70, Gz: 70, Hx: 40, Hz: 40, Rx/z: 30)
+Model(n=369, Lx/z: 259, Gx: 70, Gz: 70, Hx: 40, Hz: 40, Rx/z: 30)
+Model(n=369, Lx/z: 245, Gx: 84, Gz: 84, Hx: 40, Hz: 40, Rx/z: 44)
+Model(n=369, Lx/z: 245, Gx: 84, Gz: 84, Hx: 40, Hz: 40, Rx/z: 44)
+Model(n=369, Lx/z: 259, Gx: 70, Gz: 70, Hx: 40, Hz: 40, Rx/z: 30)
+Model(n=369, Lx/z: 259, Gx: 70, Gz: 70, Hx: 40, Hz: 40, Rx/z: 30)
+
+time ./zorbit.py find_ideals gcolor size=3
+metro module failed to load
+guage ops: 214
+qubits: 175
+stabs: 40
+Lattice(3:175, 2:348, 1:214, 0:40)
+Model(n=175, Lx/z: 1, Gx: 214, Gz: 214, Hx: 40, Hz: 40, Rx/z: 94)
+('find_ideals:', 6)
+Model(n=175, Lx/z: 121, Gx: 34, Gz: 34, Hx: 20, Hz: 20, Rx/z: 14)
+Model(n=175, Lx/z: 121, Gx: 34, Gz: 34, Hx: 20, Hz: 20, Rx/z: 14)
+Model(n=175, Lx/z: 116, Gx: 39, Gz: 39, Hx: 20, Hz: 20, Rx/z: 19)
+Model(n=175, Lx/z: 116, Gx: 39, Gz: 39, Hx: 20, Hz: 20, Rx/z: 19)
+Model(n=175, Lx/z: 121, Gx: 34, Gz: 34, Hx: 20, Hz: 20, Rx/z: 14)
+Model(n=175, Lx/z: 121, Gx: 34, Gz: 34, Hx: 20, Hz: 20, Rx/z: 14)
+
+time ./zorbit.py find_ideals gcolor size=2
+metro module failed to load
+guage ops: 80
+qubits: 65
+stabs: 16
+Lattice(3:65, 2:128, 1:80, 0:16)
+Model(n=65, Lx/z: 1, Gx: 80, Gz: 80, Hx: 16, Hz: 16, Rx/z: 32)
+('find_ideals:', 6)
+Model(n=65, Lx/z: 44, Gx: 13, Gz: 13, Hx: 8, Hz: 8, Rx/z: 5)
+Model(n=65, Lx/z: 43, Gx: 14, Gz: 14, Hx: 8, Hz: 8, Rx/z: 6)
+Model(n=65, Lx/z: 44, Gx: 13, Gz: 13, Hx: 8, Hz: 8, Rx/z: 5)
+Model(n=65, Lx/z: 43, Gx: 14, Gz: 14, Hx: 8, Hz: 8, Rx/z: 6)
+Model(n=65, Lx/z: 44, Gx: 13, Gz: 13, Hx: 8, Hz: 8, Rx/z: 5)
+Model(n=65, Lx/z: 44, Gx: 13, Gz: 13, Hx: 8, Hz: 8, Rx/z: 5)
+
+time ./zorbit.py find_ideals gcolor size=1
+metro module failed to load
+guage ops: 18
+qubits: 15
+stabs: 4
+Lattice(3:15, 2:28, 1:18, 0:4)
+Model(n=15, Lx/z: 1, Gx: 18, Gz: 18, Hx: 4, Hz: 4, Rx/z: 6)
+('find_ideals:', 6)
+Model(n=15, Lx/z: 10, Gx: 3, Gz: 3, Hx: 2, Hz: 2, Rx/z: 1)
+Model(n=15, Lx/z: 10, Gx: 3, Gz: 3, Hx: 2, Hz: 2, Rx/z: 1)
+Model(n=15, Lx/z: 10, Gx: 3, Gz: 3, Hx: 2, Hz: 2, Rx/z: 1)
+Model(n=15, Lx/z: 10, Gx: 3, Gz: 3, Hx: 2, Hz: 2, Rx/z: 1)
+Model(n=15, Lx/z: 10, Gx: 3, Gz: 3, Hx: 2, Hz: 2, Rx/z: 1)
+Model(n=15, Lx/z: 10, Gx: 3, Gz: 3, Hx: 2, Hz: 2, Rx/z: 1)
+
+
+
+
+3/12/17
+=======
+
+
+
+
+time ./zorbit.py find_ideals xy3 l=10
+Model(n=1000, Lx/z: 54, Gx: 1000, Gz: 1000, Hx: 217, Hz: 217, Rx/z: 512)
+('find_ideals:', 8)
+Model(n=1000, Lx/z: 814, Gx: 125, Gz: 125, Hx: 61, Hz: 61, Rx/z: 64)
+
+time ./zorbit.py find_ideals xy3 l=8
+Model(n=512, Lx/z: 42, Gx: 512, Gz: 512, Hx: 127, Hz: 127, Rx/z: 216)
+('find_ideals:', 8)
+Model(n=512, Lx/z: 411, Gx: 64, Gz: 64, Hx: 37, Hz: 37, Rx/z: 27)
+
+time ./zorbit.py find_ideals xy3 l=6
+Model(n=216, Lx/z: 30, Gx: 216, Gz: 216, Hx: 61, Hz: 61, Rx/z: 64)
+('find_ideals:', 8)
+Model(n=216, Lx/z: 170, Gx: 27, Gz: 27, Hx: 19, Hz: 19, Rx/z: 8)
+
+time ./zorbit.py find_ideals xy3 l=4
+Model(n=64, Lx/z: 18, Gx: 64, Gz: 64, Hx: 19, Hz: 19, Rx/z: 8)
+('find_ideals:', 8)
+Model(n=64, Lx/z: 49, Gx: 8, Gz: 8, Hx: 7, Hz: 7, Rx/z: 1)
+
+
+
+
+
+
+
+
+2/12/17
+=======
+
+./zorbit.py find_ideals xy2 l=8
+('excite:', None)
+Model(n=64, Lx/z: 2, Gx: 64, Gz: 64, Hx: 13, Hz: 13, Rx/z: 36)
+('find_ideals:', 4)
+Model(n=64, Lx/z: 41, Gx: 16, Gz: 16, Hx: 7, Hz: 7, Rx/z: 9)
+Model(n=64, Lx/z: 41, Gx: 16, Gz: 16, Hx: 7, Hz: 7, Rx/z: 9)
+Model(n=64, Lx/z: 41, Gx: 16, Gz: 16, Hx: 7, Hz: 7, Rx/z: 9)
+Model(n=64, Lx/z: 41, Gx: 16, Gz: 16, Hx: 7, Hz: 7, Rx/z: 9)
+('eval_1:', 76.051613166827607)
+('eval_2:', 73.374414524895386)
+
+excite:
+('top:', 74.764406214392721)
+
+
+
+
+time ./zorbit.py find_ideals xy2 l=6 
+111111111111........................ 111111111111........................
+......111111111111.................. ......111111111111..................
+............111111111111............ ............111111111111............
+..................111111111111...... ..................111111111111......
+11....11....11....11....11....11.... 11....11....11....11....11....11....
+.11....11....11....11....11....11... .11....11....11....11....11....11...
+..11....11....11....11....11....11.. ..11....11....11....11....11....11..
+...11....11....11....11....11....11. ...11....11....11....11....11....11.
+1111..1111..1111..1111......11....11 1111..1111..1111..1111......11....11
+Model(n=36, Lx/z: 2, Gx: 36, Gz: 36, Hx: 9, Hz: 9, Rx/z: 16)
+('find_ideals:', 4)
+[0, 2, 4, 12, 14, 16, 24, 26, 28, 43, 45, 47, 55, 57, 59, 67, 69, 71]
+Model(n=36, Lx/z: 22, Gx: 9, Gz: 9, Hx: 5, Hz: 5, Rx/z: 4)
+[1, 3, 5, 13, 15, 17, 25, 27, 29, 42, 44, 46, 54, 56, 58, 66, 68, 70]
+Model(n=36, Lx/z: 22, Gx: 9, Gz: 9, Hx: 5, Hz: 5, Rx/z: 4)
+[6, 8, 10, 18, 20, 22, 30, 32, 34, 37, 39, 41, 49, 51, 53, 61, 63, 65]
+Model(n=36, Lx/z: 22, Gx: 9, Gz: 9, Hx: 5, Hz: 5, Rx/z: 4)
+[7, 9, 11, 19, 21, 23, 31, 33, 35, 36, 38, 40, 48, 50, 52, 60, 62, 64]
+Model(n=36, Lx/z: 22, Gx: 9, Gz: 9, Hx: 5, Hz: 5, Rx/z: 4)
+('excite:', None)
+('eval_1:', 44.844410203711917)
+('eval_2:', 39.633307652783941)
+
+
+excite:
+('top:', 42.914195907333095)
+
 
 
 
