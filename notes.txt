@@ -1,8 +1,79 @@
 
+5/12/17
+=======
+
+time nice ./zorbit.py find_ideals xy2 l=12 slepc solve nev=5 eps_tol=1e-8
+no pyx module found
+Model(n=144, Lx/z: 2, Gx: 144, Gz: 144, Hx: 21, Hz: 21, Rx/z: 100)
+('find_ideals:', 4)
+Model(n=144, Lx/z: 97, Gx: 36, Gz: 36, Hx: 11, Hz: 11, Rx/z: 25)
+Model(n=144, Lx/z: 97, Gx: 36, Gz: 36, Hx: 11, Hz: 11, Rx/z: 25)
+Model(n=144, Lx/z: 97, Gx: 36, Gz: 36, Hx: 11, Hz: 11, Rx/z: 25)
+Model(n=144, Lx/z: 97, Gx: 36, Gz: 36, Hx: 11, Hz: 11, Rx/z: 25)
+('excite:', None)
+slepc: name=ex3.tmp.c
+('hash(src):', 4134961785832330221)
+./ex3.tmp -eps_nev 5 -eps_ncv 10 -eps_largest_real -eps_tol 1e-08 
+('vals:', [41.410454, 40.585673, 38.136067, 37.899172, 36.765622])
+slepc: name=ex3.tmp.c
+('hash(src):', -314668492714511423)
+./ex3.tmp -eps_nev 5 -eps_ncv 10 -eps_largest_real -eps_tol 1e-08 
+('vals:', [41.410454, 40.585673, 38.136067, 37.899172, 36.765622])
+slepc: name=ex3.tmp.c
+('hash(src):', 6500869556847474201)
+./ex3.tmp -eps_nev 5 -eps_ncv 10 -eps_largest_real -eps_tol 1e-08 
+('vals:', [41.410454, 40.585673, 38.136067, 37.899172, 36.765622])
+slepc: name=ex3.tmp.c
+('hash(src):', -4873886431300345855)
+./ex3.tmp -eps_nev 5 -eps_ncv 10 -eps_largest_real -eps_tol 1e-08 
+('vals:', [41.410454, 40.585673, 38.136067, 37.899172, 36.765622])
+('eval_1:', 165.641816)
+('eval_2:', 164.817035)
+('top:', 165.641816)
+
+real144m11.806s
+
 
 
 4/12/17
 =======
+
+time ./zorbit.py find_ideals xy2 l=10  solve sparse
+Model(n=100, Lx/z: 2, Gx: 100, Gz: 100, Hx: 17, Hz: 17, Rx/z: 64)
+('find_ideals:', 4)
+Model(n=100, Lx/z: 66, Gx: 25, Gz: 25, Hx: 9, Hz: 9, Rx/z: 16)
+Model(n=100, Lx/z: 66, Gx: 25, Gz: 25, Hx: 9, Hz: 9, Rx/z: 16)
+Model(n=100, Lx/z: 66, Gx: 25, Gz: 25, Hx: 9, Hz: 9, Rx/z: 16)
+Model(n=100, Lx/z: 66, Gx: 25, Gz: 25, Hx: 9, Hz: 9, Rx/z: 16)
+('excite:', None)
+span: 65536
+building H. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+nnz: 1638400
+span: 65536
+building H. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+nnz: 1638400
+span: 65536
+building H. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+nnz: 1638400
+span: 65536
+building H. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+nnz: 1638400
+('eval_1:', 116.30480002056763)
+('eval_2:', 114.82587988995313)
+('top:', 116.30480002056763)
+
+real4m4.679s
+user8m44m4.012s
+system0m0.652s
+
+time ./zorbit.py find_ideals xy2 l=10  solve sparse excite
+...
+('top:', 115.40040840619469)
+
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 time ./zorbit.py find_ideals xy21 l=8
 Model(n=64, Lx/z: 2, Gx: 128, Gz: 128, Hx: 13, Hz: 13, Rx/z: 36)
@@ -173,6 +244,21 @@ Model(n=64, Lx/z: 49, Gx: 8, Gz: 8, Hx: 7, Hz: 7, Rx/z: 1)
 2/12/17
 =======
 
+
+time nice ./zorbit.py find_ideals xy2 l=10 solve sparse 
+Model(n=100, Lx/z: 2, Gx: 100, Gz: 100, Hx: 17, Hz: 17, Rx/z: 64)
+('find_ideals:', 4)
+...
+('top:', 116.30480002056763)
+
+
+
+took a day to run:
+    time nice ./zorbit.py find_ideals xy2 l=10 solve sparse excite exciteall
+    ...
+    ('top:', 115.40040840619493)
+
+
 ./zorbit.py find_ideals xy2 l=8
 ('excite:', None)
 Model(n=64, Lx/z: 2, Gx: 64, Gz: 64, Hx: 13, Hz: 13, Rx/z: 36)
@@ -185,6 +271,8 @@ Model(n=64, Lx/z: 41, Gx: 16, Gz: 16, Hx: 7, Hz: 7, Rx/z: 9)
 ('eval_2:', 73.374414524895386)
 
 excite:
+time ./zorbit.py find_ideals xy2 l=8  solve sparse excite exciteall
+...
 ('top:', 74.764406214392721)
 
 

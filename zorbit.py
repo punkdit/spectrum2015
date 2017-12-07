@@ -1348,6 +1348,8 @@ def find_ideals(Gx, Gz, Hx, Hz):
         if argv.minweightall:
             excites = minweightall(Hz)
             #print("excite", excite)
+        elif argv.exciteall:
+            excites = list(enum2(len(Hz)))[1:]
         else:
             excites = []
             for i in range(len(Hz)):
@@ -1380,14 +1382,10 @@ def find_ideals(Gx, Gz, Hx, Hz):
                     H1 = build_orbigraph(H)
                 
                 vals, vecs = numpy.linalg.eigh(H)
-                vals = list(vals)
-                vals.sort(reverse=True)
 
             elif argv.sparse and r <= 19:
 
-                vals, vecs = _model.sparse_ham_eigs(_excite) #weights=weights1)
-                vals = list(vals)
-                vals.sort(reverse=True)
+                vals = _model.sparse_ham_eigs(_excite) #weights=weights1)
 
             elif r <= 27:
                 #for i in range(len(_excite)):
@@ -1396,11 +1394,14 @@ def find_ideals(Gx, Gz, Hx, Hz):
                 #vals = slepc(excite=tuple(_excite), **_model.__dict__)
                 if _excite is not None:
                     _excite = tuple(_excite)
-                vals = slepc(excite=_excite, **_model.__dict__)
+                #vals = slepc(excite=_excite, **_model.__dict__)
+                vals = _model.do_slepc(excite=_excite)
                 #vals = [0, 0]
 
             else:
                 assert 0, "r=%d too big"%r
+            vals = list(vals)
+            vals.sort(reverse=True)
 
             total += vals[0]
             gaps.append(vals[0]-vals[1])

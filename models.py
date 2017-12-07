@@ -10,7 +10,7 @@ from scipy import sparse
 from solve import shortstr, shortstrx, parse, eq2, dot2, zeros2, array2, identity2
 from solve import row_reduce, RowReduction, span, get_reductor
 from solve import u_inverse, find_logops, solve, find_kernel, linear_independent
-from solve import rand2, find_stabilizers, find_errors
+from solve import rand2, find_stabilizers, find_errors, enum2
 
 from code import lstr2
 
@@ -900,6 +900,7 @@ class Model(object):
     def __init__(self, attrs):
         self.__dict__.update(attrs)
         self.Qx = self.Rz.transpose() # backwards compat
+        self.cache = {}
 
     def __str__(self):
         return "Model(n=%d, Lx/z: %d, Gx: %d, Gz: %d, Hx: %d, Hz: %d, Rx/z: %d)" % (
@@ -964,6 +965,11 @@ class Model(object):
         return H
 
     def sparse_ham_eigs(self, excite=None, weights=None, Jx=1., Jz=1.):
+
+        key = str((excite, weights, Jx, Jz))
+        if key in self.cache:
+            return self.cache[key]
+
         Gx, Gz = self.Gx, self.Gz        
         Rx, Rz = self.Rx, self.Rz        
         Hx, Hz = self.Hx, self.Hz        
@@ -973,6 +979,24 @@ class Model(object):
         gz = len(Gz)
         r = len(Rx)
         n = self.n
+
+        if type(excite) is int:
+            _excite = [0]*len(Tx)
+            _excite[excite] = 1
+            excite = tuple(_excite)
+
+        if excite is not None:
+            assert len(excite)==len(Tx)
+    
+            t = zeros2(n)
+            for i, ex in enumerate(excite):
+                if ex:
+                    t = (t + Tx[i])%2
+            #print "t:", shortstr(t)
+            Gzt = dot2(Gz, t)
+
+        else:
+            Gzt = 0
 
         verts = []
         lookup = {}
@@ -998,7 +1022,10 @@ class Model(object):
         for i, v in enumerate(verts):
             if i%1000==0:
                 write('.')
-            count = dot2(Gz, v).sum()
+            #count = dot2(Gz, v).sum()
+            syndrome = (dot2(Gz, v) + Gzt) % 2
+            count = syndrome.sum()
+            #syndrome = (dot2(Gz, Rx.transpose(), v) + Gzt)%2
             #H[i, i] = mz - 2*count
             U.append(offset + mz - 2*count)
             for g in Gx:
@@ -1031,26 +1058,111 @@ class Model(object):
         vals, vecs = sparse.linalg.eigsh(H1, k=min(N-5, 40), which="LM")
     
         vals -= offset
-        return vals, vecs 
-        return H1
+        self.cache[key] = vals
+        return vals
 
+    def do_slepc(self, excite=None, weights=None, Jx=1., Jz=1.):
+        key = str((excite, weights, Jx, Jz))
+        if key in self.cache:
+            return self.cache[key]
 
+        from slepc import slepc
+        vals = slepc(excite=excite, **self.__dict__)
+        self.cache[key] = vals
+        return vals
 
-#        H = numpy.zeros((n, n))
-#        syndromes = [] 
-#        for i, v in enumerate(verts):
-#            syndromes.append(dot2(Gz, v))
-#            count = dot2(Gz, v).sum()
-#            Pxv = dot2(Px, v)
-#            assert count == dot2(Gz, Pxv).sum()
-#            H[i, i] = mz - 2*count
-#            for g in Gx:
-#                v1 = (g+v)%2
-#                v1 = dot2(Px, v1)
-#                j = lookup[v1.tostring()]
-#                H[i, j] += 1 
+    def do_lp(self):
+        # so far a failed experiment to apply LP...
+        Gx, Gz = self.Gx, self.Gz        
+        Rx, Rz = self.Rx, self.Rz        
+        Hx, Hz = self.Hx, self.Hz        
+        Tx, Tz = self.Tx, self.Tz        
+        Px, Pz = self.Px, self.Pz
 
+        gz = len(Gz)
+        r = len(Rx)
+        n = self.n
 
+        assert len(Hz)
+
+        import pulp
+        
+        prob = pulp.LpProblem("test1", pulp.LpMinimize) 
+        
+        # Variables 
+        #x = pulp.LpVariable("x", 0, 4) 
+        #y = pulp.LpVariable("y", -1, 1) 
+        #z = pulp.LpVariable("z", 0) 
+
+        points = list(enum2(r))
+
+        lookup = {}
+        #ps = []
+        for u in points:
+            #name = "u"+shortstr(u)
+            #var = pulp.LpVariable(name, 0., 1.)
+            #lookup[u.tostring()] = var
+            #ps.append(var)
+            for v in points:
+                name1 = "u%sv%s" % (shortstr(u), shortstr(v))
+                lookup[u.tostring(), v.tostring()] = pulp.LpVariable(name1, 0., 1.)
+        
+        # Objective 
+        #prob += x + 4*y + 9*z 
+        
+        ps = [lookup[u.tostring(), u.tostring()] for u in points]
+        prob += sum(ps)==1.
+
+        if 0:
+            for t in enum2(len(Tx)):
+                txt = dot2(Tx.transpose(), t)
+                items = []
+                for u in points:
+                    Rxtu = dot2(Rx.transpose(), u)
+                    coeff = dot2(Gz, Rxtu + txt).sum() - dot2(Gz, Rxtu).sum()
+                    items.append(coeff * lookup[shortstr(u)])
+                prob += sum(items) > 0
+
+        ham = []
+        #pairs = []
+        for u in points:
+            w = dot2(Gz, Rx.transpose(), u).sum()
+            ham.append((len(Gz) - 2*w) * lookup[u.tostring(), u.tostring()])
+            for gx in Gx:
+                v = (u + dot2(gx, Rz.transpose()))%2
+                key = u.tostring(), v.tostring()
+                ham.append(lookup[key])
+                #pairs.append(key)
+                
+            #print w, shortstr(v)
+        print "ham", len(ham)
+
+        #pairs = set(pairs) # uniq
+        #for u, v in pairs:
+        spoints = [u.tostring() for u in points]
+        for u in spoints:
+          for v in spoints:
+            # 1/2(x**2 + y**2) >= xy
+            prob += 0.5*(lookup[u, u] + lookup[v, v]) >= lookup[u, v]
+            for w in spoints:
+                prob += 0.5*(lookup[u,u]+lookup[v,v]+lookup[w,w])>=\
+                    lookup[u,v]+lookup[u,w]-lookup[v,w]
+
+            prob += (lookup[u, v]==lookup[v, u])
+
+        # Objective
+        prob += -sum(ham)
+        
+        print "solving..."
+        pulp.GLPK().solve(prob) 
+        
+        # Solution 
+        for v in prob.variables(): 
+            if v.varValue > 0.:
+                print v.name, "=", v.varValue 
+        
+        print "objective=", pulp.value(prob.objective)  
+    
 
 
 def check_sy(Lx, Hx, Tx, Rx, Lz, Hz, Tz, Rz, **kw):
@@ -1211,9 +1323,14 @@ if __name__ == "__main__":
     print "Lx/Lz:"
     print shortstrx(model.Lx, model.Lz)
 
-    if len(model.Lx):
+    if len(model.Lx) and argv.distance:
         w = min([v.sum() for v in span(model.Lx) if v.sum()])
         print "distance:", w
         
+    if argv.do_lp:
+        model.do_lp()
+
+    if argv.do_slepc:
+        model.do_slepc()
 
 
