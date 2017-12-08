@@ -517,6 +517,7 @@ def build_xy21(li, lj=None):
         g[coords[i,   j+1]] = 1 
         Gx.append(g)
 
+        g = zeros2(n)
         g[coords[i+1, j]] = 1 
         g[coords[i+1, j+1]] = 1 
         Gx.append(g)
@@ -607,6 +608,9 @@ def build_xy32(li, lj=None, lk=None):
         g[coords[i,   j+1, k]] = 1 
         g[coords[i+1, j,   k]] = 1 
         g[coords[i+1, j+1, k]] = 1 
+        Gx.append(g)
+
+        g = zeros2(n)
         g[coords[i,   j,   k+1]] = 1 
         g[coords[i,   j+1, k+1]] = 1 
         g[coords[i+1, j,   k+1]] = 1 
@@ -1064,6 +1068,7 @@ class Model(object):
     def do_slepc(self, excite=None, weights=None, Jx=1., Jz=1.):
         key = str((excite, weights, Jx, Jz))
         if key in self.cache:
+            #print "CACHE HIT"
             return self.cache[key]
 
         from slepc import slepc

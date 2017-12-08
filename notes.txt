@@ -1,6 +1,28 @@
 
+7/12/17
+=======
+
+time ./zorbit.py xy21 l=10 find_ideals solve 
+Model(n=100, Lx/z: 0, Gx: 200, Gz: 200, Hx: 10, Hz: 10, Rx/z: 80)
+('find_ideals:', 20)
+Model(n=100, Lx/z: 94, Gx: 10, Gz: 10, Hx: 1, Hz: 1, Rx/z: 4)
+...
+('eval_1:', 258.88543819998301)
+('eval_2:', 253.94116628998387)
+
+excite:
+('top:', 257.61836267738676)
+
+
+
+
+time ./zorbit.py xy2 l=12 find_ideals solve slepc nev=2 excite eps_tol=1e-6 > zorbit.out &
+
+
 5/12/17
 =======
+
+
 
 time nice ./zorbit.py find_ideals xy2 l=12 slepc solve nev=5 eps_tol=1e-8
 no pyx module found
@@ -33,6 +55,10 @@ slepc: name=ex3.tmp.c
 
 real144m11.806s
 
+time ./zorbit.py xy2 l=12 find_ideals solve slepc nev=2 excite eps_tol=1e-4
+...
+('top:', 165.00996800000001)
+real 675m
 
 
 4/12/17
