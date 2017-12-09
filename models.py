@@ -576,6 +576,9 @@ def build_xy3(li, lj=None, lk=None):
 
 
 def build_xy32(li, lj=None, lk=None):
+
+    # TOO BIG ...
+
     if lj is None:
         lj = li
     if lk is None:
@@ -616,6 +619,34 @@ def build_xy32(li, lj=None, lk=None):
         g[coords[i+1, j,   k+1]] = 1 
         g[coords[i+1, j+1, k+1]] = 1 
         Gx.append(g)
+
+        g = zeros2(n)
+        g[coords[i,   j,   k]] = 1 
+        g[coords[i,   j,   k+1]] = 1 
+        g[coords[i+1, j,   k]] = 1 
+        g[coords[i+1, j,   k+1]] = 1 
+        Gx.append(g)
+
+        g = zeros2(n)
+        g[coords[i,   j+1, k]] = 1 
+        g[coords[i,   j+1, k+1]] = 1 
+        g[coords[i+1, j+1, k]] = 1 
+        g[coords[i+1, j+1, k+1]] = 1 
+        Gx.append(g)
+
+#        g = zeros2(n)
+#        g[coords[i,   j,   k]] = 1 
+#        g[coords[i,   j,   k+1]] = 1 
+#        g[coords[i,   j+1, k]] = 1 
+#        g[coords[i,   j+1, k+1]] = 1 
+#        Gx.append(g)
+#
+#        g = zeros2(n)
+#        g[coords[i+1, j,   k]] = 1 
+#        g[coords[i+1, j,   k+1]] = 1 
+#        g[coords[i+1, j+1, k]] = 1 
+#        g[coords[i+1, j+1, k+1]] = 1 
+#        Gx.append(g)
 
     Gx = array2(Gx)
 
