@@ -13,6 +13,7 @@ from solve import row_reduce, RowReduction, span, get_reductor
 from solve import u_inverse, find_logops, solve, find_kernel, linear_independent
 from solve import System, Unknown, pseudo_inverse, enum2
 from solve import find_errors, find_stabilizers, check_commute
+from solve import minweightall
 
 from isomorph import Tanner, search, from_sparse_ham, search_recursive, Backtrack, from_ham
 from lanczos import write, show_eigs
@@ -1221,49 +1222,19 @@ def do_chainmap(Gx, Gz):
     #print shortstrx(Qx, P, Qz)
 
 
-def minweight(Hz):
-    m, n = Hz.shape
-
-    best = None
-    weight = n
-    for u in enum2(m):
-        v = dot2(u, Hz)
-        w = v.sum()
-        if w==0:
-            continue
-        if w < weight:
-            weight = w
-            best = u
-    return best
-
-
-def minweightall(Hz):
-    m, n = Hz.shape
-
-    best = []
-    weight = n
-    for u in enum2(m):
-        v = dot2(u, Hz)
-        w = v.sum()
-        if w==0:
-            continue
-        if w < weight:
-            weight = w
-            best = [u]
-        elif w==weight:
-            best.append(u)
-    return best
-
-
-def find_ideals(Gx, Gz, Hx, Hz):
+def find_ideals():
     import networkx as nx
     from models import build_model
 
-    model = build_model(Gx, Gz, Hx, Hz)
+    model = build_model()
     if argv.verbose:
         print model
         print
     #print(shortstrx(Hx, Hz))
+
+    Gx, Gz = model.Gx, model.Gz
+    Hx, Hz = model.Hx, model.Hz
+    print shortstrx(Gx, Gz)
 
     Rx, Rz = model.Rx, model.Rz
     Rxt = Rx.transpose()
@@ -1351,19 +1322,27 @@ def find_ideals(Gx, Gz, Hx, Hz):
         elif argv.exciteall:
             excites = list(enum2(len(Hz)))[1:]
         else:
+            assert len(Hz), Hz
             excites = []
             for i in range(len(Hz)):
                 excite = array2([0]*len(Hz))
                 excite[i] = 1
                 excites.append(excite)
-        print("excites", len(excites))
+        print("excites", (excites))
     else:
         excites = [None]
+
+    if eq2(model.Hx, model.Hz):
+        print "self dual stabilizers"
 
     _excite = None
     top = None
     for excite in excites:
-        print("excite:", excite)
+        #if excite is not None:
+        #    print "excite:", (excite)
+        #    g = dot2(model.Hx.transpose(), excite)
+        #    model.show_stabx(g)
+
         total = 0.
         gaps = []
 
@@ -1373,6 +1352,8 @@ def find_ideals(Gx, Gz, Hx, Hz):
             if excite is not None:
                 _excite = dot2(excite, _model.U)
                 #print(shortstrx(_excite))
+                print _excite
+                print _model.U
     
             r = len(_model.Rx)
             if r <= 12 and not argv.slepc and not argv.sparse:
@@ -1416,13 +1397,14 @@ def find_ideals(Gx, Gz, Hx, Hz):
 def main():
 
     import models
-    Gx, Gz, Hx, Hz = models.build()
 
     assert not argv.orbiham, "it's called orbigraph now"
 
     if argv.find_ideals:
-        find_ideals(Gx, Gz, Hx, Hz)
+        find_ideals()
         return
+
+    Gx, Gz, Hx, Hz = models.build()
 
     if argv.chainmap:
         do_chainmap(Gx, Gz)

@@ -51,7 +51,7 @@ def getnum(v):
 def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, excite=None, **kw):
 
     name = argv.get("name", "ex3.tmp.c")
-    print "slepc: name=%s"%name
+    #print "slepc: name=%s"%name
 
     r = len(Rx)
     n = 2**r
@@ -74,14 +74,14 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, excite=None, **kw):
     t = None
 
     if excite is not None:
-        print "excite:", excite
+        #print "excite:", excite
         if type(excite) in (int, long):
             t = Tx[excite]
         else:
             t = dot2(excite, Tx)
-        print "t:", shortstr(t)
+        #print "t:", shortstr(t)
         Gzt = dot2(Gz, t)
-        print "Gzt:", shortstr(Gzt)
+        #print "Gzt:", shortstr(Gzt)
 
     weights = kw.get("weights")
     if weights is not None:
@@ -148,7 +148,7 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, excite=None, **kw):
     assert name and name.endswith(".c")
     f = open(name, 'w')
     tag = hash(src)
-    print("hash(src):", tag)
+    #print("hash(src):", tag)
     f.write(src)
     f.close()
 
@@ -169,7 +169,7 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, excite=None, **kw):
     assert rval == 0
     #print("exec:", hash(open(stem).read()))
 
-    nev = argv.get("nev", 1)
+    nev = argv.get("nev", 2)
     cmd = "./%s -eps_nev %d -eps_ncv %d -eps_largest_real" 
 
     if argv.plot:
@@ -181,7 +181,7 @@ def slepc(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, excite=None, **kw):
         cmd += " -eps_tol %s "%eps_tol
 
     #cmd += " -eps_type arnoldi -info -eps_monitor -eps_tol 1e-3"
-    print cmd
+    #print cmd
     #rval = os.system(cmd)
     #assert rval == 0
     f = os.popen(cmd)

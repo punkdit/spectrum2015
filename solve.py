@@ -40,6 +40,8 @@ def compose2(*items):
 
 
 def eq2(A, B):
+    if A.shape != B.shape:
+        return False
     A = (A-B)%2
     return numpy.abs(A).sum() == 0
 
@@ -1310,6 +1312,42 @@ def pushout(J, K, J1=None, K1=None, check=False):
         return JJ, KK
 
 
+def minweight(Hz):
+    m, n = Hz.shape
+
+    best = None
+    weight = n
+    for u in enum2(m):
+        v = dot2(u, Hz)
+        w = v.sum()
+        if w==0:
+            continue
+        if w < weight:
+            weight = w
+            best = u
+    return best
+
+
+def minweightall(Hz):
+    m, n = Hz.shape
+
+    best = []
+    weight = n
+    for u in enum2(m):
+        v = dot2(u, Hz)
+        w = v.sum()
+        if w==0:
+            continue
+        if w < weight:
+            weight = w
+            best = [u]
+        elif w==weight:
+            best.append(u)
+    return best
+
+
+
+
 # _________________________________________________________ #
 #                                                           #
 #                       test code                           #
@@ -1855,5 +1893,4 @@ if __name__=="__main__":
     test_reductor()
 
     print "OK"
-
 

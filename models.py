@@ -5,12 +5,14 @@ from random import seed
 
 import numpy
 from numpy import concatenate
+import scipy.sparse.linalg
 from scipy import sparse
 
 from solve import shortstr, shortstrx, parse, eq2, dot2, zeros2, array2, identity2
 from solve import row_reduce, RowReduction, span, get_reductor
 from solve import u_inverse, find_logops, solve, find_kernel, linear_independent
 from solve import rand2, find_stabilizers, find_errors, enum2
+from solve import minweight
 
 from code import lstr2
 
@@ -943,6 +945,17 @@ class Model(object):
             len(self.Lx), len(self.Gx), len(self.Gz), 
             len(self.Hx), len(self.Hz), len(self.Rx))
 
+    def get_dual(self):
+        Gz, Gx = self.Gx, self.Gz        
+        Rz, Rx = self.Rx, self.Rz        
+        Hz, Hx = self.Hx, self.Hz        
+        Tz, Tx = self.Tx, self.Tz        
+        Pz, Px = self.Px, self.Pz        
+        Lz, Lx = self.Lx, self.Lz        
+        #Qz, Qx = self.Qx, self.Qz        
+        n = self.n
+        return Model(locals())
+
     def build_ham(self, excite=None, weights=None, Jx=1., Jz=1.):
         Gx, Gz = self.Gx, self.Gz        
         Rx, Rz = self.Rx, self.Rz        
@@ -1200,6 +1213,43 @@ class Model(object):
         print "objective=", pulp.value(prob.objective)  
     
 
+    def show_stabx(self, sx):
+        gxs = []
+        for gx in self.Gx:
+            if eq2(gx*sx, gx):
+                gxs.append(gx)
+        Gx = array2(gxs)
+        #print "Gx:", Gx.shape
+        #print shortstr(Gx)
+        print "sx.sum() =", sx.sum(),
+        Gxt = Gx.transpose()
+        K = find_kernel(Gxt)
+        #print "kernel:", K
+        K = array2(K)
+        #print "kernel:", len(K)
+        #print shortstr(K)
+        #print
+        best = None
+        ubest = None
+        u = solve(Gxt, sx)
+        for w in enum2(len(K)):
+            u2 = (u+dot2(w, K))%2
+            if best is None or u2.sum() < best:
+                best = u2.sum()
+                ubest = u2
+            print "u.sum() =", u2.sum(),
+        print
+
+#        print shortstr(sx)
+#        print "u.sum() =", ubest.sum()
+        #print shortstr(sx)
+        #print #"-"*len(sx)
+#        for i in range(len(ubest)):
+#            if ubest[i]:
+#                print shortstr(Gx[i])
+#        print
+
+
 
 def check_sy(Lx, Hx, Tx, Rx, Lz, Hz, Tz, Rz, **kw):
 
@@ -1338,6 +1388,11 @@ def build_model(Gx=None, Gz=None, Hx=None, Hz=None):
     assert len(find_kernel(dot2(Gz, Rx.transpose())))==0
 
     model = Model(locals())
+
+    if argv.dual:
+        model = model.get_dual()
+        argv.dual = False # HACK !!
+
     return model
 
 
@@ -1350,14 +1405,15 @@ if __name__ == "__main__":
 
     print model
 
-    print "Hx/Hz:"
-    print shortstrx(model.Hx, model.Hz)
-    print
-    print "Gx/Gz:"
-    print shortstrx(Gx, Gz)
-    print
-    print "Lx/Lz:"
-    print shortstrx(model.Lx, model.Lz)
+    if argv.show:
+        print "Hx/Hz:"
+        print shortstrx(model.Hx, model.Hz)
+        print
+        print "Gx/Gz:"
+        print shortstrx(Gx, Gz)
+        print
+        print "Lx/Lz:"
+        print shortstrx(model.Lx, model.Lz)
 
     if len(model.Lx) and argv.distance:
         w = min([v.sum() for v in span(model.Lx) if v.sum()])
@@ -1368,5 +1424,49 @@ if __name__ == "__main__":
 
     if argv.do_slepc:
         model.do_slepc()
+
+    if argv.solve:
+        vals = model.sparse_ham_eigs()
+        print vals
+
+    if argv.minweight:
+        v = minweight(model.Hz)
+        print "minweight:"
+        print shortstr(v)
+
+#    for g in Gx:
+#        print g.sum(),
+#    print
+
+    Rx = model.Rx
+    HR = numpy.concatenate((Hx, Rx))
+#    print shortstr(Hx)
+#    print
+#    print shortstr(SR)
+
+#    U = solve(Gx.transpose(), HR.transpose())
+#    print U.shape
+#    h = len(Hx)
+#    #GH = dot2(Gx.transpose(), U)
+#    U = U[:, :h]
+
+    #K = find_kernel(Gx.transpose())
+    #print "kernel:", len(K)
+
+    for g in Hx:
+        model.show_stabx(g)
+
+#        best = None
+#        vbest = None
+#        for u in enum2(h):
+#            v = dot2(U, u)
+#            vsum = v.sum()
+#            if vsum == 0:
+#                continue
+#            if best is None or v.sum() < best:
+#                best = v.sum()
+#        print "best:", best
+
+
 
 
