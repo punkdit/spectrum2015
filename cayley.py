@@ -11,11 +11,29 @@ from scipy.sparse.linalg import eigs, eigsh
 
 from solve import shortstr, shortstrx, parse, eq2, dot2, zeros2, array2, identity2
 from models import build_model
-from action import mulclose, mulclose_fast
+#from action import mulclose, mulclose_fast
 
 from argv import argv
 
 
+def mulclose(gen, verbose=False, maxsize=None):
+    els = set(gen)
+    bdy = list(els)
+    changed = True 
+    while bdy:
+        if verbose:
+            print "mulclose:", len(els)
+        _bdy = []
+        for A in gen:
+            for B in bdy:
+                C = A*B  
+                if C not in els: 
+                    els.add(C)
+                    _bdy.append(C)
+                    if maxsize and len(els)>=maxsize:
+                        return list(els)
+        bdy = _bdy
+    return els
 
 
 class Op(object):
@@ -79,6 +97,7 @@ def test():
     G = mulclose([XI, ZI, IX, IZ])
     assert len(G)==32
 
+test()
 
 def cayley():
 
@@ -102,7 +121,7 @@ def cayley():
     
     size = 2**(2*len(model.Rx)+1) * 2**(len(model.Hx)+len(model.Hz))
     print "size:", size
-    G = mulclose(gen, maxsize=size)
+    G = mulclose(gen, maxsize=size, verbose=True)
     #G = mulclose_fast(gen)
     assert len(G) == size
 
@@ -112,6 +131,7 @@ def cayley():
     for i, op in enumerate(G):
         lookup[op] = i
 
+    print "building H..."
     N = len(G)
     offset = N+1 # make H positive definite
     H = {}
@@ -123,6 +143,8 @@ def cayley():
             assert i != j
             H[i, j] = H.get((i, j), 0) + 1
 
+    del lookup
+    print "building sparse..."
     keys = H.keys()
     keys.sort()
     data = [] 
@@ -134,15 +156,17 @@ def cayley():
         rows.append(idx[0])
         cols.append(idx[1])
     del H
+    del keys
+
     H1 = sparse.coo_matrix((data, (rows, cols)), (N, N))
     H1 = sparse.csr_matrix(H1, dtype=numpy.float64)
 
-    #print "do_lanczos: eigsh"
+    print "eigsh..."
     k = argv.get("k", 40)
-    vals, vecs = sparse.linalg.eigsh(H1, k=min(N-5, k), which="LM")
+    vals, vecs = sparse.linalg.eigsh(H1, k=min(H1.shape[0]-1, k), which="LM")
     vals -= offset
 
-    print vals
+    print ' '.join("%.6f"%x for x in vals)
 
 
 if __name__ == "__main__":

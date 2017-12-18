@@ -291,6 +291,8 @@ def build_pauli(n):
 
 def build_ising(n):
 
+    assert n>=2
+
     m = n
     Gx = zeros2(m, n)
     Gz = zeros2(m, n)

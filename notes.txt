@@ -1,4 +1,27 @@
 
+19/12/17
+========
+
+A function is said to be an equivariant map when its
+domain and codomain are acted on by the same symmetry
+group, and when the function commutes with the action
+of the group.
+
+
+"Every connected regular graph of even degree is a Schreier coset graph"
+Jonathan LGross
+1977
+
+SCHREIER COSET GRAPHS AND THEIR APPLICATIONS
+Marston Conder
+1992
+
+Hecke Groups, Dessins d’Enfants and the Archimedean Solids
+Yang-Hui He1,2∗ and James Read1†
+https://arxiv.org/pdf/1309.2326.pdf
+
+
+
 16/12/17
 ========
 
