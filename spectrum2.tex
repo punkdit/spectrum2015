@@ -159,8 +159,8 @@
 
 \newcommand\tombstone{\rule{.36em}{2ex}\vskip 5pt}
 
-\newcounter{ritem}
-\newcommand{\ritem}[1]{\refstepcounter{ritem}\theritem\label{#1}}
+\newcounter{numitem}
+\newcommand{\numitem}[1]{\refstepcounter{numitem}\thenumitem\label{#1}}
 
 
 \title{Representations and Spectra of Gauge Code Hamiltonians}
@@ -341,8 +341,8 @@ is part of the story of topologically ordered phases
 
 \section{Some motivating examples}\label{Sec2}
 
-%\underline{\bf Example \ritem{Ex1}.}
-\doexample{\ritem{Ex1}.}
+%\underline{\bf Example \numitem{Ex1}.}
+\doexample{\numitem{Ex1}}
 We start our journey considering a two-dimensional state space.
 This space is blessed with two basis vectors $\ket{0}$ and $\ket{1}.$
 The $Z$ and $X$ operators act on these states as:
@@ -381,8 +381,8 @@ The other operator,
 which we call the \emph{adjacent operator}, acts to bitflip
 between the eigenspaces.
 
-%\underline{\bf Example \ritem{Ex2}.}
-\doexample{\ritem{Ex1}.}
+%\underline{\bf Example \numitem{Ex2}.}
+\doexample{\numitem{Ex1}}
 To further elucidate this idea we turn to another example,
 which is a Hamiltonian built from three commuting and
 independent operators:
@@ -424,8 +424,8 @@ The adjacent operators are not unique in general.
 For this example we could have also chosen $IZZ, ZZI, XXX.$
 \tombstone
 
-%\underline{\bf Example \ritem{Ex3}.}
-\doexample{\ritem{Ex3}.}
+%\underline{\bf Example \numitem{Ex3}.}
+\doexample{\numitem{Ex3}}
 Now we consider a four qubit example:
 $$
     \Ham = XXII + IIXX + ZIZI + IZIZ.
@@ -1666,7 +1666,7 @@ This is consistent with the classical use of the (real) symplectic group,
 where dynamical variables come in position and momentum pairs.
 
 %\dolemma{2.1}
-\dolemma{\ritem{lemma21}}
+\dolemma{\numitem{lemma21}}
 Given a CSS gauge code Hamiltonian $H$, writing
 the matrix for $H$ in the computational basis as $\Gamma,$
 this matrix decomposes into irreducible
@@ -1753,7 +1753,7 @@ Because each of these components is independant of $l_X$ we write it as $\Gamma_
 %\end{align*}
 
 %\dolemma{2.2}
-\dolemma{\ritem{lemma22}}
+\dolemma{\numitem{lemma22}}
 Given a CSS gauge code Hamiltonian $H$, 
 and matrix $\Gamma$ in the computational basis 
 with irreducible
@@ -1786,7 +1786,7 @@ vector \emph{stabilized} if it is a $+1$ eigenvector
 of every stabilizer in the given gauge group.
 
 %\dolemma{2.3}
-\dolemma{\ritem{lemma23}}
+\dolemma{\numitem{lemma23}}
 Given a CSS gauge code Hamiltonian $H$,
 every groundstate of $H$ is stabilized.
 
@@ -1854,7 +1854,7 @@ Therefore the entire groundspace must be stabilized.
 \tombstone
 
 %\doproposition{2.4}
-\doproposition{\ritem{prop24}}
+\doproposition{\numitem{prop24}}
 For any CSS gauge code Hamiltonian $\Ham$
 we have:
 $$\lambda_1(\Ham) = \lambda_1(\Ham_{0,0})$$
@@ -1875,7 +1875,7 @@ consequence of the previous lemma.
 The following lemma is used in section 2.8 below.
 
 %\dolemma{2.5}
-\dolemma{\ritem{lemma25}}
+\dolemma{\numitem{lemma25}}
 Given a 
 CSS gauge code Hamiltonian $\Ham$ and
 $t_X\in \Span{T_X},$
@@ -1899,7 +1899,7 @@ the second eigenvalue of $H$.
 
 
 %\dolemma{2.6}
-\dolemma{\ritem{lemma26}}
+\dolemma{\numitem{lemma26}}
 Let $H$ be a CSS gauge code Hamiltonian,
 with matrix $\Gamma$ in the computational basis 
 and irreducible components $\Gamma_{t_X}$.
@@ -1918,7 +1918,7 @@ The result follows by considering eigenspaces of stabilizers.
 \tombstone
 
 %\doproposition{2.7}
-\doproposition{\ritem{prop27}}
+\doproposition{\numitem{prop27}}
 For a gauge code Hamiltonian $H$,
 \begin{align*}
 \lambda_1(\Ham_{t_X,0}) &> 
@@ -1958,7 +1958,7 @@ the top eigenvalue of $H_{t_X,0}$ for each $t_X\in T_X.$
 We summarize this in the theorem:
 
 %\dotheorem{2.8}
-\dotheorem{\ritem{thm28}}
+\dotheorem{\numitem{thm28}}
 For a weakly self-dual gauge code Hamiltonian $H$,
 the spectral gap is given by:
 $$
