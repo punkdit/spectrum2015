@@ -133,41 +133,6 @@ eigsh...
 
 
 
-
-A function is said to be an equivariant map when its
-domain and codomain are acted on by the same symmetry
-group, and when the function commutes with the action
-of the group.
-
-
-THE GEOMETRY OF DRUMS
-KOEN THAS
-https://arxiv.org/pdf/1712.05448.pdf
-http://cage.ugent.be/~kthas/
-
-
-"Every connected regular graph of even degree is a Schreier coset graph"
-Jonathan LGross
-1977
-
-Hint: decompose k-regular graph into union of k/2 cycles, each of which
-partition the vertex set. Choose as group the permutation group on
-the vertices, with k/2 generators corresponding to the cycles.
-
-https://terrytao.wordpress.com/2011/12/02/245b-notes-1-basic-theory-of-expander-graphs/
-https://terrytao.wordpress.com/2011/12/06/254b-notes-2-cayley-graphs-and-kazhdans-property-t/#more-5533
-
-
-SCHREIER COSET GRAPHS AND THEIR APPLICATIONS
-Marston Conder
-1992
-
-Hecke Groups, Dessins d’Enfants and the Archimedean Solids
-Yang-Hui He1,2∗ and James Read1†
-https://arxiv.org/pdf/1309.2326.pdf
-
-
-
 16/12/17
 ========
 
