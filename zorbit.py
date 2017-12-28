@@ -1308,8 +1308,6 @@ def find_ideals():
                 gzs.append(Gz[i-mx])
         _model = build_model(array2(gxs), array2(gzs))
         print(_model)
-        U = solve(model.Hz.transpose(), _model.Hz.transpose())
-        _model.U = U
         models.append(_model)
 
     if not argv.solve:
@@ -1342,18 +1340,19 @@ def find_ideals():
         #    print "excite:", (excite)
         #    g = dot2(model.Hx.transpose(), excite)
         #    model.show_stabx(g)
+        if excite is not None:
+            tx = dot2(excite, model.Tx)
 
         total = 0.
         gaps = []
 
         for _model in models:
             #print(_model)
-            #print(shortstrx(U))
             if excite is not None:
-                _excite = dot2(excite, _model.U)
+                _tx = dot2(tx, _model.Hz.transpose(), _model.Tx)
+                _excite = dot2(_tx, _model.Hz.transpose())
                 #print(shortstrx(_excite))
-                print _excite
-                print _model.U
+                #print _excite
     
             r = len(_model.Rx)
             if r <= 12 and not argv.slepc and not argv.sparse:
