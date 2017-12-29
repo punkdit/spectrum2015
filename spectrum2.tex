@@ -2304,7 +2304,8 @@ in the numerical workload.
 \section{Numerical results}\label{Sec6}
 
 Here we show tables for the first and
-second eigenvalues of the compass and gauge color code models.
+second eigenvalues of the 2D and 3D compass models,
+as well as the 2D $XY$-model and gauge color code model.
 These results are obtained using exact diagonalization methods.
 For each instance we indicate the groundspace eigenvalue
 $\lambda_1$ which is obtained from $H_{0,0}.$
@@ -2369,6 +2370,9 @@ $n$ &  $t_X$    & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ? & gap \\
 \begin{tabular}{ c|c|c|c|l|c } 
 $n$ &  $t_X$    & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ? & gap \\
 \hline
+\hline
+36  &   0        &   & 44.8444102 & 39.633308        &            \\
+&            & 12 &              & 42.914196   \checkmark &  1.93021  \\
 \hline
 64  &   0        &   &  76.051613  &    73.374415    &            \\
 &            & 16 &              &    74.764406  \checkmark & 1.28720  \\
@@ -2438,7 +2442,7 @@ These results are obtained by exact diagonalization.
 \caption{
 Here we show the spectral gap
 for each Hamiltonian block $H_{t_X,0}$
-of the 3D gauge color code models of sizes $n=15,$ $n=65$ and $n=175.$
+of the 3D gauge color code models of sizes $n=15,65,175.$
 This gap is defined as $\lambda_1(H) - \lambda_1(H_{t_X,0}).$
 Each point is colored according to the weight of the
 frustrated stabilizer generator.
@@ -2447,7 +2451,7 @@ frustrated stabilizer generator.
 \end{center}
 \end{figure*}
 
-The gap of the 3D gauge color code is clearly far more
+The gap of the 3D gauge color code is clearly more
 robust than the other models, see Figure \ref{PicGap}.
 %This is solely due to the geometry of the code...
 It does decrease with $n$, but note also that the
@@ -2466,7 +2470,7 @@ important role than the size of the code itself.
 
 There are two main points to make about these numerics.
 The first is that the gap of the compass model 
-is decreasing much faster than the gap in the gauge color model.
+is decreasing much faster than the gap in the gauge color code.
 In fact, there is strong evidence \cite{Dorier2005} 
 that the gap of the compass model
 tends to zero as the lattice size grows.
@@ -2478,15 +2482,15 @@ gives rise to the gap is the one with largest weight.
 This is a crucial connection to make because the
 stabilizers of the compass model grow with the linear
 size of the model
-while those of the gauge color model
+while those of the gauge color code 
 do not need to grow beyond a constant bound.
 %Note the similar
 %behaviour of the 1D $XY$-model and transverse field Ising model.
 This would suggest that if this is the mechanism for
-gapless behaviour that the gauge color model may
+gapless behaviour that the gauge color code  may
 be gapped.
 
-The above numerics reach the limit of presently available 
+These numerical results reach the limit of presently available 
 computational resources.
 To find eigenvalues for each Hamiltonian block $H_{t_X,0}$
 %and for the compass code and gauge color codes we found ...)

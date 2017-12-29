@@ -105,24 +105,29 @@ def plot(xs, ys, clr, legend, row):
 
 # XY
 # note: n=25 has no stabilizers: 31.851942-31.349618
-xs = [16, 24]
-ys = [20.503324-20.109358, 30.645190-30.383016]
-plot(xs, ys, green, "1D $XY$", 0)
+#xs = [16, 24]
+#ys = [20.503324-20.109358, 30.645190-30.383016]
+#plot(xs, ys, green, "1D $XY$", 0)
 
 # 3D Compass
 xs = [27]
 ys = [0.538]
-plot(xs, ys, white, "3D compass", 2)
+plot(xs, ys, yellow, "3D compass", 2)
 
 # Compass
 xs = [16, 25, 36]
 ys = [0.644, 0.452, 0.316]
 plot(xs, ys, blue, "2D compass", 1)
 
+# 2D XY-model
+xs = [36, 64, 100, 144]
+ys = [1.93021, 1.28720, 0.90439, 0.63184]
+plot(xs, ys, green, "2D XY", 3)
+
 # gauge color 
 xs = [15, 65, 175]
 ys = [3.241, 1.694, 1.049]
-plot(xs, ys, lred, "3D gauge color", 3)
+plot(xs, ys, lred, "3D gauge color code", 4)
 
 
 c.writePDFfile("pic-gap.pdf")
