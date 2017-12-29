@@ -1313,7 +1313,7 @@ def find_ideals():
     if not argv.solve:
         return
 
-    if argv.excite:
+    if argv.excite or argv.exciteall or argv.minweightall:
         if argv.minweightall:
             excites = minweightall(Hz)
             #print("excite", excite)
@@ -1326,7 +1326,7 @@ def find_ideals():
                 excite = array2([0]*len(Hz))
                 excite[i] = 1
                 excites.append(excite)
-        print("excites", (excites))
+        print("excites", len(excites))
     else:
         excites = [None]
 
