@@ -70,7 +70,7 @@
 \newcommand{\Eref}[1]{(\ref{#1})}
 \newcommand{\Fref}[1]{Fig.~\ref{#1}}
 %\newcommand{\Aref}[1]{Appendix~\ref{#1}}
-\newcommand{\SRef}[1]{section~\ref{#1}}
+\newcommand{\SRef}[1]{Section~\ref{#1}}
 
 
 \def\Complex{\mathbb{C}}
@@ -163,7 +163,7 @@
 \newcommand{\numitem}[1]{\refstepcounter{numitem}\thenumitem\label{#1}}
 
 
-\title{Representations and Spectra of Gauge Code Hamiltonians}
+\title{Spectra of Gauge Code Hamiltonians}
 
 \author{Simon Burton\\
 Centre for Engineered Quantum Systems,\\
@@ -179,16 +179,7 @@ The University of Sydney}
 
 \maketitle
 
-\tableofcontents
-
-%\doublespacing
-%\onehalfspacing
-
-%\begin{abstract}
-%\end{abstract}
-
-\section{Overview}
-
+\begin{abstract}
 In this paper we study the spectra of 
 Hamiltonians built from Pauli spin (qubit) operators.
 These spin operators lead a double life:
@@ -201,6 +192,14 @@ For such a Hamiltonian to have any ability to act as
 a quantum memory we would expect a spectral gap between the
 groundspace and first excited states.
 The goal of this paper is to study this spectral gap.
+\end{abstract}
+
+\tableofcontents
+
+%\doublespacing
+%\onehalfspacing
+
+\section{Overview}
 
 In Section \ref{Sec2} we show graphical depictions of
 some simple Hamiltonions and introduce the action of
@@ -305,7 +304,7 @@ Using all of these tools we
 perform exact diagonalization on some 
 large instances of the 3D gauge color code 
 Hamiltonian \cite{Bombin2015,Bombin2015single,Kubica2015}.
-These numerics support the conjecture that these models are gapped,
+These numerics support the conjecture that this model is gapped,
 which in turn lends weight to the possibility that these may
 be self-correcting quantum memories.
 %Then we turn to examine the low energy spectra.
@@ -339,7 +338,7 @@ is part of the story of topologically ordered phases
 %correcting quantum memory seems to be hard to achieve in 2D even in the presence of
 %effective long-range interactions [LCYPP15].
 
-\section{Some motivating examples}\label{Sec2}
+\subsection{Some motivating examples}\label{Sec2}
 
 %\underline{\bf Example \numitem{Ex1}.}
 \doexample{\numitem{Ex1}}
@@ -516,12 +515,12 @@ $$
 \end{array} \right) \otimes I
 $$
 This block diagonal form will be worked out for
-general gauge group $G$ below and summarized in Section \ref{Sec35}.
+a general gauge group below and summarized in Section \ref{Sec35}.
 \tombstone
 
 So far we have been analysing the Hamiltonian in the
 symmetry invariant basis. The complete story of how this
-works is in \ref{Sec3} below.
+works is in \SRef{Sec3} below.
 But we can also just fix the computational basis and
 examine the Hamiltonian in this basis....\todo{more...}
 
@@ -1158,9 +1157,10 @@ a row of the matrix $R_X$.
 %a generic vector in the rowspace of $R_X.$
 
 \dotheorem{(Decomposition)}
-Given a CSS gauge group $G$ with generators $G_X\cup G_Z$
-we can find a solution to the following $\Field$-linear
-block matrix equation
+Let $G$ be an $n$-qubit 
+CSS gauge group with generators $G_X\cup~G_Z.$
+We can construct a solution to the following $\Field$-linear
+block matrix equation:
 \begin{equation}\label{lstr}
 \left( \begin{array}{l}
 L_X\\
@@ -1179,7 +1179,8 @@ I,
 such that 
 $\Span{S_X}+\Span{R_X} = \Span{G_X}$
 and 
-$\Span{S_Z}+\Span{R_Z} = \Span{G_Z}.$
+$\Span{S_Z}+\Span{R_Z} = \Span{G_Z},$
+with $I$ the $n\times n$ identity matrix.
 
 \doproof
 We first find the stabilizers $S_Z$.
@@ -1448,10 +1449,12 @@ where we use the $\pluseq$ notation
 because there may be other contributions to the
 same entry.
 These terms will always be off
-the diagonal unless $g_X$ is a stabilizer. \todo{the diagonal in what basis?}
+the diagonal unless $g_X$ is a stabilizer.
+%\todo{the diagonal in what basis?}
 
 The action of the $G_Z$ gauge group
-contributes to the diagonal of $H.$ \todo{the diagonal in what basis?}
+contributes to the diagonal of $H.$
+%\todo{the diagonal in what basis?}
 These diagonal terms apply a kind of
 ``potential energy'' penalty
 to the basis states
@@ -1489,7 +1492,8 @@ $$
 $$
 this means that the $G_X$ gauge terms
 have the same effect on $H_{t_X,0}$
-as $H_{0,0}$ and only the diagonal has changed: \todo{the diagonal in what basis?}
+as $H_{0,0}$ and only the diagonal has changed:
+%\todo{the diagonal in what basis?}
 \begin{equation}\label{hamblocktx}
 H_{t_X,0} = \sum_{\substack{v\in\Frd\\g_X\in G_X } }
   \bket{v+g_X  R_Z^\top}\bbra{v} 
@@ -2370,6 +2374,9 @@ $n$ &  $t_X$    & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ? & gap \\
 \begin{tabular}{ c|c|c|c|l|c } 
 $n$ &  $t_X$    & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ? & gap \\
 \hline
+\hline
+16  &   0        &   & 22.627417 & 11.313708      &            \\
+&            & 8 &              & 19.313708   \checkmark &  3.31371  \\
 \hline
 36  &   0        &   & 44.8444102 & 39.633308        &            \\
 &            & 12 &              & 42.914196   \checkmark &  1.93021  \\

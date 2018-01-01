@@ -1,4 +1,12 @@
 
+30/12/17
+========
+
+time ./zorbit.py find_ideals xy2 l=8 solve exciteall excite 
+('top:', 74.764406214392721)
+real 218m11.644s
+
+
 29/12/17
 ========
 
