@@ -443,24 +443,6 @@ doesn't matter, only weight of stabilizer!
 7/12/17
 =======
 
-this has 2l ideals... not sure what this means...
-time ./zorbit.py xy21 l=10 find_ideals solve 
-Model(n=100, Lx/z: 0, Gx: 200, Gz: 200, Hx: 10, Hz: 10, Rx/z: 80)
-('find_ideals:', 20)
-Model(n=100, Lx/z: 94, Gx: 10, Gz: 10, Hx: 1, Hz: 1, Rx/z: 4)
-...
-('eval_1:', 258.88543819998301)
-('eval_2:', 253.94116628998387)
-
-excite:
-('top:', 257.61836267738676)
-
-l=14:
-('eval_1:', 503.32343123271295)
-('eval_2:', 499.76309628941192)
-('top:', 502.42204771351209)
-
-
 
 time ./zorbit.py xy2 l=12 find_ideals solve slepc nev=2 excite eps_tol=1e-6 > zorbit.out &
 ('top:', 165.009972) 

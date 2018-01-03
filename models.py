@@ -522,8 +522,8 @@ def build_xy21(li, lj=None):
         Gx.append(g)
 
         g = zeros2(n)
+        g[coords[i, j]] = 1 
         g[coords[i+1, j]] = 1 
-        g[coords[i+1, j+1]] = 1 
         Gx.append(g)
 
     Gx = array2(Gx)

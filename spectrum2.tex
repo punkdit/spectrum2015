@@ -192,6 +192,12 @@ For such a Hamiltonian to have any ability to act as
 a quantum memory we would expect a spectral gap between the
 groundspace and first excited states.
 The goal of this paper is to study this spectral gap.
+We show how to apply group representation theory to
+block diagonalize the Hamiltonion, with blocks labelled
+by stabilizer eigenvalues.
+In the case when the Hamiltonion is stoquastic, we apply
+Perron-Frobenius theory to constrain the location of the
+second eigenvector.
 \end{abstract}
 
 \tableofcontents
@@ -210,8 +216,8 @@ of subgroups of the (real) Pauli group on $n$ qubits.
 %Kitaev honeycomb model in section \ref{Sec2} 
 In Section \ref{Sec37} we find the 
 irreducible representations of an arbitrary CSS gauge (subsystem) code.
-This is a new result, and involves solving a quadratic 
-system of equations over a finite field.
+%This is a new result, and involves solving a quadratic 
+%system of equations over a finite field.
 
 In the computational basis, 
 CSS gauge code Hamiltonians have positive off-diagonal
@@ -222,21 +228,38 @@ we use Perron-Frobenius theory to
 describe the low energy spectrum of such Hamiltonians.
 These are new results.
 
-In Section \ref{Sec44} we introduce the 3D gauge color code Hamiltonian.
-We find that the gauge color code Hamiltonian
-decomposes into six mutually commuting ideals in Section \ref{Sec45}.
+In Section \ref{Sec44} we introduce the 3D gauge color code Hamiltonian%
+\cite{Bombin2015,Bombin2015single,Kubica2015}.
+We find that this model 
+decomposes into six mutually commuting operators in Section \ref{Sec45}.
 This gives an exponential reduction in the numerical
 difficulty of exactly diagonalizing this Hamiltonian,
 results of which we present in Section \ref{Sec6}.
 These numerics show some evidence of a spectral
 gap, which is contrasted against models that are known
 to be gapless: the two and three dimensional compass model,
-the one dimensional $XY$-model and the one dimensional
-transverse field Ising model.
+the one dimensional $XY$-model and 
+the one dimensional transverse field Ising model.
+The conjecture that the gauge color code model is gapped
+in turn lends weight to the possibility that this may
+be a self-correcting quantum memory~\cite{Brown2016}.
+%Then we turn to examine the low energy spectra.
+%In particular we are interested in the gap between
+%the energy of the groundstate and the first excited state.
+Having a constant gap (bound from below)
+is also part of the story of topologically ordered phases
+\cite{Kitaev2003,Brown2016}.
+We also apply these techniques to a model
+we call the 2D $XY$-plaquette model,
+with weight four operators.
 
-The paper concludes with Section \ref{Sec7} where
-we suggest a relation between the size of
-stabilizers and the gapped nature of the Hamiltonian.
+Finally in Section \ref{Sec7} 
+we investigate the connection between the size of
+stabilizer generators
+and the gapped nature of the Hamiltonian.
+In particular, we would like to conjecture a relation between
+extensive stabilizer generators, and gapless excitations of
+the Hamiltonian.
 This is further application of the Perron-Frobenius 
 theory in the context of Cheeger inequalities.
 
@@ -248,71 +271,68 @@ theory in the context of Cheeger inequalities.
 
 %\section{Introduction}
 
-Physicists often like to solve Hamiltonians 
-using a change of basis, or spin transform.
-But we can also work with transformations on the level of a
-group of operators,
-and later on figure out the spin transform (if needed).
-This is in line with the thinking of 
-Gottesman who proposed a Heisenberg picture for quantum computing \cite{Gottesman1998}.
-Here states are specified by the operators that act on them, instead of
-%actually performing operations on states.
-expicitly working with the states themselves.
-This is often harder than just manipulating the
-states themselves, but when it works it can yield
-new perspectives on the dynamics of the system.
-This is also
-the philosophy of category theory, where the goal is to lift
-information about elements of some mathematical object
-up to the level of the operators (morphisms) on the
-objects themselves.
-However, forgetting about the meaning of the symbols in this way 
-leaves one with the question:
-``What is an operator?''
+%Physicists often like to solve Hamiltonians 
+%using a change of basis, or spin transform.
+%But we can also work with transformations on the level of a
+%group of operators,
+%and later on figure out the spin transform (if needed).
+%This is in line with the thinking of 
+%Gottesman who proposed a Heisenberg picture for quantum computing \cite{Gottesman1998}.
+%Here states are specified by the operators that act on them, instead of
+%%actually performing operations on states.
+%expicitly working with the states themselves.
+%This is often harder than just manipulating the
+%states themselves, but when it works it can yield
+%new perspectives on the dynamics of the system.
+%This is also
+%the philosophy of category theory, where the goal is to lift
+%information about elements of some mathematical object
+%up to the level of the operators (morphisms) on the
+%objects themselves.
+%However, forgetting about the meaning of the symbols in this way 
+%leaves one with the question:
+%``What is an operator?''
 
-From the perspective of a quantum code these are the
-things that we use to diagnose errors and perform error correction.
-We can also interpret these operators as the terms of a Hamiltonian, whose
-groundspace corresponds to the energetically protected codespace.
-In the case of mutually commuting operators we can easily diagonalize the
-Hamiltonian, but for other systems of interest this does not hold.
+%From the perspective of a quantum code these are the
+%things that we use to diagnose errors and perform error correction.
+%We can also interpret these operators as the terms of a Hamiltonian, whose
+%groundspace corresponds to the energetically protected codespace.
+%In the case of mutually commuting operators we can easily diagonalize the
+%Hamiltonian, but for other systems of interest this does not hold.
 
-The mathematicians have a name for this question ``what is an operator?''
-This is known as \emph{representation theory.}
-We examine three different notions of
-such representations, with a view to extracting
-spectral information about the Hamiltonian.
-Group theory representations give 
-a block diagonalization of the Hamiltonian:
-these are the \emph{irreducible representations} and in
-our case can be labelled by stabilizer eigenvalues.
-The coarser tool of Perron-Frobenius theory \cite{Perron1907, Frobenius1912, Baez2012}
-gives information about the
-spectral layout of these blocks in the case of CSS gauge codes.
-At the finest level, the operators in each of these blocks form a semisimple Lie
-algebra and ideals in this algebra correspond to tensor products of
-Lie algebra representations. 
+%The mathematicians have a name for this question ``what is an operator?''
+%This is known as \emph{representation theory.}
+%We examine three different notions of
+%such representations, with a view to extracting
+%spectral information about the Hamiltonian.
+%Group theory representations give 
+%a block diagonalization of the Hamiltonian:
+%these are the \emph{irreducible representations} and in
+%our case can be labelled by stabilizer eigenvalues.
+%The coarser tool of Perron-Frobenius theory \cite{Perron1907, Frobenius1912, Baez2012}
+%gives information about the
+%spectral layout of these blocks in the case of CSS gauge codes.
 
-While there are
-some hints of this theory in the literature 
-\cite{Bacon2006quantum,Yoshida2010} %,Brzezicki2013}
-here we spell out in detail how this works and much more.
-Partly it's because these models are new and we don't have
-many examples.
+%While there are
+%some hints of this theory in the literature 
+%\cite{Bacon2006quantum,Yoshida2010} %,Brzezicki2013}
+%here we spell out in detail how this works and much more.
+%Partly it's because these models are new and we don't have
+%many examples.
 
-Using all of these tools we 
-perform exact diagonalization on some 
-large instances of the 3D gauge color code 
-Hamiltonian \cite{Bombin2015,Bombin2015single,Kubica2015}.
-These numerics support the conjecture that this model is gapped,
-which in turn lends weight to the possibility that these may
-be self-correcting quantum memories.
-%Then we turn to examine the low energy spectra.
-%In particular we are interested in the gap between
-%the energy of the groundstate and the first excited state.
-Having a constant gap (bound from below)
-is part of the story of topologically ordered phases
-\cite{Kitaev2003,Brown2016}.
+%Using all of these tools we 
+%perform exact diagonalization on some 
+%large instances of the 3D gauge color code 
+%Hamiltonian \cite{Bombin2015,Bombin2015single,Kubica2015}.
+%These numerics support the conjecture that this model is gapped,
+%which in turn lends weight to the possibility that these may
+%be self-correcting quantum memories.
+%%Then we turn to examine the low energy spectra.
+%%In particular we are interested in the gap between
+%%the energy of the groundstate and the first excited state.
+%Having a constant gap (bound from below)
+%is also part of the story of topologically ordered phases
+%\cite{Kitaev2003,Brown2016}.
 
 %\cite{Wen1991} % 
 
@@ -2011,7 +2031,7 @@ $$
     G_0 = \{ X_i, Z_i Z_{i+1}\ \ \mbox{for}\ \ i=1,...,n \},
 $$
 with periodic boundary conditions.
-This model has one 
+This model has one extensive 
 $X$-type stabilizer and no logical operators.
 This model is also exactly solvable, with gap going to zero
 as the system size grows \cite{Pfeuty1970}.
@@ -2026,21 +2046,22 @@ $$
 $$
 with periodic boundary conditions.
 This is a self-dual CSS gauge code.
-For $n$ even this model has no logical operators, one 
-$X$-type stabilizer and one $Z$-type stabilizer.
-With $n$ odd, there are no stabilizers and $k=1.$
+We focus on the $n$ even $XY$-model,
+which is exactly solvable,
+with gap going to zero as the system size grows \cite{Lieb1961}.
+This model has no logical operators, one 
+$X$-type stabilizer and one $Z$-type stabilizer,
+both extensive.
+%With $n$ odd, there are no stabilizers and $k=1.$
 Normally the gauge operators are written as 
 $\{ X_i X_{i+1}, Y_i Y_{i+1} \ \mbox{for}\ i=1,...,n \}$
 but note that there is an automorphism of the Pauli group
 that sends $G_0$ to these operators.
-For $n$ even, this model is exactly solvable,
-and the gap goes to zero
-as the system size grows \cite{Lieb1961}.
 
 We also consider a two dimensional version of this
-model, which we call the \emph{2D $XY$-model}.
+model, which we call the \emph{2D $XY$-plaquette model}.
 Qubits live on a 2D periodic lattice of $l\times l$ sites.
-This is a self-dual model, with 
+This is also a self-dual CSS gauge code, with 
 gauge group generators 
 $$
     G_0 = \{
@@ -2048,7 +2069,7 @@ $$
         Z_{ij}Z_{i+1,j}Z_{i,j+1}Z_{i+1,j+1}
         \ \ \mbox{for}\ \ i,j=1,...,l \}.
 $$
-For $l$ even, we have $2l-3$ stabilizer generators of $X$ type:
+For $l$ even, we have $2l-3$ extensive stabilizer generators of $X$ type:
 $$
     \prod_{i=1}^l X_{ij} X_{i,j+1} \ \ \mbox{for}\ \ j=1,...,l-1,\ \ 
     \prod_{j=1}^l X_{ij} X_{i+1,j} \ \ \mbox{for}\ \ j=1,...,l-2,
@@ -2072,8 +2093,7 @@ $$
 \subsection{Compass model}\label{Sec43}
 
 Here we consider the compass model \cite{Bacon2006}.
-
-For the 2D compass model,
+For the 2D model,
 qubits live on a periodic square lattice of $l\times l$ sites.
 %we coordinatize the qubits on a square 
 %lattice of\ $l\times l$\ sites,
@@ -2088,6 +2108,7 @@ $$
         \mbox{for}\ \ i,j = 1,...,l\big\}.
 $$
 The generators for the stabilizers are
+extensive and given by
 $$
     \Stab_0 = \Big\{ \prod_{i=1}^l X_{ij}X_{i,j+1},\ \prod_{i=1}^l Z_{ji}Z_{j+1,i}
         \ \ \mbox{for}\ \ j=1,...,l-1\Big\}.
@@ -2117,7 +2138,8 @@ The generators of the gauge group and stabilizer group are
             \mbox{for}\ \ i=1,...,l-1\Big\}.
 \end{align*}
 
-The 3D compass model is also weakly self-dual.
+The 3D compass model is also weakly self-dual,
+and has extensive stabilizer generators.
 % \cite{Pastawski2010} ?
 % \cite{Dorier2005} ?
 
@@ -2143,8 +2165,9 @@ Each body is colored by one of four \emph{colors},
 either taken to be red, green, blue, yellow or 
 otherwise an element of the set $\{1, 2, 3, 4\}.$
 The four exterior triangular faces of the bounding tetrahedron are
-called \emph{regions,} the intersection of two regions is called
-a \emph{border} and the intersection of three regions is called
+called \emph{regions,}
+%the intersection of two regions is called a \emph{border} and 
+and the intersection of three regions is called
 a \emph{corner.}
 A cell not contained within any region is called an interior cell.
 
@@ -2174,8 +2197,8 @@ We note the following consequences of the above conditions.
 Every face supports an even number of vertices.
 % Each face cobounds two bodies, the other bodies that
 % share an edge must be 2-colorable, ie even number of edges.
-We now think of each region as corresponding to a ``missing'' body.
-Each edge is then contained in the boundary of three bodies.
+Thinking of each region as corresponding to a missing body,
+each edge is then contained in the boundary of three bodies.
 %Every interior edge is in the boundary of three bodies.
 %Edges contained in the regions are either in the boundary of two bodies or
 %otherwise are contained in one of the borders and the boundary of one body.
@@ -2189,7 +2212,7 @@ Using this cellulation we now construct the gauge code.
 Qubits are associated with the $n$ vertices.
 We associate operators to other cells, or union of cells,
 by using the contained vertices as support.
-Because this is a self-dual code, the same goes for
+Because this is a self-dual code, the same definitions apply for
 both the $X$-type and $Z$-type operators.
 %and we confuse the distinction between union of cells
 %and the corresponding $X$ or $Z$-type operator.
@@ -2197,9 +2220,10 @@ The $X/Z-$type gauge group is generated by
 $X/Z-$type operators supported on each face.
 The $X/Z-$type stabilizer group is generated by
 $X/Z-$type operators supported on each body.
-There is one $X/Z-$type logical operator and these
-are generated by
-$X/Z-$type operators supported on any region.
+Therefore, the stabilizer generators are non-extensive
+(have bounded size).
+There is one $X/Z-$type logical operator generator and these
+are given by $X/Z-$type operators supported on any region.
 
 \subsection{Commuting ideals of gauge codes}\label{Sec45}
 
@@ -2276,7 +2300,7 @@ It follows that $G_0$
 can be partitioned into six commuting ideals.
 
 In a similar vein,
-for the 2D $XY$-model (with $l$ even)
+for the 2D $XY$-plaquette model (with $l$ even)
 we find that the gauge group partitions
 into four commuting ideals.
 Each ideal corresponds to a choice of 
@@ -2305,11 +2329,12 @@ in the numerical workload.
 %\section{Spectra}
 %\label{spectra}
 
+%\newpage
 \section{Numerical results}\label{Sec6}
 
 Here we show tables for the first and
 second eigenvalues of the 2D and 3D compass models,
-as well as the 2D $XY$-model and gauge color code model.
+as well as the 2D $XY$-plaquette model and gauge color code model.
 These results are obtained using exact diagonalization methods.
 For each instance we indicate the groundspace eigenvalue
 $\lambda_1$ which is obtained from $H_{0,0}.$
@@ -2324,8 +2349,8 @@ stabilizer generator,
 as it was confirmed numerically that 
 adding further frustrated stabilizers never 
 produces a better candidate for $\lambda_2.$
-(This involved performing exact diagonalization on 
-the top eigenvalues of every $H_{t_X,0}$ block in the Hamiltonian.)
+This involved performing exact diagonalization on 
+the top eigenvalues of every $H_{t_X,0}$ block in the Hamiltonian.
 Also, we only show non-isomorphic stabilizer generators,
 under the lattice symmetry of the model.
 We use the iterative solvers in the software library 
@@ -2369,7 +2394,7 @@ $n$ &  $t_X$    & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ? & gap \\
 \end{samepage}
 
 \begin{samepage}
-\underline{2D $XY$-model}
+\underline{2D $XY$-plaquette model}
 \begin{center}
 \begin{tabular}{ c|c|c|c|l|c } 
 $n$ &  $t_X$    & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ? & gap \\
@@ -2434,7 +2459,8 @@ $n$ &  $t_X$    & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ?  & gap \\
 \begin{figure*}
 \begin{center}
 \includegraphics[width=0.8\columnwidth]{pic-gap.pdf}
-\caption{The spectral gap of four different gauge code Hamiltonians, versus the number
+\caption{%
+The spectral gap of four different gauge code Hamiltonians, versus the number
 of qubits $n$. The gap is defined as the difference between
 the ground eigenvalue and the first excited eigenvalue.
 These results are obtained by exact diagonalization.
@@ -2446,10 +2472,11 @@ These results are obtained by exact diagonalization.
 \begin{figure*}
 \begin{center}
 \includegraphics[width=0.8\columnwidth]{pic-gap-stabs.pdf}
-\caption{
-Here we show the spectral gap
-for each Hamiltonian block $H_{t_X,0}$
-of the 3D gauge color code models of sizes $n=15,65,175.$
+\caption{%
+For the 3D gauge color code model
+we show the spectral gap
+of each Hamiltonian block $H_{t_X,0}$
+with $n=15,65,175.$
 This gap is defined as $\lambda_1(H) - \lambda_1(H_{t_X,0}).$
 Each point is colored according to the weight of the
 frustrated stabilizer generator.
@@ -2458,43 +2485,44 @@ frustrated stabilizer generator.
 \end{center}
 \end{figure*}
 
-The gap of the 3D gauge color code is clearly more
+These numerics are shown in Figures \ref{PicGap} and
+\ref{PicGapStabs}.
+The gap of the 3D gauge color code is more
 robust than the other models, see Figure \ref{PicGap}.
-%This is solely due to the geometry of the code...
 It does decrease with $n$, but note also that the
 stabilizers in the code are also growing, up to weight 24.
 To emphasize this point we show in Figure \ref{PicGapStabs}
-the ground eigenvalues of all of these blocks $H_{t_X,0}.$
+the ground eigenvalues of all of the blocks $H_{t_X,0}.$
 For larger codes in this family the stabilizers do not get
 bigger than weight 24.
-%They do not get any bigger after this.
 It is not clear to what extent these results are
 representative of larger code sizes, but we
 can already see from Figure \ref{PicGapStabs} 
 evidence that 
 the weight of the frustrated stabilizer generator plays a more
 important role than the size of the code itself.
-
-There are two main points to make about these numerics.
-The first is that the gap of the compass model 
-is decreasing much faster than the gap in the gauge color code.
-In fact, there is strong evidence \cite{Dorier2005} 
-that the gap of the compass model
-tends to zero as the lattice size grows.
-The second point to make
-is that the gap always corresponds to frustrating
-a stabilizer ($t_X\ne 0.$) 
-Moreover, the stabilizer that
-gives rise to the gap is the one with largest weight.
+%The first is that the gap of the compass model 
+%is decreasing much faster than the gap in the gauge color code.
+%In fact, there is strong evidence \cite{Dorier2005} 
+%that the gap of the compass model
+%tends to zero as the lattice size grows.
+In these examples, the gap always corresponds to frustrating
+a stabilizer ($t_X\ne 0$)
+and in particular the stabilizer generator with largest weight.%
+\footnote{There is some subtlety about what we mean by 
+stabilizer generator, but hopefully this is clear for the
+codes we study here.}
 This is a crucial connection to make because the
-stabilizers of the compass model grow with the linear
+stabilizers of the compass model 
+(as well as the $XY$ and Ising models)
+grow with the linear
 size of the model
 while those of the gauge color code 
-do not need to grow beyond a constant bound.
+do not grow beyond a constant bound.
 %Note the similar
 %behaviour of the 1D $XY$-model and transverse field Ising model.
 This would suggest that if this is the mechanism for
-gapless behaviour that the gauge color code  may
+gapless behaviour that the gauge color code model may
 be gapped.
 
 These numerical results reach the limit of presently available 
@@ -2794,7 +2822,7 @@ to understand how
 the gap between the first two eigenvalues behaves as we 
 increase the number of qubits.
 For a system to maintain a topologically ordered groundstate
-we would expect this gap to be bounded away from zero, or ``gapped''.
+we would expect this gap to be bounded away from zero, or gapped.
 
 The numerical results obtained show some evidence for
 this gapped behaviour for the 3D gauge color code Hamiltonian.
@@ -2810,7 +2838,6 @@ is to be found in the block decomposition of the Hamiltonian,
 which leads to a polynomial reduction in the numeric workload.
 %Also, the Perron-Frobenius theory gives geometric reasons as to
 %why the size of stabilizers is related to the gap.
-
 The third main result of this paper is the decomposition of
 each Hamiltonian block into mutually commuting ideals.
 In the case of the 3D gauge color code Hamiltonian, this

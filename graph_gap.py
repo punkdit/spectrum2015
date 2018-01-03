@@ -122,7 +122,7 @@ plot(xs, ys, blue, "2D compass", 1)
 # 2D XY-model
 xs = [16, 36, 64, 100, 144]
 ys = [3.31371, 1.93021, 1.28720, 0.90439, 0.63184]
-plot(xs, ys, green, "2D XY", 3)
+plot(xs, ys, green, "2D XY-plaquette", 3)
 
 # gauge color 
 xs = [15, 65, 175]
