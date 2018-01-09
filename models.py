@@ -1455,8 +1455,8 @@ if __name__ == "__main__":
     #K = find_kernel(Gx.transpose())
     #print "kernel:", len(K)
 
-    for g in Hx:
-        model.show_stabx(g)
+    #for g in Hx:
+    #    model.show_stabx(g)
 
 #        best = None
 #        vbest = None

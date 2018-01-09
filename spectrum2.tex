@@ -180,32 +180,79 @@ The University of Sydney}
 \maketitle
 
 \begin{abstract}
-In this paper we study the spectra of 
-Hamiltonians built from Pauli spin (qubit) operators.
-These spin operators lead a double life:
-both as the energetic terms of a Hamiltonian model, and as
-the operators in a quantum error correcting code.
-When these operators commute, the code is known as a stabilizer code.
-When they don't commute, the code is known as a subsystem code or gauge code.
-The resulting Hamiltonian groundstate becomes frustrated.
-For such a Hamiltonian to have any ability to act as 
-a quantum memory we would expect a spectral gap between the
-groundspace and first excited states.
-The goal of this paper is to study this spectral gap.
-We show how to apply group representation theory to
-block diagonalize the Hamiltonion, with blocks labelled
-by stabilizer eigenvalues.
-In the case when the Hamiltonion is stoquastic, we apply
-Perron-Frobenius theory to constrain the location of the
-second eigenvector.
+We study the spectral gap of frustrated spin (qubit)
+Hamiltonians constructed from quantum subsystem (gauge) codes.
+Such a Hamiltonian can be block diagonalized, with
+blocks labelled by eigenvalues of extensively many
+integrals of motion (stabilizers of the code.)
+Of particular interest is the 3D gauge color code,
+whose Hamiltonian has been conjectured to act as a quantum
+memory at finite temperature. 
+Using Perron-Frobenius theory we constrain the
+location of first and second eigenvalues among the
+blocks of the Hamiltonian.
+This allows us to numerically find the gap of some large instances
+of the 3D gauge color code, which is compared to 
+other frustrated spin Hamiltonians.
+Finally, we suggest a relation between bounded 
+stabilizers and gapped spectra.
+%and present numerical results in support of this.
 \end{abstract}
+
+%\begin{abstract}
+%In this paper we study the spectra of 
+%Hamiltonians built from spin one-half (qubit) Pauli operators.
+%These operators lead a double life:
+%both as the energetic terms of a Hamiltonian model, and as
+%the operators in a quantum error correcting code.
+%For gauge (subsystem) codes,
+%the resulting Hamiltonian groundstate becomes frustrated.
+%For such a Hamiltonian to have any ability to act as 
+%a quantum memory we would require a spectral gap between the
+%groundspace and first excited states.
+%The goal of this paper is to study this spectral gap.
+%We show how to block diagonalize the Hamiltonion, with blocks labelled
+%by stabilizer eigenvalues.
+%In the case when the Hamiltonion is stoquastic, we apply
+%Perron-Frobenius theory to find bounds on the spectrum
+%of these blocks.
+%Of particular interest is the 3D gauge color code,
+%whose Hamiltonian is conjectured to have self-correcting
+%quantum memory properties.
+%Our results allow us to perform numerics on some
+%large instances of these Hamiltonians, which
+%gives some evidence that these models are gapped.
+%\end{abstract}
 
 \tableofcontents
 
 %\doublespacing
 %\onehalfspacing
 
-\section{Overview}
+\section{Introduction}
+
+In this paper we study the spectra of 
+Hamiltonians built from spin one-half (qubit) Pauli operators.
+Sometimes these operators lead a double life,
+both as the energetic terms of a Hamiltonian model, and as
+the operators in a quantum error correcting code.
+In this case we have
+extensively many integrals of motion.
+These are the stabilizers of the code,
+and can be used to block diagonalize the Hamiltonion.
+This sets these models apart from other 
+quantum condensed matter Hamiltonions, such as
+the Ising model, which has very few integrals of motion.
+
+%When these operators commute, the code is known as a stabilizer code.
+%When they don't commute, the code is known as a subsystem code or gauge code.
+%Hamiltonians built from stabilizer codes are
+%easily diagonalizable.
+%This work was motivated by the 3D gauge color code,
+%conjectured to be a self-correcting quantum memory.
+%\todo{more...}
+
+%\subsection{Overview}
 
 In Section \ref{Sec2} we show graphical depictions of
 some simple Hamiltonions and introduce the action of
@@ -227,6 +274,8 @@ This motivates the ideas in Section \ref{Sec5}, where
 we use Perron-Frobenius theory to
 describe the low energy spectrum of such Hamiltonians.
 These are new results.
+Note that in this paper we use a ``neg-Hamiltonian'' convention,
+so that the groundspace corresponds to the \emph{highest} eigenvalue.
 
 In Section \ref{Sec44} we introduce the 3D gauge color code Hamiltonian%
 \cite{Bombin2015,Bombin2015single,Kubica2015}.
@@ -251,17 +300,26 @@ is also part of the story of topologically ordered phases
 \cite{Kitaev2003,Brown2016}.
 We also apply these techniques to a model
 we call the 2D $XY$-plaquette model,
-with weight four operators.
+which has weight four gauge operators.
 
 Finally in Section \ref{Sec7} 
 we investigate the connection between the size of
 stabilizer generators
 and the gapped nature of the Hamiltonian.
-In particular, we would like to conjecture a relation between
+In particular, we suggest a relation between
 extensive stabilizer generators, and gapless excitations of
 the Hamiltonian.
 This is further application of the Perron-Frobenius 
 theory in the context of Cheeger inequalities.
+
+
+\vskip 5pt \noindent{\bf \underline{Acknowledgements.}\ }
+The author would like to thank 
+Andrew Doherty,
+Steven Flammia,
+Michael Kastoryano,
+Jiannis Pachos and 
+Dan Browne.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -542,7 +600,9 @@ So far we have been analysing the Hamiltonian in the
 symmetry invariant basis. The complete story of how this
 works is in \SRef{Sec3} below.
 But we can also just fix the computational basis and
-examine the Hamiltonian in this basis....\todo{more...}
+examine the Hamiltonian in this basis.
+This leads to the Perron-Frobenius theory in \SRef{Sec5}.
+%...\todo{more...}
 
 %\todo{XXX and now for another formula}
 %\begin{align*}
@@ -2838,7 +2898,7 @@ is to be found in the block decomposition of the Hamiltonian,
 which leads to a polynomial reduction in the numeric workload.
 %Also, the Perron-Frobenius theory gives geometric reasons as to
 %why the size of stabilizers is related to the gap.
-The third main result of this paper is the decomposition of
+The third key result is the decomposition of
 each Hamiltonian block into mutually commuting ideals.
 In the case of the 3D gauge color code Hamiltonian, this
 decomposition yields an exponential reduction in 
