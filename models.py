@@ -947,6 +947,7 @@ class Model(object):
             len(self.Lx), len(self.Gx), len(self.Gz), 
             len(self.Hx), len(self.Hz), len(self.Rx))
 
+    attrs = "Gz Gx Rz Rx Hz Hx Tz Tx Pz Px Lz Lx".split()
     def get_dual(self):
         Gz, Gx = self.Gx, self.Gz        
         Rz, Rx = self.Rx, self.Rz        
@@ -1405,6 +1406,27 @@ if __name__ == "__main__":
 
     model = build_model(Gx, Gz, Hx, Hz)
 
+
+    if argv.extend:
+        k = len(model.Lx)
+        n = model.n + k
+        mx = len(model.Hx)
+        mz = len(model.Hz)
+            
+        Hx = zeros2(mx)+k, n+k)
+        Hz = zeros2(mz)+k, n+k)
+
+        Hx[:mx, :n] = model.Hx
+        Hz[:mz, :n] = model.Hz
+        Hx[mx:, :n] = model.Lx
+        Hz[mz:, :n] = model.Lz
+
+        for i in range(k):
+            Hx[mx+i, n+i] = 1
+            Hz[mz+i, n+i] = 1
+
+        model = build_model() # um....
+            
     print model
 
     if argv.show:
@@ -1469,6 +1491,9 @@ if __name__ == "__main__":
 #                best = v.sum()
 #        print "best:", best
 
+        
+            
+        
 
 
 
