@@ -1,8 +1,15 @@
 
-all: repr.pdf hecke.pdf spectrum.pdf spectrum2.pdf
+all: repr.pdf hecke.pdf spectrum.pdf spectrum2.pdf spectrum3.pdf
 
 #out: repr
 #	open repr.pdf 
+
+spectrum3.pdf: spectrum3.tex refs3.bib pic-gap.pdf pic-gap-stabs.pdf
+	pdflatex spectrum3.tex
+	bibtex spectrum3
+	pdflatex spectrum3.tex
+	pdflatex spectrum3.tex
+
 
 spectrum2.pdf: spectrum2.tex refs3.bib pic-gap.pdf pic-gap-stabs.pdf
 	rm -f spectrum2.bbl
