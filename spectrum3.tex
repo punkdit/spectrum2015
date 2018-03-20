@@ -166,10 +166,11 @@
 
 \title{Spectra of Gauge Code Hamiltonians}
 
-\author{Simon Burton\\
-Centre for Engineered Quantum Systems,\\
-School of Physics,\\
-The University of Sydney}
+\author{Simon Burton}
+%\author{Simon Burton\\
+%Centre for Engineered Quantum Systems,\\
+%School of Physics,\\
+%The University of Sydney}
 
 
 \date{\today}
@@ -472,7 +473,7 @@ $$
     \Ham =  \bigoplus_{t\in T}\ \Ham_t \otimes I^{\otimes k}.
 $$
 \end{framed}
-See Appendix \ref{Reptheory} for details.
+See Appendix \ref{Sec3} for details.
 %Writing $I$ for the identity element of $T$ we write the corresponding
 %block of the Hamiltonian as $\Ham_{0,0}.$
 
@@ -798,7 +799,7 @@ for $v\in \Frd.$
 
 Adding up all of the above we
 have in summary,
-\begin{equation}%\label{hamblockgs}
+\begin{equation}\label{hamblockgs}
 H_{0,0} = \sum_{\substack{v\in\Frd\\g_X\in G_X } }
   \bket{v+g_X  R_Z^\top}\bbra{v} 
   + \sum_{v\in\Frd} \bigl(|G_Z| - 2w(G_Z R_X^\top v^\top)
@@ -814,7 +815,7 @@ this means that the $G_X$ gauge terms
 have the same effect on $H_{t_X,0}$
 as $H_{0,0}$ and only the diagonal has changed:
 %\todo{the diagonal in what basis?}
-\begin{equation}%\label{hamblocktx}
+\begin{equation}\label{hamblocktx}
 H_{t_X,0} = \sum_{\substack{v\in\Frd\\g_X\in G_X } }
   \bket{v+g_X  R_Z^\top}\bbra{v} 
   + \sum_{v\in\Frd} \bigl(
@@ -839,7 +840,7 @@ each Hamiltonian block is:
 %    |G_Z| - 2w(G_Z R_X^\top v^\top + G_Z t_X^\top)
 %    \bigr) \ \bket{v}\bbra{v}
 %\end{align*}
-\begin{equation}%\label{hamblockgen}
+\begin{equation}\label{hamblockgen}
 H_{t_X,t_Z} = \sum_{\substack{v\in\Frd\\g_X\in G_X } }
     \eta(t_Z g_X^\top)
   \ \bket{v+g_X  R_Z^\top}\bbra{v} 
@@ -932,11 +933,10 @@ theorem with the proviso that the eigenvalues are shifted by some constant.
 For a linear operator $A$ we will use notation 
 $\lambda_1(A)$, $\lambda_2(A),$ etc., to denote the (real) eigenvalues of $A$,
 ordered as:
-$$
+$
     \lambda_1(A) \ge \lambda_2(A) \ge ...
-$$
+$
 Similarly, the notation $v_1(A), v_2(A),$ etc., refers to the associated eigenvectors.
-
 
 Given a CSS gauge code Hamiltonian $H,$ 
 let the matrix for $H$ in the computational basis be $\Gamma.$
@@ -948,9 +948,9 @@ and so this matrix is stoquastic.
 In the language of graph theory,
 $\Gamma$ has vertices the $2^n$ computational
 basis elements, and edges:
-$$
+$
     \ket{v} \mapsto g_X \ket{v}, \smbox{for all} v\in\Fnd, g_X\in G_X.
-$$
+$
 These are undirected edges because $g_X^2 = I.$
 We also add weighted loops corresponding to the $Z$-type gauge operators:
 $$
@@ -1069,9 +1069,9 @@ every groundstate of $H$ is stabilized.
 %We will construct a basis for the groundspace consisting of
 %vectors that are stabilized.
 The set of top eigenvectors 
-$$
+$
     \bigl\{ v_1(\Gamma_{t_X}) \bigr\}_{t_X\in\Span{T_X}}
-$$
+$
 must contain a basis for the groundspace of $H.$
 Let such a basis vector be $\ket{v} = v_1(\Gamma_{t_X})$ for some $t_X.$
 This vector is positive by Lemma \ref{lemma22}.
@@ -1119,12 +1119,12 @@ Therefore the entire groundspace must be stabilized.
 \doproposition{\numitem{prop24}}
 For any CSS gauge code Hamiltonian $\Ham$
 we have:
-$$\lambda_1(\Ham) = \lambda_1(\Ham_{0,0})$$
+$\lambda_1(\Ham) = \lambda_1(\Ham_{0,0})$
 and for $t_X\in\Span{T_X}, t_Z\in\Span{T_Z}$
 with $t_X\ne 0$ or $t_Z\ne 0$,
-$$
+$
 \lambda_1(\Ham) > \lambda_1(H_{t_X,t_Z}).
-$$
+$
 
 \doproof
 The vectors in the space that 
@@ -1393,13 +1393,11 @@ a \emph{corner.}
 A cell not contained within any region is called an interior cell.
 
 This colored cellulation is required to have the following further properties:
-\begin{enumerate}
-\item Adjacent bodies have different colors.
-\item Each region has a unique color 
+\emph{1.} Adjacent bodies have different colors.
+\emph{2.} Each region has a unique color 
 such that no bodies intersecting that region has that color.
-\item All vertices are adjacent to four other vertices,
+\emph{3.} All vertices are adjacent to four other vertices,
 except for the corner vertices which are adjacent to three other vertices.
-\end{enumerate}
 
 Here we show some instances of this construction,
 along with the colors of the unobscured bodies.
