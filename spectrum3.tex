@@ -235,125 +235,94 @@ stabilizers and gapped spectra.
 
 In this paper we study the spectra of 
 Hamiltonians built from spin one-half (qubit) Pauli operators.
-Sometimes these operators lead a double life,
-both as the energetic terms of a Hamiltonian model, and as
-the operators in a quantum error correcting code.
-In this case we have
-extensively many integrals of motion.
+Sometimes these operators lead a double life:
+as the energetic terms of a Hamiltonian model,
+or as the check operators in an error correcting code.
+In this case we have extensively many integrals of motion.
 These are the stabilizers of the code,
 and can be used to block diagonalize the Hamiltonion.
 This sets these models apart from other 
 quantum condensed matter Hamiltonions, such as
 the Ising model, which has very few integrals of motion.
 
-From the perspective of a quantum code these are the
-things that we use to diagnose errors and perform error correction.
-We can also interpret these operators as the terms of a Hamiltonian, whose
-groundspace corresponds to the energetically protected codespace.
-In the case of mutually commuting operators we can easily diagonalize the
-Hamiltonian, but for other systems of interest this does not hold.
+As a Hamiltonian, we are protecting information in the groundspace. 
+When the terms come from a \emph{stabilizer} code
+they all commute and so 
+we can readily diagonalize the Hamiltonian.
+Such models, for example the toric code\cite{Dennis2002}
+are easily seen to be gapped.
+For more general \emph{subsystem} or \emph{gauge codes}, this is
+not the case, but we can still block diagonalize the Hamiltonian
+with blocks labelled by eigenvalues of the 
+stabilizers~\cite{Bacon2006quantum,Yoshida2010,Brzezicki2013}.
 
-The mathematicians have a name for this question ``what is an operator?''
-This is known as \emph{representation theory.}
-We examine three different notions of
-such representations, with a view to extracting
-spectral information about the Hamiltonian.
-Group theory representations give 
-a block diagonalization of the Hamiltonian:
-these are the \emph{irreducible representations} and in
-our case can be labelled by stabilizer eigenvalues.
-The coarser tool of Perron-Frobenius theory \cite{Perron1907, Frobenius1912, Baez2012}
-gives information about the
-spectral layout of these blocks in the case of CSS gauge codes.
-
-While there are
-some hints of this theory in the literature 
-\cite{Bacon2006quantum,Yoshida2010} %,Brzezicki2013}
-here we spell out in detail how this works and much more.
-Partly it's because these models are new and we don't have
-many examples.
-
-Using all of these tools we 
-perform exact diagonalization on some 
-large instances of the 3D gauge color code 
-Hamiltonian \cite{Bombin2015,Bombin2015single,Kubica2015}.
-These numerics support the conjecture that this model is gapped,
-which in turn lends weight to the possibility that these may
-be self-correcting quantum memories.
-%Then we turn to examine the low energy spectra.
-%In particular we are interested in the gap between
-%the energy of the groundstate and the first excited state.
-Having a constant gap (bound from below)
-is also part of the story of topologically ordered phases
-\cite{Kitaev2003,Brown2016}.
-
-%When these operators commute, the code is known as a stabilizer code.
-%When they don't commute, the code is known as a subsystem code or gauge code.
-%Hamiltonians built from stabilizer codes are
-%easily diagonalizable.
-%This work was motivated by the 3D gauge color code,
-%conjectured to be a self-correcting quantum memory.
-%\todo{more...}
-
-%\subsection{Overview}
-
-%In Section \ref{Sec2} we show graphical depictions of
-%some simple Hamiltonions and introduce the action of
-%the Pauli $X$ and $Z$ operators.
-%In Section \ref{Sec3} we study the group representation theory
-%of subgroups of the (real) Pauli group on $n$ qubits.
-%%We apply this to the 2D compass model and the
-%%Kitaev honeycomb model in section \ref{Sec2} 
-%In Section \ref{Sec37} we find the 
-%irreducible representations of an arbitrary CSS gauge (subsystem) code.
-%%This is a new result, and involves solving a quadratic 
-%%system of equations over a finite field.
-
-In the computational basis, 
-CSS gauge code Hamiltonians have positive off-diagonal
-entries and so can be viewed as the adjacency matrix
-of a weighted graph.
-This motivates the ideas in Section \ref{Sec5}, where 
-we use Perron-Frobenius theory to
-describe the low energy spectrum of such Hamiltonians.
-These are new results.
 Note that in this paper we use a ``neg-Hamiltonian'' convention,
 so that the groundspace corresponds to the \emph{highest} eigenvalue.
+
+When the quantum code is restricted to the class of
+CSS codes\cite{Calderbank1997}, the corresponding Hamiltonian
+will be stoquastic. 
+This means the off-diagonal terms in the Hamiltonian are
+non-negative.
+In this case we can use the tools from
+Perron-Frobenius theory~\cite{Perron1907, Frobenius1912, Baez2012}.
+%constrains the spectrum of the Hamiltonian blocks.
+%with particular attention given to the spectral
+%gap of the Hamiltonian.
+These are new results, presented in Section \ref{Sec5},
+which show where the groundstate and first excited
+states are located among the blocks of the Hamiltonian.
+%These results enable to numerically find 
+%and are crucial for obtaining the numerical results presented in
+%Section \ref{Sec6}.
+In \ref{Sec6} we use these results to numerically find 
+spectral gap of several gauge code Hamiltonians.
 
 In Section \ref{Sec44} we introduce the 3D gauge color code Hamiltonian%
 \cite{Bombin2015,Bombin2015single,Kubica2015}.
 We find that this model 
-decomposes into six mutually commuting operators in Section \ref{Sec45}.
+decomposes into six mutually commuting pieces in Section \ref{Sec45}.
 This gives an exponential reduction in the numerical
 difficulty of exactly diagonalizing this Hamiltonian,
 results of which we present in Section \ref{Sec6}.
-These numerics show some evidence of a spectral
-gap, which is contrasted against models that are known
+These numerics show some evidence of a spectral gap,
+which is contrasted against models that are known
 to be gapless: the two and three dimensional compass model,
 the one dimensional $XY$-model and 
 the one dimensional transverse field Ising model.
-The conjecture that the gauge color code model is gapped
-in turn lends weight to the possibility that this may
-be a self-correcting quantum memory~\cite{Brown2016}.
-%Then we turn to examine the low energy spectra.
-%In particular we are interested in the gap between
-%the energy of the groundstate and the first excited state.
-Having a constant gap (bound from below)
-is also part of the story of topologically ordered phases
-\cite{Kitaev2003,Brown2016}.
-We also apply these techniques to a model
+We also apply these techniques to a new model
 we call the 2D $XY$-plaquette model,
 which has weight four gauge operators.
 
-Finally in Section \ref{Sec7} 
-we investigate the connection between the size of
-stabilizer generators
-and the gapped nature of the Hamiltonian.
-In particular, we suggest a relation between
-extensive stabilizer generators, and gapless excitations of
-the Hamiltonian.
-This is further application of the Perron-Frobenius 
-theory in the context of Cheeger inequalities.
+We conjecture that the decisive feature that makes
+the gauge code model gapped is the lack of unbounded stabilizers.
+In other words, if the excitations, or ``quasi-particles'' of
+the system are localized, then we have a gap.
+This fits nicely with the proposed classification of 
+gapped phases of matter at long distances by topological
+quantum field theories~\cite{Kitaev2003,Kapustin2017}.
+%The size of stabilizers is the 
+The gap of this model would also likely be a pre-requisite for
+it being a quantum memory. 
+The existance of quantum memories (in three dimensions)
+is unknown at this time~\cite{Brown2016}.
+%Then we turn to examine the low energy spectra.
+%In particular we are interested in the gap between
+%the energy of the groundstate and the first excited state.
+%Having a constant gap (bound from below)
+%is also part of the story of topologically ordered phases
+%\cite{Kitaev2003,Brown2016}.
+
+
+%Finally in Section \ref{Sec7} 
+%we investigate the connection between the size of
+%stabilizer generators
+%and the gapped nature of the Hamiltonian.
+%In particular, we suggest a relation between
+%extensive stabilizer generators, and gapless excitations of
+%the Hamiltonian.
+%This is further application of the Perron-Frobenius 
+%theory in the context of Cheeger inequalities.
 
 
 \vskip 5pt \noindent{\bf \underline{Acknowledgements.}\ }
@@ -362,7 +331,8 @@ Andrew Doherty,
 Steven Flammia,
 Michael Kastoryano,
 Jiannis Pachos and 
-Dan Browne.
+Dan Browne
+for useful discussions and comments.
 
 \section{Gauge code Hamiltonians}%\label{Sec3}
 
@@ -370,7 +340,7 @@ We define
 the (real) {\it $n$-qubit Pauli group} $\Pauli_n$, 
 %using the $2n+1$ element generating set 
 %$\{X_1, .., X_n, Z_1, .., Z_n\}$
-as generated by $n$-fold tensor products of the matrices:
+as the group generated by $n$-fold tensor products of the matrices:
 $$
 I = \left( \begin{array}{ll} 1&0\\ 0&1\end{array} \right),\ \ 
 X = \left( \begin{array}{ll} 0&1\\ 1&0\end{array} \right),\ \ 
@@ -385,6 +355,16 @@ is denoted $\Pauli_n^X.$ These are the $X$-type
 elements. Similarly,
  $\{Z_1,...,Z_n\}$ generates % $\{Z_i\}_{i=1,..,n}$ 
 the subgroup of $Z$-type elements $\Pauli_n^Z$.
+
+We write the group commutator as
+$[[g, h]]:=ghg^{-1}h^{-1}$
+and note the important commutation relation:
+$$
+    [[Z_i, X_j]] = 
+    \left\{ \begin{array}{ll}
+ -I &\mbox{if}\ i=j,\\
+ I &\mbox{if}\ i\ne j.\end{array}\right.
+$$
 
 We now define an {\it $n-$qubit gauge group} to be 
 any non-abelian subgroup $G$ of $\Pauli_n,$
@@ -466,8 +446,8 @@ Using the representation theory of the gauge group $G$
 we find the following. 
 \begin{framed}
 \noindent
-The Hamiltonian is block diagonalized, 
-into $2^m$ blocks
+The Hamiltonian is block diagonalized
+into $2^m$ blocks,
 indexed by operators $t$ in the abelian group $T$ with multiplicity $2^k:$
 $$
     \Ham =  \bigoplus_{t\in T}\ \Ham_t \otimes I^{\otimes k}.
@@ -496,7 +476,7 @@ In this section, and the remainder of this paper,
 we restrict our
 attention to gauge groups formed from terms 
 in $\Pauli_n^X\cup\Pauli_n^Z.$
-We call these \emph{CSS gauge codes.}
+We call these \emph{CSS gauge codes}\cite{Calderbank1997}.
 We next turn to a discussion of the symplectic structure of
 these operators.
 
@@ -619,7 +599,7 @@ Let $G$ be an $n$-qubit
 CSS gauge group with generators $G_X\cup~G_Z.$
 We can construct a solution to the following $\Field$-linear
 block matrix equation:
-\begin{equation}%\label{lstr}
+\begin{equation}\label{lstr}
 \left( \begin{array}{l}
 L_X\\
 S_X\\
@@ -648,8 +628,6 @@ matrices
 an $(L,S,T,R)$-decomposition of the gauge group.
 In general this will not be unique for
 any given gauge group.
-Note that equation \Eref{lstr} is equivalent to the 
-Pauli presentation \Eref{presentation}.
 
 \subsection{CSS gauge code Hamiltonians}%\label{Sec37}
 
@@ -1625,6 +1603,8 @@ To find eigenvalues for each Hamiltonian block $H_{t_X,0}$
 %and for the compass code and gauge color codes we found ...)
 %For simulation purposes, these numerics are constrained by
 we need to operate on wavefunctions with $2^r$ real coefficients.
+We use the iterative solvers in the software library 
+{\tt SLEPc} \cite{Hernandez2005} to find these eigenvalues.
 The iterative solvers in {\tt SLEPc} need to store at least two,
 but ideally more, of these wavefunctions.
 For $r=32$ this is about 32 Gigabytes for one wavefunction (using double
@@ -1721,9 +1701,9 @@ $\ket{0}-\ket{1}$ that is anti-stabilized by $X.$
 
 We are going to be considering Hamiltonians built from
 summing operators of this form.
-In this paper we use a ``neg-Hamiltonian'' convention,
-to save complicating expressions with negative signs.
-The ground space corresponds to the \emph{highest} eigenvalue.
+%In this paper we use a ``neg-Hamiltonian'' convention,
+%to save complicating expressions with negative signs.
+%The ground space corresponds to the \emph{highest} eigenvalue.
 
 So building a Hamiltonian from a single $X$ or $Z$ term,
 we find the ground space as the stabilized space
@@ -1926,6 +1906,9 @@ Z_iX_jZ_iX_j=I, \mbox{\ for\ } i, j = 1,..,n,\ i\ne j.
 \end{array}
 \end{equation}
 
+Note that the Decomposition equation \Eref{lstr} is equivalent to  
+this presentation.
+
 This abstract approach to the definition of a group is known as
 a group \emph{presentation}. In general, this is a set of
 generators together with a set of relations satisfied
@@ -1939,15 +1922,6 @@ Therefore we will write $\omega$ as $-I,$
 similarly $\pm I$ will denote the
 set $\{\omega, I\},$ and $-X$ is $\omega X$, etc.
 
-We write the group commutator as
-$[[g, h]]:=ghg^{-1}h^{-1}$
-and note the important commutation relation:
-$$
-    [[Z_i, X_j]] = 
-    \left\{ \begin{array}{ll}
- -I &\mbox{if}\ i=j,\\
- I &\mbox{if}\ i\ne j.\end{array}\right.
-$$
 If we take an arbitrary $g\in \Pauli_n$
 written as a product of the generators,
 it follows that we can rewrite this
@@ -2005,74 +1979,74 @@ is defined as the following tensor product of $2\times 2$ matrices:
 \right.
 \end{align*}
 
-\subsection{Subgroups of the Pauli group}\label{Sec32}
-
-We now define an {\it $n-$qubit gauge group} to be 
-any non-abelian subgroup $G$ of $\Pauli_n,$
-defined by a set of generators $G_0\subset \Pauli_n,$
-%for some subgroup $G$ of $\Pauli_n:$
-$$ G := \langle G_0\rangle.$$
-%We will assume $G$ is not abelian, which 
-%%is equivalent to the condition that $-I\in G.$ % No! {-I, I} is abelian...
-%implies that $-I\in G.$
-Because $G$ is not abelian, it follows that $-I\in G.$
-We also restrict $G_0$ to only contain Hermitian operators,
-which is equivalent to requiring that $g^2=I$ for all $g\in G_0.$
-
-Now let $\Stab$ be the largest subgroup of $G$ not containing
-$-I.$
-$\Stab$ is then an abelian subgroup,
-also known as the {\it stabilizer} subgroup.
-%(Note that each of the stabilizers commutes with the Hamiltonian.)
-$G$ decomposes as a direct product:
-$$G = \Stab\times R,$$
-where $R\cong \Pauli_r$ for some $1\le r\le n,$
-and $\Stab\cong \Z_2^{m}$ for $0\le m<n.$
-Therefore, 
-$$|G| = |\Stab| |R| = 2^{m+2r+1}.$$
-We call $R$ the {\it reduced gauge group}.
-We consider both $\Stab$ and $R$ to be subgroups of $G.$
-%Let $\phi:\Pauli_r\to R$ be a group isomorphism,
-Let $\phi:R\to \Pauli_r$ be a group isomorphism,
-%then $R_0 := \{\phi(X_i), \phi(Z_i)\}_{1\le i\le r}$
-%then $R_0 := \{\phi(X_i), \phi(Z_i)\}_{i=1,..,r}$
-then $R_0 := \{\phi^{-1}(X_i), \phi^{-1}(Z_i)\}_{i=1,..,r}$
-is a set of independent generators of $R.$
-We also let $\Stab_0$ be a set of $m$ independent generators of $\Stab.$
-
-To find the cosets of $G$ in $\Pauli_n$ we take
-the group closure of $\Pauli_n-G$; when this is non-empty
-we only need to add $I$ and $-I.$
-This is another
-gauge group, whose reduced gauge group is known as
-the {\it logical} operators $L$, and whose 
-stabilizer subgroup is known as the {\it error} operators $T.$
-Now any coset of $G$ can be written as $ltG$ with
-$l\in L$ and $t\in T.$
-The size of $T$ equals the size of $\Stab$: $|T|=|\Stab|=2^m.$
-If we let $L_0$ be an independent generating set for $L$
-then we have the important formula:
-\begin{align*}
-n &= \frac{1}{2}|L_0| + |\Stab_0| + \frac{1}{2}|R_0|\\
-  &= k + m + r
-\end{align*}
-We summarize the information in this section in a table
-of Pauli group elements arranged in
-two columns and $n$ rows:
-\begin{center}
-\includegraphics[]{pic-canonical.pdf}
-\end{center}
-Here we show the $2n$ generators of $\Pauli_n$ arranged 
-so that each row contains a pair of generators,
-where each such generator anti-commutes with the operator on the same row and
-commutes with all the other operators in the table.
-Note that this is exactly the definition of the Pauli group
-via a presentation given in the previous section.
-Furthermore, the table shows $2k$ generators
-of $L$, $m$ generators each for $S$ and $T,$ and $2r$
-generators of $R.$
-The gauge group $G$ encloses $R$ and $S$, and one can
-immediately see how $L$ and $T$ also form a gauge group.
+%\subsection{Subgroups of the Pauli group}\label{Sec32}
+%
+%We now define an {\it $n-$qubit gauge group} to be 
+%any non-abelian subgroup $G$ of $\Pauli_n,$
+%defined by a set of generators $G_0\subset \Pauli_n,$
+%%for some subgroup $G$ of $\Pauli_n:$
+%$$ G := \langle G_0\rangle.$$
+%%We will assume $G$ is not abelian, which 
+%%%is equivalent to the condition that $-I\in G.$ % No! {-I, I} is abelian...
+%%implies that $-I\in G.$
+%Because $G$ is not abelian, it follows that $-I\in G.$
+%We also restrict $G_0$ to only contain Hermitian operators,
+%which is equivalent to requiring that $g^2=I$ for all $g\in G_0.$
+%
+%Now let $\Stab$ be the largest subgroup of $G$ not containing
+%$-I.$
+%$\Stab$ is then an abelian subgroup,
+%also known as the {\it stabilizer} subgroup.
+%%(Note that each of the stabilizers commutes with the Hamiltonian.)
+%$G$ decomposes as a direct product:
+%$$G = \Stab\times R,$$
+%where $R\cong \Pauli_r$ for some $1\le r\le n,$
+%and $\Stab\cong \Z_2^{m}$ for $0\le m<n.$
+%Therefore, 
+%$$|G| = |\Stab| |R| = 2^{m+2r+1}.$$
+%We call $R$ the {\it reduced gauge group}.
+%We consider both $\Stab$ and $R$ to be subgroups of $G.$
+%%Let $\phi:\Pauli_r\to R$ be a group isomorphism,
+%Let $\phi:R\to \Pauli_r$ be a group isomorphism,
+%%then $R_0 := \{\phi(X_i), \phi(Z_i)\}_{1\le i\le r}$
+%%then $R_0 := \{\phi(X_i), \phi(Z_i)\}_{i=1,..,r}$
+%then $R_0 := \{\phi^{-1}(X_i), \phi^{-1}(Z_i)\}_{i=1,..,r}$
+%is a set of independent generators of $R.$
+%We also let $\Stab_0$ be a set of $m$ independent generators of $\Stab.$
+%
+%To find the cosets of $G$ in $\Pauli_n$ we take
+%the group closure of $\Pauli_n-G$; when this is non-empty
+%we only need to add $I$ and $-I.$
+%This is another
+%gauge group, whose reduced gauge group is known as
+%the {\it logical} operators $L$, and whose 
+%stabilizer subgroup is known as the {\it error} operators $T.$
+%Now any coset of $G$ can be written as $ltG$ with
+%$l\in L$ and $t\in T.$
+%The size of $T$ equals the size of $\Stab$: $|T|=|\Stab|=2^m.$
+%If we let $L_0$ be an independent generating set for $L$
+%then we have the important formula:
+%\begin{align*}
+%n &= \frac{1}{2}|L_0| + |\Stab_0| + \frac{1}{2}|R_0|\\
+%  &= k + m + r
+%\end{align*}
+%We summarize the information in this section in a table
+%of Pauli group elements arranged in
+%two columns and $n$ rows:
+%\begin{center}
+%\includegraphics[]{pic-canonical.pdf}
+%\end{center}
+%Here we show the $2n$ generators of $\Pauli_n$ arranged 
+%so that each row contains a pair of generators,
+%where each such generator anti-commutes with the operator on the same row and
+%commutes with all the other operators in the table.
+%Note that this is exactly the definition of the Pauli group
+%via a presentation given in the previous section.
+%Furthermore, the table shows $2k$ generators
+%of $L$, $m$ generators each for $S$ and $T,$ and $2r$
+%generators of $R.$
+%The gauge group $G$ encloses $R$ and $S$, and one can
+%immediately see how $L$ and $T$ also form a gauge group.
 
 %\section{Gauge group representations}\label{GroupReps}
 
@@ -2358,7 +2332,7 @@ Let $G$ be an $n$-qubit
 CSS gauge group with generators $G_X\cup~G_Z.$
 We can construct a solution to the following $\Field$-linear
 block matrix equation:
-\begin{equation}\label{lstr}
+\begin{equation}\ref{lstr}
 \left( \begin{array}{l}
 L_X\\
 S_X\\
@@ -2541,8 +2515,6 @@ This involved performing exact diagonalization on
 the top eigenvalues of every $H_{t_X,0}$ block in the Hamiltonian.
 Also, we only show non-isomorphic stabilizer generators,
 under the lattice symmetry of the model.
-We use the iterative solvers in the software library 
-{\tt SLEPc} \cite{Hernandez2005} to find these eigenvalues.
 
 \begin{samepage}
 \underline{2D compass model}
