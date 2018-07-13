@@ -1413,8 +1413,8 @@ if __name__ == "__main__":
         mx = len(model.Hx)
         mz = len(model.Hz)
             
-        Hx = zeros2(mx)+k, n+k)
-        Hz = zeros2(mz)+k, n+k)
+        Hx = zeros2(mx+k, n+k)
+        Hz = zeros2(mz+k, n+k)
 
         Hx[:mx, :n] = model.Hx
         Hz[:mz, :n] = model.Hz
