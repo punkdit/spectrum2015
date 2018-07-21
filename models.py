@@ -310,6 +310,13 @@ def build_ising(n):
     return Gx, Gz, Hx, Hz
 
 
+def build_isingdual(n):
+
+    Gx, Gz, Hx, Hz = build_ising(n)
+
+    return Gz, Gx, Hz, Hx
+
+
 
 #def build_ising2():
 #
@@ -867,6 +874,9 @@ def build(name=""):
     elif argv.ising:
         Gx, Gz, Hx, Hz = build_ising(l)
 
+    elif argv.isingdual:
+        Gx, Gz, Hx, Hz = build_isingdual(l)
+
     elif argv.random:
         Gx, Gz, Hx, Hz = build_random(l)
 
@@ -1393,6 +1403,7 @@ def build_model(Gx=None, Gz=None, Hx=None, Hz=None):
     model = Model(locals())
 
     if argv.dual:
+        print("get_dual")
         model = model.get_dual()
         argv.dual = False # HACK !!
 
