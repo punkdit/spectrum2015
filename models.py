@@ -293,14 +293,17 @@ def build_ising(n):
 
     assert n>=2
 
-    m = n
-    Gx = zeros2(m, n)
-    Gz = zeros2(m, n)
-    for i in range(m):
+    mx = mz = n
+    if n==2:
+        mz = 1
+    Gx = zeros2(mx, n)
+    Gz = zeros2(mz, n)
+    for i in range(mx):
+        Gx[i, i] = 1 # transverse field
+
+    for i in range(mz):
         Gz[i, i] = 1
         Gz[i, (i+1)%n] = 1
-
-        Gx[i, i] = 1 # transverse field
 
     Hx = zeros2(1, n)
     Hz = zeros2(0, n)
