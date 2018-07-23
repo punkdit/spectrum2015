@@ -502,6 +502,7 @@ def dense(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
 
     vec0 = None
 
+    eigvals = []
     for excite in excites:
 
         print "excite:", excite
@@ -565,8 +566,9 @@ def dense(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
             vals.sort()
             val0 = vals[-1] # top one is last
             assert vals[-2] < val0 - 1e-4
-            print "excite:", excite,
+            #print "excite:", excite,
             print "eigval:", val0
+            eigvals.append(val0)
             vec0 = vecs[:,-1]
             if vec0[0] < 0:
                 vec0 = -vec0
@@ -589,6 +591,13 @@ def dense(Gx, Gz, Hx, Hz, Rx, Rz, Pxt, Qx, Pz, Tx, **kw):
             g.writePDFfile("pic-groundstate.pdf")
 
             return
+
+    if eigvals:
+        top = max(eigvals)
+        idx = eigvals.index(top)
+        eigvals.pop(idx)
+        second = max(eigvals)
+        print "gap:", top-second
 
 
 

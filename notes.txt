@@ -1,4 +1,23 @@
 
+23/7/18
+=======
+
+./zorbit.py longising l=14 dense solve |tail
+eigval: 10.0498756211
+excite: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0)
+eigval: 8.0622577483
+excite: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1)
+eigval: 10.0498756211
+excite: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+eigval: 10.0498756211
+excite: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+eigval: 12.0415945788
+gap: 1.99407426883
+
+gap approaches 2 from below as n->infty
+stabilizers of bounded size.
+
+
 30/12/17
 ========
 

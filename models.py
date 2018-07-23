@@ -320,6 +320,23 @@ def build_isingdual(n):
     return Gz, Gx, Hz, Hx
 
 
+def build_longising(n):
+    # gap approaches 2 from below as n->infty
+
+    assert n>2
+
+    mx = n
+    mz = 1
+    Gx = zeros2(mx, n)
+    Gz = zeros2(mz, n)
+    for i in range(mx):
+        Gx[i, i] = 1 # transverse field
+
+    Gz[:] = 1
+
+    return Gz, Gx, None, None
+
+
 
 #def build_ising2():
 #
@@ -879,6 +896,9 @@ def build(name=""):
 
     elif argv.isingdual:
         Gx, Gz, Hx, Hz = build_isingdual(l)
+
+    elif argv.longising:
+        Gx, Gz, Hx, Hz = build_longising(l)
 
     elif argv.random:
         Gx, Gz, Hx, Hz = build_random(l)
