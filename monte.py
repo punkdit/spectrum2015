@@ -3,7 +3,7 @@
 from __future__ import print_function
 
 import sys, os
-from random import randint
+from random import randint, random
 
 import numpy
 from numpy import kron, dot, allclose, log
@@ -150,13 +150,93 @@ def main():
         s = s.replace("0.0000", "      ")
         print(s)
 
+    x = HB.min()
+    if x < 0.:
+        HB -= 2*x
+
+    def get_weight(config):
+        assert len(config) == 2*M
+        W = 1.
+        for idx in range(M):
+            W *= HA[config[2*idx], config[2*idx+1]]
+            W *= HB[config[2*idx+1], config[(2*idx+2)%(2*M)]]
+        return W
+
+    #config = [randint(0, N-1) for i in range(2*M)]
+    def get_rand():
+        config = [randint(0, N-1)]
+        while len(config) < 2*M:
+            while 1:
+                idx = randint(0, N-1)
+                if HA[config[-1], idx]>0.:
+                    break
+            config.append(idx)
+            if len(config) == 2*M:
+                break
+            while 1:
+                idx = randint(0, N-1)
+                if HB[config[-1], idx]>0.:
+                    break
+            config.append(idx)
+        return config
+
+    trials = argv.get("trials", 10000)
+    counts = argv.get("counts", 100)
+
+    samples = []
+    for count in range(counts):
+      config = get_rand()
+      config1 = list(config)
+      W0 = get_weight(config)
+      assert W0 > 0., (W0, trial)
+      accept = 0
+      for trial in range(trials):
+
+        idx = 2*randint(0, M-1)
+        val = randint(0, N-1)
+        config1[idx] = val
+        config1[idx+1] = val
+        W1 = get_weight(config1)
+        #if W1==0.:
+        #    print(".", end="", flush=True)
+
+        if random() <= W1 / W0:
+            #config = config1
+            config[idx] = val
+            config[idx+1] = val
+            #print(config1)
+            W0 = W1
+            accept += 1
+            #print(W1)
+        else:
+            val0 = config[idx]
+            config1[idx] = val0
+            config1[idx+1] = val0
+
+      #print("accept:", accept)
+
+      #print("W0 =", W0)
+      samples.append(W0)
+    #W = sum(samples) / counts
+    #print("W = ", W)
+    #print("Z* =", W*N)
+    samples = numpy.array(samples)
+    samples *= N
+    print("mean=%s, std=%s" % (numpy.mean(samples), numpy.std(samples)))
+    #print(samples)
+    
+    # -----------------------------------------
+
+    if not argv.exact:
+        return
+
     A = numpy.identity(N)
     for i in range(M):
         A = dot(A, HA)
         A = dot(A, HB)
 
-    print("Z =", numpy.trace(A))
-    print("Z =", get_partition(model, beta))
+    print("Z  =", numpy.trace(A))
+    print("Z  =", get_partition(model, beta))
 
     ys = []
 #    xs = numpy.arange(1., 100., 1.)
@@ -178,7 +258,6 @@ def main():
         pyplot.plot(xs, ys, 'bo')
         pyplot.show()
 
-    #config = [randint(0, N-1) for i in range(M)]
 
     
 
