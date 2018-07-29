@@ -1243,7 +1243,7 @@ def find_ideals():
 
     Gx, Gz = model.Gx, model.Gz
     Hx, Hz = model.Hx, model.Hz
-    print shortstrx(Gx, Gz)
+    #print shortstrx(Gx, Gz)
 
     Rx, Rz = model.Rx, model.Rz
     Rxt = Rx.transpose()
@@ -1392,6 +1392,7 @@ def find_ideals():
             vals = list(vals)
             vals.sort(reverse=True)
 
+            #print("total +=", vals[0])
             total += vals[0]
             gaps.append(vals[0]-vals[1])
     
