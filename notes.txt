@@ -1,4 +1,17 @@
 
+1/8/18
+=======
+
+Re-examining the directional-ordering transition in the compass model with screw-periodic boundary conditions
+Sandro Wenzel, Wolfhard Janke, Andreas M. Laeuchli
+https://arxiv.org/abs/1002.3508
+
+Monte Carlo simulations of the directional-ordering transition in the two-dimensional classical and quantum compass model
+Sandro Wenzel, Wolfhard Janke
+https://arxiv.org/abs/0804.2972
+
+
+
 23/7/18
 =======
 
