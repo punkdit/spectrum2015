@@ -1433,6 +1433,41 @@ def build_model(Gx=None, Gz=None, Hx=None, Hz=None):
     return model
 
 
+def bits2int(g):
+    i = 0
+    idx = 0
+    while idx < len(g):
+        i *= 2
+        i += g[idx]
+        idx += 1
+    return i
+
+assert bits2int([0,0,0,1]) == 1
+assert bits2int([0,0,1,1]) == 3
+assert bits2int([1,1,0,0]) == 8+4
+
+
+
+def dumpc(model):
+
+    f = open("sse.h", "w")
+
+    gx = len(model.Gx)
+    gz = len(model.Gz)
+    print >>f, ("const int n = %d;" % model.n)
+    print >>f, ("const int mx = %d;" % gx)
+    print >>f, ("const int offset = %d;" % gx)
+    print >>f, ("const int mz = %d;" % gz)
+    print >>f, ("const int nletters = %d;" % (gx+1))
+    s = ', '.join(str(bits2int(g)) for g in model.Gx)
+    print >>f, ("spins_t Gx[%d] = {0, %s};" % (gx+1, s))
+    s = ', '.join(str(bits2int(g)) for g in model.Gz)
+    print >>f, ("spins_t Gz[%d] = {%s};" % (gz, s))
+    print("Gx =")
+    print(model.Gx)
+    print("Gz =")
+    print(model.Gz)
+
 
 if __name__ == "__main__":
 
@@ -1462,6 +1497,9 @@ if __name__ == "__main__":
         model = build_model() # um....
             
     print model
+
+    if argv.dumpc:
+        dumpc(model)
 
     if argv.show:
         print "Hx/Hz:"

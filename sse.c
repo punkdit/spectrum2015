@@ -1,8 +1,10 @@
 
 #include <stdio.h>
 #include <malloc.h>
+#include <string.h>
 #include <stdint.h>
 #include <math.h>
+#include <assert.h>
 
 #include "gsl_rng.h"
 
@@ -10,14 +12,14 @@
 
 https://www.gnu.org/software/gsl/doc/html/rng.html
 
-Function: unsigned long int gsl_rng_get (const gsl_rng * r)
+    unsigned long int gsl_rng_get (const gsl_rng * r)
 This function returns a random integer from the generator
 r. The minimum and maximum values depend on the algorithm
 used, but all integers in the range [min,max] are equally
 likely. The values of min and max can be determined using
 the auxiliary functions gsl_rng_max (r) and gsl_rng_min (r).
 
-Function: double gsl_rng_uniform (const gsl_rng * r)
+    double gsl_rng_uniform (const gsl_rng * r)
 This function returns a double precision floating point
 number uniformly distributed in the range [0,1). The
 range includes 0.0 but excludes 1.0. The value is typically
@@ -28,7 +30,7 @@ floating point numbers with more than 32 bits of randomness
 (the maximum number of bits that can be portably represented
 in a single unsigned long int).
 
-Function: double gsl_rng_uniform_pos (const gsl_rng * r)
+    double gsl_rng_uniform_pos (const gsl_rng * r)
 This function returns a positive double precision floating
 point number uniformly distributed in the range (0,1),
 excluding both 0.0 and 1.0. The number is obtained by
@@ -36,7 +38,7 @@ sampling the generator with the algorithm of gsl_rng_uniform
 until a non-zero value is obtained. You can use this
 function if you need to avoid a singularity at 0.0.
 
-Function: unsigned long int gsl_rng_uniform_int (const gsl_rng * r, unsigned long int n)
+    unsigned long int gsl_rng_uniform_int (const gsl_rng * r, unsigned long int n)
 This function returns a random integer from 0 to n-1
 inclusive by scaling down and/or discarding samples from
 the generator r. All integers in the range [0,n-1] are
@@ -65,13 +67,13 @@ be able to save and restore the state. To permit these
 practices, a few somewhat more advanced functions are
 supplied. These include:
 
-Function: int gsl_rng_memcpy (gsl_rng * dest, const gsl_rng * src)
+    int gsl_rng_memcpy (gsl_rng * dest, const gsl_rng * src)
 This function copies the random number generator src
 into the pre-existing generator dest, making dest into
 an exact copy of src. The two generators must be of the
 same type.
 
-Function: gsl_rng * gsl_rng_clone (const gsl_rng * r)
+    gsl_rng * gsl_rng_clone (const gsl_rng * r)
 This function returns a pointer to a newly created generator
 which is an exact copy of the generator r.
 
@@ -106,50 +108,168 @@ which is an exact copy of the generator r.
 
 
 
-#define WIDTH (32)
-#define HEIGHT (32)
+typedef uint64_t spins_t;
+//typedef __uint128_t spins_t;
+
+
+#include "sse.h"
+/*
+
+const int n = 4;
+const int mx = 4;
+const int mz = 4;
+const int nletters = 5;
+spins_t Gx[5] = {0, 8, 4, 2, 1};
+spins_t Gz[4] = {12, 6, 3, 9};
+*/
+
+
+gsl_rng * rng;
+
 
 void
-dump_state(uint8_t *state)
+init_word(int *word, int order)
 {
-    int i, j, bit;
-    for(j=0; j<HEIGHT; j++) // 
+    int i;
+    for(i=0; i<order; i++)
     {
-        for(i=0; i<WIDTH; i++) // 
-        {
-            bit = state[i + (WIDTH)*j];
-            if(bit)
-                printf("*");
-            else
-                printf(".");
-        }
-        printf("\n");
+        int idx = gsl_rng_uniform_int(rng, nletters);
+        word[i] = idx;
+        word[i+order] = idx; // XXX choose random place
     }
 }
 
-void
-main()
+
+// See also ex3.c for faster version
+int 
+countbits(spins_t v)
 {
+    int c;
+    for(c = 0; v; v >>= 1)
+    {   
+      c += v & 1;
+    }   
+    return c;
+}
 
-    gsl_rng * rng;
-    // timings for different rng's
-    //    rng = gsl_rng_alloc (gsl_rng_taus);    // 4 s
-    //    rng = gsl_rng_alloc (gsl_rng_mt19937); // 5 s
-    //    rng = gsl_rng_alloc (gsl_rng_ranlxs0); // 30 s "luxury"
-    //    rng = gsl_rng_alloc (gsl_rng_cmrg);    // 20 s
-    //    rng = gsl_rng_alloc (gsl_rng_taus2);   // 4 s
-    //    rng = gsl_rng_alloc (gsl_rng_mrg);     // 11 s
-    //    rng = gsl_rng_alloc (gsl_rng_gfsr4);   // 3.3 s
 
-    /*
-    double val = 0.0;
-    long int i;
-    for(i=0; i<(1024*1024*1024); i++)
+void
+dump_word(int *word, int order)
+{
+    int i;
+    printf("[");
+    for(i=0; i<2*order; i++)
+        printf("%d", word[i]);
+    printf("]\n");
+}
+
+
+
+double 
+eval_word(int *word, int order, spins_t *psi)
+{
+    spins_t u, v;
+    int i, j;
+    double weight;
+
+    u = 0;
+    weight = 1.0;
+//    printf("eval_word\n");
+    for(i=0; i<2*order; i++)
     {
-        val += gsl_rng_uniform (rng);
-        //printf("val = %f\n", val);
+        int idx = word[i];
+        v = u ^ Gx[idx];
+//        printf("<%ld|H|%ld>\n", u, v);
+        if(u==v)
+        {
+            double w;
+            w = offset + mz;
+            for(j=0; j<mz; j++)
+            {
+//                printf("\tw = %f\n", w);
+//                printf("\tGz[j] = %ld\n", Gz[j]);
+                w -= 2*(countbits(Gz[j] & u) & 1);
+            }
+            assert(w>=0.0);
+
+            weight *= w;
+        }
+        // else: weight *= Jx
+        u = v;
+        if(i==order)
+            *psi = u; // wavefunction sample
     }
-    */
+    assert(u==0);
+    return weight;
+}
+
+
+double
+move_word(int *word, int *word1, int order)
+{
+    double ratio;
+
+    memcpy(word1, word, sizeof(int)*2*order);
+
+    if(gsl_rng_uniform(rng) < 0.5)
+    {
+        // replace a pair
+    
+        int idx, jdx, delta;
+        int counts[nletters];
+        double pairs, fwd, rev;
+        memset(counts, 0, sizeof(counts));
+        
+        for(idx=0; idx<2*order; idx++)
+            counts[word[idx]] += 1;
+        pairs = 0;
+        for(idx=0; idx<nletters; idx++)
+            pairs += counts[idx] * (counts[idx-1]) / 2;
+        fwd = 1./(4*pairs);
+
+        while(1)
+        {
+            idx = gsl_rng_uniform_int(rng, 2*order);
+            jdx = gsl_rng_uniform_int(rng, 2*order);
+            if(idx==jdx || word[idx]!=word[jdx])
+                continue;
+
+            delta = gsl_rng_uniform_int(rng, nletters-1) + 1;
+            word1[idx] = (word1[idx] + delta) % nletters;
+            word1[jdx] = word1[idx];
+            break;
+        }
+
+        for(idx=0; idx<2*order; idx++)
+            counts[word[idx]] += 1;
+        pairs = 0;
+        for(idx=0; idx<nletters; idx++)
+            pairs += counts[idx] * (counts[idx-1]) / 2;
+        rev = 1./(4*pairs);
+
+        ratio = rev/fwd;
+
+    }
+    else
+    {
+        // swap two letters
+        int idx;
+        idx = gsl_rng_uniform_int(rng, 2*order-1);
+        spins_t tmp;
+        tmp = word1[idx];
+        word1[idx] = word1[idx+1];
+        word1[idx+1] = tmp;
+
+        ratio = 1.0;
+    }
+
+    return ratio;
+}
+
+
+void
+main(int argc, char *argv[])
+{
 
     rng = gsl_rng_alloc (gsl_rng_gfsr4);   // fastest rng
 
@@ -157,46 +277,58 @@ main()
     int i, j;
     unsigned long int bit;
 
-    state = (uint8_t *)malloc(WIDTH * HEIGHT * sizeof(uint8_t));
+    int order, seed;
+    order = 10;
 
-    // initialize
-    for(j=0; j<HEIGHT; j++) // 
-    for(i=0; i<WIDTH; i++) // 
-      {
-        bit = gsl_rng_uniform_int(rng, 2);
-        state[i + WIDTH*j] = bit;
-      }
-
-    dump_state(state);
-
-    int trial;
-    double beta = 1.0 / (2.0);
-
-#define TRIALS (1024*1024)
-#define get_state(i, j)     ((double)state[(i)%WIDTH + WIDTH*((j)%HEIGHT)])
-
-    for(trial=0; trial<TRIALS; trial++)
+    if(argc>=2)
     {
-        i = gsl_rng_uniform_int(rng, WIDTH);
-        j = gsl_rng_uniform_int(rng, HEIGHT);
-        
-        double field = 0.0;
-        field += 2*get_state(i+1, j) - 1.0;
-        field += 2*get_state(i, j+1) - 1.0;
-        field += 2*get_state(i-1, j) - 1.0;
-        field += 2*get_state(i, j-1) - 1.0;
-        double p = 1.0/(1 + exp(-2*beta*field));
-        double val = gsl_rng_uniform(rng);
-        //printf("val = %f, p = %f\n", val, p);
-        if(val < p)
-            state[i+WIDTH*j] = 1;
-        else
-            state[i+WIDTH*j] = 0;
+        order = atoi(argv[1]);
+    }
+    if(argc>=3)
+    {
+        seed = atoi(argv[2]);
+        gsl_rng_set(rng, seed);
+        printf("seed = %d\n", seed);
     }
 
-    printf("\n"); dump_state(state);
+    printf("order = %d\n", order);
 
-    free(state);
+    int trial;
+
+
+    int *word, *word1;
+    word = (int *)malloc(sizeof(int)*order*2);
+    word1 = (int *)malloc(sizeof(int)*order*2);
+
+    init_word(word, order);
+
+    spins_t psi, psi1;
+    double weight, weight1, x, ratio;
+
+    weight = eval_word(word, order, &psi);
+
+#define TRIALS (100000)
+    for(trial=0; trial<TRIALS; trial++)
+    {
+        //dump_word(word, order);
+        //printf("weight = %f\n", weight);
+        
+        ratio = move_word(word, word1, order);
+        weight1 = eval_word(word1, order, &psi1);
+
+        //printf("\t"); dump_word(word1, order);
+        //printf("\tweight = %f\n", weight1);
+
+        x = gsl_rng_uniform(rng);
+        if(weight==0.0 || x <= (ratio * weight1 / weight))
+        {
+            memcpy(word, word1, 2*order*sizeof(int));
+            weight = weight1;
+        }
+    }
+    dump_word(word, order);
+    printf("\tweight = %f\n", weight);
+
     gsl_rng_free(rng);
 }
 
