@@ -124,6 +124,7 @@ class Metro(object):
         assert Jz >= 0.
         self.beta = beta
         self.offset = offset # add multiple of the identity
+        #self.min_offset = offset
         I = zeros2(n)
         letters = [I] + list(Gx)
         #print("letters:", [l for l in letters])
@@ -137,7 +138,8 @@ class Metro(object):
         if eq2(u, v):
             w = self.offset + Jz*(self.mz - 2*(dot2(self.Gz, u).sum()))
             assert w>=0.
-        elif 1:
+            #self.min_offset = min(w, self.min_offset)
+        elif 0:
             # faster to add u & v, then count occurances in Gx ?
             w = 0.
             for g in self.Gx:
@@ -267,7 +269,7 @@ class Metro(object):
             for count in counts:
                 if count:
                     total += count * (count-1) / 2 # pairs for this letter
-            p = 1./total
+            p = 1./total # XXX this is still not exactly right...
 
             fwd = base*2./(nword+1)/(nword+2)/nlet
             rev = base*p
@@ -282,7 +284,7 @@ class Metro(object):
             for count in counts:
                 if count:
                     total += count * (count-1) / 2 # pairs for this letter
-            p = 1./total
+            p = 1./total # XXX this is still not exactly right...
 
             check = 0
             while 1:
@@ -319,7 +321,6 @@ class Metro(object):
     def get_sample(self, verbose):
         n = self.n
     
-        assert n <= 10
         N = 2**n
     
         state = self.get_init()
@@ -359,6 +360,162 @@ class Metro(object):
             if eq2(state[0], state1[0]) and state[1]==state1[1]:
                 count += 1.
         return count / trials
+
+
+class MetroZero(Metro):
+    "Zero tempurature SSE sampler"
+    def __init__(self, Gx, Gz, order, offset=0., Jx=1.0, Jz=1.0):
+        mx, n = Gx.shape
+        self.n = n
+        self.mx = mx
+        self.mz = len(Gz)
+        assert Gz.shape[1] == n
+        self.Gx = Gx
+        self.Gz = Gz
+        self.Jx = Jx
+        self.Jz = Jz
+        assert Jx >= 0.
+        assert Jz >= 0.
+        self.order = order # power of H applied to initial state
+        self.offset = offset # add multiple of the identity
+        #self.min_offset = offset
+        I = zeros2(n)
+        letters = [I] + list(Gx)
+        #print("letters:", [l for l in letters])
+        self.letters = letters
+
+    def _get_init(self):
+        u = zeros2(self.n)
+        word = [0]*(2*self.order)
+        return (u, word)
+
+    def get_init(self):
+        u = zeros2(self.n)
+        #if random()<0.5:
+        #    u[:] = 1
+        word = [randint(0, len(self.letters)-1) for i in range(self.order)]
+        word = word + word # double each letter
+        shuffle(word)
+        state = u, word
+        return state
+
+    get_init_rand = get_init
+
+    def move(self, state0):
+        global debug
+        debug = None
+
+        u, word = state0
+        word = list(word)
+        nlet = len(self.letters)
+        nword = len(word)
+
+        if random() <= 0.5:
+            # replace a pair
+
+            counts = [word.count(i) for i in range(nlet)]
+            pairs = 0
+            for count in counts:
+                pairs += count * (count-1) // 2
+            fwd = 1./4/pairs
+
+            while 1:
+                idx = randint(0, nword-1)
+                jdx = randint(0, nword-1)
+                if idx!=jdx and word[idx]==word[jdx]:
+                    delta = randint(1, nlet-1)
+                    l = (word[idx] + delta) % nlet
+                    word[idx] = l
+                    word[jdx] = l
+                    break
+
+            counts = [word.count(i) for i in range(nlet)]
+            pairs = 0
+            for count in counts:
+                pairs += count * (count-1) // 2
+            rev = 1./4/pairs
+
+            ratio = rev/fwd
+
+        else:
+            # swap
+            idx = randint(0, nword-2)
+            word[idx], word[idx+1] = word[idx+1], word[idx]
+            ratio = 1.0
+
+        return ratio, (u, word)
+
+    def getx(self, spins):
+        assert 0
+
+    def evaluate(self, state):
+        letters = self.letters
+        u, word = state
+        #print("evaluate", word)
+        order = self.order
+        assert len(word)==2*order
+        spins = [u]
+        for lidx in word:
+            op = letters[lidx]
+            u = (u + op)%2
+            spins.append(u)
+
+        assert eq2(u, spins[0])
+
+        #spins = list(spins) + [spins[0]]
+        N = len(spins)
+        w = 1.
+        h = None
+        for idx in range(N-1):
+            val = self.get(spins[idx], spins[idx+1])
+            #assert val > 0
+            w *= val
+            if w == 0.:
+                break
+        #print(" w =", w)
+        idx = self.order
+        #h = self.get(spins[idx], spins[idx])
+        psi = spins[idx] # sample the wave function
+        return w, psi
+
+    def get_sample(self, verbose):
+        n = self.n
+    
+        N = 2**n
+    
+        state = self.get_init()
+
+        W, psi = self.evaluate(state)
+        h = self.get(psi, psi)
+        if verbose>1:
+            indent = "    "
+            print(statestr(state), W, h)
+
+        accept = 0
+        trials = argv.get("trials", 100)
+        for trial in range(trials):
+
+            ratio, state1 = self.move(state)
+            #state1 = self.get_init_rand() # very low accept ratio
+            #ratio = 1.0
+            W1, psi = self.evaluate(state1)
+            h = self.get(psi, psi)
+            if W==0 or random() <= (ratio*W1/W):
+                if not eqstate(state, state1):
+                    accept += 1
+                state = state1
+                W = W1
+                if verbose>1:
+                    print(indent+statestr(state), W)
+
+        nword = len(state[1])
+        if verbose:
+            print("%s %.6f %s" % (statestr(state), W, h))
+            #print()
+        accept = 1.*accept/trials
+        _, psi = self.evaluate(state)
+        h = self.get(psi, psi)
+        return psi, h, accept
 
 
 
@@ -406,7 +563,12 @@ def test_balance():
     offset = 4
     Gx, Gz, _, _ = models.build_ising(n)
     beta = 1.0
-    metro = Metro(Gx, Gz, beta, offset)
+
+    if argv.zero:
+        order = argv.get("order", n*2)
+        metro = MetroZero(Gx, Gz, order, offset)
+    else:
+        metro = Metro(Gx, Gz, beta, offset)
 
     state0 = (zeros2(n), [])
     state1 = (zeros2(n), [0])
@@ -428,6 +590,30 @@ def test_balance():
     print("sample fwd = %s" % fwd)
     print("sample rev = %s" % rev)
     print("ratio = %s, sampled ratio = %s" % (ratio, rev/fwd))
+
+
+def test_support():
+    n = 4
+    offset = 4
+    Gx, Gz, _, _ = models.build_ising(n)
+    beta = 1.0
+
+    order = argv.get("order", n*2)
+    metro = MetroZero(Gx, Gz, order, offset)
+
+    state0 = metro.get_init()
+
+    support = set()
+    while len(support) < 2**n:
+        ratio, state1 = metro.move(state0)
+        state0 = state1
+        W, psi = metro.evaluate(state0)
+        if W==0:
+            continue
+            print(W, state0, psi)
+        support.add(str(psi))
+
+    print(support)
 
 
 
@@ -462,9 +648,79 @@ def main():
 
     print("N =", N)
     print("offset =", offset)
+    order = argv.get("order", model.n*2)
 
+    if argv.zero:
 
-    if argv.metro:
+        print("-----------------")
+
+        print("order =", order)
+        metro = MetroZero(model.Gx, model.Gz, order, offset, Jx, Jz)
+    
+        counts = argv.get("counts", 100)
+
+        hs = []
+        support = set()
+        state = numpy.zeros((2,)*n)
+        accept = 0.
+        for count in range(counts):
+            psi, h, _accept = metro.get_sample(verbose)
+            key = str(psi)
+            if key not in support:
+                support.add(key)
+                print("[%s]" % len(support), end=" ")
+                sys.stdout.flush()
+            state[tuple(psi)] += 1
+            hs.append(h)
+            accept += _accept
+        print()
+
+        print("accept:", accept/counts)
+        hs = numpy.array(hs)
+        avg = numpy.mean(hs)
+        dev = numpy.std(hs) / (len(hs)**0.5)
+        print("<n> = %s, <lambda> = %s +/- %.2f" % (avg, avg, dev))
+        #print("min_offset = ", metro.min_offset)
+
+#        keys = list(state.keys())
+#        keys.sort()
+#        #sample = numpy.array([state[key] for key in keys])
+#        r = state[keys[0]]
+#        for key in keys:
+#            x = state[key] / r
+#            print(key, x)
+
+        state.shape = (N,)
+        r = state.max()
+        state /= r
+        print(state)
+
+        H = get_dense(model, offset, Jx, Jz)
+
+        r = dot(state, state)
+        h = dotx([state, H, state])
+        print("h/r = ", h/r)
+
+        print("-----------------")
+
+        print("power:")
+
+        state = numpy.zeros(2**n)
+        state[0] = 1
+        for i in range(order):
+            state = dot(H, state)
+            state /= state.max()
+        #HP = powop(H, order)
+        #state = HP[:, 0].copy()
+        r = dot(state, state)
+        #state /= r
+        h = dotx([state, H, state])
+        h = h/r
+        print("h =", h)
+        state /= state[0]
+        print(state)
+
+    elif argv.metro:
     
         print("-----------------")
 
@@ -480,35 +736,41 @@ def main():
         avg = numpy.mean(ns)
         dev = numpy.std(ns) / (len(ns)**0.5)
         print("<n> = %s, <lambda> = %s +/- %.2f" % (avg, avg/beta, dev))
+        #print("min_offset = ", metro.min_offset)
 
 
-    if not argv.exact and not argv.taylor:
-        return
+    if argv.exact:
 
-    print("-----------------")
-
-    H = get_dense(model, offset, Jx, Jz)
-
-    vals = numpy.linalg.eigvalsh(H)
-    vals = list(vals)
-    vals.sort()
-    #print(vals[-3:])
-    print("eigval:", vals[-1] - offset)
-    print("gap:", vals[-1] - vals[-2])
-
-    Z = 0.
-    dZ = 0.
-    for val in vals:
-        x = numpy.exp(beta * val)
-        Z += x
-        dZ += val * x
+        print("-----------------")
     
-    #print("Z =", Z) # FIX: correct for offset
-    print("<H> =", dZ/Z - offset)
+        H = get_dense(model, offset, Jx, Jz)
+    
+        vals, vecs = numpy.linalg.eigh(H)
+        #vals = list(vals)
+        #vals.sort()
+        #print(vals[-3:])
+        print("exact eigval:", vals[-1])
+        print("exact gap:   ", vals[-1] - vals[-2])
+        v = vecs[:, -1]
+        r = v[0]
+        v /= r
+        print(v)
+    
+        Z = 0.
+        dZ = 0.
+        for val in vals:
+            x = numpy.exp(beta * val)
+            Z += x
+            dZ += val * x
+        
+        #print("Z =", Z) # FIX: correct for offset
+    #    print("<H> =", dZ/Z - offset)
+        print("<dZ/Z> =", dZ/Z)
 
     if argv.taylor:
         print("-----------------")
     
+        H = get_dense(model, offset, Jx, Jz)
         D = argv.get("D", 10)
     
         Z = 0.
@@ -576,8 +838,10 @@ if __name__ == "__main__":
         numpy.random.seed(_seed)
         seed(_seed)
 
-    if argv.test:
+    if argv.test_balance:
         test_balance()
+    elif argv.test_support:
+        test_support()
     else:
         main()
 

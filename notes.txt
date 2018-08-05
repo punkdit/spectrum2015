@@ -1,4 +1,20 @@
 
+3/8/18
+======
+
+Bridging lattice-scale physics and continuum field theory
+with quantum Monte Carlo simulations
+Ribhu K. Kaul,1 Roger G. Melko,2 and Anders W. Sandvik3
+https://arxiv.org/pdf/1204.5405.pdf
+    pg 16: 2. Calculating the topological entanglement entropy
+    Using the QMC estimators described in Section II G,
+    it is possible to isolate the topological entanglement entropy
+    from the leading-order boundary law, as well as
+    subleading corrections due to effects such as corners, by
+    taking measurements using several different geometries
+    A and performing additions or subtractions which isolate
+    only γ.
+
 1/8/18
 =======
 
