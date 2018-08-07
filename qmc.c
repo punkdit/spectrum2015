@@ -41,7 +41,7 @@ spins_t Gz[4] = {12, 6, 3, 9};
 
 gsl_rng * rng;
 
-#define MAX_WORD (256)
+#define MAX_WORD (1024)
 
 struct state 
 {
@@ -121,6 +121,37 @@ factorial(int n)
     return r;
 }
 
+
+#define FACT_MAX (1024)
+double _cache[FACT_MAX];
+
+double
+_log_factorial(int n)
+{
+    double r = 0.0;
+    int i;
+    for(i=1; i<=n; i++)
+        r += log((double)i);
+
+    return r;
+}
+
+void
+init_cache()
+{
+    int n;
+    for(n=0; n<FACT_MAX; n++)
+        _cache[n] = _log_factorial(n);
+}
+
+double
+log_factorial(int n)
+{
+    assert(0<=n && n<FACT_MAX);
+    return _cache[n];
+}
+
+
 double 
 eval_state(struct state *s, double beta)
 {
@@ -149,6 +180,42 @@ eval_state(struct state *s, double beta)
     assert(u==s->u);
     weight *= 1.0 * pow(beta, s->size) / factorial(s->size);
     return weight;
+}
+
+
+int 
+log_eval_state(struct state *s, double beta, double *result)
+{
+    spins_t u, v;
+    int i;
+    double weight;
+
+    check_state(s);
+    *result = 0.;
+    u = s->u;
+    weight = 0.0;
+//    printf("eval_word\n");
+    for(i=0; i<s->size; i++)
+    {
+        int idx = s->word[i];
+        v = u ^ Gx[idx];
+//        printf("<%ld|H|%ld>\n", u, v);
+        if(u==v)
+        {
+            double w;
+            w = eval1(u);
+            assert(w>=0.0);
+            if(w==0.0)
+                return 0; // result is log(zero)
+            weight += log(w);
+        }
+        // else: weight *= Jx
+        u = v;
+    }
+    assert(u==s->u);
+    weight += s->size * log(beta) - log_factorial(s->size);
+    *result = weight;
+    return 1;
 }
 
 
@@ -370,6 +437,7 @@ move_state(struct state *s, struct state *s1)
 int
 main(int argc, char *argv[])
 {
+    init_cache();
 
     rng = gsl_rng_alloc (gsl_rng_gfsr4);   // fastest rng
 
@@ -393,7 +461,7 @@ main(int argc, char *argv[])
     printf("seed = %d\n", seed);
     printf("n = %d\n", n);
 
-    assert(n<=10);
+    //assert(n<=10);
 
     int trial, count;
     int accept = 0;
@@ -403,23 +471,31 @@ main(int argc, char *argv[])
     {
         struct state s, s1;
         double weight, weight1, x, ratio;
+        int nz, nz1; // non-zero
     
         init_state_rand(&s, beta);
-        weight = eval_state(&s, beta);
+//        weight = eval_state(&s, beta);
+        nz = log_eval_state(&s, beta, &weight);
 
         for(trial=0; trial<trials; trial++)
         {
             ratio = move_state(&s, &s1);
-            weight1 = eval_state(&s1, beta);
+//            weight1 = eval_state(&s1, beta);
+            nz1 = log_eval_state(&s1, beta, &weight1);
 
-//            dump_state(&s);
-//            printf(" --> ");
-//            dump_state(&s1);
-//            printf(" weight=%f, weight1=%f, ratio=%f", weight, weight1, ratio);
-//            printf("\n");
+if(0)
+{
+            dump_state(&s);
+            printf(" --> ");
+            dump_state(&s1);
+            printf(" log(weight)=%f, log(weight1)=%f, ratio=%f", 
+                weight, weight1, ratio);
+            printf("\n");
+}
     
             x = gsl_rng_uniform(rng);
-            if(weight==0.0 || x <= (ratio * weight1 / weight))
+            if(!nz || 
+                (nz1 && x <= (ratio * exp(weight1 - weight))))
             {
                 if(!eq_state(&s, &s1))
                 {
@@ -433,7 +509,9 @@ main(int argc, char *argv[])
         }
 
         total += s.size;
+        printf("."); fflush(stdout);
     }
+    printf("\n");
 
     printf("accept: %f\n", (double)accept / (trials*counts));
     printf("<H>: %f\n", total / counts / beta);

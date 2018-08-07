@@ -888,7 +888,8 @@ def main():
         #r = v[0]
         r = v.max()
         v /= r
-        print(v)
+        if len(v)<100:
+            print(v)
     
         Z = 0.
         dZ = 0.
