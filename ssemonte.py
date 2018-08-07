@@ -77,18 +77,27 @@ assert factorial(4) == 24
 assert factorial(5) == 120
 
 
+def cross(itemss):
+    if len(itemss)==0:
+        yield ()
+    else:
+        for head in itemss[0]:
+            for tail in cross(itemss[1:]):
+                yield (head,)+tail
+
+
 
     
-def get_dense(model, offset, Jx=1.0, Jz=1.0):
-    n = model.n
+def get_dense(Gx, Gz, offset, Jx=1.0, Jz=1.0):
+    n = Gx.shape[1]
     N = 2**n
     H = numpy.zeros((N, N))
-    for g in model.Gz:
+    for g in Gz:
         ops = [(Z if i else I) for i in g]
         op = kronx(ops)
         H += Jz*op
 
-    for g in model.Gx:
+    for g in Gx:
         ops = [(X if i else I) for i in g]
         op = kronx(ops)
         H += Jx*op
@@ -99,8 +108,8 @@ def get_dense(model, offset, Jx=1.0, Jz=1.0):
     return H
 
 
-def get_partition(model, beta, offset):
-    H = get_dense(model, offset)
+def get_partition(Gx, Gz, beta, offset):
+    H = get_dense(Gx, Gz, offset)
     H = beta * H
     A = expm(H)
     x = numpy.trace(A)
@@ -363,7 +372,7 @@ class Metro(object):
 
 
 class MetroZero(Metro):
-    "Zero tempurature SSE sampler"
+    "Zero temperature SSE sampler"
     def __init__(self, Gx, Gz, order, offset=0., Jx=1.0, Jz=1.0):
         mx, n = Gx.shape
         self.n = n
@@ -416,8 +425,10 @@ class MetroZero(Metro):
             counts = [word.count(i) for i in range(nlet)]
             pairs = 0
             for count in counts:
-                pairs += count * (count-1) // 2
-            fwd = 1./4/pairs
+                assert count%2==0
+                if count:
+                    pairs += count * (count-1) // 2
+            fwd = 1./8/pairs
 
             while 1:
                 idx = randint(0, nword-1)
@@ -432,9 +443,12 @@ class MetroZero(Metro):
             counts = [word.count(i) for i in range(nlet)]
             pairs = 0
             for count in counts:
-                pairs += count * (count-1) // 2
-            rev = 1./4/pairs
+                assert count%2==0
+                if count:
+                    pairs += count * (count-1) // 2
+            rev = 1./8/pairs
 
+            debug = fwd, rev
             ratio = rev/fwd
 
         else:
@@ -513,10 +527,123 @@ class MetroZero(Metro):
             print("%s %.6f %s" % (statestr(state), W, h))
             #print()
         accept = 1.*accept/trials
-        _, psi = self.evaluate(state)
+        W, psi = self.evaluate(state)
         h = self.get(psi, psi)
-        return psi, h, accept
+        return W, psi, h, accept
 
+    def run(self, counts, verbose=0):
+
+        n = self.n
+        hs = []
+        support = set()
+        state = numpy.zeros((2,)*n)
+        accept = 0.
+        total = 0.
+        for count in range(counts):
+            W, psi, h, _accept = self.get_sample(verbose)
+            total += W
+            key = str(psi)
+            if key not in support:
+                support.add(key)
+                print("[%s]" % len(support), end=" ")
+                sys.stdout.flush()
+            state[tuple(psi)] += 1
+            hs.append(h)
+            accept += _accept
+        print()
+
+        print("accept:", accept/counts)
+        hs = numpy.array(hs)
+        avg = numpy.mean(hs)
+        dev = numpy.std(hs) / (len(hs)**0.5)
+        print("<n> = %s, <lambda> = %s +/- %.2f" % (avg, avg, dev))
+        #print("min_offset = ", self.min_offset)
+
+#        keys = list(state.keys())
+#        keys.sort()
+#        #sample = numpy.array([state[key] for key in keys])
+#        r = state[keys[0]]
+#        for key in keys:
+#            x = state[key] / r
+#            print(key, x)
+
+        N = 2**n
+        state.shape = (N,)
+        print(state)
+        r = state.max()
+        state /= r
+        print(state)
+
+        H = get_dense(self.Gx, self.Gz, self.offset, self.Jx, self.Jz)
+        #HP = powop(H, self.order)
+
+        r = dot(state, state)
+        h = dotx([state, H, state])
+        print("h/r = ", h/r)
+
+        print("-----------------")
+        print("power:")
+
+        state = numpy.zeros(2**n)
+        state[0] = 1
+        for i in range(self.order):
+            state = dot(H, state)
+            state /= state.max()
+        #HP = powop(H, order)
+        #state = HP[:, 0].copy()
+        r = dot(state, state)
+        #state /= r
+        h = dotx([state, H, state])
+        h = h/r
+        print("h =", h)
+        state /= state[0]
+        print(state)
+
+
+    def sum_paths(self, counts=100):
+        from numpy.random import multinomial
+
+        H = get_dense(self.Gx, self.Gz, self.offset, self.Jx, self.Jz)
+
+        order = self.order
+
+        N = 2**self.n
+        idxs = range(N)
+
+        total = 0.
+        dist = []
+        paths = []
+        for path in cross([idxs]*(order*2-1)):
+            #print(path)
+            idx = 0
+            w = 1.
+            for idx1 in path:
+                w *= H[idx, idx1]
+                idx = idx1
+            w *= H[idx, 0]
+            if w:
+                paths.append(path)
+                dist.append(w)
+            total += w
+        print("total:", total)
+        HP = powop(H, order)
+        print(HP)
+        print(len(dist))
+        print(dist)
+
+        p = numpy.array(dist)
+        p /= p.sum()
+        #print(p)
+
+        state = numpy.zeros(N)
+        for count in range(counts):
+            a = multinomial(1, p)
+            idx = numpy.where(a)[0][0]
+            path = paths[idx]
+            #print(path, end=" ")
+            state[path[order-1]] += 1
+        print()
+        print(state)
 
 
 def statestr(state):
@@ -652,73 +779,20 @@ def main():
 
     if argv.zero:
 
-        print("-----------------")
-
-        print("order =", order)
         metro = MetroZero(model.Gx, model.Gz, order, offset, Jx, Jz)
-    
         counts = argv.get("counts", 100)
 
-        hs = []
-        support = set()
-        state = numpy.zeros((2,)*n)
-        accept = 0.
-        for count in range(counts):
-            psi, h, _accept = metro.get_sample(verbose)
-            key = str(psi)
-            if key not in support:
-                support.add(key)
-                print("[%s]" % len(support), end=" ")
-                sys.stdout.flush()
-            state[tuple(psi)] += 1
-            hs.append(h)
-            accept += _accept
-        print()
-
-        print("accept:", accept/counts)
-        hs = numpy.array(hs)
-        avg = numpy.mean(hs)
-        dev = numpy.std(hs) / (len(hs)**0.5)
-        print("<n> = %s, <lambda> = %s +/- %.2f" % (avg, avg, dev))
-        #print("min_offset = ", metro.min_offset)
-
-#        keys = list(state.keys())
-#        keys.sort()
-#        #sample = numpy.array([state[key] for key in keys])
-#        r = state[keys[0]]
-#        for key in keys:
-#            x = state[key] / r
-#            print(key, x)
-
-        state.shape = (N,)
-        r = state.max()
-        state /= r
-        print(state)
-
-        H = get_dense(model, offset, Jx, Jz)
-
-        r = dot(state, state)
-        h = dotx([state, H, state])
-        print("h/r = ", h/r)
-
-        print("-----------------")
-
-        print("power:")
-
-        state = numpy.zeros(2**n)
-        state[0] = 1
-        for i in range(order):
-            state = dot(H, state)
-            state /= state.max()
-        #HP = powop(H, order)
-        #state = HP[:, 0].copy()
-        r = dot(state, state)
-        #state /= r
-        h = dotx([state, H, state])
-        h = h/r
-        print("h =", h)
-        state /= state[0]
-        print(state)
+        if argv.run:
+            metro.run(counts, verbose=verbose)
+        elif argv.sum_paths:
+            metro.sum_paths(counts)
+    
+        if 0:
+            word = "04023200030204201100"
+            word = [int(c) for c in word]
+            state = zeros2(n), word
+            print("evaluate(%s) =" % word)
+            print(metro.evaluate(state))
 
     elif argv.metro:
     
@@ -743,7 +817,7 @@ def main():
 
         print("-----------------")
     
-        H = get_dense(model, offset, Jx, Jz)
+        H = get_dense(model.Gx, model.Gz, offset, Jx, Jz)
     
         vals, vecs = numpy.linalg.eigh(H)
         #vals = list(vals)
@@ -770,7 +844,7 @@ def main():
     if argv.taylor:
         print("-----------------")
     
-        H = get_dense(model, offset, Jx, Jz)
+        H = get_dense(model.Gx, model.Gz, offset, Jx, Jz)
         D = argv.get("D", 10)
     
         Z = 0.
@@ -811,7 +885,7 @@ def main():
         xs = numpy.arange(10., 20., 1.)
         #xs = numpy.arange(0.9*beta, 1.1*beta, 0.01*beta)
         for beta in xs:
-            y = get_partition(model, beta, offset)
+            y = get_partition(model.Gx, model.Gz, beta, offset)
             y = log(y)
             ys.append(y)
     
