@@ -236,6 +236,7 @@ move_state(struct state *s, struct state *s1)
 
 //    printf("move_state ");
 //    dump_state(s);
+//    printf("\n");
 
     i = gsl_rng_uniform_int(rng, 6);
 //    printf("i=%d ", i);
@@ -247,7 +248,7 @@ move_state(struct state *s, struct state *s1)
         // add I
         total = state_count(s, 0);
         idx = gsl_rng_uniform_int(rng, s->size+1);
-        ratio = ((double)(s->size)) / (total+1);
+        ratio = ((double)(s->size+1)) / (total+1);
 //        printf(" idx=%d ", idx);
         state_insert(s1, idx, 0);
     }
@@ -407,6 +408,12 @@ main(int argc, char *argv[])
         {
             ratio = move_state(&s, &s1);
             weight1 = eval_state(&s1, beta);
+
+//            dump_state(&s);
+//            printf(" --> ");
+//            dump_state(&s1);
+//            printf(" weight=%f, weight1=%f, ratio=%f", weight, weight1, ratio);
+//            printf("\n");
     
             x = gsl_rng_uniform(rng);
             if(weight==0.0 || x <= (ratio * weight1 / weight))

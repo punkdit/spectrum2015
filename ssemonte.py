@@ -327,6 +327,65 @@ class Metro(object):
 
         return ratio, (u, word)
 
+    def test_move(self, state0, state1, i):
+        global debug
+        debug = None
+
+        u, word = state0
+        word = list(word)
+        nlet = len(self.letters)
+        nword = len(word)
+
+        C = 6 # choices
+        base = 1./C
+
+        #print("move", i)
+
+        ratio = 1.0
+
+        if i==0:
+            # add I
+            total = word.count(0)
+            ratio = 1. * (nword+1) / (total+1)
+
+        elif i==1 and 0 in word:
+            # remove I
+            total = word.count(0)
+            ratio = 1.*total / nword
+
+        elif i==2:
+            # add a pair
+            word = state1[1]
+
+            counts = [word.count(i) for i in range(nlet)]
+            total = 0 # total number of pairs in word
+            for count in counts:
+                if count:
+                    total += count * (count-1) / 2 # pairs for this letter
+            p = 1./total # XXX this is still not exactly right...
+
+            fwd = base*2./(nword+1)/(nword+2)/nlet
+            rev = base*p
+            debug = fwd, rev
+            ratio = rev/fwd
+
+        elif i==3 and nword>1:
+            # remove pair
+            counts = [word.count(i) for i in range(nlet)]
+
+            total = 0 # total number of pairs in word
+            for count in counts:
+                if count:
+                    total += count * (count-1) / 2 # pairs for this letter
+            p = 1./total # XXX this is still not exactly right...
+
+            fwd = base*p
+            rev = base*2./nword/(nword-1)/nlet
+            debug = fwd, rev
+            ratio = rev/fwd
+
+        return ratio
+
     def get_sample(self, verbose):
         n = self.n
     
