@@ -84,7 +84,7 @@ dump_state(struct state *s)
 {
     int i;
     check_state(s);
-    printf("%d", s->u);
+    printf("%ld", s->u);
     printf("[");
     for(i=0; i<s->size; i++)
         printf("%d", s->word[i]);
@@ -108,8 +108,19 @@ eval1(spins_t u)
 }
 
 
+double
+factorial(int n)
+{
+    double r;
+    int i;
+    r = 1.0;
+    for(i=1; i<=n; i++)
+        r *= i;
+    return r;
+}
+
 double 
-eval_state(struct state *s)
+eval_state(struct state *s, double beta)
 {
     spins_t u, v;
     int i;
@@ -134,6 +145,7 @@ eval_state(struct state *s)
         u = v;
     }
     assert(u==s->u);
+    weight *= 1.0 * pow(beta, s->size) / factorial(s->size);
     return weight;
 }
 
@@ -166,9 +178,12 @@ state_insert(struct state *s, int idx, int i)
     assert(0<=i && i<nletters);
 
     // use memmove ?
-    for(j=idx+1; j<s->size; j++)
+    for(j=s->size; j>idx; j--)
         s->word[j] = s->word[j-1];
     s->word[idx] = i;
+    s->size++;
+
+    check_state(s);
 }
 
 
@@ -187,11 +202,13 @@ state_pop(struct state *s, int idx)
     // use memmove ?
     for(j=idx; j+1<s->size; j++)
         s->word[j] = s->word[j+1];
+    s->size--;
+    check_state(s);
     return i;
 }
 
 
-void
+int
 state_count(struct state *s, int i)
 {
     int j, count;
@@ -215,17 +232,23 @@ move_state(struct state *s, struct state *s1)
     check_state(s);
     assert(s1);
 
-    memcpy(s1, s, sizeof(struct state*));
+    memcpy(s1, s, sizeof(struct state));
+
+//    printf("move_state ");
+//    dump_state(s);
 
     i = gsl_rng_uniform_int(rng, 6);
+//    printf("i=%d ", i);
+
     ratio = 1.0;
 
     if(i==0)
     {
         // add I
         total = state_count(s, 0);
-        idx = gsl_rng_uniform(rng, s->size+1);
+        idx = gsl_rng_uniform_int(rng, s->size+1);
         ratio = ((double)(s->size)) / (total+1);
+//        printf(" idx=%d ", idx);
         state_insert(s1, idx, 0);
     }
     else
@@ -237,7 +260,7 @@ move_state(struct state *s, struct state *s1)
         {
             while(1)
             {
-                idx = gsl_rng_uniform(rng, s->size);
+                idx = gsl_rng_uniform_int(rng, s->size);
                 if(s->word[idx]==0)
                     break;
             }
@@ -249,9 +272,9 @@ move_state(struct state *s, struct state *s1)
     if(i==2)
     {
         // add a pair
-        idx = gsl_rng_uniform(rng, s->size);
-        jdx = gsl_rng_uniform(rng, s->size+1);
-        i = gsl_rng_uniform(rng, nletters);
+        idx = gsl_rng_uniform_int(rng, s->size+1);
+        jdx = gsl_rng_uniform_int(rng, s->size+2);
+        i = gsl_rng_uniform_int(rng, nletters);
         state_insert(s1, idx, i);
         state_insert(s1, jdx, i);
 
@@ -295,8 +318,8 @@ move_state(struct state *s, struct state *s1)
 
         while(1)
         {
-            idx = gsl_rng_uniform(rng, s->size);
-            jdx = gsl_rng_uniform(rng, s->size);
+            idx = gsl_rng_uniform_int(rng, s->size);
+            jdx = gsl_rng_uniform_int(rng, s->size);
             if(idx != jdx && s->word[idx]==s->word[jdx])
             {
                 if(idx<jdx)
@@ -309,6 +332,7 @@ move_state(struct state *s, struct state *s1)
                     state_pop(s1, idx);
                     state_pop(s1, jdx);
                 }
+                break;
             }
         }
 
@@ -319,7 +343,7 @@ move_state(struct state *s, struct state *s1)
     {
         // swap
         spins_t tmp;
-        idx = gsl_rng_uniform(rng, s1->size-1);
+        idx = gsl_rng_uniform_int(rng, s1->size-1);
         tmp = s1->word[idx];
         s1->word[idx] = s1->word[idx+1];
         s1->word[idx+1] = tmp;
@@ -328,11 +352,13 @@ move_state(struct state *s, struct state *s1)
     if(i==5)
     {
         // flip a spin
-        idx = gsl_rng_uniform(rng, n);
-        s1->u[idx] = 1-s1->u[idx];
+        idx = gsl_rng_uniform_int(rng, n);
+        s1->u = (s1->u) ^ (1<<idx);
     }
 
     check_state(s1);
+
+//    printf(" --> "); dump_state(s1); printf("\n");
 
     return ratio;
 }
@@ -345,105 +371,62 @@ main(int argc, char *argv[])
     rng = gsl_rng_alloc (gsl_rng_gfsr4);   // fastest rng
 
     int seed, trials, counts;
+    double beta;
     trials = 100;
     counts = 1;
     beta = 1.0;
 
-    if(argc>=2)
-    {
-        trials = atoi(argv[1]);
-    }
-    if(argc>=3)
-    {
-        counts = atoi(argv[2]);
-    }
+    seed = (int)time(NULL); 
+    gsl_rng_set(rng, seed);
 
-    if(argc>=4)
-    {
-        seed = atoi(argv[3]);
-        gsl_rng_set(rng, seed);
-    }
-    else
-    {
-        seed = (int)time(NULL);
-        gsl_rng_set(rng, seed);
-    }
+    if(argc>=2) { trials = atoi(argv[1]); }
+    if(argc>=3) { counts = atoi(argv[2]); }
+    if(argc>=4) { beta = atof(argv[3]); }
+    if(argc>=5) { seed = atoi(argv[4]); gsl_rng_set(rng, seed); }
 
     printf("trials = %d\n", trials);
     printf("counts = %d\n", counts);
+    printf("beta = %f\n", beta);
     printf("seed = %d\n", seed);
 
     assert(n<=10);
 
     int trial, count;
-
     int accept = 0;
+    double total = 0.0;
 
     for(count=0; count<counts; count++)
     {
-        init_state(word, order);
-    
-        spins_t psi=0, psi1=0;
+        struct state s, s1;
         double weight, weight1, x, ratio;
     
-        weight = eval_word(word, order, &psi);
+        init_state(&s);
+        weight = eval_state(&s, beta);
 
         for(trial=0; trial<trials; trial++)
         {
-//            dump_word(word, order); printf("\n");
-            
-            ratio = move_word(word, word1, order);
-            weight1 = eval_word(word1, order, &psi1);
-    
-//            dump_word(word1, order); printf("\n");
-//            printf("weight = %f\n", weight);
-//            printf("weight1 = %f\n", weight1);
-//            printf("ratio=%f\n", ratio);
-//            printf("%f\n", ratio*weight1/weight);
+            ratio = move_state(&s, &s1);
+            weight1 = eval_state(&s1, beta);
     
             x = gsl_rng_uniform(rng);
             if(weight==0.0 || x <= (ratio * weight1 / weight))
             {
-                if(!eq_word(word, word1, order))
+                if(!eq_state(&s, &s1))
                 {
                     accept += 1;
 //                    printf("ACCEPT\n");
                 }
-                memcpy(word, word1, 2*order*sizeof(int));
+                memcpy(&s, &s1, sizeof(struct state));
                 weight = weight1;
-                psi = psi1;
             }
 
-//            printf("\n");
         }
-        x = eval1(psi);
 
-//        dump_word(word, order);
-//        printf("weight = %f ", weight);
-//        printf("psi = %ld ", psi);
-//        printf("x = %f\n", x);
-
-        h += x;
-
-        support[psi] += 1;
+        total += s.size;
     }
-
-    h /= counts;
-    printf("<h> = %f\n", h);
-    printf("support: \n");
-    int norm = support[0];
-
-    int idx;
-    int N = powl(2, n);
-    for(idx=0; idx<N; idx++)
-    {
-        printf("%.6f  ", (double)support[idx] / norm);
-        if((idx+1)%8 == 0)
-            printf("\n");
-    }
-    printf("\n");
 
     printf("accept: %f\n", (double)accept / (trials*counts));
+    printf("<n>: %f\n", total / counts);
 
     gsl_rng_free(rng);
 
