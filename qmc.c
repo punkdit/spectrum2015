@@ -28,7 +28,7 @@ countbits(spins_t v)
 
 
 
-#include "sse.h"
+#include "model.h"
 /*
 const int n = 4;
 const int mx = 4;
@@ -74,7 +74,9 @@ void
 init_state_rand(struct state *s, double beta)
 {
     assert(s);
-    // ...
+    s->u = gsl_rng_uniform_int(rng, 1<<n);
+    s->size = 0;
+    memset(s->word, 0, sizeof(int)*MAX_WORD);
     check_state(s);
 }
 
@@ -389,6 +391,7 @@ main(int argc, char *argv[])
     printf("counts = %d\n", counts);
     printf("beta = %f\n", beta);
     printf("seed = %d\n", seed);
+    printf("n = %d\n", n);
 
     assert(n<=10);
 
@@ -401,7 +404,7 @@ main(int argc, char *argv[])
         struct state s, s1;
         double weight, weight1, x, ratio;
     
-        init_state(&s);
+        init_state_rand(&s, beta);
         weight = eval_state(&s, beta);
 
         for(trial=0; trial<trials; trial++)
@@ -433,7 +436,7 @@ main(int argc, char *argv[])
     }
 
     printf("accept: %f\n", (double)accept / (trials*counts));
-    printf("<n>: %f\n", total / counts);
+    printf("<H>: %f\n", total / counts / beta);
 
     gsl_rng_free(rng);
 

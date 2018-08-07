@@ -885,7 +885,8 @@ def main():
         print("exact eigval:", vals[-1])
         print("exact gap:   ", vals[-1] - vals[-2])
         v = vecs[:, -1]
-        r = v[0]
+        #r = v[0]
+        r = v.max()
         v /= r
         print(v)
     

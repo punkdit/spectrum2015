@@ -1450,7 +1450,7 @@ assert bits2int([1,1,0,0]) == 8+4
 
 def dumpc(model):
 
-    f = open("sse.h", "w")
+    f = open("model.h", "w")
 
     gx = len(model.Gx)
     gz = len(model.Gz)

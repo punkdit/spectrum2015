@@ -114,7 +114,7 @@ typedef uint64_t spins_t;
 //typedef __uint128_t spins_t;
 
 
-#include "sse.h"
+#include "model.h"
 /*
 
 const int n = 4;
