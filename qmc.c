@@ -11,10 +11,11 @@
 #include "gsl_rng.h"
 
 
-typedef uint64_t spins_t;
+typedef uint32_t spins_t;
+//typedef uint64_t spins_t;
 //typedef __uint128_t spins_t;
 
-// See also ex3.c for faster version
+
 int 
 countbits(spins_t v)
 {
@@ -23,6 +24,36 @@ countbits(spins_t v)
     {   
       c += v & 1;
     }   
+    return c;
+}
+
+
+//
+// From:
+// https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetNaive
+//
+
+// Counting bits set by lookup table
+static const unsigned char BitsSetTable256[256] = 
+{
+#   define B2(n) n,     n+1,     n+1,     n+2
+#   define B4(n) B2(n), B2(n+1), B2(n+1), B2(n+2)
+#   define B6(n) B4(n), B4(n+1), B4(n+1), B4(n+2)
+    B6(0), B6(1), B6(1), B6(2)
+};
+
+static int 
+countbits_fast(long v0)  // count the number of bits set in 32-bit value v
+{
+    uint32_t v;
+    //assert(0xffffffffL&v0 == v0);
+    v = (uint32_t)v0;
+
+    uint32_t c; // c is the total bits set in v
+    c = BitsSetTable256[v & 0xff] + 
+        BitsSetTable256[(v >> 8) & 0xff] + 
+        BitsSetTable256[(v >> 16) & 0xff] + 
+        BitsSetTable256[v >> 24]; 
     return c;
 }
 
@@ -103,7 +134,7 @@ eval1(spins_t u)
     {
 //        printf("\tw = %f\n", w);
 //        printf("\tGz[j] = %ld\n", Gz[j]);
-        w -= 2*(countbits(Gz[j] & u) & 1);
+        w -= 2*(countbits_fast(Gz[j] & u) & 1);
     }
     assert(w>=0.0);
     return w;
@@ -122,6 +153,8 @@ factorial(int n)
 }
 
 
+// see also:
+// https://www.johndcook.com/blog/2010/08/16/how-to-compute-log-factorial/
 #define FACT_MAX (1024)
 double _cache[FACT_MAX];
 
@@ -462,6 +495,7 @@ main(int argc, char *argv[])
     printf("n = %d\n", n);
 
     //assert(n<=10);
+    assert(n<=32); // adjust spins_t as needed
 
     int trial, count;
     int accept = 0;

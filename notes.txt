@@ -2,7 +2,40 @@
 8/8/18
 ======
 
-n=25 compass model:
+gcc -O3 -g -Wall qmc.c -o qmc  -lm -I/usr/include/gsl -lgsl -L/usr/physics/ic15/composer_xe_2015.0.090/mkl/lib/intel64/ -lmkl_intel_lp64  -lmkl_core -lmkl_sequential -lmkl_core -pthread
+
+n=15 gcolor model
+------------------
+
+$ python -c "print 25.455 + 18"
+43.455
+$ time ./qmc 1000000 100 10.0
+trials = 1000000
+counts = 100
+beta = 10.000000
+seed = 1533660686
+n = 15
+........................................
+............................................................
+accept: 0.398521
+<H>: 43.584000
+
+$ time ./qmc 1000000 100 10.0
+trials = 1000000
+counts = 100
+beta = 10.000000
+seed = 1533666530
+n = 15
+....................................................................................................
+accept: 0.399188
+<H>: 43.449000
+
+95minutes
+
+
+
+n=25 compass model
+------------------
 
 $ python -c "print 25+29.076"
 54.076
