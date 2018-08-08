@@ -992,6 +992,14 @@ class Model(object):
         n = self.n
         return Model(locals())
 
+    def get_sector(self, tx=None, tz=None):
+        Gx, Gz = self.Gx, self.Gz        
+        Rx, Rz = self.Rx, self.Rz        
+        Gx = dot2(Gx, Rz.transpose())
+        Gz = dot2(Gz, Rx.transpose())
+        model = build_model(Gx, Gz)
+        return model
+
     def build_ham(self, excite=None, weights=None, Jx=1., Jz=1.):
         Gx, Gz = self.Gx, self.Gz        
         Rx, Rz = self.Rx, self.Rz        
@@ -1285,6 +1293,27 @@ class Model(object):
 #                print shortstr(Gx[i])
 #        print
 
+    def dumpc(model):
+    
+        f = open("model.h", "w")
+    
+        gx = len(model.Gx)
+        gz = len(model.Gz)
+        print >>f, ("const int n = %d;" % model.n)
+        print >>f, ("const int mx = %d;" % gx)
+        print >>f, ("const int offset = %d;" % gx)
+        print >>f, ("const int mz = %d;" % gz)
+        print >>f, ("const int nletters = %d;" % (gx+1))
+        s = ', '.join(str(bits2int(g)) for g in model.Gx)
+        print >>f, ("spins_t Gx[%d] = {0, %s};" % (gx+1, s))
+        s = ', '.join(str(bits2int(g)) for g in model.Gz)
+        print >>f, ("spins_t Gz[%d] = {%s};" % (gz, s))
+        print("Gx =")
+        print(model.Gx)
+        print("Gz =")
+        print(model.Gz)
+
+
 
 
 def check_sy(Lx, Hx, Tx, Rx, Lz, Hz, Tz, Rz, **kw):
@@ -1448,27 +1477,6 @@ assert bits2int([1,1,0,0]) == 8+4
 
 
 
-def dumpc(model):
-
-    f = open("model.h", "w")
-
-    gx = len(model.Gx)
-    gz = len(model.Gz)
-    print >>f, ("const int n = %d;" % model.n)
-    print >>f, ("const int mx = %d;" % gx)
-    print >>f, ("const int offset = %d;" % gx)
-    print >>f, ("const int mz = %d;" % gz)
-    print >>f, ("const int nletters = %d;" % (gx+1))
-    s = ', '.join(str(bits2int(g)) for g in model.Gx)
-    print >>f, ("spins_t Gx[%d] = {0, %s};" % (gx+1, s))
-    s = ', '.join(str(bits2int(g)) for g in model.Gz)
-    print >>f, ("spins_t Gz[%d] = {%s};" % (gz, s))
-    print("Gx =")
-    print(model.Gx)
-    print("Gz =")
-    print(model.Gz)
-
-
 if __name__ == "__main__":
 
     Gx, Gz, Hx, Hz = build()
@@ -1499,7 +1507,10 @@ if __name__ == "__main__":
     print model
 
     if argv.dumpc:
-        dumpc(model)
+        if argv.sector:
+            model = model.get_sector()
+        model.dumpc()
+        sys.exit(0)
 
     if argv.show:
         print "Hx/Hz:"
