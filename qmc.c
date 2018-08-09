@@ -72,7 +72,7 @@ spins_t Gz[4] = {12, 6, 3, 9};
 
 gsl_rng * rng;
 
-#define MAX_WORD (1024)
+#define MAX_WORD (4096)
 
 struct state 
 {
@@ -85,7 +85,7 @@ void
 check_state(struct state *s)
 {
     assert(s);
-    assert(s->u<(1<<n));
+    assert(s->u<(1UL<<n));
     assert(0<=s->size);
     assert(s->size<=MAX_WORD);
 }
@@ -105,7 +105,7 @@ void
 init_state_rand(struct state *s, double beta)
 {
     assert(s);
-    s->u = gsl_rng_uniform_int(rng, 1<<n);
+    s->u = gsl_rng_uniform_int(rng, 1<<n); // XX init one byte at a time
     s->size = 0;
     memset(s->word, 0, sizeof(int)*MAX_WORD);
     check_state(s);
@@ -129,12 +129,13 @@ eval1(spins_t u)
 {
     double w;
     int j;
-    w = offset + mz;
+    w = offset;
     for(j=0; j<mz; j++)
     {
 //        printf("\tw = %f\n", w);
 //        printf("\tGz[j] = %ld\n", Gz[j]);
-        w -= 2*(countbits_fast(Gz[j] & u) & 1);
+        w += Jz[j];
+        w -= 2*Jz[j]*(countbits_fast(Gz[j] & u) & 1);
     }
     assert(w>=0.0);
     return w;
@@ -155,8 +156,8 @@ factorial(int n)
 
 // see also:
 // https://www.johndcook.com/blog/2010/08/16/how-to-compute-log-factorial/
-#define FACT_MAX (1024)
-double _cache[FACT_MAX];
+#define LOG_FACT_MAX (4096)
+double _log_fact_cache[LOG_FACT_MAX];
 
 double
 _log_factorial(int n)
@@ -169,19 +170,32 @@ _log_factorial(int n)
     return r;
 }
 
+#define LOG_MAX (1024)
+double _log_cache[LOG_MAX];
+
+double
+ilog(int n)
+{
+    assert(n>0);
+    assert(n-1<LOG_MAX);
+    return _log_cache[n-1];
+}
+
 void
 init_cache()
 {
     int n;
-    for(n=0; n<FACT_MAX; n++)
-        _cache[n] = _log_factorial(n);
+    for(n=0; n<LOG_FACT_MAX; n++)
+        _log_fact_cache[n] = _log_factorial(n);
+    for(n=0; n<LOG_MAX; n++)
+        _log_cache[n] = log(n+1);
 }
 
 double
 log_factorial(int n)
 {
-    assert(0<=n && n<FACT_MAX);
-    return _cache[n];
+    assert(0<=n && n<LOG_FACT_MAX);
+    return _log_fact_cache[n];
 }
 
 
@@ -207,7 +221,10 @@ eval_state(struct state *s, double beta)
             w = eval1(u);
             weight *= w;
         }
-        // else: weight *= Jx
+        else
+        {
+            weight *= Jx[idx];
+        }
         u = v;
     }
     assert(u==s->u);
@@ -217,7 +234,7 @@ eval_state(struct state *s, double beta)
 
 
 int 
-log_eval_state(struct state *s, double beta, double *result)
+log_eval_state(struct state *s, double log_beta, double *result)
 {
     spins_t u, v;
     int i;
@@ -240,13 +257,17 @@ log_eval_state(struct state *s, double beta, double *result)
             assert(w>=0.0);
             if(w==0.0)
                 return 0; // result is log(zero)
-            weight += log(w);
+            weight += ilog(w);
         }
-        // else: weight *= Jx
+        else
+        {
+            assert(idx);
+            weight += ilog(Jx[idx-1]);
+        }
         u = v;
     }
     assert(u==s->u);
-    weight += s->size * log(beta) - log_factorial(s->size);
+    weight += s->size * log_beta - log_factorial(s->size);
     *result = weight;
     return 1;
 }
@@ -372,14 +393,10 @@ move_state(struct state *s, struct state *s1)
         }
     }
     else
-    if(i==2)
+    if((i==2 || i==3) && s->size>1)
     {
-        // add a pair
-        idx = gsl_rng_uniform_int(rng, s->size+1);
-        jdx = gsl_rng_uniform_int(rng, s->size+2);
-        i = gsl_rng_uniform_int(rng, nletters);
-        state_insert(s1, idx, i);
-        state_insert(s1, jdx, i);
+        // replace a pair
+        double fwd, rev;
 
         int counts[nletters];
         int pairs;
@@ -396,28 +413,7 @@ move_state(struct state *s, struct state *s1)
             if(count)
                 pairs += count * (count-1) / 2; // XX check overflow
         }
-
-        ratio = (0.5/pairs) * (s->size+1) * (s->size+2) * nletters;
-    }
-    else
-    if(i==3 && s->size>1)
-    {
-        // remove a pair
-        int counts[nletters];
-        int pairs;
-
-        memset(counts, 0, sizeof(counts));
-        for(idx=0; idx<s1->size; idx++)
-            counts[s1->word[idx]] += 1;
-
-        pairs = 0;
-        for(idx=0; idx<nletters; idx++)
-        {
-            int count = counts[idx];
-            assert(idx==0 || count%2==0);
-            if(count)
-                pairs += count * (count-1) / 2; // XX check overflow
-        }
+        fwd = 1./pairs;
 
         while(1)
         {
@@ -425,22 +421,103 @@ move_state(struct state *s, struct state *s1)
             jdx = gsl_rng_uniform_int(rng, s->size);
             if(idx != jdx && s->word[idx]==s->word[jdx])
             {
-                if(idx<jdx)
-                {
-                    state_pop(s1, jdx);
-                    state_pop(s1, idx);
-                }
-                else
-                {
-                    state_pop(s1, idx);
-                    state_pop(s1, jdx);
-                }
+                int delta = gsl_rng_uniform_int(rng, nletters-1);
+                int letter = (s->word[idx] + delta) % nletters;
+                s1->word[idx] = letter;
+                s1->word[jdx] = letter;
                 break;
             }
         }
 
-        ratio = 2.*pairs/s->size/(s->size-1)/nletters;
+
+        memset(counts, 0, sizeof(counts));
+        for(idx=0; idx<s1->size; idx++)
+            counts[s1->word[idx]] += 1;
+
+        pairs = 0;
+        for(idx=0; idx<nletters; idx++)
+        {
+            int count = counts[idx];
+            assert(idx==0 || count%2==0);
+            if(count)
+                pairs += count * (count-1) / 2; // XX check overflow
+        }
+        rev = 1./pairs;
+
+        ratio = rev/fwd;
     }
+//
+//    if(i==2)
+//    {
+//        // add a pair
+//        idx = gsl_rng_uniform_int(rng, s->size+1);
+//        jdx = gsl_rng_uniform_int(rng, s->size+2);
+//        i = gsl_rng_uniform_int(rng, nletters);
+//        state_insert(s1, idx, i);
+//        state_insert(s1, jdx, i);
+//
+//        int counts[nletters];
+//        int pairs;
+//
+//        memset(counts, 0, sizeof(counts));
+//        for(idx=0; idx<s1->size; idx++)
+//            counts[s1->word[idx]] += 1;
+//
+//        pairs = 0;
+//        for(idx=0; idx<nletters; idx++)
+//        {
+//            int count = counts[idx];
+//            assert(idx==0 || count%2==0);
+//            if(count)
+//                pairs += count * (count-1) / 2; // XX check overflow
+//        }
+//
+//        // XXX This calculation is not exactly right
+//        ratio = (0.5/pairs) * (s->size+1) * (s->size+2) * nletters;
+//    }
+//    else
+//    if(i==3 && s->size>1)
+//    {
+//        // remove a pair
+//        int counts[nletters];
+//        int pairs;
+//
+//        memset(counts, 0, sizeof(counts));
+//        for(idx=0; idx<s1->size; idx++)
+//            counts[s1->word[idx]] += 1;
+//
+//        pairs = 0;
+//        for(idx=0; idx<nletters; idx++)
+//        {
+//            int count = counts[idx];
+//            assert(idx==0 || count%2==0);
+//            if(count)
+//                pairs += count * (count-1) / 2; // XX check overflow
+//        }
+//
+//        while(1)
+//        {
+//            idx = gsl_rng_uniform_int(rng, s->size);
+//            jdx = gsl_rng_uniform_int(rng, s->size);
+//            if(idx != jdx && s->word[idx]==s->word[jdx])
+//            {
+//                if(idx<jdx)
+//                {
+//                    state_pop(s1, jdx);
+//                    state_pop(s1, idx);
+//                }
+//                else
+//                {
+//                    state_pop(s1, idx);
+//                    state_pop(s1, jdx);
+//                }
+//                break;
+//            }
+//        }
+//
+//        // XXX This calculation is not exactly right
+//        ratio = 2.*pairs/s->size/(s->size-1)/nletters;
+//    }
     else
     if(i==4 && s->size>1)
     {
@@ -493,6 +570,7 @@ main(int argc, char *argv[])
     printf("beta = %f\n", beta);
     printf("seed = %d\n", seed);
     printf("n = %d\n", n);
+    printf("offset = %d\n", offset);
 
     //assert(n<=10);
     assert(n<=32); // adjust spins_t as needed
@@ -500,6 +578,7 @@ main(int argc, char *argv[])
     int trial, count;
     int accept = 0;
     double total = 0.0;
+    double log_beta = log(beta);
 
     for(count=0; count<counts; count++)
     {
@@ -508,6 +587,8 @@ main(int argc, char *argv[])
         int nz, nz1; // non-zero
     
         init_state_rand(&s, beta);
+//        init_state(&s);
+
 //        weight = eval_state(&s, beta);
         nz = log_eval_state(&s, beta, &weight);
 
@@ -515,7 +596,7 @@ main(int argc, char *argv[])
         {
             ratio = move_state(&s, &s1);
 //            weight1 = eval_state(&s1, beta);
-            nz1 = log_eval_state(&s1, beta, &weight1);
+            nz1 = log_eval_state(&s1, log_beta, &weight1);
 
 if(0)
 {

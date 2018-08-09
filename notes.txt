@@ -1,4 +1,41 @@
 
+10/8/18
+=======
+
+n=15 gcolor model: 43.455
+-------------------------
+
+trials = 100000 counts = 100 beta = 10.000000 seed = 1533830674 n = 6 offset = 18
+accept: 0.425531
+<H>: 43.129000
+
+trials = 100000 counts = 100 beta = 10.000000 seed = 1533830762 n = 6 offset = 18
+accept: 0.425954
+<H>: 43.130000
+
+
+trials = 1000000 counts = 100 beta = 10.000000 seed = 1533830892 n = 6 offset = 18
+accept: 0.428595
+<H>: 43.618000
+8m58s
+
+accept: 0.428483 <H>: 43.368000
+9m1s
+
+
+Use "replace pair" move:
+
+trials = 100000 counts = 100 beta = 10.000000 seed = 1533834141 n = 6 offset = 18
+accept: 0.330243
+<H>: 36.905000
+0m58s
+
+trials = 1000000 counts = 100 beta = 10.000000 seed = 1533834225 n = 6 offset = 18
+accept: 0.361870
+<H>: 43.524000
+9m28s
+
+
 8/8/18
 ======
 

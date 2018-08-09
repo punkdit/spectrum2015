@@ -967,6 +967,21 @@ def build_reduced():
     return Rx, Rz
 
 
+def uniqify(Gx):
+    rows = [shortstr(g, zero="0") for g in Gx]
+    bag = {}
+    for row in rows:
+        bag[row] = bag.get(row, 0) + 1
+    rows = list(bag.keys())
+    rows.sort()
+    Gx = [array2([int(c) for c in row]) for row in rows]
+    Gx = array2(Gx)
+    Jx = [bag[row] for row in rows]
+    #print(shortstr(Gx))
+    #print(Jx)
+    return Gx, Jx
+
+
 
 class Model(object):
     def __init__(self, attrs):
@@ -997,7 +1012,12 @@ class Model(object):
         Rx, Rz = self.Rx, self.Rz        
         Gx = dot2(Gx, Rz.transpose())
         Gz = dot2(Gz, Rx.transpose())
-        model = build_model(Gx, Gz)
+        Jx = numpy.array([1]*len(Gx))
+        Jz = numpy.array([1]*len(Gz))
+        if argv.compress:
+            Gx, Jx = uniqify(Gx)
+            Gz, Jz = uniqify(Gz)
+        model = build_model(Gx, Gz, Jx=Jx, Jz=Jz)
         return model
 
     def build_ham(self, excite=None, weights=None, Jx=1., Jz=1.):
@@ -1301,17 +1321,26 @@ class Model(object):
         gz = len(model.Gz)
         print >>f, ("const int n = %d;" % model.n)
         print >>f, ("const int mx = %d;" % gx)
-        print >>f, ("const int offset = %d;" % gx)
+        offset = gz
+        if model.Jz is not None:
+            offset = sum(model.Jz)
+        print >>f, ("const int offset = %d;" % offset)
         print >>f, ("const int mz = %d;" % gz)
         print >>f, ("const int nletters = %d;" % (gx+1))
-        s = ', '.join(str(bits2int(g)) for g in model.Gx)
+        s = ', '.join("%sULL" % bits2int(g) for g in model.Gx)
         print >>f, ("spins_t Gx[%d] = {0, %s};" % (gx+1, s))
-        s = ', '.join(str(bits2int(g)) for g in model.Gz)
+        s = ', '.join("%sULL" % bits2int(g) for g in model.Gz)
         print >>f, ("spins_t Gz[%d] = {%s};" % (gz, s))
-        print("Gx =")
-        print(model.Gx)
-        print("Gz =")
-        print(model.Gz)
+        if model.Jx is not None:
+            s = ', '.join(str(j) for j in model.Jx)
+            print >>f, ("int Jx[%d] = {%s};" % (gx, s))
+        if model.Jz is not None:
+            s = ', '.join(str(j) for j in model.Jz)
+            print >>f, ("int Jz[%d] = {%s};" % (gz, s))
+        #print("Gx =")
+        #print(model.Gx)
+        #print("Gz =")
+        #print(model.Gz)
 
 
 
@@ -1340,7 +1369,7 @@ def check_sy(Lx, Hx, Tx, Rx, Lz, Hz, Tz, Rz, **kw):
 
 
 
-def build_model(Gx=None, Gz=None, Hx=None, Hz=None):
+def build_model(Gx=None, Gz=None, Hx=None, Hz=None, Jx=None, Jz=None):
 
     if Gx is None:
         Gx, Gz, Hx, Hz = build()
@@ -1476,6 +1505,21 @@ assert bits2int([0,0,1,1]) == 3
 assert bits2int([1,1,0,0]) == 8+4
 
 
+def low_weight(basis):
+    for v in basis:
+        #print(shortstr(v))
+        print v.sum(),
+    print
+    return
+
+    vecs = []
+    for u in span(basis):
+        vecs.append(shortstr(u, zero="0"))
+    vecs.sort(key = lambda s:s.count("1"))
+    print(len(vecs))
+    for v in vecs[:100]:
+        print(v.replace("0", "."), v.count("1"))
+
 
 if __name__ == "__main__":
 
@@ -1506,9 +1550,18 @@ if __name__ == "__main__":
             
     print model
 
+    if argv.get_sector:
+        model = model.get_sector()
+
+    print model
+
+    if argv.kernel:
+        basis = find_kernel(model.Gx.transpose())
+        print("kernel:", len(basis))
+        if basis:
+            low_weight(basis)
+
     if argv.dumpc:
-        if argv.sector:
-            model = model.get_sector()
         model.dumpc()
         sys.exit(0)
 
@@ -1545,8 +1598,8 @@ if __name__ == "__main__":
 #        print g.sum(),
 #    print
 
-    Rx = model.Rx
-    HR = numpy.concatenate((Hx, Rx))
+#    Rx = model.Rx
+#    HR = numpy.concatenate((Hx, Rx))
 #    print shortstr(Hx)
 #    print
 #    print shortstr(SR)
