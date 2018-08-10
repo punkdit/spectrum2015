@@ -1,4 +1,67 @@
 
+./models.py ising l=8 dumpc solve
+Model(n=8, Lx/z: 0, Gx: 8, Gz: 8, Hx: 1, Hz: 0, Rx/z: 7)
+Model(n=8, Lx/z: 0, Gx: 8, Gz: 8, Hx: 1, Hz: 0, Rx/z: 7)
+const int n = 8;
+const int mx = 8;
+const int offset = 8;
+const int mz = 8;
+const int nletters = 9;
+char *_Gx[8] = {
+  "1.......", 
+  ".1......", 
+  "..1.....", 
+  "...1....", 
+  "....1...", 
+  ".....1..", 
+  "......1.", 
+  ".......1"
+};
+char *_Gz[8] = {
+  "11......", 
+  ".11.....", 
+  "..11....", 
+  "...11...", 
+  "....11..", 
+  ".....11.", 
+  "......11", 
+  "1......1"
+};
+spins_t Gx[9];
+spins_t Gz[8];
+int Jx[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+int Jz[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+
+gcc -DSMALL_PROB -O3 -g -Wall qmc.c -o qmc1  -lm -I/usr/include/gsl -lgsl -lblas  
+
+./models.py ising l=8  solve
+Model(n=8, Lx/z: 0, Gx: 8, Gz: 8, Hx: 1, Hz: 0, Rx/z: 7)
+Model(n=8, Lx/z: 0, Gx: 8, Gz: 8, Hx: 1, Hz: 0, Rx/z: 7)
+span: 128
+building H. 
+nnz: 1024
+[  1.70086019   2.03918232   2.40537955   2.54551716   2.54551716
+   2.54551716   2.54551716   3.00264222   3.00264222   3.00264222
+   3.00264222   3.14277983   3.14277983   3.14277983   3.14277983
+   3.59990489   4.10623974   4.10623974   4.10623974   4.10623974
+   4.24637735   4.70350241   4.70350241   4.70350241   4.70350241
+   5.54815938   5.54815938   5.54815938   5.54815938   5.80709993
+   6.14542205   6.14542205   6.14542205   6.14542205   7.24901957
+   7.24901957   7.24901957   7.24901957   8.69093921  10.25166179]
+
+time ./qmc1  length=2000 burnin=1000 beta=10.0 output=samples_ising.out chains=10 # 10.25166179
+writing to file 'samples_ising.out'
+chains = 10, length = 2000, burnin = 1000, period = 1000
+beta = 10.000000, seed = 1533918205
+n = 8
+offset = 8
+
+accept: 0.434415, samples: 10010
+<H>: 18.262048
+<H> - offset: 10.262048 # <--- PRETTY GOOD
+
+
+
 10/8/18
 =======
 
@@ -17,6 +80,41 @@ eigval, degeneracy:
 show_partition:
 Z = 113728845809.31335
 <H> = 25.445333778143766
+
+gcc -O3 -g -Wall qmc.c -o qmc  -lm -I/usr/include/gsl -lgsl -lblas && time ./qmc output=samples.out length=4000 burnin=1000 period=1000 beta=1.0 chains=10
+writing to file 'samples.out'
+chains = 10, length = 4000, burnin = 1000, period = 1000
+beta = 1.000000, seed = 1533912385
+n = 15
+offset = 18
+accept: 0.428757, samples: 30010
+<H>: 39.877841
+<H> - offset: 21.877841 # <---- FAIL
+
+
+n=369 gcolor model
+------------------
+
+./zorbit.py gcolor size=4 find_ideals
+metro module failed to load
+guage ops: 448
+qubits: 369
+stabs: 80
+Lattice(3:369, 2:736, 1:448, 0:80)
+Model(n=369, Lx/z: 1, Gx: 448, Gz: 448, Hx: 80, Hz: 80, Rx/z: 208)
+('find_ideals:', 6)
+Model(n=369, Lx/z: 259, Gx: 70, Gz: 70, Hx: 40, Hz: 40, Rx/z: 30)
+('kernel:', 0, [])
+Model(n=369, Lx/z: 259, Gx: 70, Gz: 70, Hx: 40, Hz: 40, Rx/z: 30)
+('kernel:', 0, [])
+Model(n=369, Lx/z: 245, Gx: 84, Gz: 84, Hx: 40, Hz: 40, Rx/z: 44)
+('kernel:', 0, [])
+Model(n=369, Lx/z: 259, Gx: 70, Gz: 70, Hx: 40, Hz: 40, Rx/z: 30)
+('kernel:', 0, [])
+Model(n=369, Lx/z: 245, Gx: 84, Gz: 84, Hx: 40, Hz: 40, Rx/z: 44)
+('kernel:', 0, [])
+Model(n=369, Lx/z: 259, Gx: 70, Gz: 70, Hx: 40, Hz: 40, Rx/z: 30)
+('kernel:', 0, [])
 
 
 
@@ -127,15 +225,17 @@ self dual stabilizers
 ('eval_2:', 99.014096510138387)
 ('top:', 104.07602591584734)
 
-const int n = 6;
-const int mx = 10;
-const int offset = 14;
-const int mz = 10;
-const int nletters = 11;
-spins_t Gx[11] = {0, 2ULL, 4ULL, 8ULL, 11ULL, 24ULL, 29ULL, 32ULL, 48ULL, 50ULL, 54ULL};
-spins_t Gz[10] = {1ULL, 2ULL, 4ULL, 9ULL, 20ULL, 26ULL, 32ULL, 48ULL, 56ULL, 57ULL};
-int Jx[10] = {2, 2, 1, 2, 2, 1, 1, 1, 1, 1};
-int Jz[10] = {2, 1, 2, 2, 1, 2, 1, 1, 1, 1};
+
+gcc -DLARGE_PROB -g -Wall qmc.c -o qmc  -lm -I/usr/include/gsl -lgsl -lblas && time ./qmc output=samples.out length=400 burnin=200 period=10000 beta=10.0 chains=1
+writing to file 'samples.out'
+chains = 1, length = 400, burnin = 200, period = 10000
+beta = 10.000000, seed = 1533918105
+n = 65
+offset = 13
+accept: 0.428483, samples: 201
+<H>: 29.125871
+<H> - offset: 16.125871
+
 
 
 
