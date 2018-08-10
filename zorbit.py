@@ -1317,7 +1317,23 @@ def find_ideals():
                 gzs.append(Gz[i-mx])
         _model = build_model(array2(gxs), array2(gzs))
         print(_model)
+        #print(shortstrx(_model.Gx))
+        basis = find_kernel(_model.Gx.transpose())
+        print("kernel:", len(basis), [v.sum() for v in basis])
         models.append(_model)
+
+    idx = argv.dumpc
+    if idx is not None:
+        model = models[idx]
+        #model = model.get_sector(compress=True)
+        print(model)
+        #print(shortstrx(model.Gx))
+        basis = find_kernel(model.Gx.transpose())
+        print("kernel:", len(basis), [v.sum() for v in basis])
+        models.append(_model)
+    
+        model.dumpc()
+        return
 
     if not argv.solve:
         return
@@ -1392,7 +1408,7 @@ def find_ideals():
             vals = list(vals)
             vals.sort(reverse=True)
 
-            #print("total +=", vals[0])
+            print("total +=", vals[0])
             total += vals[0]
             gaps.append(vals[0]-vals[1])
     
@@ -1401,6 +1417,21 @@ def find_ideals():
         print("eval_1:", total)
         print("eval_2:", total-min(gaps))
     print("top:", top)
+
+
+def show_partition(vals, beta):
+    print("show_partition:")
+
+    Z = 0.
+    EH = 0.
+
+    for val in vals:
+        x = math.exp(beta * val)
+        Z += x
+        EH += val * x
+        
+    print("Z =", Z)
+    print("<H> =", EH/Z)
 
 
 def main():
@@ -1565,6 +1596,10 @@ def main():
     
         vals, vecs = numpy.linalg.eigh(H)
         show_eigs(vals)
+
+        if argv.show_partition:
+            beta = argv.get("beta", 1.0)
+            show_partition(vals, beta)
 
         if argv.orbigraph:
             if argv.symplectic:

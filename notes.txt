@@ -2,8 +2,158 @@
 10/8/18
 =======
 
+n=15 gcolor model with Gx^T kernel
+----------------------------------
+
+./zorbit.py solve sparse gcolor size=1 show_partition beta=1.0
+eigval, degeneracy:
+    25.4558441227 1
+    16.9705627485 6
+    8.48528137424 15
+    1.05533788885e-14 20
+    -8.48528137424 15
+    -16.9705627485 6
+    -25.4558441227 1
+show_partition:
+Z = 113728845809.31335
+<H> = 25.445333778143766
+
+
+
+n=175 gcolor model
+------------------
+
+./zorbit.py gcolor size=3 find_ideals solve
+metro module failed to load
+guage ops: 214
+qubits: 175
+stabs: 40
+Lattice(3:175, 2:348, 1:214, 0:40)
+Model(n=175, Lx/z: 1, Gx: 214, Gz: 214, Hx: 40, Hz: 40, Rx/z: 94)
+('find_ideals:', 6)
+Model(n=175, Lx/z: 116, Gx: 39, Gz: 39, Hx: 20, Hz: 20, Rx/z: 19)
+('kernel:', 0, [])
+Model(n=175, Lx/z: 121, Gx: 34, Gz: 34, Hx: 20, Hz: 20, Rx/z: 14)
+('kernel:', 0, [])
+Model(n=175, Lx/z: 121, Gx: 34, Gz: 34, Hx: 20, Hz: 20, Rx/z: 14)
+('kernel:', 0, [])
+Model(n=175, Lx/z: 121, Gx: 34, Gz: 34, Hx: 20, Hz: 20, Rx/z: 14)
+('kernel:', 0, [])
+Model(n=175, Lx/z: 121, Gx: 34, Gz: 34, Hx: 20, Hz: 20, Rx/z: 14)
+('kernel:', 0, [])
+Model(n=175, Lx/z: 116, Gx: 39, Gz: 39, Hx: 20, Hz: 20, Rx/z: 19)
+('kernel:', 0, [])
+self dual stabilizers
+('vals:', [48.219093, 45.272161]) ('total +=', 48.219093)
+('vals:', [42.689847, 38.44274]) ('total +=', 42.689847)
+('vals:', [42.689847, 38.44274]) ('total +=', 42.689847)
+('vals:', [42.689847, 38.44274]) ('total +=', 42.689847)
+('vals:', [42.689847, 38.44274]) ('total +=', 42.689847)
+('vals:', [48.219093, 45.272161]) ('total +=', 48.219093)
+('eval_1:', 267.197574)
+('eval_2:', 264.25064199999997)
+('top:', 267.197574)
+
+Model(n=19, Lx/z: 0, Gx: 33, Gz: 33, Hx: 0, Hz: 0, Rx/z: 19)
+('kernel:', 14, [3, 4, 3, 4, 6, 5, 4, 12, 12, 7, 9, 7, 5, 14])
+const int n = 19;
+const int mx = 33;
+const int offset = 39;
+const int mz = 33;
+const int nletters = 34;
+spins_t Gx[34] = {0, 1ULL, 2ULL, 4ULL, 5ULL, 12ULL, 15ULL, 28ULL, 64ULL, 128ULL, 408ULL, 512ULL, 640ULL, 1120ULL, 1136ULL, 2304ULL, 3136ULL, 4096ULL, 12293ULL, 16384ULL, 24576ULL, 28672ULL, 58368ULL, 59392ULL, 65536ULL, 73824ULL, 114688ULL, 131072ULL, 155648ULL, 156288ULL, 262144ULL, 320256ULL, 321536ULL, 425984ULL};
+spins_t Gz[33] = {1ULL, 2ULL, 5ULL, 15ULL, 16ULL, 24ULL, 26ULL, 32ULL, 56ULL, 96ULL, 128ULL, 256ULL, 272ULL, 512ULL, 896ULL, 1024ULL, 1056ULL, 1088ULL, 2048ULL, 4096ULL, 11564ULL, 24576ULL, 36112ULL, 60716ULL, 65536ULL, 90112ULL, 131072ULL, 180224ULL, 241664ULL, 262144ULL, 294912ULL, 361536ULL, 393728ULL};
+int Jx[33] = {1, 2, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+int Jz[33] = {2, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+
+
+gcc -O3 -g -Wall qmc.c -o qmc  -lm -I/usr/include/gsl -lgsl -lblas && time ./qmc output=samples.out length=10000000 burnin=1000000 period=100000 beta=1.0 chains=1
+writing to file 'samples.out'
+chains = 1, length = 10000000, burnin = 1000000, period = 100000
+beta = 1.000000, seed = 1533904895
+n = 19
+offset = 39
+accept: 0.447078, samples: 91
+<H>: 85.000000
+<H> - offset: 46.000000
+1m1s
+
+simon@hero:~/home/github/spectrum2015$ gcc -O3 -g -Wall qmc.c -o qmc  -lm -I/usr/include/gsl -lgsl -lblas && time ./qmc output=samples.out length=10000000 burnin=1000000 period=100000 beta=10.0 chains=1
+writing to file 'samples.out'
+chains = 1, length = 10000000, burnin = 1000000, period = 100000
+beta = 10.000000, seed = 1533905030
+n = 19
+offset = 39
+accept: 0.400109, samples: 91
+<H>: 78.981319
+<H> - offset: 39.981319
+10m13s
+
+# FAIL...
+
+
+
+n=65 gcolor model
+-----------------
+
+./zorbit.py gcolor size=2 find_ideals solve
+metro module failed to load
+guage ops: 80
+qubits: 65
+stabs: 16
+Lattice(3:65, 2:128, 1:80, 0:16)
+Model(n=65, Lx/z: 1, Gx: 80, Gz: 80, Hx: 16, Hz: 16, Rx/z: 32)
+('find_ideals:', 6)
+Model(n=65, Lx/z: 43, Gx: 14, Gz: 14, Hx: 8, Hz: 8, Rx/z: 6)
+('kernel:', 0, [])
+Model(n=65, Lx/z: 44, Gx: 13, Gz: 13, Hx: 8, Hz: 8, Rx/z: 5)
+('kernel:', 0, [])
+Model(n=65, Lx/z: 44, Gx: 13, Gz: 13, Hx: 8, Hz: 8, Rx/z: 5)
+('kernel:', 0, [])
+Model(n=65, Lx/z: 44, Gx: 13, Gz: 13, Hx: 8, Hz: 8, Rx/z: 5)
+('kernel:', 0, [])
+Model(n=65, Lx/z: 44, Gx: 13, Gz: 13, Hx: 8, Hz: 8, Rx/z: 5)
+('kernel:', 0, [])
+Model(n=65, Lx/z: 43, Gx: 14, Gz: 14, Hx: 8, Hz: 8, Rx/z: 6)
+('kernel:', 0, [])
+self dual stabilizers
+('total +=', 18.052875114275896)
+('total +=', 16.992568921823882)
+('total +=', 16.992568921823885)
+('total +=', 16.992568921823889)
+('total +=', 16.992568921823885)
+('total +=', 18.052875114275896)
+('eval_1:', 104.07602591584734)
+('eval_2:', 99.014096510138387)
+('top:', 104.07602591584734)
+
+const int n = 6;
+const int mx = 10;
+const int offset = 14;
+const int mz = 10;
+const int nletters = 11;
+spins_t Gx[11] = {0, 2ULL, 4ULL, 8ULL, 11ULL, 24ULL, 29ULL, 32ULL, 48ULL, 50ULL, 54ULL};
+spins_t Gz[10] = {1ULL, 2ULL, 4ULL, 9ULL, 20ULL, 26ULL, 32ULL, 48ULL, 56ULL, 57ULL};
+int Jx[10] = {2, 2, 1, 2, 2, 1, 1, 1, 1, 1};
+int Jz[10] = {2, 1, 2, 2, 1, 2, 1, 1, 1, 1};
+
+
+
 n=15 gcolor model: 43.455
 -------------------------
+
+Model(n=6, Lx/z: 0, Gx: 6, Gz: 6, Hx: 0, Hz: 0, Rx/z: 6)
+('kernel:', 0)
+const int n = 6;
+const int mx = 6;
+const int offset = 18;
+const int mz = 6;
+const int nletters = 7;
+spins_t Gx[7] = {0, 1ULL, 2ULL, 7ULL, 8ULL, 16ULL, 32ULL};
+spins_t Gz[6] = {4ULL, 5ULL, 6ULL, 8ULL, 16ULL, 32ULL};
+int Jx[6] = {3, 3, 3, 3, 3, 3};
+int Jz[6] = {3, 3, 3, 3, 3, 3};
+
 
 trials = 100000 counts = 100 beta = 10.000000 seed = 1533830674 n = 6 offset = 18
 accept: 0.425531
@@ -65,6 +215,16 @@ offset = 18
 accept: 0.378283, samples: 910
 <H>: 43.516044
 9m59s
+
+
+time ./qmc chains=1 output=samples.out length=10000000 burnin=1000000 period=100000 beta=1.0 chains=100
+writing to file 'samples.out'
+chains = 100, length = 10000000, burnin = 1000000, period = 100000
+beta = 1.000000, seed = 1533900280
+n = 6
+offset = 18
+accept: 0.465612, samples: 9100
+<H>: 43.719451
 
 
 8/8/18

@@ -10,24 +10,6 @@
 
 #include "gsl_rng.h"
 
-
-typedef uint32_t spins_t;
-//typedef uint64_t spins_t;
-//typedef __uint128_t spins_t;
-
-
-int 
-countbits(spins_t v)
-{
-    int c;
-    for(c = 0; v; v >>= 1)
-    {   
-      c += v & 1;
-    }   
-    return c;
-}
-
-
 //
 // From:
 // https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetNaive
@@ -42,8 +24,12 @@ static const unsigned char BitsSetTable256[256] =
     B6(0), B6(1), B6(1), B6(2)
 };
 
+
+#ifdef SMALL_PROB
+typedef uint32_t spins_t;
+
 static int 
-countbits_fast(long v0)  // count the number of bits set in 32-bit value v
+countbits_fast(spins_t v0)
 {
     uint32_t v;
     //assert(0xffffffffL&v0 == v0);
@@ -58,6 +44,68 @@ countbits_fast(long v0)  // count the number of bits set in 32-bit value v
 }
 
 
+#endif
+
+#ifdef MED_PROB
+typedef uint64_t spins_t;
+
+static int 
+countbits_fast(spins_t v)
+{
+    uint32_t c;
+    c = BitsSetTable256[v & 0xff] + 
+        BitsSetTable256[(v >> 8 ) & 0xff] + 
+        BitsSetTable256[(v >> 16) & 0xff] + 
+        BitsSetTable256[(v >> 24) & 0xff] +
+        BitsSetTable256[(v >> 32) & 0xff] + 
+        BitsSetTable256[(v >> 40) & 0xff] + 
+        BitsSetTable256[(v >> 48) & 0xff] + 
+        BitsSetTable256[v >> 56]; 
+    return c;
+}
+
+#endif 
+
+#ifdef LARGE_PROB
+typedef __uint128_t spins_t;
+
+static int 
+countbits_fast(spins_t v)
+{
+    uint32_t c;
+    c = BitsSetTable256[v & 0xff] + 
+        BitsSetTable256[(v >> 8 ) & 0xff] + 
+        BitsSetTable256[(v >> 16) & 0xff] + 
+        BitsSetTable256[(v >> 24) & 0xff] +
+        BitsSetTable256[(v >> 32) & 0xff] + 
+        BitsSetTable256[(v >> 40) & 0xff] + 
+        BitsSetTable256[(v >> 48) & 0xff] + 
+        BitsSetTable256[(v >> 56) & 0xff] +
+        BitsSetTable256[(v >> 64) & 0xff] +
+        BitsSetTable256[(v >> 72) & 0xff] +
+        BitsSetTable256[(v >> 80) & 0xff] +
+        BitsSetTable256[(v >> 88) & 0xff] +
+        BitsSetTable256[(v >> 96) & 0xff] +
+        BitsSetTable256[(v >> 104) & 0xff] +
+        BitsSetTable256[(v >> 112) & 0xff] +
+        BitsSetTable256[(v >> 120) & 0xff];
+    return c;
+}
+#endif
+
+
+int 
+countbits_slow(spins_t v)
+{
+    int c;
+    for(c = 0; v; v >>= 1)
+    {   
+      c += v & 1;
+    }   
+    return c;
+}
+
+
 
 #include "model.h"
 /*
@@ -68,6 +116,32 @@ const int nletters = 5;
 spins_t Gx[5] = {0, 8, 4, 2, 1};
 spins_t Gz[4] = {12, 6, 3, 9};
 */
+
+
+spins_t
+bits2int(char *bits)
+{
+    spins_t result = 0;
+    int idx;
+    for(idx = 0; bits[idx]; idx++)
+    {
+        result *= 2;
+        if(bits[idx]=='1')
+            result += 1;
+    }
+    return result;
+}
+
+void
+init_ops()
+{
+    int idx;
+    Gx[0] = 0; // first one is identity op
+    for(idx=0; idx<mx; idx++)
+        Gx[idx+1] = bits2int(_Gx[idx]);
+    for(idx=0; idx<mz; idx++)
+        Gz[idx] = bits2int(_Gz[idx]);
+}
 
 
 gsl_rng * rng;
@@ -85,7 +159,7 @@ void
 check_state(struct state *s)
 {
     assert(s);
-    assert(s->u<(1UL<<n));
+    assert(s->u<(((spins_t)1)<<n));
     assert(0<=s->size);
     assert(s->size<=MAX_WORD);
 }
@@ -105,7 +179,8 @@ void
 init_state_rand(struct state *s, double beta)
 {
     assert(s);
-    s->u = gsl_rng_uniform_int(rng, 1<<n); // XX init one byte at a time
+    //s->u = gsl_rng_uniform_int(rng, 1<<n); // XX init one byte at a time
+    s->u = 0;
     s->size = 0;
     memset(s->word, 0, sizeof(int)*MAX_WORD);
     check_state(s);
@@ -117,7 +192,7 @@ dump_state(struct state *s)
 {
     int i;
     check_state(s);
-    printf("%ld", s->u);
+    printf("%ld", (long)s->u);
     printf("[");
     for(i=0; i<s->size; i++)
         printf("%d", s->word[i]);
@@ -361,7 +436,7 @@ move_state(struct state *s, struct state *s1)
 //    dump_state(s);
 //    printf("\n");
 
-    i = gsl_rng_uniform_int(rng, 6);
+    i = gsl_rng_uniform_int(rng, 5);
 //    printf("i=%d ", i);
 
     ratio = 1.0;
@@ -393,7 +468,7 @@ move_state(struct state *s, struct state *s1)
         }
     }
     else
-    if((i==2 || i==3) && s->size>1)
+    if(i==2 && s->size>1)
     {
         // replace a pair
         double fwd, rev;
@@ -519,7 +594,7 @@ move_state(struct state *s, struct state *s1)
 //        ratio = 2.*pairs/s->size/(s->size-1)/nletters;
 //    }
     else
-    if(i==4 && s->size>1)
+    if(i==3 && s->size>1)
     {
         // swap
         spins_t tmp;
@@ -529,11 +604,11 @@ move_state(struct state *s, struct state *s1)
         s1->word[idx+1] = tmp;
     }
     else
-    if(i==5)
+    if(i==4)
     {
         // flip a spin
         idx = gsl_rng_uniform_int(rng, n);
-        s1->u = (s1->u) ^ (1<<idx);
+        s1->u = (s1->u) ^ (((spins_t)1)<<idx);
     }
 
     check_state(s1);
@@ -548,17 +623,20 @@ int
 main(int argc, char *argv[])
 {
     init_cache();
+    init_ops();
 
     rng = gsl_rng_alloc (gsl_rng_gfsr4);   // fastest rng
 
-    int chains, length, burnin, period;
+    int chains, length, burnin, period, verbose;
     int seed;
     double beta;
     chains = 1;
-    length = 10000;
-    burnin = 1000;
-    period = 100;
+    period = 1000; // unit
+    burnin = 100; // warmup length in period units
+    length = 1000;  // total length in period units
+    verbose = 0;
     beta = 1.0;
+    FILE *output = NULL;
 
     seed = (int)time(NULL); 
     gsl_rng_set(rng, seed);
@@ -566,12 +644,43 @@ main(int argc, char *argv[])
     int idx;
     for(idx=1; idx<argc; idx++)
     {
-        if(idx==1) { chains = atoi(argv[idx]); }
-        if(idx==2) { length = atoi(argv[idx]); }
-        if(idx==3) { burnin = atoi(argv[idx]); }
-        if(idx==4) { period = atoi(argv[idx]); }
-        if(idx==5) { beta = atof(argv[idx]); }
-        if(idx==6) { seed = atoi(argv[idx]); gsl_rng_set(rng, seed); }
+//        if(idx==1) { chains = atoi(argv[idx]); }
+//        if(idx==2) { length = atoi(argv[idx]); }
+//        if(idx==3) { burnin = atoi(argv[idx]); }
+//        if(idx==4) { period = atoi(argv[idx]); }
+//        if(idx==5) { beta = atof(argv[idx]); }
+//        if(idx==6) { seed = atoi(argv[idx]); gsl_rng_set(rng, seed); }
+
+        char *arg = argv[idx];
+        char *value;
+        for(value = arg; *value; value++)
+            if(*value=='=')
+                break;
+        if(*value == 0)
+            continue;
+        *value = 0;
+        value++;
+        
+        if(strcmp("chains", arg)==0)      { chains = atoi(value); }
+        else if(strcmp("length", arg)==0) { length = atoi(value); }
+        else if(strcmp("burnin", arg)==0) { burnin = atoi(value); }
+        else if(strcmp("period", arg)==0) { period = atoi(value); }
+        else if(strcmp("verbose", arg)==0) { verbose = atoi(value); }
+        else if(strcmp("beta", arg)==0)   { beta = atof(value); }
+        else if(strcmp("seed", arg)==0)   
+        { seed = atoi(value); gsl_rng_set(rng, seed); }
+        else if(strcmp("output", arg)==0)   
+        {
+            printf("writing to file '%s'\n", value);
+            output = fopen(value, "w+");
+            if(output==NULL)
+                printf("failed to open file '%s'\n", value);
+        }
+        else
+        {
+            printf("unrecognized arg '%s'\n", arg);
+            return 1;
+        }
     }
 
     printf("chains = %d, ", chains); // number of chains
@@ -580,15 +689,17 @@ main(int argc, char *argv[])
     printf("period = %d\n", period); // sample period
     printf("beta = %f, ", beta);
     printf("seed = %d\n", seed);
+    assert(length > burnin);
 
     printf("n = %d\n", n);
     printf("offset = %d\n", offset);
 
-    assert(burnin % period == 0);
-    assert(length % period == 0);
+    burnin *= period;
+    length *= period;
+//    assert(burnin % period == 0);
+//    assert(length % period == 0);
 
-    //assert(n<=10);
-    assert(n<=32); // adjust spins_t as needed
+    assert(sizeof(spins_t) >= (n/8));
 
     int trial, chain;
     int accept = 0;
@@ -627,18 +738,23 @@ main(int argc, char *argv[])
             {
                 total += s.size;
                 samples += 1;
-                printf("."); fflush(stdout);
+                if(verbose>0) { printf("."); fflush(stdout); }
+                if(output)
+                    fprintf(output, "%d\n", s.size);
             }
         }
-        printf("/"); fflush(stdout);
+        if(verbose>0) { printf("/"); fflush(stdout); }
     }
-    printf("\n");
+    if(verbose>0) printf("\n");
 
     printf("accept: %f, ", (double)accept / ((length+1)*chains));
     printf("samples: %d\n", samples);
     printf("<H>: %f\n", total / samples / beta);
+    printf("<H> - offset: %f\n", total / samples / beta - offset);
 
     gsl_rng_free(rng);
+    if(output)
+        fclose(output);
 
     return 0;
 }

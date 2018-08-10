@@ -1,9 +1,29 @@
-const int n = 6;
-const int mx = 6;
-const int offset = 18;
-const int mz = 6;
-const int nletters = 7;
-spins_t Gx[7] = {0, 1, 2, 7, 8, 16, 32};
-spins_t Gz[6] = {4, 5, 6, 8, 16, 32};
-int Jx[6] = {3, 3, 3, 3, 3, 3};
-int Jz[6] = {3, 3, 3, 3, 3, 3};
+const int n = 8;
+const int mx = 8;
+const int offset = 8;
+const int mz = 8;
+const int nletters = 9;
+char *_Gx[8] = {
+  "1.......", 
+  ".1......", 
+  "..1.....", 
+  "...1....", 
+  "....1...", 
+  ".....1..", 
+  "......1.", 
+  ".......1"
+};
+char *_Gz[8] = {
+  "11......", 
+  ".11.....", 
+  "..11....", 
+  "...11...", 
+  "....11..", 
+  ".....11.", 
+  "......11", 
+  "1......1"
+};
+spins_t Gx[9];
+spins_t Gz[8];
+int Jx[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+int Jz[8] = {1, 1, 1, 1, 1, 1, 1, 1};

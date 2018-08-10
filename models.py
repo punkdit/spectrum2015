@@ -1007,14 +1007,14 @@ class Model(object):
         n = self.n
         return Model(locals())
 
-    def get_sector(self, tx=None, tz=None):
+    def get_sector(self, tx=None, tz=None, compress=False):
         Gx, Gz = self.Gx, self.Gz        
         Rx, Rz = self.Rx, self.Rz        
         Gx = dot2(Gx, Rz.transpose())
         Gz = dot2(Gz, Rx.transpose())
         Jx = numpy.array([1]*len(Gx))
         Jz = numpy.array([1]*len(Gz))
-        if argv.compress:
+        if compress:
             Gx, Jx = uniqify(Gx)
             Gz, Jz = uniqify(Gz)
         model = build_model(Gx, Gz, Jx=Jx, Jz=Jz)
@@ -1315,7 +1315,8 @@ class Model(object):
 
     def dumpc(model):
     
-        f = open("model.h", "w")
+        #f = open("model.h", "w")
+        f = sys.stdout
     
         gx = len(model.Gx)
         gz = len(model.Gz)
@@ -1327,16 +1328,29 @@ class Model(object):
         print >>f, ("const int offset = %d;" % offset)
         print >>f, ("const int mz = %d;" % gz)
         print >>f, ("const int nletters = %d;" % (gx+1))
-        s = ', '.join("%sULL" % bits2int(g) for g in model.Gx)
-        print >>f, ("spins_t Gx[%d] = {0, %s};" % (gx+1, s))
-        s = ', '.join("%sULL" % bits2int(g) for g in model.Gz)
-        print >>f, ("spins_t Gz[%d] = {%s};" % (gz, s))
-        if model.Jx is not None:
-            s = ', '.join(str(j) for j in model.Jx)
-            print >>f, ("int Jx[%d] = {%s};" % (gx, s))
-        if model.Jz is not None:
-            s = ', '.join(str(j) for j in model.Jz)
-            print >>f, ("int Jz[%d] = {%s};" % (gz, s))
+        #s = ', '.join("%sULL" % bits2int(g) for g in model.Gx)
+        #print >>f, ("spins_t Gx[%d] = {0, %s};" % (gx+1, s))
+        #s = ', '.join("%sULL" % bits2int(g) for g in model.Gz)
+        #print >>f, ("spins_t Gz[%d] = {%s};" % (gz, s))
+
+        s = ', \n'.join('  "%s"'%shortstr(g, zero=".") for g in model.Gx)
+        print >>f, ('char *_Gx[%d] = {\n%s\n};' % (gx, s))
+        s = ', \n'.join('  "%s"'%shortstr(g, zero=".") for g in model.Gz)
+        print >>f, ('char *_Gz[%d] = {\n%s\n};' % (gz, s))
+        print >>f, ("spins_t Gx[%d];" % (gx+1,))
+        print >>f, ("spins_t Gz[%d];" % (gz,))
+
+        Jx = model.Jx
+        if Jx is None:
+            Jx = [1 for g in model.Gx]
+        s = ', '.join(str(j) for j in Jx)
+        print >>f, ("int Jx[%d] = {%s};" % (gx, s))
+
+        Jz = model.Jz
+        if Jz is None:
+            Jz = [1 for g in model.Gz]
+        s = ', '.join(str(j) for j in Jz)
+        print >>f, ("int Jz[%d] = {%s};" % (gz, s))
         #print("Gx =")
         #print(model.Gx)
         #print("Gz =")
@@ -1496,7 +1510,7 @@ def bits2int(g):
     idx = 0
     while idx < len(g):
         i *= 2
-        i += g[idx]
+        i += long(g[idx])
         idx += 1
     return i
 
@@ -1551,7 +1565,8 @@ if __name__ == "__main__":
     print model
 
     if argv.get_sector:
-        model = model.get_sector()
+        compress = argv.compress
+        model = model.get_sector(compress=compress)
 
     print model
 
