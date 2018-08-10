@@ -551,36 +551,52 @@ main(int argc, char *argv[])
 
     rng = gsl_rng_alloc (gsl_rng_gfsr4);   // fastest rng
 
-    int seed, trials, counts;
+    int chains, length, burnin, period;
+    int seed;
     double beta;
-    trials = 100;
-    counts = 1;
+    chains = 1;
+    length = 10000;
+    burnin = 1000;
+    period = 100;
     beta = 1.0;
 
     seed = (int)time(NULL); 
     gsl_rng_set(rng, seed);
 
-    if(argc>=2) { trials = atoi(argv[1]); }
-    if(argc>=3) { counts = atoi(argv[2]); }
-    if(argc>=4) { beta = atof(argv[3]); }
-    if(argc>=5) { seed = atoi(argv[4]); gsl_rng_set(rng, seed); }
+    int idx;
+    for(idx=1; idx<argc; idx++)
+    {
+        if(idx==1) { chains = atoi(argv[idx]); }
+        if(idx==2) { length = atoi(argv[idx]); }
+        if(idx==3) { burnin = atoi(argv[idx]); }
+        if(idx==4) { period = atoi(argv[idx]); }
+        if(idx==5) { beta = atof(argv[idx]); }
+        if(idx==6) { seed = atoi(argv[idx]); gsl_rng_set(rng, seed); }
+    }
 
-    printf("trials = %d\n", trials);
-    printf("counts = %d\n", counts);
-    printf("beta = %f\n", beta);
+    printf("chains = %d, ", chains); // number of chains
+    printf("length = %d, ", length); // length of each chain
+    printf("burnin = %d, ", burnin); // before first sample
+    printf("period = %d\n", period); // sample period
+    printf("beta = %f, ", beta);
     printf("seed = %d\n", seed);
+
     printf("n = %d\n", n);
     printf("offset = %d\n", offset);
+
+    assert(burnin % period == 0);
+    assert(length % period == 0);
 
     //assert(n<=10);
     assert(n<=32); // adjust spins_t as needed
 
-    int trial, count;
+    int trial, chain;
     int accept = 0;
+    int samples = 0;
     double total = 0.0;
     double log_beta = log(beta);
 
-    for(count=0; count<counts; count++)
+    for(chain=0; chain<chains; chain++)
     {
         struct state s, s1;
         double weight, weight1, x, ratio;
@@ -588,48 +604,39 @@ main(int argc, char *argv[])
     
         init_state_rand(&s, beta);
 //        init_state(&s);
-
 //        weight = eval_state(&s, beta);
         nz = log_eval_state(&s, beta, &weight);
 
-        for(trial=0; trial<trials; trial++)
+        for(trial=0; trial<length+1; trial++)
         {
             ratio = move_state(&s, &s1);
-//            weight1 = eval_state(&s1, beta);
             nz1 = log_eval_state(&s1, log_beta, &weight1);
 
-if(0)
-{
-            dump_state(&s);
-            printf(" --> ");
-            dump_state(&s1);
-            printf(" log(weight)=%f, log(weight1)=%f, ratio=%f", 
-                weight, weight1, ratio);
-            printf("\n");
-}
-    
             x = gsl_rng_uniform(rng);
-            if(!nz || 
-                (nz1 && x <= (ratio * exp(weight1 - weight))))
+            if(!nz || (nz1 && x <= (ratio * exp(weight1 - weight))))
             {
                 if(!eq_state(&s, &s1))
-                {
                     accept += 1;
-//                    printf("ACCEPT\n");
-                }
                 memcpy(&s, &s1, sizeof(struct state));
                 weight = weight1;
             }
 
+            if(trial < burnin)
+                continue;
+            if(trial % period == 0)
+            {
+                total += s.size;
+                samples += 1;
+                printf("."); fflush(stdout);
+            }
         }
-
-        total += s.size;
-        printf("."); fflush(stdout);
+        printf("/"); fflush(stdout);
     }
     printf("\n");
 
-    printf("accept: %f\n", (double)accept / (trials*counts));
-    printf("<H>: %f\n", total / counts / beta);
+    printf("accept: %f, ", (double)accept / ((length+1)*chains));
+    printf("samples: %d\n", samples);
+    printf("<H>: %f\n", total / samples / beta);
 
     gsl_rng_free(rng);
 

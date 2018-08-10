@@ -34,6 +34,37 @@ trials = 1000000 counts = 100 beta = 10.000000 seed = 1533834225 n = 6 offset = 
 accept: 0.361870
 <H>: 43.524000
 9m28s
+accept: 0.362257
+<H>: 42.964000
+
+trials = 1000000 chains = 1000 beta = 10.000000 seed = 1533866018 n = 6 offset = 18
+accept: 0.362057
+<H>: 43.232200
+93m
+
+trials = 1000000 chains = 1000 beta = 10.000000 seed = 1533883411
+n = 6 offset = 18
+accept: 0.361666
+<H>: 43.174100
+98m
+
+ time ./qmc1 10 10000000 1000000 100000 10.0 100
+chains = 10, length = 10000000, burnin = 1000000, period = 100000
+beta = 10.000000, seed = 100
+n = 6
+offset = 18
+accept: 0.378671, samples: 910
+<H>: 43.672637
+9m59s
+
+simon@hero:~/home/github/spectrum2015$ time ./qmc1 10 10000000 1000000 100000 10.0 
+chains = 10, length = 10000000, burnin = 1000000, period = 100000
+beta = 10.000000, seed = 1533888366
+n = 6
+offset = 18
+accept: 0.378283, samples: 910
+<H>: 43.516044
+9m59s
 
 
 8/8/18
