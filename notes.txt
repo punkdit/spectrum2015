@@ -236,6 +236,23 @@ accept: 0.428483, samples: 201
 <H>: 29.125871
 <H> - offset: 16.125871
 
+time nice ./qmc output=samples1.out length=800 burnin=200 period=50000 beta=10.0 chains=1 # 16.99256
+writing to file 'samples1.out'
+chains = 1, length = 800, burnin = 200, period = 50000
+beta = 10.000000, seed = 1533924571
+n = 65 offset = 13 accept: 0.450171, samples: 601
+<H>: 30.140100
+<H> - offset: 17.140100
+50m
+
+time nice ./qmc output=samples2.out length=800 burnin=200 period=50000 beta=10.0 chains=10 # 16.99256
+chains = 10, length = 800, burnin = 200, period = 50000
+beta = 10.000000, seed = 1533928422
+n = 65 offset = 13 accept: 0.450626, samples: 6010
+<H>: 30.177671
+<H> - offset: 17.177671
+468m
+
 
 
 

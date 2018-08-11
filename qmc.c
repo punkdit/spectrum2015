@@ -10,213 +10,6 @@
 
 #include "gsl_rng.h"
 
-//
-// From:
-// https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetNaive
-//
-
-// Counting bits set by lookup table
-static const unsigned char BitsSetTable256[256] = 
-{
-#   define B2(n) n,     n+1,     n+1,     n+2
-#   define B4(n) B2(n), B2(n+1), B2(n+1), B2(n+2)
-#   define B6(n) B4(n), B4(n+1), B4(n+1), B4(n+2)
-    B6(0), B6(1), B6(1), B6(2)
-};
-
-
-#ifdef SMALL_PROB
-typedef uint32_t spins_t;
-
-static int 
-countbits_fast(spins_t v0)
-{
-    uint32_t v;
-    //assert(0xffffffffL&v0 == v0);
-    v = (uint32_t)v0;
-
-    uint32_t c; // c is the total bits set in v
-    c = BitsSetTable256[v & 0xff] + 
-        BitsSetTable256[(v >> 8) & 0xff] + 
-        BitsSetTable256[(v >> 16) & 0xff] + 
-        BitsSetTable256[v >> 24]; 
-    return c;
-}
-
-
-#endif
-
-#ifdef MED_PROB
-typedef uint64_t spins_t;
-
-static int 
-countbits_fast(spins_t v)
-{
-    uint32_t c;
-    c = BitsSetTable256[v & 0xff] + 
-        BitsSetTable256[(v >> 8 ) & 0xff] + 
-        BitsSetTable256[(v >> 16) & 0xff] + 
-        BitsSetTable256[(v >> 24) & 0xff] +
-        BitsSetTable256[(v >> 32) & 0xff] + 
-        BitsSetTable256[(v >> 40) & 0xff] + 
-        BitsSetTable256[(v >> 48) & 0xff] + 
-        BitsSetTable256[v >> 56]; 
-    return c;
-}
-
-#endif 
-
-#ifdef LARGE_PROB
-typedef __uint128_t spins_t;
-
-static int 
-countbits_fast(spins_t v)
-{
-    uint32_t c;
-    c = BitsSetTable256[v & 0xff] + 
-        BitsSetTable256[(v >> 8 ) & 0xff] + 
-        BitsSetTable256[(v >> 16) & 0xff] + 
-        BitsSetTable256[(v >> 24) & 0xff] +
-        BitsSetTable256[(v >> 32) & 0xff] + 
-        BitsSetTable256[(v >> 40) & 0xff] + 
-        BitsSetTable256[(v >> 48) & 0xff] + 
-        BitsSetTable256[(v >> 56) & 0xff] +
-        BitsSetTable256[(v >> 64) & 0xff] +
-        BitsSetTable256[(v >> 72) & 0xff] +
-        BitsSetTable256[(v >> 80) & 0xff] +
-        BitsSetTable256[(v >> 88) & 0xff] +
-        BitsSetTable256[(v >> 96) & 0xff] +
-        BitsSetTable256[(v >> 104) & 0xff] +
-        BitsSetTable256[(v >> 112) & 0xff] +
-        BitsSetTable256[(v >> 120) & 0xff];
-    return c;
-}
-#endif
-
-
-int 
-countbits_slow(spins_t v)
-{
-    int c;
-    for(c = 0; v; v >>= 1)
-    {   
-      c += v & 1;
-    }   
-    return c;
-}
-
-
-
-#include "model.h"
-/*
-const int n = 4;
-const int mx = 4;
-const int mz = 4;
-const int nletters = 5;
-spins_t Gx[5] = {0, 8, 4, 2, 1};
-spins_t Gz[4] = {12, 6, 3, 9};
-*/
-
-
-spins_t
-bits2int(char *bits)
-{
-    spins_t result = 0;
-    int idx;
-    for(idx = 0; bits[idx]; idx++)
-    {
-        result *= 2;
-        if(bits[idx]=='1')
-            result += 1;
-    }
-    return result;
-}
-
-void
-init_ops()
-{
-    int idx;
-    Gx[0] = 0; // first one is identity op
-    for(idx=0; idx<mx; idx++)
-        Gx[idx+1] = bits2int(_Gx[idx]);
-    for(idx=0; idx<mz; idx++)
-        Gz[idx] = bits2int(_Gz[idx]);
-}
-
-
-gsl_rng * rng;
-
-#define MAX_WORD (4096)
-
-struct state 
-{
-    spins_t u;
-    int size;
-    int word[MAX_WORD];
-};
-
-void
-check_state(struct state *s)
-{
-    assert(s);
-    assert(s->u<(((spins_t)1)<<n));
-    assert(0<=s->size);
-    assert(s->size<=MAX_WORD);
-}
-
-
-void
-init_state(struct state *s)
-{
-    assert(s);
-    s->u = 0;
-    s->size = 0;
-    memset(s->word, 0, sizeof(int)*MAX_WORD);
-    check_state(s);
-}
-
-void
-init_state_rand(struct state *s, double beta)
-{
-    assert(s);
-    //s->u = gsl_rng_uniform_int(rng, 1<<n); // XX init one byte at a time
-    s->u = 0;
-    s->size = 0;
-    memset(s->word, 0, sizeof(int)*MAX_WORD);
-    check_state(s);
-}
-
-
-void
-dump_state(struct state *s)
-{
-    int i;
-    check_state(s);
-    printf("%ld", (long)s->u);
-    printf("[");
-    for(i=0; i<s->size; i++)
-        printf("%d", s->word[i]);
-    printf("]");
-}
-
-double
-eval1(spins_t u)
-{
-    double w;
-    int j;
-    w = offset;
-    for(j=0; j<mz; j++)
-    {
-//        printf("\tw = %f\n", w);
-//        printf("\tGz[j] = %ld\n", Gz[j]);
-        w += Jz[j];
-        w -= 2*Jz[j]*(countbits_fast(Gz[j] & u) & 1);
-    }
-    assert(w>=0.0);
-    return w;
-}
-
-
 double
 factorial(int n)
 {
@@ -274,6 +67,286 @@ log_factorial(int n)
 }
 
 
+//
+// From:
+// https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetNaive
+//
+
+// Counting bits set by lookup table
+const unsigned char BitsSetTable256[256] = 
+{
+#   define B2(n) n,     n+1,     n+1,     n+2
+#   define B4(n) B2(n), B2(n+1), B2(n+1), B2(n+2)
+#   define B6(n) B4(n), B4(n+1), B4(n+1), B4(n+2)
+    B6(0), B6(1), B6(1), B6(2)
+};
+
+
+#if defined(SMALL_PROB)
+
+typedef uint32_t slab_t;
+#define SLABS (1)
+
+#elif defined(MED_PROB)
+
+typedef uint64_t slab_t;
+#define SLABS (1)
+
+#elif defined(LARGE_PROB)
+
+typedef uint64_t slab_t;
+#define SLABS (2)
+
+//typedef __uint128_t slab_t;
+
+#elif defined(HUGE_PROB)
+
+typedef uint64_t slab_t;
+#define SLABS (6)
+
+#else
+#error "problem size not defined"
+#endif
+
+
+typedef slab_t spins_t[SLABS];
+
+int 
+countbits_fast(spins_t v)
+{
+    uint32_t c = 0;
+    uint8_t *p = (uint8_t *)v;
+    int i;
+    for(i=0; i<sizeof(spins_t); i++)
+        c += BitsSetTable256[p[i]];
+    return c;
+}
+
+
+
+
+#include "model.h"
+/*
+const int n = 8;
+const int mx = 8;
+const int offset = 8;
+const int mz = 8;
+const int nletters = 9;
+char *_Gx[8] = {
+  "1.......", 
+  ".1......", 
+  "..1.....", 
+  "...1....", 
+  "....1...", 
+  ".....1..", 
+  "......1.", 
+  ".......1"
+};
+char *_Gz[8] = {
+  "11......", 
+  ".11.....", 
+  "..11....", 
+  "...11...", 
+  "....11..", 
+  ".....11.", 
+  "......11", 
+  "1......1"
+};
+spins_t Gx[9];
+spins_t Gz[8];
+int Jx[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+int Jz[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+*/
+
+
+
+void
+SPINS_INIT(spins_t u)
+{
+    memset(u, 0, sizeof(slab_t)*SLABS);
+}
+
+void
+SPINS_SET(spins_t u, spins_t v)
+{
+    memcpy(u, v, sizeof(slab_t)*SLABS);
+}
+
+void
+SPINS_AND(spins_t u, spins_t v, spins_t w)
+{
+    int i;
+    for(i=0; i<SLABS; i++)
+        u[i] = v[i] & w[i];
+}
+
+void
+SPINS_XOR(spins_t u, spins_t v, spins_t w)
+{
+    int i;
+    for(i=0; i<SLABS; i++)
+        u[i] = v[i] ^ w[i];
+}
+
+int
+SPINS_EQ(spins_t u, spins_t v)
+{
+    int i;
+    for(i=0; i<SLABS; i++)
+        if(u[i] != v[i])
+            return 0;
+    return 1;
+}
+
+
+slab_t
+bits2slab(char *bits)
+{
+    slab_t result = 0;
+    int idx;
+    for(idx = 0; idx<sizeof(slab_t)*8; idx++)
+    {
+        if(bits[idx]==0)
+            break; // null terminator
+        result *= 2;
+        if(bits[idx]=='1')
+            result += 1;
+    }
+    return result;
+}
+
+void
+bits2spins(spins_t u, char *bits)
+{
+    int idx;
+    for(idx=0; idx<SLABS; idx++)
+    {
+        u[idx] = bits2slab(bits);
+        bits += sizeof(slab_t)*8;
+    }
+}
+
+
+void
+init_ops()
+{
+    int idx;
+    SPINS_INIT(Gx[0]); // first one is identity op
+    for(idx=0; idx<mx; idx++)
+        bits2spins(Gx[idx+1], _Gx[idx]);
+    for(idx=0; idx<mz; idx++)
+        bits2spins(Gz[idx], _Gz[idx]);
+}
+
+
+gsl_rng * rng;
+
+#define MAX_WORD (4096)
+
+struct state 
+{
+    spins_t u;
+    int size;
+    int word[MAX_WORD];
+};
+
+void
+check_state(struct state *s)
+{
+    assert(s);
+//    assert(s->u<(((spins_t)1)<<n));
+    assert(0<=s->size);
+    assert(s->size<=MAX_WORD);
+}
+
+int verbose;
+
+
+void
+init_state(struct state *s)
+{
+    assert(s);
+    SPINS_INIT(s->u);
+    s->size = 0;
+    memset(s->word, 0, sizeof(int)*MAX_WORD);
+    check_state(s);
+}
+
+void
+state_insert(struct state *s, int idx, int i);
+
+void
+dump_state(struct state *s)
+{
+    int i;
+    check_state(s);
+    //printf("%ld", (long)s->u);
+    printf("[");
+    for(i=0; i<s->size; i++)
+        printf("%d,", s->word[i]);
+    printf("]");
+}
+
+void
+init_state_rand(struct state *s, double beta)
+{
+    int idx;
+    assert(s);
+    init_state(s);
+
+    // init one byte at a time
+    uint8_t *u = (uint8_t *)s->u;
+    int nn = n;
+    for(idx=0; idx<sizeof(spins_t) && nn>0; idx++)
+    {
+        if(nn>=8)
+            *u = gsl_rng_uniform_int(rng, 1<<8);
+        else
+            *u = gsl_rng_uniform_int(rng, 1<<nn);
+        u++;
+        nn -= 8;
+    }
+    assert(nn<=0);
+
+/*
+    int jdx;
+    for(jdx=0; jdx<1; jdx++)
+      for(idx=0; idx<offset; idx++)
+        {
+            int letter, i;
+            letter = gsl_rng_uniform_int(rng, nletters);
+            i = gsl_rng_uniform_int(rng, s->size+1);
+            state_insert(s, i, letter);
+            i = gsl_rng_uniform_int(rng, s->size+1);
+            state_insert(s, i, letter);
+        }
+
+    if(verbose>1)
+    { dump_state(s); printf("\n");}
+*/
+
+    check_state(s);
+}
+
+
+double
+eval1(spins_t u)
+{
+    spins_t v;
+    double w;
+    int j;
+    w = offset;
+    for(j=0; j<mz; j++)
+    {
+        w += Jz[j];
+        SPINS_AND(v, Gz[j], u);
+        w -= 2*Jz[j]*(countbits_fast(v) & 1);
+    }
+    assert(w>=0.0);
+    return w;
+}
+
+
 double 
 eval_state(struct state *s, double beta)
 {
@@ -282,15 +355,16 @@ eval_state(struct state *s, double beta)
     double weight;
 
     check_state(s);
-    u = s->u;
+    SPINS_SET(u, s->u);
     weight = 1.0;
 //    printf("eval_word\n");
     for(i=0; i<s->size; i++)
     {
         int idx = s->word[i];
-        v = u ^ Gx[idx];
+        //v = u ^ Gx[idx];
+        SPINS_XOR(v, u, Gx[idx]);
 //        printf("<%ld|H|%ld>\n", u, v);
-        if(u==v)
+        if(SPINS_EQ(u, v))
         {
             double w;
             w = eval1(u);
@@ -300,9 +374,11 @@ eval_state(struct state *s, double beta)
         {
             weight *= Jx[idx];
         }
-        u = v;
+        //u = v;
+        SPINS_SET(u, v);
     }
-    assert(u==s->u);
+    //assert(u==s->u);
+    assert(SPINS_EQ(u, s->u));
     weight *= 1.0 * pow(beta, s->size) / factorial(s->size);
     return weight;
 }
@@ -313,35 +389,41 @@ log_eval_state(struct state *s, double log_beta, double *result)
 {
     spins_t u, v;
     int i;
-    double weight;
+    double weight, c_weight, w;
+    int changed = 1;
 
     check_state(s);
     *result = 0.;
-    u = s->u;
+    SPINS_SET(u, s->u);
     weight = 0.0;
-//    printf("eval_word\n");
     for(i=0; i<s->size; i++)
     {
         int idx = s->word[i];
-        v = u ^ Gx[idx];
-//        printf("<%ld|H|%ld>\n", u, v);
-        if(u==v)
+        //v = u ^ Gx[idx];
+        if(idx)
+            SPINS_XOR(v, u, Gx[idx]);
+        if(idx==0 || SPINS_EQ(u, v))
         {
-            double w;
-            w = eval1(u);
+            if(changed)
+                w = eval1(u);
+            else
+                w = c_weight;
             assert(w>=0.0);
             if(w==0.0)
                 return 0; // result is log(zero)
             weight += ilog(w);
+            changed = 0;
+            c_weight = w;
         }
         else
         {
             assert(idx);
             weight += ilog(Jx[idx-1]);
+            SPINS_SET(u, v);
+            changed = 1;
         }
-        u = v;
     }
-    assert(u==s->u);
+    assert(SPINS_EQ(u, s->u));
     weight += s->size * log_beta - log_factorial(s->size);
     *result = weight;
     return 1;
@@ -354,7 +436,8 @@ eq_state(struct state *s1, struct state *s2)
     int idx;
     check_state(s1);
     check_state(s2);
-    if(s1->u != s2->u)
+//    if(s1->u != s2->u)
+    if(!SPINS_EQ(s1->u, s2->u))
         return 0;
     if(s1->size != s2->size)
         return 0;
@@ -597,7 +680,7 @@ move_state(struct state *s, struct state *s1)
     if(i==3 && s->size>1)
     {
         // swap
-        spins_t tmp;
+        int tmp;
         idx = gsl_rng_uniform_int(rng, s1->size-1);
         tmp = s1->word[idx];
         s1->word[idx] = s1->word[idx+1];
@@ -607,8 +690,10 @@ move_state(struct state *s, struct state *s1)
     if(i==4)
     {
         // flip a spin
-        idx = gsl_rng_uniform_int(rng, n);
-        s1->u = (s1->u) ^ (((spins_t)1)<<idx);
+        idx = gsl_rng_uniform_int(rng, SLABS); // slab
+        jdx = gsl_rng_uniform_int(rng, sizeof(slab_t)*8); // bit
+        //s1->u = (s1->u) ^ (((spins_t)1)<<idx);
+        s1->u[idx] = (s1->u[idx]) ^ (((slab_t)1)<<jdx);
     }
 
     check_state(s1);
@@ -618,7 +703,6 @@ move_state(struct state *s, struct state *s1)
     return ratio;
 }
 
-
 int
 main(int argc, char *argv[])
 {
@@ -627,7 +711,7 @@ main(int argc, char *argv[])
 
     rng = gsl_rng_alloc (gsl_rng_gfsr4);   // fastest rng
 
-    int chains, length, burnin, period, verbose;
+    int chains, length, burnin, period;
     int seed;
     double beta;
     chains = 1;
@@ -683,12 +767,12 @@ main(int argc, char *argv[])
         }
     }
 
-    printf("chains = %d, ", chains); // number of chains
-    printf("length = %d, ", length); // length of each chain
-    printf("burnin = %d, ", burnin); // before first sample
-    printf("period = %d\n", period); // sample period
-    printf("beta = %f, ", beta);
-    printf("seed = %d\n", seed);
+    printf("chains=%d ", chains); // number of chains
+    printf("length=%d ", length); // length of each chain
+    printf("burnin=%d ", burnin); // before first sample
+    printf("period=%d ", period); // sample period
+    printf("beta=%f ", beta);
+    printf("seed=%d\n", seed);
     assert(length > burnin);
 
     printf("n = %d\n", n);
@@ -718,7 +802,7 @@ main(int argc, char *argv[])
 //        weight = eval_state(&s, beta);
         nz = log_eval_state(&s, beta, &weight);
 
-        for(trial=0; trial<length+1; trial++)
+        for(trial=0; trial<length; trial++)
         {
             ratio = move_state(&s, &s1);
             nz1 = log_eval_state(&s1, log_beta, &weight1);
@@ -734,7 +818,8 @@ main(int argc, char *argv[])
 
             if(trial < burnin)
                 continue;
-            if(trial % period == 0)
+
+            if((trial+1) % period == 0)
             {
                 total += s.size;
                 samples += 1;
