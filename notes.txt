@@ -1,4 +1,7 @@
 
+11/8/18
+=======
+
 ./models.py ising l=8 dumpc solve
 Model(n=8, Lx/z: 0, Gx: 8, Gz: 8, Hx: 1, Hz: 0, Rx/z: 7)
 Model(n=8, Lx/z: 0, Gx: 8, Gz: 8, Hx: 1, Hz: 0, Rx/z: 7)

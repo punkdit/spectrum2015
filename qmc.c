@@ -7,6 +7,8 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
+
 
 #include "gsl_rng.h"
 
@@ -100,6 +102,11 @@ typedef uint64_t slab_t;
 //typedef __uint128_t slab_t;
 
 #elif defined(HUGE_PROB)
+
+typedef uint64_t slab_t;
+#define SLABS (3)
+
+#elif defined(MASSIVE_PROB)
 
 typedef uint64_t slab_t;
 #define SLABS (6)
@@ -283,7 +290,14 @@ dump_state(struct state *s)
     //printf("%ld", (long)s->u);
     printf("[");
     for(i=0; i<s->size; i++)
-        printf("%d,", s->word[i]);
+    {
+        int l;
+        l = s->word[i];
+        if(l)
+            printf("(%d)", l);
+        else
+            printf(".");
+    }
     printf("]");
 }
 
@@ -503,12 +517,13 @@ state_count(struct state *s, int i)
     return count;
 }
 
+#define MOVES (5)
 
-double
-move_state(struct state *s, struct state *s1)
+int
+move_state(struct state *s, struct state *s1, int *choice, double *ratio)
 {
-    double ratio;
     int i, idx, jdx, total;
+    int changed;
 
     check_state(s);
     assert(s1);
@@ -519,17 +534,19 @@ move_state(struct state *s, struct state *s1)
 //    dump_state(s);
 //    printf("\n");
 
-    i = gsl_rng_uniform_int(rng, 5);
+    i = gsl_rng_uniform_int(rng, MOVES);
 //    printf("i=%d ", i);
+    *choice = i;
 
-    ratio = 1.0;
+    *ratio = 1.0;
+    changed = true;
 
     if(i==0)
     {
         // add I
         total = state_count(s, 0);
         idx = gsl_rng_uniform_int(rng, s->size+1);
-        ratio = ((double)(s->size+1)) / (total+1);
+        *ratio = ((double)(s->size+1)) / (total+1);
 //        printf(" idx=%d ", idx);
         state_insert(s1, idx, 0);
     }
@@ -546,11 +563,12 @@ move_state(struct state *s, struct state *s1)
                 if(s->word[idx]==0)
                     break;
             }
-            ratio = ((double)total) / s->size;
+            *ratio = ((double)total) / s->size;
             state_pop(s1, idx);
         }
     }
     else
+#if 0
     if(i==2 && s->size>1)
     {
         // replace a pair
@@ -602,80 +620,51 @@ move_state(struct state *s, struct state *s1)
         }
         rev = 1./pairs;
 
-        ratio = rev/fwd;
+        *ratio = rev/fwd;
     }
-//
-//    if(i==2)
-//    {
-//        // add a pair
-//        idx = gsl_rng_uniform_int(rng, s->size+1);
-//        jdx = gsl_rng_uniform_int(rng, s->size+2);
-//        i = gsl_rng_uniform_int(rng, nletters);
-//        state_insert(s1, idx, i);
-//        state_insert(s1, jdx, i);
-//
-//        int counts[nletters];
-//        int pairs;
-//
-//        memset(counts, 0, sizeof(counts));
-//        for(idx=0; idx<s1->size; idx++)
-//            counts[s1->word[idx]] += 1;
-//
-//        pairs = 0;
-//        for(idx=0; idx<nletters; idx++)
-//        {
-//            int count = counts[idx];
-//            assert(idx==0 || count%2==0);
-//            if(count)
-//                pairs += count * (count-1) / 2; // XX check overflow
-//        }
-//
-//        // XXX This calculation is not exactly right
-//        ratio = (0.5/pairs) * (s->size+1) * (s->size+2) * nletters;
-//    }
-//    else
-//    if(i==3 && s->size>1)
-//    {
-//        // remove a pair
-//        int counts[nletters];
-//        int pairs;
-//
-//        memset(counts, 0, sizeof(counts));
-//        for(idx=0; idx<s1->size; idx++)
-//            counts[s1->word[idx]] += 1;
-//
-//        pairs = 0;
-//        for(idx=0; idx<nletters; idx++)
-//        {
-//            int count = counts[idx];
-//            assert(idx==0 || count%2==0);
-//            if(count)
-//                pairs += count * (count-1) / 2; // XX check overflow
-//        }
-//
-//        while(1)
-//        {
-//            idx = gsl_rng_uniform_int(rng, s->size);
-//            jdx = gsl_rng_uniform_int(rng, s->size);
-//            if(idx != jdx && s->word[idx]==s->word[jdx])
-//            {
-//                if(idx<jdx)
-//                {
-//                    state_pop(s1, jdx);
-//                    state_pop(s1, idx);
-//                }
-//                else
-//                {
-//                    state_pop(s1, idx);
-//                    state_pop(s1, jdx);
-//                }
-//                break;
-//            }
-//        }
-//
-//        // XXX This calculation is not exactly right
-//        ratio = 2.*pairs/s->size/(s->size-1)/nletters;
-//    }
+    else
+#endif
+    if(i==2 && s->size>1)
+    {
+        // replace a pair
+        int k;
+        int pairs;
+        double fwd, rev;
+        pairs = 0;
+        for(k=0; k<s->size-1; k++)
+            if(s->word[k]==s->word[k+1])
+                pairs++;
+
+        changed = false;
+
+        if(pairs)
+        {
+            fwd = 1./pairs;
+    
+            for(k=0; k<2*s->size + 10; k++)
+            {
+                idx = gsl_rng_uniform_int(rng, s->size-1);
+                if(s->word[idx]==s->word[idx+1])
+                {
+                    int delta = gsl_rng_uniform_int(rng, nletters-1);
+                    int letter = (s->word[idx] + delta) % nletters;
+                    s1->word[idx] = letter;
+                    s1->word[idx+1] = letter;
+                    changed = true;
+                    break;
+                }
+            }
+    
+            pairs = 0;
+            for(k=0; k<s->size-1; k++)
+                if(s->word[k]==s->word[k+1])
+                    pairs++;
+            assert(pairs);
+            rev = 1./pairs;
+    
+            *ratio = rev/fwd;
+        }
+    }
     else
     if(i==3 && s->size>1)
     {
@@ -685,6 +674,7 @@ move_state(struct state *s, struct state *s1)
         tmp = s1->word[idx];
         s1->word[idx] = s1->word[idx+1];
         s1->word[idx+1] = tmp;
+        changed = (s1->word[idx] != s1->word[idx+1]);
     }
     else
     if(i==4)
@@ -695,12 +685,17 @@ move_state(struct state *s, struct state *s1)
         //s1->u = (s1->u) ^ (((spins_t)1)<<idx);
         s1->u[idx] = (s1->u[idx]) ^ (((slab_t)1)<<jdx);
     }
+    else
+    {
+        *choice = MOVES;
+        changed = false;
+    }
 
     check_state(s1);
 
 //    printf(" --> "); dump_state(s1); printf("\n");
 
-    return ratio;
+    return changed;
 }
 
 int
@@ -722,7 +717,10 @@ main(int argc, char *argv[])
     beta = 1.0;
     FILE *output = NULL;
 
-    seed = (int)time(NULL); 
+    // WARNING
+    // WARNING don't run more than one instance per second!!!!!
+    // WARNING
+    seed = (int)time(NULL);  
     gsl_rng_set(rng, seed);
 
     int idx;
@@ -788,6 +786,8 @@ main(int argc, char *argv[])
     int trial, chain;
     int accept = 0;
     int samples = 0;
+    int choice;
+    int accepted[MOVES+1] = {0, 0, 0, 0, 0, 0};
     double total = 0.0;
     double log_beta = log(beta);
 
@@ -804,14 +804,18 @@ main(int argc, char *argv[])
 
         for(trial=0; trial<length; trial++)
         {
-            ratio = move_state(&s, &s1);
+            while(!move_state(&s, &s1, &choice, &ratio))
+                ;
             nz1 = log_eval_state(&s1, log_beta, &weight1);
 
             x = gsl_rng_uniform(rng);
             if(!nz || (nz1 && x <= (ratio * exp(weight1 - weight))))
             {
-                if(!eq_state(&s, &s1))
+//                if(!eq_state(&s, &s1))
+//                {
                     accept += 1;
+                    accepted[choice] += 1;
+//                }
                 memcpy(&s, &s1, sizeof(struct state));
                 weight = weight1;
             }
@@ -829,10 +833,15 @@ main(int argc, char *argv[])
             }
         }
         if(verbose>0) { printf("/"); fflush(stdout); }
+        dump_state(&s);
+        printf("\n");
     }
     if(verbose>0) printf("\n");
 
-    printf("accept: %f, ", (double)accept / ((length+1)*chains));
+    for(idx=0; idx<MOVES+1; idx++)
+        printf("%d, ", accepted[idx]);
+    printf("\n");
+    printf("accept: %f, ", (double)accept / (length*chains));
     printf("samples: %d\n", samples);
     printf("<H>: %f\n", total / samples / beta);
     printf("<H> - offset: %f\n", total / samples / beta - offset);

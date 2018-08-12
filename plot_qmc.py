@@ -48,8 +48,8 @@ for i in range(1, 200):
         r += ys[j] * ys[j+i]
     r /= N
     rs.append(r)
-    print("%.0f"%(r/N), end=" ")
-print()
+#    print("%.1f"%(r/N), end=" ")
+#print()
 
 pyplot.plot(rs)
 pyplot.show()

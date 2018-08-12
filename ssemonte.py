@@ -7,7 +7,7 @@ SSE quantum monte-carlo
 from __future__ import print_function
 
 import sys, os
-from random import randint, random, shuffle, seed
+from random import randint, random, shuffle, seed, choice
 
 import numpy
 from numpy import kron, dot, allclose, log
@@ -265,54 +265,76 @@ class Metro(object):
 
             word.pop(idx)
 
-        elif i==2:
-            # add a pair
-            idx = randint(0, nword)
-            jdx = randint(0, nword+1)
-            lidx = randint(0, nlet-1)
-            word.insert(idx, lidx)
-            word.insert(jdx, lidx)
+        elif (i==2 or i==3) and nword>1:
+            ratio = 1.0
+            pairs = []
+            for i in range(nword-1):
+                if word[i]==word[i+1]:
+                    pairs.append(i)
 
-            counts = [word.count(i) for i in range(nlet)]
-            total = 0 # total number of pairs in word
-            for count in counts:
-                if count:
-                    total += count * (count-1) / 2 # pairs for this letter
-            p = 1./total # XXX this is still not exactly right...
+            if pairs:
+                fwd = 1./len(pairs)
+                i = choice(pairs)
+                delta = randint(1, nlet)
+                word[i] = (word[i] + delta) % nlet
+                word[i+1] = (word[i+1] + delta) % nlet
 
-            fwd = base*2./(nword+1)/(nword+2)/nlet
-            rev = base*p
-            debug = fwd, rev
-            ratio = rev/fwd
+                pairs = 0
+                for i in range(nword-1):
+                    if word[i]==word[i+1]:
+                        pairs += 1
+                rev = 1./pairs
+                ratio = rev/fwd
+                debug = fwd/nlet*2/C, rev/nlet*2/C
 
-        elif i==3 and nword>1:
-            # remove pair
-            counts = [word.count(i) for i in range(nlet)]
-
-            total = 0 # total number of pairs in word
-            for count in counts:
-                if count:
-                    total += count * (count-1) / 2 # pairs for this letter
-            p = 1./total # XXX this is still not exactly right...
-
-            check = 0
-            while 1:
-                idx = randint(0, nword-1)
-                #jdx = randint(idx+1, nword-1)
-                jdx = randint(0, nword-1)
-                if idx!=jdx and word[idx]==word[jdx]:
-                    if jdx<idx:
-                        jdx, idx = idx, jdx
-                    word.pop(jdx)
-                    word.pop(idx)
-                    break
-                check += 1
-                assert check < 1e6, "wup... nword=%d"%nword
-
-            fwd = base*p
-            rev = base*2./nword/(nword-1)/nlet
-            debug = fwd, rev
-            ratio = rev/fwd
+#        elif i==2:
+#            # add a pair
+#            idx = randint(0, nword)
+#            jdx = randint(0, nword+1)
+#            lidx = randint(0, nlet-1)
+#            word.insert(idx, lidx)
+#            word.insert(jdx, lidx)
+#
+#            counts = [word.count(i) for i in range(nlet)]
+#            total = 0 # total number of pairs in word
+#            for count in counts:
+#                if count:
+#                    total += count * (count-1) / 2 # pairs for this letter
+#            p = 1./total # XXX this is still not exactly right...
+#
+#            fwd = base*2./(nword+1)/(nword+2)/nlet
+#            rev = base*p
+#            debug = fwd, rev
+#            ratio = rev/fwd
+#
+#        elif i==3 and nword>1:
+#            # remove pair
+#            counts = [word.count(i) for i in range(nlet)]
+#
+#            total = 0 # total number of pairs in word
+#            for count in counts:
+#                if count:
+#                    total += count * (count-1) / 2 # pairs for this letter
+#            p = 1./total # XXX this is still not exactly right...
+#
+#            check = 0
+#            while 1:
+#                idx = randint(0, nword-1)
+#                #jdx = randint(idx+1, nword-1)
+#                jdx = randint(0, nword-1)
+#                if idx!=jdx and word[idx]==word[jdx]:
+#                    if jdx<idx:
+#                        jdx, idx = idx, jdx
+#                    word.pop(jdx)
+#                    word.pop(idx)
+#                    break
+#                check += 1
+#                assert check < 1e6, "wup... nword=%d"%nword
+#
+#            fwd = base*p
+#            rev = base*2./nword/(nword-1)/nlet
+#            debug = fwd, rev
+#            ratio = rev/fwd
 
         elif i==4 and nword>1:
             # swap
@@ -745,8 +767,8 @@ test()
 
 
 def test_balance():
-    n = 4
-    offset = 4
+    n = 8
+    offset = 8
     Gx, Gz, _, _ = models.build_ising(n)
     beta = 1.0
 
