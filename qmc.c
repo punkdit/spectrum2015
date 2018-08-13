@@ -12,6 +12,10 @@
 
 #include "gsl_rng.h"
 
+
+#define SWAP(x, y) do { typeof(x) SWAP = x; x = y; y = SWAP; } while (0)
+
+
 double
 factorial(int n)
 {
@@ -238,6 +242,9 @@ void
 init_ops()
 {
     int idx;
+    assert(mx<256); // increase WORD_SIZE
+    assert(mz<256); // increase WORD_SIZE
+
     SPINS_INIT(Gx[0]); // first one is identity op
     for(idx=0; idx<mx; idx++)
         bits2spins(Gx[idx+1], _Gx[idx]);
@@ -249,12 +256,13 @@ init_ops()
 gsl_rng * rng;
 
 #define MAX_WORD (4096)
+#define WORD_SIZE (sizeof(uint8_t))
 
 struct state 
 {
     spins_t u;
     int size;
-    int word[MAX_WORD];
+    uint8_t word[MAX_WORD];
 };
 
 void
@@ -275,7 +283,7 @@ init_state(struct state *s)
     assert(s);
     SPINS_INIT(s->u);
     s->size = 0;
-    memset(s->word, 0, sizeof(int)*MAX_WORD);
+    memset(s->word, 0, WORD_SIZE*MAX_WORD);
     check_state(s);
 }
 
@@ -698,6 +706,50 @@ move_state(struct state *s, struct state *s1, int *choice, double *ratio)
     return changed;
 }
 
+
+int
+swap_run(struct state *s, double log_beta, double *weight)
+{
+    double weight1, x;
+    int nz, nz1;
+    //struct state *s1;
+    int idx, k;
+    int accept = 0;
+
+    //s1 = (struct state *)alloca(sizeof(struct state));
+
+    nz = log_eval_state(s, log_beta, weight);
+
+    for(k=0; k<2; k++)
+    {
+    for(idx=k; idx+1<s->size; idx+=2)
+    {
+
+        if(s->word[idx]==s->word[idx+1])
+            continue;
+
+        SWAP(s->word[idx], s->word[idx+1]);
+
+        nz1 = log_eval_state(s, log_beta, &weight1);
+
+        x = gsl_rng_uniform(rng);
+        if(!nz || (nz1 && x <= exp(weight1 - *weight)))
+        {
+            accept += 1;
+            *weight = weight1;
+            nz = nz1;
+        }
+        else
+        {
+            // undo
+            SWAP(s->word[idx], s->word[idx+1]);
+        }
+    }
+    }
+    return nz;
+}
+
+
 int
 main(int argc, char *argv[])
 {
@@ -706,15 +758,16 @@ main(int argc, char *argv[])
 
     rng = gsl_rng_alloc (gsl_rng_gfsr4);   // fastest rng
 
-    int chains, length, burnin, period;
+    int chains, duration, burnin, period;
     int seed;
-    double beta;
+    double beta, dbeta;
     chains = 1;
     period = 1000; // unit
     burnin = 100; // warmup length in period units
-    length = 1000;  // total length in period units
+    duration = 1000;  // sample length in period units
     verbose = 0;
     beta = 1.0;
+    dbeta = 0.0;
     FILE *output = NULL;
 
     // WARNING
@@ -726,13 +779,6 @@ main(int argc, char *argv[])
     int idx;
     for(idx=1; idx<argc; idx++)
     {
-//        if(idx==1) { chains = atoi(argv[idx]); }
-//        if(idx==2) { length = atoi(argv[idx]); }
-//        if(idx==3) { burnin = atoi(argv[idx]); }
-//        if(idx==4) { period = atoi(argv[idx]); }
-//        if(idx==5) { beta = atof(argv[idx]); }
-//        if(idx==6) { seed = atoi(argv[idx]); gsl_rng_set(rng, seed); }
-
         char *arg = argv[idx];
         char *value;
         for(value = arg; *value; value++)
@@ -743,12 +789,13 @@ main(int argc, char *argv[])
         *value = 0;
         value++;
         
-        if(strcmp("chains", arg)==0)      { chains = atoi(value); }
-        else if(strcmp("length", arg)==0) { length = atoi(value); }
-        else if(strcmp("burnin", arg)==0) { burnin = atoi(value); }
-        else if(strcmp("period", arg)==0) { period = atoi(value); }
-        else if(strcmp("verbose", arg)==0) { verbose = atoi(value); }
-        else if(strcmp("beta", arg)==0)   { beta = atof(value); }
+        if(strcmp("chains", arg)==0)        { chains = atoi(value); }
+        else if(strcmp("duration", arg)==0) { duration = atoi(value); }
+        else if(strcmp("burnin", arg)==0)   { burnin = atoi(value); }
+        else if(strcmp("period", arg)==0)   { period = atoi(value); }
+        else if(strcmp("verbose", arg)==0)  { verbose = atoi(value); }
+        else if(strcmp("beta", arg)==0)     { beta = atof(value); }
+        else if(strcmp("dbeta", arg)==0)     { dbeta = atof(value); }
         else if(strcmp("seed", arg)==0)   
         { seed = atoi(value); gsl_rng_set(rng, seed); }
         else if(strcmp("output", arg)==0)   
@@ -766,30 +813,33 @@ main(int argc, char *argv[])
     }
 
     printf("chains=%d ", chains); // number of chains
-    printf("length=%d ", length); // length of each chain
+    printf("duration=%d ", duration); // length of each chain
     printf("burnin=%d ", burnin); // before first sample
     printf("period=%d ", period); // sample period
     printf("beta=%f ", beta);
+    if(dbeta!=0.)
+        printf("dbeta=%f ", dbeta);
     printf("seed=%d\n", seed);
-    assert(length > burnin);
+
+    duration += burnin;
 
     printf("n = %d\n", n);
     printf("offset = %d\n", offset);
 
     burnin *= period;
-    length *= period;
-//    assert(burnin % period == 0);
-//    assert(length % period == 0);
+    duration *= period;
 
     assert(sizeof(spins_t) >= (n/8));
 
-    int trial, chain;
-    int accept = 0;
-    int samples = 0;
+    long trial, chain;
+    long accept = 0;
+    long samples = 0;
     int choice;
-    int accepted[MOVES+1] = {0, 0, 0, 0, 0, 0};
+    long accepted[MOVES+1] = {0, 0, 0, 0, 0, 0};
     double total = 0.0;
     double log_beta = log(beta);
+
+    assert(sizeof(accept)==8);
 
     for(chain=0; chain<chains; chain++)
     {
@@ -798,12 +848,12 @@ main(int argc, char *argv[])
         int nz, nz1; // non-zero
     
         init_state_rand(&s, beta);
-//        init_state(&s);
-//        weight = eval_state(&s, beta);
-        nz = log_eval_state(&s, beta, &weight);
+        nz = log_eval_state(&s, log_beta, &weight);
 
-        for(trial=0; trial<length; trial++)
+        for(trial=0; trial<duration; trial++)
         {
+            //nz = swap_run(&s, log_beta, &weight);
+
             while(!move_state(&s, &s1, &choice, &ratio))
                 ;
             nz1 = log_eval_state(&s1, log_beta, &weight1);
@@ -811,17 +861,21 @@ main(int argc, char *argv[])
             x = gsl_rng_uniform(rng);
             if(!nz || (nz1 && x <= (ratio * exp(weight1 - weight))))
             {
-//                if(!eq_state(&s, &s1))
-//                {
-                    accept += 1;
-                    accepted[choice] += 1;
-//                }
+                accept += 1;
+                accepted[choice] += 1;
                 memcpy(&s, &s1, sizeof(struct state));
                 weight = weight1;
             }
 
             if(trial < burnin)
+            {
+                if((trial+1) % period == 0)
+                {
+                    beta += dbeta;
+                    log_beta = log(beta);
+                }
                 continue;
+            }
 
             if((trial+1) % period == 0)
             {
@@ -833,16 +887,18 @@ main(int argc, char *argv[])
             }
         }
         if(verbose>0) { printf("/"); fflush(stdout); }
-        dump_state(&s);
-        printf("\n");
+
+        dump_state(&s); printf("\n");
     }
     if(verbose>0) printf("\n");
 
     for(idx=0; idx<MOVES+1; idx++)
-        printf("%d, ", accepted[idx]);
+        printf("%ld, ", accepted[idx]);
     printf("\n");
-    printf("accept: %f, ", (double)accept / (length*chains));
-    printf("samples: %d\n", samples);
+    printf("accept: %f, ", (double)accept / (duration*chains));
+    printf("samples: %ld\n", samples);
+    if(dbeta!=0.0)
+        printf("beta: %f\n", beta);
     printf("<H>: %f\n", total / samples / beta);
     printf("<H> - offset: %f\n", total / samples / beta - offset);
 
