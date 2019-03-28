@@ -73,6 +73,41 @@ log_factorial(int n)
 }
 
 
+#if defined(SMALL_PROB) // up to 32 spins
+
+typedef uint32_t slab_t;
+#define SLABS (1)
+
+#elif defined(MED_PROB) // up to 64 spins
+
+typedef uint64_t slab_t;
+#define SLABS (1)
+
+#elif defined(LARGE_PROB) // up to 128 spins
+
+typedef uint64_t slab_t;
+#define SLABS (2)
+
+//typedef __uint128_t slab_t;
+
+#elif defined(HUGE_PROB) // up to 192 spins
+
+typedef uint64_t slab_t;
+#define SLABS (3)
+
+#elif defined(MASSIVE_PROB) // up to 384 spins
+
+typedef uint64_t slab_t;
+#define SLABS (6)
+
+#else
+#error "problem size not defined"
+#endif
+
+
+typedef slab_t spins_t[SLABS];
+
+
 //
 // From:
 // https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetNaive
@@ -87,40 +122,6 @@ const unsigned char BitsSetTable256[256] =
     B6(0), B6(1), B6(1), B6(2)
 };
 
-
-#if defined(SMALL_PROB)
-
-typedef uint32_t slab_t;
-#define SLABS (1)
-
-#elif defined(MED_PROB)
-
-typedef uint64_t slab_t;
-#define SLABS (1)
-
-#elif defined(LARGE_PROB)
-
-typedef uint64_t slab_t;
-#define SLABS (2)
-
-//typedef __uint128_t slab_t;
-
-#elif defined(HUGE_PROB)
-
-typedef uint64_t slab_t;
-#define SLABS (3)
-
-#elif defined(MASSIVE_PROB)
-
-typedef uint64_t slab_t;
-#define SLABS (6)
-
-#else
-#error "problem size not defined"
-#endif
-
-
-typedef slab_t spins_t[SLABS];
 
 int 
 countbits_fast(spins_t v)

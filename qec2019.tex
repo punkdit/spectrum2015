@@ -1,0 +1,198 @@
+%thesis.tex 
+%Model LaTeX file for Ph.D. thesis at the 
+%School of Mathematics, University of Edinburgh
+
+%\documentclass[11pt,twoside,openright]{report} 
+\documentclass[11pt,oneside]{article} 
+
+\usepackage{a4wide}
+
+%% \titleformat{command}[shape]{format}{label}{sep}{before}[after]
+
+% bug in titlesec:
+% https://bugs.launchpad.net/ubuntu/+source/texlive-extra/+bug/1574052
+%\usepackage{titlesec}
+%\usepackage[tracking=true]{microtype}
+%\titleformat{\chapter}[display]
+%  {\normalfont\huge\bfseries}
+%  {\filcenter\underline{\MakeUppercase{\textls[400]{\chaptertitlename}}\ \thechapter}}
+%  {20pt}{\Huge}
+
+%\usepackage{epsf}
+\usepackage{amsmath}
+\usepackage{color}
+%\usepackage{natbib} % kills arxiv 
+%\usepackage{framed}
+%\usepackage{cite}
+%\usepackage{tikz}
+%\usepackage{tikz-cd}
+
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{amsthm}
+%\RequirePackage{algorithmic}
+%\RequirePackage{algorithm}
+%\RequirePackage{theorem}
+%\RequirePackage{eucal}
+\RequirePackage{color}
+\RequirePackage{url}
+\RequirePackage{mdwlist}
+
+\RequirePackage[all]{xy}
+\CompileMatrices
+%\RequirePackage{hyperref}
+\RequirePackage{graphicx}
+%\RequirePackage[dvips]{geometry}
+
+\usepackage{xcolor}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{graphicx}
+\usepackage[caption=false]{subfig}
+\usepackage{enumerate}
+\usepackage{mathrsfs}
+
+
+%\usepackage{epstopdf} % to include .eps graphics files with pdfLaTeX
+%\usepackage[pdfpagelabels,pdftex,bookmarks,breaklinks]{hyperref}
+
+\definecolor{darkblue}{RGB}{0,0,127} % choose colors
+\definecolor{darkgreen}{RGB}{0,150,0}
+%\hypersetup{colorlinks, linkcolor=darkblue, citecolor=darkgreen, filecolor=red, urlcolor=blue}
+%\hypersetup{pdfauthor={Simon Burton}}
+%\hypersetup{pdftitle={Foo Foo}}
+
+%\usepackage[normalem]{ulem}
+%
+\usepackage{setspace}   %Allows double spacing with the \doublespacing command
+
+\newcommand{\todo}[1]{\ \textcolor{red}{\{#1\}}\ }
+
+\newcommand{\Eref}[1]{(\ref{#1})}
+\newcommand{\Fref}[1]{Fig.~\ref{#1}}
+%\newcommand{\Aref}[1]{Appendix~\ref{#1}}
+\newcommand{\SRef}[1]{Section~\ref{#1}}
+
+
+\def\Complex{\mathbb{C}}
+\def\C{\mathbb{C}}
+\def\R{\mathbb{R}}
+\def\Z{\mathbb{Z}}
+%\def\Ham{\mathcal{H}} % meh..
+\def\Ham{H}
+\def\Pauli{\mathcal{P}}
+\def\Spec{\mbox{Spec}}
+\def\Proveit{{\it (Proof??)}}
+\def\GL{\mathrm{GL}}
+\def\half{\frac{1}{2}}
+\def\Stab{S}
+
+
+\newcommand{\ket}[1]{|{#1}\rangle}
+\newcommand{\expect}[1]{\langle{#1}\rangle}
+\newcommand{\bra}[1]{\langle{#1}|}
+\newcommand{\ketbra}[2]{\ket{#1}\!\bra{#2}}
+\newcommand{\braket}[2]{\langle{#1}|{#2}\rangle}
+
+\newcommand{\bket}[1]{\bigl|\,{#1}\,\bigr\rangle}
+\newcommand{\bbra}[1]{\bigl\langle\,{#1}\,\bigr|}
+\newcommand{\bketbra}[2]{\bket{#1}\!\bra{#2}}
+\newcommand{\bbraket}[2]{\bigl\langle\,{#1}\,\bigr|\,{#2}\,\bigr\rangle}
+
+\def\Span#1{\langle #1 \rangle}
+
+%\newcommand{\todo}[1]{\textcolor{red}{#1}}
+
+\def\smbox#1{\ \ \mbox{#1}\ \ }
+
+
+\newcommand{\Field}{\mathcal{F}}
+\def\Im{\mathrm{im}}
+\def\Ker{\mathrm{ker}}
+\def\Dim{\mathrm{dim}}
+
+\def\Cn{\Complex[2^n]}
+\def\Cr{\Complex[2^r]}
+%\def\Field{\mathcal{F}_2}
+%\def\Field{\mathcal{F}}
+%\def\Fn{\Field[n]}
+%\def\Fr{\Field[r]}
+\def\Fn{\Field^n}
+\def\Fm{\Field^m}
+\def\Fr{\Field^r}
+%\def\Fnd{\Field^{n*}}
+%\def\Fmd{\Field^{m*}}
+%\def\Frd{\Field^{r*}}
+\def\Fnd{\Field_{n}}
+\def\Fmd{\Field_{m}}
+\def\Frd{\Field_{r}}
+
+%\def\Im{\mathrm{im}}
+%\def\Ker{\mathrm{ker}}
+%\def\Span#1{\mathrm{span}(#1)}
+%\def\Span#1{\langle #1 \rangle}
+
+\def\lie{\mathfrak{g}}
+\def\lieh{\mathfrak{h}}
+\def\sl{\mathfrak{sl}}
+
+
+%\renewenvironment{framed}[1][\hsize]{%
+%\def\FrameCommand{{\color{black}\vrule width 3pt}\hspace{0pt}\fboxsep=\FrameSep\colorbox{lightgray}}%
+%\MakeFramed{\hsize0.8\linewidth\advance\hsize-\width\FrameRestore}}
+%{\endMakeFramed}
+
+%\renewenvironment{framed}
+%{\MakeFramed}
+%{\endMakeFramed}
+
+
+\newcommand\dolemma[1]{\vskip 5pt \noindent{\bf \underline{Lemma #1.}\ }}
+\newcommand\doproposition[1]{\vskip 5pt \noindent {\bf \underline{Proposition #1.}\ }}
+\newcommand\dotheorem[1]{\vskip 5pt \noindent {\bf \underline{Theorem #1.}\ }}
+\newcommand\doexample[1]{\vskip 5pt \noindent {\bf \underline{Example #1.}\ }}
+\newcommand\doproof{\vskip 5pt \noindent{\bf \underline{Proof:}\ }}
+
+\newcommand\tombstone{\rule{.36em}{2ex}\vskip 5pt}
+
+\newcounter{numitem}
+\newcommand{\numitem}[1]{\refstepcounter{numitem}\thenumitem\label{#1}}
+
+
+\title{Spectra of Gauge Code Hamiltonians}
+
+\author{Simon Burton\\
+Department of Physics and Astronomy,\\
+University College London, London, WC1E 6BT, UK
+}
+
+\begin{document}
+
+\maketitle
+
+We study the spectral gap of frustrated spin (qubit)
+Hamiltonians constructed from quantum subsystem (gauge) codes.
+Such a Hamiltonian can be block diagonalized, with
+blocks labelled by eigenvalues of extensively many
+integrals of motion. These are the stabilizers of the code.
+Using Perron-Frobenius theory we constrain the
+location of first and second eigenvalues among the
+blocks of the Hamiltonian.
+Of particular interest is the 3D gauge color code\cite{Bombin2015,Bombin2015single},
+whose Hamiltonian has been conjectured to act as a quantum
+memory at finite temperature. 
+We show how the 3D gauge color code Hamiltonian decomposes as
+a sum of six mutually commuting Hamiltonians.
+Using all of these techniques 
+we are able to numerically find the gap of some large instances
+of the 3D gauge color code, up to 175 qubits, which is compared to 
+other frustrated spin Hamiltonians.
+Finally, we suggest a relation between bounded 
+stabilizers and gapped spectra.
+%and present numerical results in support of this.
+
+\bibliography{refs3}{}
+\bibliographystyle{abbrv}
+
+\end{document}
+
+

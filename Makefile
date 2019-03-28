@@ -1,8 +1,15 @@
 
-all: repr.pdf hecke.pdf spectrum.pdf spectrum2.pdf spectrum3.pdf
+all: repr.pdf hecke.pdf spectrum.pdf spectrum2.pdf spectrum3.pdf qec2019.pdf
 
 #out: repr
 #	open repr.pdf 
+
+qec2019.pdf: qec2019.tex refs3.bib 
+	pdflatex qec2019.tex
+	bibtex qec2019
+	pdflatex qec2019.tex
+	pdflatex qec2019.tex
+
 
 spectrum3.pdf: spectrum3.tex refs3.bib pic-gap.pdf pic-gap-stabs.pdf
 	pdflatex spectrum3.tex
