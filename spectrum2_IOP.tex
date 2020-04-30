@@ -3,15 +3,16 @@
 %School of Mathematics, University of Edinburgh
 
 %\documentclass[11pt,twoside,openright]{report} 
-\documentclass[11pt,oneside]{article} 
+\documentclass[12pt]{iopart} 
 
-\usepackage{a4wide}
+\usepackage{iopams}
+%\usepackage{a4wide}
 
 %% \titleformat{command}[shape]{format}{label}{sep}{before}[after]
 
 % bug in titlesec:
 % https://bugs.launchpad.net/ubuntu/+source/texlive-extra/+bug/1574052
-\usepackage{titlesec}
+%\usepackage{titlesec}
 %\usepackage[tracking=true]{microtype}
 %\titleformat{\chapter}[display]
 %  {\normalfont\huge\bfseries}
@@ -19,7 +20,8 @@
 %  {20pt}{\Huge}
 
 %\usepackage{epsf}
-\usepackage{amsmath}
+%\usepackage{amsmath}
+\usepackage{setstack}
 \usepackage{color}
 %\usepackage{natbib} % kills arxiv 
 \usepackage{framed}
@@ -27,9 +29,10 @@
 \usepackage{tikz}
 \usepackage{tikz-cd}
 
-\RequirePackage{amsmath}
-\RequirePackage{amssymb}
-\RequirePackage{amsthm}
+%\RequirePackage{amsmath}
+%\RequirePackage{amssymb}
+%\RequirePackage{amsthm}
+
 %\RequirePackage{algorithmic}
 %\RequirePackage{algorithm}
 %\RequirePackage{theorem}
@@ -45,7 +48,7 @@
 %\RequirePackage[dvips]{geometry}
 
 \usepackage{xcolor}
-\usepackage{amsmath,amsfonts,amssymb}
+%\usepackage{amsmath,amsfonts,amssymb}
 \usepackage{graphicx}
 \usepackage[caption=false]{subfig}
 \usepackage{enumerate}
@@ -67,10 +70,10 @@
 
 \newcommand{\todo}[1]{\ \textcolor{red}{\{#1\}}\ }
 
-\newcommand{\Eref}[1]{(\ref{#1})}
-\newcommand{\Fref}[1]{Fig.~\ref{#1}}
-%\newcommand{\Aref}[1]{Appendix~\ref{#1}}
-\newcommand{\SRef}[1]{Section~\ref{#1}}
+%\newcommand{\Eref}[1]{(\ref{#1})}
+%\newcommand{\Fref}[1]{Fig.~\ref{#1}}
+%%\newcommand{\Aref}[1]{Appendix~\ref{#1}}
+%\newcommand{\Sref}[1]{Section~\ref{#1}}
 
 
 \def\Complex{\mathbb{C}}
@@ -163,21 +166,22 @@
 \newcommand{\numitem}[1]{\refstepcounter{numitem}\thenumitem\label{#1}}
 
 
+\begin{document}
+
 \title{Spectra of Gauge Code Hamiltonians}
 
-\author{Simon Burton\\
-Centre for Engineered Quantum Systems,\\
+\author{Simon Burton}
+\address{Centre for Engineered Quantum Systems,\\
 School of Physics,\\
 The University of Sydney}
 
-
-\date{\today}
-
-\flushbottom
-
-\begin{document}
-
-\maketitle
+%
+%\date{\today}
+%
+%\flushbottom
+%
+%
+%\maketitle
 
 \begin{abstract}
 We study the spectral gap of frustrated spin (qubit)
@@ -224,7 +228,7 @@ stabilizers and gapped spectra.
 %gives some evidence that these models are gapped.
 %\end{abstract}
 
-\tableofcontents
+%\tableofcontents
 
 %\doublespacing
 %\onehalfspacing
@@ -394,7 +398,7 @@ Dan Browne.
 
 %\cite{Wen1991} % 
 
-%In \SRef{GroupReps} we do the group reps
+%In \Sref{GroupReps} we do the group reps
 
 
 %From http://arxiv.org/pdf/1504.01444 page 90:
@@ -479,14 +483,14 @@ $$\mathrm{GS} = \ket{000}+\ket{011}+\ket{110}+\ket{101}.$$
 We select three adjacent operators
 $ZII, IIZ,$ and $IXI,$
 one for each of the stabilizer operators:
-\begin{align*}
+\begin{eqnarray*}
     ZII : \mbox{GS} &\mapsto \ket{000}+\ket{011}-\ket{110}-\ket{101} 
         \ \mbox{anti-stabilized by}\  XXI,\\
     IIZ : \mbox{GS} &\mapsto \ket{000}-\ket{011}+\ket{110}-\ket{101} 
         \ \mbox{anti-stabilized by}\  IXX,\\
     IXI : \mbox{GS} &\mapsto \ket{010}+\ket{001}+\ket{100}+\ket{111} 
         \ \mbox{anti-stabilized by}\  ZZZ.
-\end{align*}
+\end{eqnarray*}
 
 %For example, $ZII$ sends the ground state to
 %$\ket{000}+\ket{011}-\ket{110}-\ket{101}$
@@ -598,18 +602,18 @@ a general gauge group below and summarized in Section \ref{Sec35}.
 
 So far we have been analysing the Hamiltonian in the
 symmetry invariant basis. The complete story of how this
-works is in \SRef{Sec3} below.
+works is in \Sref{Sec3} below.
 But we can also just fix the computational basis and
 examine the Hamiltonian in this basis.
-This leads to the Perron-Frobenius theory in \SRef{Sec5}.
+This leads to the Perron-Frobenius theory in \Sref{Sec5}.
 %...\todo{more...}
 
 %\todo{XXX and now for another formula}
-%\begin{align*}
+%\begin{eqnarray*}
 %\Ham &= XXII + IIXX + ZIZI + IZIZ \\
 %  &= \Xt_4 + \Zt_2\Xt_4 + \Zt_4 + \Zt_3\Zt_4 \\
 %  &= (I+\Zt_2)\Xt_4 + (I+\Zt_3) \Zt_4.
-%\end{align*}
+%\end{eqnarray*}
 
 \section{Gauge code Hamiltonians}\label{Sec3}
 
@@ -710,7 +714,7 @@ On the independent generators
 $\{X_1, .., X_n, Z_1, .., Z_n\},\ \rho_{\mathrm{pauli}}$
 is defined as the following tensor product of $2\times 2$ matrices:
 
-\begin{align*}
+\begin{eqnarray*}
 \rho_{\mathrm{pauli}}(X_i) := &\bigotimes_{j=1}^n \left\{ \begin{array}{ll}
 \left( \begin{array}{ll}
 0&1\\
@@ -729,7 +733,7 @@ is defined as the following tensor product of $2\times 2$ matrices:
 1&0\\
 0&1\end{array} \right) &\mbox{for $j\ne i$}\end{array}
 \right.
-\end{align*}
+\end{eqnarray*}
 
 \subsection{Subgroups of the Pauli group}\label{Sec32}
 
@@ -778,10 +782,10 @@ $l\in L$ and $t\in T.$
 The size of $T$ equals the size of $\Stab$: $|T|=|\Stab|=2^m.$
 If we let $L_0$ be an independent generating set for $L$
 then we have the important formula:
-\begin{align*}
+\begin{eqnarray*}
 n &= \frac{1}{2}|L_0| + |\Stab_0| + \frac{1}{2}|R_0|\\
   &= k + m + r
-\end{align*}
+\end{eqnarray*}
 We summarize the information in this section in a table
 of Pauli group elements arranged in
 two columns and $n$ rows:
@@ -815,7 +819,7 @@ On the independent generators
 $\{X_1, .., X_n, Z_1, .., Z_n\},\ \rho_{\mathrm{pauli}}$
 is defined as the following tensor product of $2\times 2$ matrices:
 
-\begin{align*}
+\begin{eqnarray*}
 \rho_{\mathrm{pauli}}(X_i) := &\bigotimes_{j=1}^n \left\{ \begin{array}{ll}
 \left( \begin{array}{ll}
 0&1\\
@@ -834,7 +838,7 @@ is defined as the following tensor product of $2\times 2$ matrices:
 1&0\\
 0&1\end{array} \right) &\mbox{for $j\ne i$}\end{array}
 \right.
-\end{align*}
+\end{eqnarray*}
 
 %on $n$ qubits, $\Pauli_n,$
 %as the set of $n$-fold tensor products
@@ -970,10 +974,10 @@ $\langle\chi_{t},\chi_{t}\rangle = 1$ and
 $\rho_t$ is an irreducible representation of $G.$
 We now count the occurrences of 
 this representation in $\rho^r_{pauli}$:
-\begin{align*}
+\begin{eqnarray*}
 \langle\chi^r_{pauli},\chi_{t}\rangle &= \frac{1}{|G|}\sum_{g\in G} \chi^r_{pauli}(g)\overline{\chi_{t}(g)} \\
 &= \frac{1}{2^{2r+m+1}} \sum_{g=\pm I} 2^n 2^r = \frac{2^{n+1+r}}{2^{2r+m+1}} = 2^k
-\end{align*}
+\end{eqnarray*}
 where $k$ is the number of logical qubits so that $n=r+m+k.$
 
 %\noindent{\bf Theorem.}
@@ -1003,12 +1007,12 @@ $$
 %$$
 %where $d$ is the dimension of the irreducible representation.
 %We can use this to calculate projectors onto the irreps $\rho_t$ in $\rho_{pauli}$:
-%\begin{align*}
+%\begin{eqnarray*}
 %P_t &= \frac{d}{|G|} \sum_{g\in G} \overline{\chi_t(g)} \rho_{pauli}(g) \\
 %    &= \frac{d}{|G|} \sum_{h\in \Stab}\sum_{g\in R} \overline{\chi_t(hg)} \rho_{pauli}(hg) \\
 %    &= \frac{d}{|G|} 2^{2r} \sum_{h\in \Stab} {\rho^1_t(h)} \rho_{pauli}(h) \\
 %    &= \frac{1}{2^m} \sum_{h\in \Stab} {\rho^1_t(h)} \rho_{pauli}(h).
-%\end{align*}
+%\end{eqnarray*}
 %
 %We can also write this as a product of projectors onto
 %the $\pm 1$ eigenspaces of stabilizers $\rho_{pauli}(h)$ for $h\in \Stab.$
@@ -1040,10 +1044,10 @@ an operator $\Ham:\Complex[2^n]\to\Complex[2^n]$:
 %we will reverse the sign:
 $$ \Ham := \sum_{g\in G_0} \rho_{\mathrm{pauli}}(g).$$
 Using the above decomposition we find:
-\begin{align*}
+\begin{eqnarray*}
     \Ham &= \sum_{g\in G_0}\ \bigoplus_{l\in L, t\in T}\ \rho_t(g)\\
          &= \bigoplus_{l\in L, t\in T} \sum_{g\in G_0}\ \rho_t(g).
-\end{align*}
+\end{eqnarray*}
 %The goal is to decompose $\Ham$ into blocks as
 %$$
 %    \Ham = \bigoplus_{\mathrm{irrep}\rho} \sum_{g\in G_0}\ \rho(g),
@@ -1065,10 +1069,10 @@ $$
 More generally, we can assign real valued weights
 $J_g\in\R$
 to each operator $g\in G_0,$
-\begin{align*}
+\begin{eqnarray*}
     \Ham = \sum_{g\in G_0} J_g \rho_{\mathrm{pauli}}(g)
             = \bigoplus_{l\in L, t\in T} \sum_{g\in G_0}\ J_g \rho_t(g).
-\end{align*}
+\end{eqnarray*}
 In other words, using weights does not change the block structure of $\Ham.$
 
 In the following sections we will forget the distinction 
@@ -1095,14 +1099,14 @@ as the corresponding Pauli linear operators.
 %generate $\Pauli_n$ can be seen by considering
 %the abelianization of $\Pauli_n$ which is the group $\Z_2^{2n}.$
 %There are two other ways of writing this presentation:
-%\begin{align*}
+%\begin{eqnarray*}
 %%\mathrm{JW}_X &:=
 %\big\{c_{2j}^X:=X_1...X_{j-1} Y_j,\ c_{2j+1}^X:=X_1...X_{j-1} Z_j\ \ 
 %\mbox{for}\ 1\le j\le n\big\},\\
 %%\mathrm{JW}_Y &:=
 %\big\{c_{2j}^Y:=Y_1...Y_{j-1} X_j,\ c_{2j+1}^Y:=Y_1...X_{j-1} Z_j\ \ 
 %\mbox{for}\ 1\le j\le n\big\}.
-%\end{align*}
+%\end{eqnarray*}
 %
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1266,10 +1270,10 @@ with $I$ the $n\times n$ identity matrix.
 We first find the stabilizers $S_Z$.
 These are built out of $\Fnd$ vectors from the span of $G_Z$
 that commute with the rows of $G_X:$
-\begin{align*}
+\begin{eqnarray*}
     \Span{S_Z} &= \{\  vG_Z \ |\  v G_Z G_X^\top = 0, \ \ v \in F_{|G_Z|}\ \} \\
                &= \{\  vG_Z \ |\  v^\top \in \Ker(G_X G_Z^\top)  \ \}.
-\end{align*}
+\end{eqnarray*}
 The generators (rows of $S_Z$) are then extracted
 from this span by row reduction.
 We swap the role of $X$ and $Z$ to find $S_X.$
@@ -1310,10 +1314,10 @@ We define $P_X$ similarly for the operation of mod $\Span{S_X}.$
 
 To find $L_X$ we solve the following $\Field$-linear
 system:
-%\begin{align*}
+%\begin{eqnarray*}
 %    L_Z L_X^\top &= I, \\
 %    G_Z L_X^\top &= 0.
-%\end{align*}
+%\end{eqnarray*}
 $$
 \left( \begin{array}{l}
 L_Z\\
@@ -1335,11 +1339,11 @@ $\widetilde{R}_Z$ to be a row-reduction of  $G_Z P_Z.$
 
 The error operators $T_X$ are then found as the solution
 to the $\Field$-linear system:
-%\begin{align*}
+%\begin{eqnarray*}
 %    S_Z T_X^\top &= I,\\
 %    L_Z T_X^\top &= 0,\\
 %    \widetilde{R}_Z T_X^\top &= 0.
-%\end{align*}
+%\end{eqnarray*}
 $$
 \left( \begin{array}{l}
 L_Z\\
@@ -1354,12 +1358,12 @@ I\\
 \end{array} \right)
 $$
 And then the operators $T_Z$ solve the $\Field$-linear system:
-%\begin{align*}
+%\begin{eqnarray*}
 %    S_X T_Z^\top &= I,\\
 %    T_X T_Z^\top &= 0,\\
 %    L_X T_Z^\top &= 0,\\
 %    R_X T_Z^\top &= 0.
-%\end{align*}
+%\end{eqnarray*}
 $$
 \left( \begin{array}{l}
 L_X\\
@@ -1376,12 +1380,12 @@ I\\
 \end{array} \right)
 $$
 Finally at this point $R_Z$ is given as the solution to
-%\begin{align*}
+%\begin{eqnarray*}
 %    R_X R_Z^\top &= I,\\
 %    L_X R_Z^\top &= 0,\\
 %    S_X R_Z^\top &= 0,\\
 %    T_X R_Z^\top &= 0.
-%\end{align*}
+%\end{eqnarray*}
 $$
 \left( \begin{array}{l}
 L_X\\
@@ -1502,16 +1506,16 @@ with $v\in\Frd.$
 Since $R_X R_Z^\top = I$
 we can write $v = u R_Z^\top.$
 Each $g_X\in G_X$ acts on $u$ to give
-\begin{align*}
+\begin{eqnarray*}
     u_1 &= (u + g_X) \ \mbox{mod}\ \Span{S_X} \\
         &= (u + g_X) P_X \\
         &= (v R_X + g_X) P_X.
-\end{align*}
+\end{eqnarray*}
 writing $u_1 = v_1 R_X$ we then have
-\begin{align*}
+\begin{eqnarray*}
     v_1 &= (v R_X + g_X) P_X R_Z^\top \\
         &= v + g_X R_Z^\top.
-\end{align*}
+\end{eqnarray*}
 %\todo{XXX explain that \todo{$P_X R_Z^\top = R_Z^\top$} etc. XXX}
 So we have that working in the computational
 basis, the action of the $X$ part of the
@@ -1591,14 +1595,14 @@ H_{t_X,0} = \sum_{\substack{v\in\Frd\\g_X\in G_X } }
 %$$
 The general form of
 each Hamiltonian block is:
-%\begin{align*}
+%\begin{eqnarray*}
 %H_{t_X,t_Z} = &\sum_{\substack{v\in\Frd\\g_X\in G_X } }
 %    \eta(t_Z g_X^\top)
 %  \ \bket{v+g_X  R_Z^\top}\bbra{v} \\
 %  &+ \sum_{v\in\Frd} \bigl(
 %    |G_Z| - 2w(G_Z R_X^\top v^\top + G_Z t_X^\top)
 %    \bigr) \ \bket{v}\bbra{v}
-%\end{align*}
+%\end{eqnarray*}
 \begin{equation}\label{hamblockgen}
 H_{t_X,t_Z} = \sum_{\substack{v\in\Frd\\g_X\in G_X } }
     \eta(t_Z g_X^\top)
@@ -1836,14 +1840,14 @@ Because each of these components is independant of $l_X$ we write it as $\Gamma_
 
 %Using \Eref{hamblockgen}
 %we have that 
-%\begin{align*}
+%\begin{eqnarray*}
 %    \Gamma_{0} - \Gamma_{t_X}
 %    &= \sum_{t_Z\in\Span{T_Z}} H_{0,t_Z} - H_{t_X,t_Z} \\
 %    &= \sum_{t_Z\in\Span{T_Z}} \sum_{u\in\Field_r}
 %        \bigl( 2w(G_Z R_X^\top v^\top + G_z t_X^\top)
 %        - 2w(G_Z R_X^\top v^\top)\bigr)
 %        \ket{v}\bra{v}
-%\end{align*}
+%\end{eqnarray*}
 
 %\dolemma{2.2}
 \dolemma{\numitem{lemma22}}
@@ -2013,12 +2017,12 @@ The result follows by considering eigenspaces of stabilizers.
 %\doproposition{2.7}
 \doproposition{\numitem{prop27}}
 For a gauge code Hamiltonian $H$,
-\begin{align*}
+\begin{eqnarray*}
 \lambda_1(\Ham_{t_X,0}) &> 
     \lambda_1(\Ham_{t_X,t_Z}) \ \smbox{and}\\
 \lambda_1(\Ham_{0,t_Z}) &> 
     \lambda_1(\Ham_{t_X,t_Z}),
-\end{align*}
+\end{eqnarray*}
 where $t_X\ne 0$ and $t_Z\ne 0.$
 
 \doproof
@@ -2134,10 +2138,10 @@ $$
     \prod_{i=1}^l X_{ij} X_{i,j+1} \ \ \mbox{for}\ \ j=1,...,l-1,\ \ 
     \prod_{j=1}^l X_{ij} X_{i+1,j} \ \ \mbox{for}\ \ j=1,...,l-2,
 $$
-%\begin{align*}
+%\begin{eqnarray*}
 %    &\prod_{i=1}^l X_{ij} X_{i,j+1} \ \ \mbox{for}\ \ j=1,...,l-1 \\
 %    &\prod_{j=1}^l X_{ij} X_{i+1,j} \ \ \mbox{for}\ \ j=1,...,l-2,
-%\end{align*}
+%\end{eqnarray*}
 and similarly for the $Z$-type stabilizer generators.
 This model has two logical qubits with logical operators 
 generated by
@@ -2185,7 +2189,7 @@ the square lattice of $l\times l$ qubits.
 The 3D compass model has qubits on a periodic lattice of $l\times l\times l$
 sites.
 The generators of the gauge group and stabilizer group are
-\begin{align*}
+\begin{eqnarray*}
     G_0 &= \big\{ 
         X_{ijk}X_{i+1,j,k},\ 
         X_{ijk}X_{i,j+1,k},\ 
@@ -2196,7 +2200,7 @@ The generators of the gauge group and stabilizer group are
         \prod_{j,k=1}^l X_{ijk}X_{i+1,j,k},\ 
         \prod_{j,k=1}^l Z_{jki}Z_{j,k,i+1}\ \ 
             \mbox{for}\ \ i=1,...,l-1\Big\}.
-\end{align*}
+\end{eqnarray*}
 
 The 3D compass model is also weakly self-dual,
 and has extensive stabilizer generators.
@@ -2294,11 +2298,11 @@ of mutually commuting operators.
 For example,
 for $n$ even, the $XY$-model gauge generators can
 be partitioned into two mutually commuting parts:
-\begin{align*}
+\begin{eqnarray*}
 G_0 = &\{X_i X_{i+1}, Z_i Z_{i+1}\  \smbox{for} i=1,...,n. \} \\
     = &\{X_i X_{i+1}, Z_{i+1} Z_{i+2}\ \smbox{for}  i=1,3,..,n-1. \}\\
     & \cup \{X_i X_{i+1}, Z_{i+1} Z_{i+2}\ \smbox{for}  i=2,4,..,n. \}.
-\end{align*}
+\end{eqnarray*}
 In general we call these parts \emph{commuting ideals}.\footnote{
 These parts generate Lie algebra ideals when we consider 
 the usual commutator $[\cdot,\cdot]$ as Lie algebra bracket.}
@@ -2321,11 +2325,11 @@ $$
     H^a = \sum_{g\in G_0^{a}} g,\ \  
     H = \sum_{a\in A} H^a.
 $$
-%\begin{align*}
+%\begin{eqnarray*}
 %    G_0 &= \cup_{a\in A} G_0^{a} \\
 %    H^a &= \sum_{g\in G_0^{a}} g \\
 %    H &= \sum_{a\in A} H^a.
-%\end{align*}
+%\end{eqnarray*}
 %Because the $H^a$ commute, we have that 
 %$$
 %    \lambda_1(H) = \sum_{a\in A} \lambda_1(H^a).
@@ -2702,14 +2706,14 @@ $$
 %     -\braket{i}{v_1} &\mbox{if}\ \ket{i}\in\Gamma_B\end{array}\right..
 %$$
 And then
-\begin{align*}
+\begin{eqnarray*}
     \lambda_2 \ge \bra{u}H\ket{u} &= 
 \bra{v_A}H_{AA}\ket{v_A} +
 \bra{v_B}H_{BB}\ket{v_B} -
 \bra{v_B}H_{BA}\ket{v_A} -
 \bra{v_A}H_{AB}\ket{v_B} \\
     &= \lambda_1 - 4 \bra{v_B}H_{BA}\ket{v_A}.
-\end{align*}
+\end{eqnarray*}
 So if we can show that 
 $ \bra{v_B}H_{BA}\ket{v_A}$
 tends to zero we are done.
@@ -2800,11 +2804,11 @@ but is not at all true for example when $T$ is trivial:
 For a sufficiently ``well-behaved''
 weakly self-dual
 gauge code Hamiltonian $H$
-\begin{align*}
+\begin{eqnarray*}
 \lambda_2(\Ham) 
     &= \min_{t_X\ne 0} \lambda_1(\Ham_{t_X,0})\\
     &= \min_{t_Z\ne 0} \lambda_1(\Ham_{0,t_Z}).
-\end{align*}
+\end{eqnarray*}
 \end{framed}
 Indeed, contrary to this proto-fact
 we suspect that $H_{0,0}$ will not be gapped in
@@ -2852,11 +2856,11 @@ $$
 If we denote $\lambda_1(A)$ as the top eigenvalue of $A$ and
 $\lambda_1(B)$ as the top eigenvalue of $B$,
 then
-\begin{align*}
+\begin{eqnarray*}
 \lambda_2 = v_2^\top \Ham v_2 &= x^\top A x + 2 x^\top C y + y^\top B y \\
         &\le x^\top A x + y^\top B y\ \le\ ||x||^2 \lambda_1(A) + ||y||^2 \lambda_1(B) \\
         &\le \mbox{min}(\lambda_1(A), \lambda_1(B))\ \le\ \lambda_1.
-\end{align*}
+\end{eqnarray*}
 
 Defining the following constant as a maximization over
 all bi-partitions of $\Ham:$

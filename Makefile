@@ -4,6 +4,13 @@ all: repr.pdf hecke.pdf spectrum.pdf spectrum2.pdf spectrum3.pdf qec2019.pdf
 #out: repr
 #	open repr.pdf 
 
+spectrum2_IOP.pdf: spectrum2_IOP.tex refs3.bib 
+	pdflatex spectrum2_IOP.tex
+	bibtex spectrum2_IOP
+	pdflatex spectrum2_IOP.tex
+	pdflatex spectrum2_IOP.tex
+
+
 qec2019.pdf: qec2019.tex refs3.bib 
 	pdflatex qec2019.tex
 	bibtex qec2019
