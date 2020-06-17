@@ -25,7 +25,7 @@
 %\usepackage{epsf}
 \usepackage{amsmath}
 \usepackage{color}
-%\usepackage{natbib} % kills arxiv 
+\usepackage[numbers,sort&compress]{natbib} % kills arxiv ?
 \usepackage{framed}
 %\usepackage{cite}
 \usepackage{tikz}
@@ -1246,7 +1246,7 @@ a row of the matrix $R_X$.
 %Given $v\in \Fr$ then $u = v R_X$ is
 %a generic vector in the rowspace of $R_X.$
 
-\dotheorem{(Decomposition)}
+\dotheorem{\numitem{thmDecomposition}}{\it (Decomposition)}
 Let $G$ be an $n$-qubit 
 CSS gauge group with generators $G_X\cup~G_Z.$
 We can construct a solution to the following $\Field$-linear
@@ -1680,9 +1680,9 @@ with a fixed basis.
 The following theorem originally appeared
 in the work of Frobenius \cite{Frobenius1912}, who
 was building on previous results of Perron \cite{Perron1907}.
-See also the recent book \cite{Baez2012}.
+See also the recent book \cite{Baez2018}.
 
-\dotheorem{(Perron-Frobenius)}
+\dotheorem{\numitem{thmPF}}{\it (Perron-Frobenius)}
 Let $\Gamma$ be a non-negative irreducible matrix.
 Then $\Gamma$ has a positive real eigenvalue
 $\lambda$ equal to its spectral radius,
@@ -2978,8 +2978,8 @@ and how this relates to the geometry of the underlying code.
 %
 
 
-\bibliography{refs3}{}
-\bibliographystyle{abbrv}
+\bibliographystyle{plainnat}
+\bibliography{refs3}
 
 
 
