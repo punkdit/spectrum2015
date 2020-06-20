@@ -162,7 +162,8 @@
 \newcommand\doexample[1]{\vskip 5pt \noindent {\bf \underline{Example #1.}\ }}
 \newcommand\doproof{\vskip 5pt \noindent{\bf \underline{Proof:}\ }}
 
-\newcommand\tombstone{\rule{.36em}{2ex}\vskip 5pt}
+%\newcommand\tombstone{\rule{.36em}{2ex}\vskip 5pt}
+\newcommand\tombstone{\qedsymbol\vskip 5pt}
 
 \newcounter{numitem}
 \newcommand{\numitem}[1]{\refstepcounter{numitem}\thenumitem\label{#1}}
@@ -190,7 +191,7 @@ We study the spectral gap of frustrated spin (qubit)
 Hamiltonians constructed from quantum subsystem (gauge) codes.
 Such a Hamiltonian can be block diagonalized, with
 blocks labelled by eigenvalues of extensively many
-integrals of motion (stabilizers of the code.)
+integrals of motion (stabilizers of the code).
 Of particular interest is the 3D gauge color code,
 whose Hamiltonian has been conjectured to act as a quantum
 memory at finite temperature. 
@@ -289,7 +290,7 @@ We find that this model
 decomposes into six mutually commuting operators in Section \ref{Sec45}.
 This gives an exponential reduction in the numerical
 difficulty of exactly diagonalizing this Hamiltonian,
-results of which we present in Section \ref{Sec6}.
+results of which we present in Section \ref{SecNumerical}.
 These numerics show some evidence of a spectral
 gap, which is contrasted against models that are known
 to be gapless: the two and three dimensional compass model,
@@ -1881,7 +1882,7 @@ We apply the Perron-Frobenius theorem and the result follows.
 
 Any stabilizer that acts as $-1$ in a given block of
 the Hamiltonian we will call a \emph{frustrated stabilizer}
-(with respect to the given block.)
+(with respect to the given block).
 Similarly, a \emph{satisfied stabilizer} acts as $+1$ in a given
 block of the Hamiltonian.
 We will call a
@@ -1975,24 +1976,25 @@ and so the result follows as a
 consequence of the previous lemma.
 \tombstone
 
-The following lemma is used in section 2.8 below.
-
-%\dolemma{2.5}
-\dolemma{\numitem{lemma25}}
-Given a 
-CSS gauge code Hamiltonian $\Ham$ and
-$t_X\in \Span{T_X},$
-the matrices for $\Ham_{t_X,0}$ 
-in the symmetry invariant basis 
-are irreducible stoquastic.
-
-\doproof
-From equation \Eref{hamblocktx} we see that 
-the nonzero, nondiagonal entries of the matrices
-$\Ham_{t_X,0}$ are $+1,$ and so this matrix is stoquastic.
-This matrix is irreducible because as an operator it is
-irreducible.
-\tombstone
+% See section 2.8 of PhD thesis:
+%The following lemma is used in section 2.8 below. \todo{FIX FIX FIX XXX}
+%
+%%\dolemma{2.5}
+%\dolemma{\numitem{lemma25}}
+%Given a 
+%CSS gauge code Hamiltonian $\Ham$ and
+%$t_X\in \Span{T_X},$
+%the matrices for $\Ham_{t_X,0}$ 
+%in the symmetry invariant basis 
+%are irreducible stoquastic.
+%
+%\doproof
+%From equation \Eref{hamblocktx} we see that 
+%the nonzero, nondiagonal entries of the matrices
+%$\Ham_{t_X,0}$ are $+1,$ and so this matrix is stoquastic.
+%This matrix is irreducible because as an operator it is
+%irreducible.
+%\tombstone
 
 So far, the Perron-Frobenius theory has been fruitful,
 telling us that the first eigenvalue of $H$ resides in
@@ -2022,7 +2024,7 @@ The result follows by considering eigenspaces of stabilizers.
 
 %\doproposition{2.7}
 \doproposition{\numitem{prop27}}
-For a gauge code Hamiltonian $H$,
+For a CSS gauge code Hamiltonian $H$,
 \begin{align*}
 \lambda_1(\Ham_{t_X,0}) &> 
     \lambda_1(\Ham_{t_X,t_Z}) \ \smbox{and}\\
@@ -2054,6 +2056,19 @@ We switch to the $\ket{\pm}$ basis and repeat this argument
 to obtain the second inequality.
 \tombstone
 
+A CSS gauge code is \emph{self-dual} when the $X$-type and $Z$-type
+gauge generators are equal: $$G_X = G_Z.$$
+%The $XY$-model is an example of a self-dual CSS gauge code.
+A CSS gauge code is \emph{weakly self-dual}
+when there is a permutation $P$ on the set of $n$ qubits
+that induces equality of the gauge generators:
+$$
+    G_X P = G_Z,
+$$
+where we write $P$ as an $n\times n$ permutation matrix.
+We also apply the qualifiers self-dual and weakly self-dual
+to the Hamiltonian built from such a CSS gauge code.
+
 To find the spectral gap of a weakly self-dual gauge code Hamiltonian $H$,
 %which is the difference of the top two eigenvalues of the Hamiltonian,
 we need only examine the top two eigenvalues of $H_{0,0}$ and 
@@ -2065,9 +2080,9 @@ We summarize this in the theorem:
 For a weakly self-dual gauge code Hamiltonian $H$,
 the spectral gap is given by:
 $$
-    \min \bigl\{ \lambda_1(H_{0,0}) - \lambda_2(H_{0,0}),
-        \min_{t_X\in\Span{T_X}} 
-         \{ \lambda_1(H_{0,0}) - \lambda_2(H_{t_X,0}) \} \bigr\}
+    \min \Bigl\{ \lambda_1(H_{0,0}) - \lambda_2(H_{0,0}),\ 
+        \min_{\substack{t_X\in\Span{T_X}\\t_X\ne 0} }
+         \{ \lambda_1(H_{0,0}) - \lambda_1(H_{t_X,0}) \} \Bigr\}.
 $$
 \doproof
 Combine Proposition \ref{prop24} with Proposition \ref{prop27}.
@@ -2076,22 +2091,17 @@ the spectrum of $H_{t'_X,t'_Z}$ for some
 $t'_X\in\Span{T_X}, t'_Z\in\Span{T_Z}.$
 \tombstone
 
+\todo{
+This theorem says that the gap of a weakly self-dual
+Hamiltonian comes from the $H_{0,0}$ sector,
+or otherwise a frustrated $X$-type stabilizer.
+In all the examples we consider in section \ref{SecNumerical}, it 
+turns out to be the later.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
 \section{Models}\label{Sec4}
-
-A CSS gauge code is \emph{self-dual} when the $X$-type and $Z$-type
-gauge generators are equal: $$G_X = G_Z.$$
-%The $XY$-model is an example of a self-dual CSS gauge code.
-A CSS gauge code is \emph{weakly self-dual}
-when there is a permutation $P$ on the set of $n$ qubits
-that induces equality of the gauge generators:
-$$
-    G_X P = G_Z,
-$$
-where we write $P$ as an $n\times n$ permutation matrix.
 
 \subsection{Transverse field Ising model}\label{Sec42}
 
@@ -2400,7 +2410,7 @@ in the numerical workload.
 %\label{spectra}
 
 %\newpage
-\section{Numerical results}\label{Sec6}
+\section{Numerical results}\label{SecNumerical}
 
 Here we show tables for the first and
 second eigenvalues of the 2D and 3D compass models,
@@ -2565,6 +2575,7 @@ To emphasize this point we show in Figure \ref{PicGapStabs}
 the ground eigenvalues of all of the blocks $H_{t_X,0}.$
 For larger codes in this family the stabilizers do not get
 bigger than weight 24.
+\todo{ The gap is monotonic in stabilizer weight !!!}
 It is not clear to what extent these results are
 representative of larger code sizes, but we
 can already see from Figure \ref{PicGapStabs} 
