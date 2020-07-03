@@ -2420,7 +2420,7 @@ For each instance we indicate the groundspace eigenvalue
 $\lambda_1$ which is obtained from $H_{0,0}.$
 Then we list the second eigenvalue of $H_{0,0}$ as
 well as the first eigenvalue of $H_{t_X,0}$ for $t_X\ne 0.$
-The weight of the corresponding frustrated stabilizer is $w(s_Z).$
+The weight of the corresponding frustrated stabilizer is $w(s_Z),$
 %minimum number of gauge operators needed to form $s_Z.$
 The eigenvalue closest to $\lambda_1(H_{0,0})$ is marked
 with a tick, along with the value of the gap, $\lambda_1-\lambda_2.$
@@ -2436,22 +2436,43 @@ under the lattice symmetry of the model.
 We use the iterative solvers in the software library 
 {\tt SLEPc} \cite{Hernandez2005} to find these eigenvalues.
 
+%\begin{samepage}
+%\underline{2D compass model}
+%\begin{center}
+%\begin{tabular}{ c|c|c|c|l|c } 
+%$n$ &  $t_X$    & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ? & gap \\
+%\hline
+%\hline
+%16  &   0        &   &  19.012903&    16.335705          &            \\
+%&            & 8 &              &  18.369300    \checkmark & 0.643603 \\
+%\hline
+%25  &   0        &   & 29.076200 & 27.597280        &            \\
+%&            & 10 &              & 28.624004 \checkmark &  0.452196 \\
+%\hline
+%36  &   0        &   & 41.410454 & 40.585673        &            \\
+%&            & 12 &              & 41.094532 \checkmark &  0.315922 \\
+%%             &     &           &   &              &          &    &            \\
+%\end{tabular}
+%\end{center}
+%\end{samepage}
+
 \begin{samepage}
 \underline{2D compass model}
 \begin{center}
-\begin{tabular}{ c|c|c|c|l|c } 
-$n$ &  $t_X$    & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ? & gap \\
+\begin{tabular}{ |c|c|c|l|c| } 
+\hline
+$n$ & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ? & gap \\
 \hline
 \hline
-16  &   0        &   &  19.012903&    16.335705          &            \\
-&            & 8 &              &  18.369300    \checkmark & 0.643603 \\
+16  & 0 &  19.012903&    16.335705          &            \\
+    & 8 &              &  18.369300    \checkmark & 0.643603 \\
 \hline
-25  &   0        &   & 29.076200 & 27.597280        &            \\
-&            & 10 &              & 28.624004 \checkmark &  0.452196 \\
+25  & 0 & 29.076200 & 27.597280        &            \\
+    & 10 &              & 28.624004 \checkmark &  0.452196 \\
 \hline
-36  &   0        &   & 41.410454 & 40.585673        &            \\
-&            & 12 &              & 41.094532 \checkmark &  0.315922 \\
-%             &     &           &   &              &          &    &            \\
+36  & 0 & 41.410454 & 40.585673        &            \\
+    & 12 &              & 41.094532 \checkmark &  0.315922 \\
+\hline
 \end{tabular}
 \end{center}
 \end{samepage}
@@ -2460,15 +2481,93 @@ Such numerics for the 2D compass model have been previously found
 using similar methods \cite{Brzezicki2013}. 
 The following numerical results are new:
 
+%\begin{samepage}
+%\underline{3D compass model}
+%\begin{center}
+%\begin{tabular}{ c|c|c|c|l|c } 
+%$n$ &  $t_X$    & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ? & gap \\
+%\hline
+%\hline
+%27  &   0        &   & 60.295471  &    58.382445          &            \\
+%&            & 18 &              &  59.757677   \checkmark & 0.53779 \\
+%\end{tabular}
+%\end{center}
+%\end{samepage}
+%
+%\begin{samepage}
+%\underline{2D $XY$-plaquette model}
+%\begin{center}
+%\begin{tabular}{ c|c|c|c|l|c } 
+%$n$ &  $t_X$    & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ? & gap \\
+%\hline
+%\hline
+%16  &   0        &   & 22.627417 & 11.313708      &            \\
+%&            & 8 &              & 19.313708   \checkmark &  3.31371  \\
+%\hline
+%36  &   0        &   & 44.8444102 & 39.633308        &            \\
+%&            & 12 &              & 42.914196   \checkmark &  1.93021  \\
+%\hline
+%64  &   0        &   &  76.051613  &    73.374415    &            \\
+%&            & 16 &              &    74.764406  \checkmark & 1.28720  \\
+%\hline
+%100  &   0        &   & 116.304800 & 114.825880        &            \\
+%&            & 20 &              & 115.400408   \checkmark &  0.90439  \\
+%\hline
+%144  &   0        &   & 165.641816   & 164.817035  &            \\
+%&            & 24 &              & 165.009972   \checkmark &  0.63184   \\
+%%             &     &           &   &              &          &    &            \\
+%\end{tabular}
+%\end{center}
+%\end{samepage}
+%
+%\begin{samepage}
+%\underline{3D gauge color code}
+%\begin{center}
+%\begin{tabular}{ c|c|c|c|l|c } 
+%$n$ &  $t_X$    & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ?  & gap \\
+%\hline
+%\hline
+%15  & 0         & &  25.455844  & 16.970563    &  \\
+%                 &   & 8 &              & 22.214755 \checkmark & 3.241089           \\
+%\hline
+%%39  & 0         & &  64.476081   & 58.137233    &  \\
+%%                 &           & 8 &              & 60.706477    &   \\
+%%                 &           & 8 &              & 60.357053  &    \\
+%%                 &           & 12 &              & 61.366348   &  \\
+%%                 &           & 20 &              & 63.495916  \checkmark  & 0.980165 \\
+%%\hline
+%65  & 0         &    &  104.076026  & 99.014097     &    \\
+%                 &           & 8  &              &  100.429340   &            \\
+%                 &           & 12 &              &  100.585413   &            \\
+%                 &           & 12 &              &  101.602340   &            \\
+%                 &           & 18 &              &  102.382483  \checkmark  &  1.693543 \\
+%\hline
+%175 & 0         &  &  267.197576  & 264.250644    & \\
+% & & 8  & & 263.171190  &    \\
+% & & 8  & & 263.324858  &    \\
+% & & 8  & & 263.340832  &    \\
+% & & 12 & &  264.269635  &    \\
+% & & 12 & &  264.617135  &    \\
+% & & 12 & &  264.745548  &    \\
+% & & 18 & &  264.843629  &    \\
+% & & 18 & &  265.413935  &    \\
+% & & 18 & &  265.754772  &    \\
+% & & 24 & &  266.148188  \checkmark &  1.04939  \\
+%\end{tabular}
+%\end{center}
+%\end{samepage}
+
 \begin{samepage}
 \underline{3D compass model}
 \begin{center}
-\begin{tabular}{ c|c|c|c|l|c } 
-$n$ &  $t_X$    & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ? & gap \\
+\begin{tabular}{ |c|c|c|l|c| } 
+\hline
+$n$ & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ? & gap \\
 \hline
 \hline
-27  &   0        &   & 60.295471  &    58.382445          &            \\
-&            & 18 &              &  59.757677   \checkmark & 0.53779 \\
+27  & 0  & 60.295471  &    58.382445          &            \\
+    & 18 &              &  59.757677   \checkmark & 0.53779 \\
+\hline
 \end{tabular}
 \end{center}
 \end{samepage}
@@ -2476,25 +2575,26 @@ $n$ &  $t_X$    & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ? & gap \\
 \begin{samepage}
 \underline{2D $XY$-plaquette model}
 \begin{center}
-\begin{tabular}{ c|c|c|c|l|c } 
-$n$ &  $t_X$    & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ? & gap \\
+\begin{tabular}{ |c|c|c|l|c| } 
+\hline
+$n$ & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ? & gap \\
 \hline
 \hline
-16  &   0        &   & 22.627417 & 11.313708      &            \\
-&            & 8 &              & 19.313708   \checkmark &  3.31371  \\
+16  & 0  & 22.627417 & 11.313708      &            \\
+& 8 &              & 19.313708   \checkmark &  3.31371  \\
 \hline
-36  &   0        &   & 44.8444102 & 39.633308        &            \\
-&            & 12 &              & 42.914196   \checkmark &  1.93021  \\
+36  & 0 & 44.8444102 & 39.633308        &            \\
+& 12 &              & 42.914196   \checkmark &  1.93021  \\
 \hline
-64  &   0        &   &  76.051613  &    73.374415    &            \\
-&            & 16 &              &    74.764406  \checkmark & 1.28720  \\
+64  & 0 &  76.051613  &    73.374415    &            \\
+& 16 &              &    74.764406  \checkmark & 1.28720  \\
 \hline
-100  &   0        &   & 116.304800 & 114.825880        &            \\
-&            & 20 &              & 115.400408   \checkmark &  0.90439  \\
+100  & 0 & 116.304800 & 114.825880        &            \\
+& 20 &              & 115.400408   \checkmark &  0.90439  \\
 \hline
-144  &   0        &   & 165.641816   & 164.817035  &            \\
-&            & 24 &              & 165.009972   \checkmark &  0.63184   \\
-%             &     &           &   &              &          &    &            \\
+144  & 0 & 165.641816   & 164.817035  &            \\
+& 24 &              & 165.009972   \checkmark &  0.63184   \\
+\hline
 \end{tabular}
 \end{center}
 \end{samepage}
@@ -2502,39 +2602,36 @@ $n$ &  $t_X$    & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ? & gap \\
 \begin{samepage}
 \underline{3D gauge color code}
 \begin{center}
-\begin{tabular}{ c|c|c|c|l|c } 
-$n$ &  $t_X$    & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ?  & gap \\
+\begin{tabular}{ |c|c|c|l|c| } 
+\hline
+$n$ & $w(s_Z)$ & $\lambda_1$ & $\ \ \ \ \lambda_2$ ?  & gap \\
 \hline
 \hline
-15  & 0         & &  25.455844  & 16.970563    &  \\
-                 &   & 8 &              & 22.214755 \checkmark & 3.241089           \\
+15  & 0 &  25.455844  & 16.970563    &  \\
+    & 8 &              & 22.214755 \checkmark & 3.241089           \\
 \hline
-%39  & 0         & &  64.476081   & 58.137233    &  \\
-%                 &           & 8 &              & 60.706477    &   \\
-%                 &           & 8 &              & 60.357053  &    \\
-%                 &           & 12 &              & 61.366348   &  \\
-%                 &           & 20 &              & 63.495916  \checkmark  & 0.980165 \\
-%\hline
-65  & 0         &    &  104.076026  & 99.014097     &    \\
-                 &           & 8  &              &  100.429340   &            \\
-                 &           & 12 &              &  100.585413   &            \\
-                 &           & 12 &              &  101.602340   &            \\
-                 &           & 18 &              &  102.382483  \checkmark  &  1.693543 \\
+65  & 0  &  104.076026  & 99.014097     &    \\
+    & 8  &              &  100.429340   &            \\
+    & 12 &              &  100.585413   &            \\
+    & 12 &              &  101.602340   &            \\
+    & 18 &              &  102.382483  \checkmark  &  1.693543 \\
 \hline
-175 & 0         &  &  267.197576  & 264.250644    & \\
- & & 8  & & 263.171190  &    \\
- & & 8  & & 263.324858  &    \\
- & & 8  & & 263.340832  &    \\
- & & 12 & &  264.269635  &    \\
- & & 12 & &  264.617135  &    \\
- & & 12 & &  264.745548  &    \\
- & & 18 & &  264.843629  &    \\
- & & 18 & &  265.413935  &    \\
- & & 18 & &  265.754772  &    \\
- & & 24 & &  266.148188  \checkmark &  1.04939  \\
+175 & 0  &  267.197576  & 264.250644    & \\
+ & 8  & & 263.171190  &    \\
+ & 8  & & 263.324858  &    \\
+ & 8  & & 263.340832  &    \\
+ & 12 & &  264.269635  &    \\
+ & 12 & &  264.617135  &    \\
+ & 12 & &  264.745548  &    \\
+ & 18 & &  264.843629  &    \\
+ & 18 & &  265.413935  &    \\
+ & 18 & &  265.754772  &    \\
+ & 24 & &  266.148188  \checkmark &  1.04939  \\
+\hline
 \end{tabular}
 \end{center}
 \end{samepage}
+
 
 \begin{figure*}
 \begin{center}
@@ -2849,8 +2946,7 @@ In this section we show how the Cheeger cut also
 yields a lower bound on the gap.
 %an upper bound on the second eigenvalue of a Perron-Frobenius
 %operator $H.$
-
-In \cite{Friedland2002}, they derive the following Cheeger inequality
+In \cite{Friedland2002} they derive the following Cheeger inequality
 by considering bi-partitions of the graph. We will do the
 same, but using matrix block notation.
 
